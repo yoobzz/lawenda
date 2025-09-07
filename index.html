@@ -2,18 +2,50 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>~||-_^+*.</title>
+    <meta name="description" content="wiersze stanisława szpinety — minimalistyczna interaktywna strona z poezją.">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="color-scheme" content="light">
+    <meta name="format-detection" content="telephone=no">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="~||-_^+*.">
+    <meta property="og:description" content="wiersze stanisława szpinety — minimalistyczna interaktywna strona z poezją.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="~||-_^+*.">
+    <meta name="twitter:description" content="wiersze stanisława szpinety — minimalistyczna interaktywna strona z poezją.">
+    <link rel="icon" href="favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <script>try{if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduced-motion')}}catch(e){}</script>
+    <script>
+      // ustaw --vh (1% wysokości okna) dla iOS i mobilnych przeglądarek
+      function setVh(){
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+      setVh();
+      window.addEventListener('resize', setVh);
+      window.addEventListener('orientationchange', setVh);
+    </script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        /* iOS 100vh fix i safe areas */
+        :root { --vh: 1vh; }
+        body { min-height: calc(var(--vh) * 100); }
+        .container, .poems-section { min-height: calc(var(--vh) * 100); }
+        .navigation, .controls {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .navigation { left: 50%; transform: translateX(-50%); }
 
         body {
             font-family: 'Geist', sans-serif;
@@ -47,9 +79,7 @@
             white-space: nowrap;
         }
 
-        .title:hover {
-            /* Usunięte wszystkie efekty hover - tylko animacja lawenda */
-        }
+        /* hover tytułu celowo bez efektów */
 
         .poems-section {
             display: none;
@@ -119,8 +149,8 @@
         }
 
         .nav-arrow {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             border: 2px solid #000000;
             background: transparent;
             cursor: pointer;
@@ -129,7 +159,7 @@
             align-items: center;
             justify-content: center;
             font-family: 'Geist Mono', monospace;
-            font-size: 16px;
+            font-size: 18px;
             color: #000000;
         }
 
@@ -152,11 +182,106 @@
 
         .nav-counter {
             font-family: 'Geist Mono', monospace;
-            font-size: 14px;
+            font-size: 16px;
             color: #000000;
             padding: 0 1rem;
         }
 
+
+        /* pasek postępu wierszy */
+        .progress {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.08);
+            z-index: 101;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #000000;
+            transition: width 0.3s ease;
+        }
+
+        /* kontrolki: tryb czytania + rozmiar tekstu */
+        .controls {
+            position: fixed;
+            right: 2rem;
+            bottom: 2rem;
+            display: none;
+            gap: 0.5rem;
+            align-items: center;
+            z-index: 102;
+        }
+        .control-btn {
+            background: transparent;
+            border: 0;
+            font-family: 'Geist Mono', monospace;
+            font-size: 16px;
+            color: #000000;
+            opacity: 0.8;
+            cursor: pointer;
+            padding: 8px 10px;
+            min-width: 44px; min-height: 44px; /* tap target */
+        }
+        .control-btn:hover, .control-btn:focus-visible {
+            opacity: 1;
+            text-decoration: underline;
+            outline: none;
+        }
+        .control-sep { color: rgba(0,0,0,0.25); }
+
+        /* focus states minimalne */
+        .nav-arrow:focus-visible, .bio-link:focus-visible, .help-close:focus-visible {
+            outline: 1px dotted #000000;
+            outline-offset: 3px;
+        }
+        .control-btn:focus-visible {
+            outline: 1px dotted #000000;
+            outline-offset: 2px;
+        }
+
+        /* skala czcionki wierszy */
+        :root { --poem-font-scale: 1; }
+        .poem { font-size: calc(1rem * var(--poem-font-scale)); }
+
+        /* tryb czytania */
+        .reading-mode .star-fog,
+        .reading-mode .poems-background,
+        .reading-mode #instructions { display: none !important; }
+        .reading-mode .poem { color: #000000; }
+
+        /* drukowanie */
+        @media print {
+            .star-fog, #navigation, #progress, #controls, #helpOverlay, #typingText, #poemTyping, #bioOverlay { display: none !important; }
+            .poems-section { display: block !important; }
+            .poem { display: none !important; }
+            .poem.active { display: block !important; opacity: 1 !important; transform: none !important; }
+            body { color: #000000; background: #ffffff; }
+            @page { margin: 20mm; }
+        }
+
+        /* toast kopiowania linku */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 3.5rem;
+            transform: translateX(-50%);
+            background: #000000;
+            color: #ffffff;
+            font-family: 'Geist Mono', monospace;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1500;
+        }
+        .toast.show { opacity: 0.85; }
 
 
         .instructions {
@@ -167,7 +292,30 @@
             font-size: 0.9rem;
             color: rgba(196, 181, 253, 0.7);
             opacity: 0;
+            transition: opacity 0.4s ease;
         }
+
+
+        /* overlay pomocy */
+        .help-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.95);
+            display: none;
+            z-index: 2000;
+        }
+        .help-overlay.show { display: block; }
+        .help-content {
+            max-width: 720px;
+            margin: 10vh auto;
+            padding: 2rem;
+            font-family: 'Geist Mono', monospace;
+            color: #000000;
+        }
+        .help-title { font-size: 1.2rem; margin-bottom: 1rem; }
+        .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
+        .help-key { color: #666666; }
+        .help-close { position: fixed; top: 1rem; right: 1rem; background: transparent; border: 0; font-size: 1.5rem; cursor: pointer; }
 
 
         .star-fog {
@@ -187,7 +335,7 @@
         .star-container {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: calc(var(--vh) * 100);
             animation: starMorph 15s ease-in-out infinite;
         }
 
@@ -378,9 +526,7 @@
             opacity: 1;
         }
 
-        .typing-text.completed {
-            /* Timer zostaje widoczny - brak animacji znikania */
-        }
+        /* .typing-text.completed bez zmian wizualnych */
 
         .typing-cursor {
             display: inline-block;
@@ -414,8 +560,9 @@
             letter-spacing: 0.1em;
             white-space: nowrap;
             opacity: 0;
-            display: flex; /* ukryj sekwencje znaków */
-        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               j
+            display: none; /* ukryj sekwencje znaków */
+            pointer-events: none;
+        }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
         .poem-typing.show {
@@ -578,9 +725,85 @@
             transform: translate(150px, -50%);
             width: 300px;
         }
+        /* respektuj preferencje reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+            .star-container {
+                animation: none !important;
+            }
+        }
+        html.reduced-motion * {
+            animation: none !important;
+            transition: none !important;
+        }
+
+        /* mobile layout dla bio */
+        @media (max-width: 640px) {
+            /* kontrolki i nawigacja nie powinny nachodzić na tekst */
+            .controls {
+                top: calc(env(safe-area-inset-top) + 8px);
+                right: 8px;
+                bottom: auto;
+                left: auto;
+                gap: 0.25rem;
+            }
+            .navigation {
+                bottom: calc(1rem + env(safe-area-inset-bottom));
+            }
+            .bio-overlay {
+                padding: 16px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                align-items: flex-start;
+                justify-content: flex-start;
+            }
+            .bio-content {
+                position: relative;
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+            .bio-photo {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+                width: 100%;
+                height: auto;
+                max-height: 40vh;
+            }
+            .bio-photo video { height: 100%; }
+            .bio-title {
+                position: static;
+                margin-top: 4px;
+            }
+            .bio-text {
+                position: static;
+                width: auto;
+                font-size: 1rem;
+            }
+            .bio-links {
+                position: static;
+                gap: 0.6rem;
+            }
+            .spotify-widget {
+                position: static;
+                transform: none;
+                width: 100%;
+            }
+            .bio-extra-text-1 { display: none; }
+            .bio-close { top: 0.5rem; right: 0.5rem; }
+        }
     </style>
 </head>
 <body>
+    <noscript>ta strona wymaga włączonego javascriptu, aby działać poprawnie.</noscript>
     <div class="star-fog" id="starFog">
         <div class="star-container" id="starContainer"></div>
     </div>
@@ -2508,19 +2731,47 @@
         <button class="nav-arrow" id="nextBtn">›</button>
     </div>
 
+    <div class="progress" id="progress">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="controls" id="controls" aria-label="kontrolki czytania">
+        <button class="control-btn" id="fontSmaller" title="mniejszy tekst">a</button>
+        <button class="control-btn" id="fontBigger" title="większy tekst">A</button>
+        <span class="control-sep">/</span>
+        <button class="control-btn" id="copyLink" title="kopiuj link do wiersza">link</button>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite">skopiowano link</div>
+
     <div class="instructions" id="instructions">
         scroll: nawigacja • przyciski: poprzedni/następny • kliknij lewą/prawą stronę ekranu
     </div>
     
+    <div class="help-overlay" id="helpOverlay" aria-hidden="true">
+        <button class="help-close" id="helpClose" aria-label="zamknij pomoc">×</button>
+        <div class="help-content">
+            <div class="help-title">skrót klawiszowy „?” — pomoc</div>
+            <div class="help-grid">
+                <div class="help-key">← / →</div><div>poprzedni / następny wiersz</div>
+                <div class="help-key">↑ / ↓</div><div>poprzedni / następny wiersz</div>
+                <div class="help-key">PageUp / PageDown</div><div>o jeden wiersz</div>
+                <div class="help-key">Home / End</div><div>pierwszy / ostatni</div>
+                <div class="help-key">1–9</div><div>szybki skok</div>
+                <div class="help-key">g</div><div>skok do numeru</div>
+                <div class="help-key">r</div><div>losowy wiersz</div>
+                <div class="help-key">klik lewa/prawa</div><div>poprzedni / następny</div>
+                <div class="help-key">#wiersz-N</div><div>link bezpośredni</div>
+            </div>
+        </div>
+    </div>
+
     
     
 
     <div class="typing-text" id="typingText">
         <span id="typedText"></span><span class="typing-cursor"></span>
     </div>
-    <div class="poem-typing" id="poemTyping">
-        <span id="poemTypedText"></span><span class="typing-cursor"></span>
-    </div>
+    <!-- sekwencja znaków wyłączona -->
 
     <div class="bio-overlay" id="bioOverlay">
         <button class="bio-close" id="bioClose">×</button>
@@ -2554,6 +2805,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         let isAnimating = false;
         const poems = document.querySelectorAll('.poem');
         const navDots = document.querySelectorAll('.nav-dot');
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
         // super wydajna fala 3d z więcej znaków
         function createStarFog() {
@@ -2561,7 +2813,9 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             const chars = ['_', '-', '~', '"', '|',',', '*', '^', ':', ';','.', '+', '=', '`', "'", '!'];
             
             // Mniej gęste, bardziej losowe cząsteczki
-            for (let i = 0; i < 1200; i++) {
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const count = isTouch ? 500 : 1200;
+            for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'star-particle';
                 particle.textContent = chars[Math.floor(Math.random() * chars.length)];
@@ -2629,13 +2883,44 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                     createPoemsBackground();
                 }, 100);
                 
-                // Pokaż nawigację
+                // Pokaż nawigację i kontrolki
                 document.getElementById('navigation').style.display = 'flex';
+                document.getElementById('controls').style.display = 'flex';
                 
-                // Uruchom animacje dla pierwszego wiersza
+                // Ustal indeks startowy: hash lub pamięć lokalna
+                const hashMatch = window.location.hash.match(/^#wiersz-(\d+)$/);
+                const stored = localStorage.getItem('lastPoemIndex');
+                let startIndex = 0;
+                if (hashMatch) {
+                    const n = parseInt(hashMatch[1], 10);
+                    if (!Number.isNaN(n) && n >= 1 && n <= poems.length) startIndex = n - 1;
+                } else if (stored !== null) {
+                    const n = parseInt(stored, 10);
+                    if (!Number.isNaN(n) && n >= 0 && n < poems.length) startIndex = n;
+                }
+
+                // Aktywuj właściwy wiersz
+                document.querySelector('.poem.active')?.classList.remove('active');
+                poems[startIndex].classList.add('active');
+                currentPoem = startIndex;
+
+                // Animacje i nawigacja
                 startPoemBreathing();
-                startPoemTyping(0);
+                // startPoemTyping(currentPoem); // wyłączone
                 updateNavigation();
+                updateHashAndStore();
+
+                // Pokaż instrukcje na kilka sekund po przejściu
+                const instr = document.getElementById('instructions');
+                if (instr) {
+                    instr.style.opacity = '1';
+                    setTimeout(() => { instr.style.opacity = '0'; }, 3500);
+                }
+            
+                // wyczyść automatyczne animacje na mobile
+                try { if (__autoLawendaStop) clearTimeout(__autoLawendaStop); } catch(e) {}
+                try { if (__autoStasTimer) clearInterval(__autoStasTimer); } catch(e) {}
+            
             }, 500);
         }
 
@@ -2651,6 +2936,17 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             
             // Aktualizuj licznik
             navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
+
+            // Aktualizuj pasek postępu
+            updateProgress();
+        }
+
+        // Pasek postępu
+        function updateProgress() {
+            const fill = document.getElementById('progressFill');
+            if (!fill) return;
+            const percent = poems.length > 0 ? ((currentPoem + 1) / poems.length) * 100 : 0;
+            fill.style.width = percent + '%';
         }
 
         // Nawigacja między wierszami
@@ -2679,7 +2975,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                     // Uruchom animacje po zakończeniu
                     setTimeout(() => {
                         startPoemBreathing();
-                        startPoemTyping(index);
+                        // startPoemTyping(index); // wyłączone
                         isAnimating = false;
                     }, 300);
                 }, 50);
@@ -2689,8 +2985,30 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             
             // Aktualizuj nawigację
             updateNavigation();
+            updateHashAndStore();
         
         }
+
+        // Hash i zapamiętywanie pozycji
+        function updateHashAndStore() {
+            const newHash = `#wiersz-${currentPoem + 1}`;
+            if (window.location.hash !== newHash) {
+                history.replaceState(null, '', newHash);
+            }
+            try { localStorage.setItem('lastPoemIndex', String(currentPoem)); } catch(e) {}
+        }
+
+        // Obsługa wejścia przez hash po załadowaniu (gdy już przeszliśmy do wierszy)
+        window.addEventListener('hashchange', () => {
+            if (!hasTransitioned) return;
+            const m = window.location.hash.match(/^#wiersz-(\d+)$/);
+            if (m) {
+                const n = parseInt(m[1], 10);
+                if (!Number.isNaN(n) && n >= 1 && n <= poems.length) {
+                    goToPoem(n - 1);
+                }
+            }
+        });
 
 
         // Animacja oddychania wiersza
@@ -3271,6 +3589,29 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         
         // Start typing animation - pisze tytuł dużymi literami
         startTyping();
+        // Na urządzeniach dotykowych: automatyczne animacje na landing page
+        let __autoLawendaStop = null;
+        let __autoStasTimer = null;
+        if (isTouchDevice) {
+            // odczekaj aż canTransition będzie true (koniec timera)
+            const waitForReady = setInterval(() => {
+                if (typeof canTransition !== 'undefined' && canTransition) {
+                    clearInterval(waitForReady);
+                    // losowo co 6–14s animuj tytuł
+                    let alive = true;
+                    (function loopLawenda(){
+                        if (!alive || hasTransitioned) return;
+                        const delay = 6000 + Math.random()*8000;
+                        __autoLawendaStop = setTimeout(() => { animateLawenda(); loopLawenda(); }, delay);
+                    })();
+                    // co 10s delikatnie animuj "staś"
+                    __autoStasTimer = setInterval(() => {
+                        if (hasTransitioned) return;
+                        animateStas();
+                    }, 10000);
+                }
+            }, 300);
+        }
         
         // Apply glitch animation to poems will be called when needed
 
@@ -3342,6 +3683,15 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 goToPoem(currentPoem + 1);
             }
             
+            // Pomoc — overlay pod "?"
+            if (e.key === '?') {
+                e.preventDefault();
+                const help = document.getElementById('helpOverlay');
+                help.classList.add('show');
+                help.setAttribute('aria-hidden', 'false');
+                return;
+            }
+
             // Szybki skok do pierwszych 9 wierszy
             else if (e.key >= '1' && e.key <= '9') {
                 e.preventDefault();
@@ -3400,6 +3750,26 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 const randomIndex = Math.floor(Math.random() * poems.length);
                 goToPoem(randomIndex);
             }
+            // zmiana rozmiaru tekstu (cmd/ctrl + + / -)
+            else if ((e.key === '+' || e.key === '=') && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                adjustFontScale(0.05);
+            } else if (e.key === '-' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                adjustFontScale(-0.05);
+            }
+        });
+
+        // zamknięcie overlayu pomocy
+        document.getElementById('helpClose').addEventListener('click', () => {
+            const help = document.getElementById('helpOverlay');
+            help.classList.remove('show');
+            help.setAttribute('aria-hidden', 'true');
+        });
+        document.getElementById('helpOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'helpOverlay') {
+                document.getElementById('helpClose').click();
+            }
         });
 
         // Nawigacja przyciskami
@@ -3411,6 +3781,51 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             }
         });
 
+        // Kontrolki
+        function toggleReadingMode() {
+            const pressed = document.body.classList.toggle('reading-mode');
+            // kontrolka trybu czytania usunięta
+        }
+
+        function adjustFontScale(delta) {
+            const root = document.documentElement;
+            const current = parseFloat(getComputedStyle(root).getPropertyValue('--poem-font-scale')) || 1;
+            const next = Math.min(1.6, Math.max(0.8, current + delta));
+            root.style.setProperty('--poem-font-scale', String(next));
+            try { localStorage.setItem('poemFontScale', String(next)); } catch(e) {}
+        }
+
+        function restoreFontScale() {
+            try {
+                const v = parseFloat(localStorage.getItem('poemFontScale'));
+                if (!Number.isNaN(v) && v >= 0.8 && v <= 1.6) {
+                    document.documentElement.style.setProperty('--poem-font-scale', String(v));
+                }
+            } catch(e) {}
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (!t) return;
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => t.classList.remove('show'), 1200);
+        }
+
+        // przycisk trybu czytania usunięty
+        document.getElementById('fontSmaller').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); adjustFontScale(-0.05); });
+        document.getElementById('fontBigger').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); adjustFontScale(0.05); });
+        document.getElementById('copyLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const link = location.origin + location.pathname + `#wiersz-${currentPoem + 1}`;
+            try { await navigator.clipboard.writeText(link); showToast('skopiowano link'); }
+            catch(e) { showToast('nie udało się skopiować'); }
+        });
+
+        // przy wejściu przywróć skalę czcionki
+        restoreFontScale();
         document.getElementById('nextBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -3443,16 +3858,63 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             }
         }, { passive: false });
 
+        // Swipe na urządzeniach dotykowych
+        let touchStartX = null;
+        let touchStartY = null;
+        let touchStartTime = 0;
+        const SWIPE_DISTANCE = 40; // px
+        const SWIPE_TIME = 500; // ms
+
+        document.addEventListener('touchstart', (e) => {
+            if (!hasTransitioned) return;
+            const t = e.changedTouches[0];
+            touchStartX = t.clientX;
+            touchStartY = t.clientY;
+            touchStartTime = Date.now();
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (!hasTransitioned || touchStartX === null) return;
+            const t = e.changedTouches[0];
+            const dx = t.clientX - touchStartX;
+            const dy = t.clientY - touchStartY;
+            const dt = Date.now() - touchStartTime;
+
+            // horyzontalny gest, niewielki dryf pionowy i w czasie
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_DISTANCE && dt < SWIPE_TIME) {
+                if (dx < 0 && currentPoem < poems.length - 1) {
+                    goToPoem(currentPoem + 1);
+                } else if (dx > 0 && currentPoem > 0) {
+                    goToPoem(currentPoem - 1);
+                }
+            }
+
+            touchStartX = touchStartY = null;
+        }, { passive: true });
+
         // Kliknięcie w lewą/prawą stronę ekranu
         document.addEventListener('click', (e) => {
             if (!hasTransitioned) return;
             
-            // Sprawdź czy kliknięcie nie jest w przycisku nawigacji
+            // na mobile wyłącz klik na pół ekranu
+            if (isTouchDevice) return;
+
+            // zignoruj kliknięcia w interaktywne elementy
             if (e.target.id === 'prevBtn' || e.target.id === 'nextBtn' || 
-                e.target.closest('#prevBtn') || e.target.closest('#nextBtn')) {
+                e.target.closest('#prevBtn') || e.target.closest('#nextBtn') ||
+                e.target.closest('#controls') ||
+                e.target.closest('#navigation') ||
+                e.target.closest('#helpOverlay') ||
+                e.target.closest('#bioOverlay') ||
+                e.target.closest('a') ||
+                e.target.closest('#authorName') ||
+                e.target.closest('#toast')) {
                 return;
             }
             
+            // tylko klik w obszarze sekcji wierszy steruje nawigacją
+            if (!e.target.closest('#poemsSection')) return;
+
             const windowWidth = window.innerWidth;
             const clickX = e.clientX;
             
