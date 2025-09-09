@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -147,6 +148,25 @@
             color: #000000;
             transform: none;
         }
+
+        /* powrót do startu */
+        .back-button {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: transparent;
+            border: 0;
+            font-family: 'Geist Mono', monospace;
+            font-size: 14px;
+            color: #000000;
+            opacity: 0.4;
+            cursor: pointer;
+            padding: 6px 8px;
+            display: none;
+            z-index: 110;
+        }
+
+        .back-button:hover { opacity: 0.8; }
 
         .nav-counter {
             font-family: 'Geist Mono', monospace;
@@ -655,13 +675,14 @@
     
     <div class="container" id="landingContainer">
         <h1 class="title title-emerging" id="title">~||-_^+*.</h1>
-        <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.8rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.15em; font-family: 'Geist Mono', monospace; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
+        <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.8rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.15em; font-family: 'IBM Plex Mono', 'Geist Mono', monospace; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
         </div>
     </div>
 
     <div class="poems-section" id="poemsSection">
         <div class="poems-background" id="poemsBackground"></div>
+        <button class="back-button" id="backToStart" title="wróć">← start</button>
         <div class="poem active poem-breathing" data-index="0">
             po pełni<br>
             (z)nów<br><br>
@@ -2604,7 +2625,7 @@
             </video>
             <h2 class="bio-title"><span class="bio-first-name">staś</span> <span class="bio-last-name">szpineta</span></h2>
             <p class="bio-text">
-to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszystko musi mieć sens. piszę, bo wiersze są dla mnie naturalnym i jedynym sposobem, żeby nie zgubić siebie w sobie i w świecie. to moja codzienność, pamięć, myśli, emocje, wspomnienia, a czasem rozmowa z kimś, kogo już nie ma albo kto jest bardzo blisko. w tekstach dodaję znaki, traktując je jako coś, czego nie da się zapisać słowami. to mój własny język. mój tworzony od kilku lat zbiór „lawenda" to pierwszy krok do pokazania ludziom mojego świata. oprócz pisania tworzę muzykę, biżuterię, maluję, projektuję. kocham naturę, wschody słońca, ciszę i dźwięk analogowych kaset audio.
+nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszystko musi mieć sens. piszę, bo wiersze są dla mnie naturalnym i jedynym sposobem, żeby nie zgubić siebie w sobie i w świecie. to moja codzienność, pamięć, myśli, emocje, wspomnienia, a czasem rozmowa z kimś, kogo już nie ma albo kto jest bardzo blisko. w tekstach dodaję znaki, traktując je jako coś, czego nie da się zapisać słowami. to mój własny język. mój tworzony od kilku lat zbiór „lawenda" to pierwszy krok do pokazania ludziom mojego świata. oprócz pisania tworzę muzykę, biżuterię, maluję, projektuję. kocham naturę, wschody słońca, ciszę i dźwięk analogowych kaset audio.
             </p>
             <div class="bio-links">
                 <a href="mailto:stas.mono123@gmail.com" class="bio-link">email</a>
@@ -2707,10 +2728,26 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 // Pokaż nawigację i kontrolki
                 document.getElementById('navigation').style.display = 'flex';
                 document.getElementById('controls').style.display = 'flex';
+                document.getElementById('backToStart').style.display = 'block';
                 
                 // Uruchom animacje dla pierwszego wiersza
+                // Jeśli hash lub zapis w localStorage, ustaw odpowiedni wiersz
+                const hashMatch = location.hash.match(/^#wiersz-(\d+)$/);
+                const savedIndex = parseInt(localStorage.getItem('poemIndex') || '1');
+                let startIndex = 1;
+                if (hashMatch) {
+                    startIndex = Math.max(1, Math.min(poems.length, parseInt(hashMatch[1])));
+                } else if (!isNaN(savedIndex) && savedIndex >= 1 && savedIndex <= poems.length) {
+                    startIndex = savedIndex;
+                }
+
+                if (startIndex > 1) {
+                    currentPoem = 0;
+                    goToPoem(startIndex - 1);
+                }
+
                 startPoemBreathing();
-                startPoemTyping(0);
+                startPoemTyping(currentPoem);
                 updateNavigation();
             }, 500);
         }
@@ -2763,6 +2800,14 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             
             currentPoem = index;
             
+            // zapamiętaj pozycję
+            try { localStorage.setItem('poemIndex', String(currentPoem + 1)); } catch(e) {}
+            // aktualizuj hash bez przewijania
+            const newHash = `#wiersz-${currentPoem + 1}`;
+            if (location.hash !== newHash) {
+                history.replaceState(null, '', location.pathname + newHash);
+            }
+
             // Aktualizuj nawigację
             updateNavigation();
         
@@ -2950,19 +2995,21 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         // Animacja pisania tytułu po timerze
         function startTitleTyping() {
             const title = document.getElementById('title');
-            const text = '"~||-_^+*.';
+            const text = '~||-_^+*.';
             const charDelay = 120; // 120ms między znakami (przyspieszone)
             
             title.textContent = '';
             title.style.opacity = '0.6';
             
             let index = 0;
+            window.__isTitleTyping = true;
             const typingInterval = setInterval(() => {
                 if (index < text.length) {
                     title.textContent += text[index];
                     index++;
                 } else {
                     clearInterval(typingInterval);
+                    window.__isTitleTyping = false;
                     
                     // Po ostatnim znaku tytułu - pojawia się tło
                     createStarFog();
@@ -3230,7 +3277,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
 
         // Animacja "lawenda" - zamienia znaczki na "lawenda" i z powrotem
         function animateLawenda() {
-            if (isAnimating) return; // Nie uruchamiaj jeśli już trwa animacja
+            if (isAnimating || window.__isTitleTyping) return; // Nie uruchamiaj jeśli trwa pisanie tytułu lub animacja
             
             isAnimating = true;
             const title = document.getElementById('title');
@@ -3347,12 +3394,40 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         
         // Start typing animation - pisze tytuł dużymi literami
         startTyping();
+        // Autoanimacje: najpierw jednorazowo po chwili, potem co ~10s (naprzemiennie)
+        (function setupAutoAnimations(){
+            let cleared = false;
+            const clearAll = () => { cleared = true; };
+            // wyczyść przy przejściu do wierszy
+            const origTransition = transitionToPoems;
+            window.transitionToPoems = function(){ clearAll(); return origTransition.apply(this, arguments); };
+
+            // uruchom po gotowości (canTransition)
+            const readyInt = setInterval(() => {
+                if (canTransition) {
+                    clearInterval(readyInt);
+                    if (cleared) return;
+                    // jednorazowo: tytuł po 1200ms, imię po 2500ms
+                    setTimeout(() => { if (!cleared) animateLawenda(); }, 1200);
+                    setTimeout(() => { if (!cleared) animateStas(); }, 2500);
+                    // cyklicznie naprzemiennie co ~10s
+                    let toggle = true;
+                    const loop = () => {
+                        if (cleared || hasTransitioned) return;
+                        if (toggle) animateLawenda(); else animateStas();
+                        toggle = !toggle;
+                        setTimeout(loop, 10000);
+                    };
+                    setTimeout(loop, 10000);
+                }
+            }, 200);
+        })();
         
         // Apply glitch animation to poems will be called when needed
 
         document.getElementById('title').addEventListener('click', () => {
             if (canTransition) {
-                transitionToPoems();
+                window.location.href = 'poems.html';
             } else {
                 // Pokaż komunikat że trzeba poczekać
                 const title = document.getElementById('title');
@@ -3366,6 +3441,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 }, 1000);
             }
         });
+
 
         // Animacja "lawenda" przy najezdzaniu na tytuł
         document.getElementById('title').addEventListener('mouseenter', () => {
@@ -3386,7 +3462,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     if (canTransition) {
-                        transitionToPoems();
+                        window.location.href = 'poems.html';
                     } else {
                         // Pokaż komunikat że trzeba poczekać
                         const title = document.getElementById('title');
@@ -3475,6 +3551,14 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 e.preventDefault();
                 const randomIndex = Math.floor(Math.random() * poems.length);
                 goToPoem(randomIndex);
+            }
+            // wyjście Esc
+            else if (e.key === 'Escape' && hasTransitioned) {
+                e.preventDefault();
+                const backBtn = document.getElementById('backToStart');
+                if (backBtn && backBtn.style.display !== 'none') {
+                    backBtn.click();
+                }
             }
         });
 
@@ -3571,7 +3655,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             
             // Sprawdź czy kliknięcie nie jest w przycisku nawigacji
             if (e.target.id === 'prevBtn' || e.target.id === 'nextBtn' || 
-                e.target.closest('#prevBtn') || e.target.closest('#nextBtn')) {
+                e.target.closest('#prevBtn') || e.target.closest('#nextBtn') || e.target.closest('#backToStart')) {
                 return;
             }
             
@@ -3588,6 +3672,104 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             }
         });
 
+        // powrót do ekranu startowego
+        function returnToLanding() {
+            if (!hasTransitioned) return;
+            hasTransitioned = false;
+            document.getElementById('poemsSection').style.display = 'none';
+            document.getElementById('navigation').style.display = 'none';
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('backToStart').style.display = 'none';
+            
+            // resetuj stan strony tytułowej
+            const starFog = document.getElementById('starFog');
+            const landing = document.getElementById('landingContainer');
+            const title = document.getElementById('title');
+            const authorName = document.getElementById('authorName');
+            const typingText = document.getElementById('typingText');
+            
+            // przywróć elementy
+            starFog.style.display = 'flex';
+            starFog.style.opacity = '1';
+            starFog.style.position = 'fixed';
+            starFog.style.top = '0';
+            starFog.style.left = '0';
+            starFog.style.width = '100%';
+            starFog.style.height = '100%';
+            starFog.style.pointerEvents = 'none';
+            starFog.style.zIndex = '1';
+            starFog.style.perspective = '2000px';
+            starFog.style.alignItems = 'center';
+            starFog.style.justifyContent = 'center';
+            landing.style.display = 'block';
+            landing.style.opacity = '0';
+            typingText.style.display = 'block';
+            
+            // resetuj tytuł i imię do stanu początkowego
+            title.textContent = '~||-_^+*.';
+            title.style.color = '#1a1a1a';
+            title.style.opacity = '0';
+            authorName.style.opacity = '0';
+            authorName.style.position = 'absolute';
+            authorName.style.bottom = '3rem';
+            
+            // resetuj timer
+            const typedText = document.getElementById('typedText');
+            if (typedText) typedText.textContent = '';
+            
+            // resetuj canTransition
+            canTransition = false;
+            
+            // resetuj tło body
+            document.body.style.background = '';
+            
+            // usuń hash z URL (ale zachowaj localStorage)
+            history.replaceState(null, '', location.pathname);
+            
+            // nie regeneruj tła - zostaw istniejące cząsteczki
+            // tylko upewnij się że są widoczne
+            const starContainer = document.getElementById('starContainer');
+            const particles = starContainer.querySelectorAll('.star-particle');
+            particles.forEach(particle => {
+                particle.style.opacity = '1';
+                particle.classList.remove('typing-in');
+                particle.classList.add('typing-in');
+            });
+            
+            // uruchom animacje od nowa - identycznie jak przy pierwszym załadowaniu
+            setTimeout(() => {
+                landing.style.opacity = '1';
+                // uruchom timer od nowa
+                startTyping();
+                
+                // uruchom autoanimacje po gotowości - identycznie jak w setupAutoAnimations
+                const readyInt = setInterval(() => {
+                    if (canTransition) {
+                        clearInterval(readyInt);
+                        // jednorazowo: tytuł po 1200ms, imię po 2500ms
+                        setTimeout(() => { if (!hasTransitioned) animateLawenda(); }, 1200);
+                        setTimeout(() => { if (!hasTransitioned) animateStas(); }, 2500);
+                        // cyklicznie naprzemiennie co ~10s
+                        let toggle = true;
+                        const loop = () => {
+                            if (hasTransitioned) return;
+                            if (toggle) animateLawenda(); else animateStas();
+                            toggle = !toggle;
+                            setTimeout(loop, 10000);
+                        };
+                        setTimeout(loop, 10000);
+                    }
+                }, 200);
+            }, 100);
+        }
+
+        // klik przycisku powrotu
+        document.getElementById('backToStart').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            returnToLanding();
+        });
+
 
         // Kliknięcie w sekwencję znaków - zamień wiersz na symbole (wyłączone)
         // document.getElementById('poemTyping').addEventListener('click', (e) => {
@@ -3602,18 +3784,16 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         // Interaktywność imienia - bio overlay
         const authorEl = document.getElementById('authorName');
         authorEl.addEventListener('click', () => {
-            const bioOverlay = document.getElementById('bioOverlay');
-            bioOverlay.classList.add('show');
-            
-            // Prosta animacja wejścia
-            setTimeout(() => {
-                gsap.fromTo('.bio-content', 
-                    { opacity: 0 },
-                    { opacity: 1, duration: 0.5, ease: "power2.out" }
-                );
-            }, 100);
+            window.location.href = 'bio.html';
         });
         authorEl.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); authorEl.click(); }, { passive: false });
+
+        // klik poza bio-content zamyka bio
+        document.getElementById('bioOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'bioOverlay') {
+                document.getElementById('bioClose').click();
+            }
+        });
 
         // Zamknij bio
         document.getElementById('bioClose').addEventListener('click', () => {
