@@ -38,10 +38,11 @@
             background: #ffffff;
             color: #1a1a1a;
             overflow-x: hidden;
+            touch-action: manipulation;
         }
 
         .container {
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -56,7 +57,7 @@
             letter-spacing: 0.15em;
             color: #000000;
             user-select: none;
-            cursor: wait;
+            cursor: pointer;
             transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             opacity: 0;
             display: block;
@@ -69,7 +70,7 @@
 
         .poems-section {
             display: none;
-            min-height: 100vh;
+            min-height: 100dvh;
             position: relative;
             perspective: 1200px;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
@@ -113,6 +114,8 @@
             padding: 2rem 2rem 160px 2rem;
             opacity: 0;
             transform: translateY(30px);
+            content-visibility: auto;
+            contain-intrinsic-size: 80vh;
         }
 
 
@@ -277,7 +280,7 @@
         .star-container {
             position: relative;
             width: 100vw;
-            height: 100vh;
+            height: 100dvh;
             animation: starMorph 15s ease-in-out infinite;
         }
 
@@ -498,6 +501,11 @@
         }
         @media (prefers-reduced-motion: reduce) {
             * { animation: none !important; transition: none !important; }
+        }
+
+        /* iOS: całkowicie wyłącz tło gwiazd, aby zapobiec zacięciom */
+        @supports (-webkit-touch-callout: none) {
+            .star-fog { display: none !important; }
         }
 
         .poem-typing {
@@ -2726,7 +2734,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             
             // Mniej gęste, bardziej losowe cząsteczki
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            const count = isTouch ? 900 : 2000;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
+            const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduced) return; // nie generuj cząsteczek przy reduced motion
+            const count = isIOS ? 0 : (isTouch ? 400 : 1500);
             for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'star-particle';
@@ -2750,7 +2761,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             particles.forEach((particle, index) => {
                 setTimeout(() => {
                     particle.classList.add('typing-in');
-                }, index * 50); // 50ms między każdą cząsteczką (jak timer)
+                }, Math.min(index * 30, 1200));
             });
         }
 
@@ -2894,7 +2905,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             background.innerHTML = '';
             
             // Stwórz subtelne cząsteczki
-            const particleCount = 15;
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
+            const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const particleCount = (reduced || isIOS) ? 0 : (isTouch ? 6 : 15);
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'poem-particle';
@@ -2919,11 +2933,13 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             
             document.addEventListener('mousemove', (e) => {
                 if (!hasTransitioned) return;
+                if (isTouch) return; // nie liczmy drogich hover interakcji na dotyk
                 
                 mouseX = e.clientX;
                 mouseY = e.clientY;
                 
                 const particles = background.querySelectorAll('.poem-particle');
+                if (isTouch) return; // pomiń drogie liczenia na dotyk
                 particles.forEach((particle, index) => {
                     const rect = particle.getBoundingClientRect();
                     const particleX = rect.left + rect.width / 2;
@@ -2962,14 +2978,17 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             let timerX = window.innerWidth / 2;
             let timerY = 2 * 16; // 2rem w pikselach
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
+            const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             const gyroMultiplier = 5; // zwiększona czułość
-            const maxDistMouse = isTouch ? 220 : 100;
-            const maxDistTimer = isTouch ? 280 : 150;
-            const pushMouse = isTouch ? 80 : 30;
-            const pushTimer = isTouch ? 140 : 50;
+            const maxDistMouse = isTouch ? 160 : 100;
+            const maxDistTimer = isTouch ? 200 : 150;
+            const pushMouse = isTouch ? 40 : 30;
+            const pushTimer = isTouch ? 80 : 50;
             let animId = null;
 
             document.addEventListener('mousemove', (e) => {
+                if (isTouch || isIOS || reduced) return;
                 mouseX = e.clientX;
                 mouseY = e.clientY;
                 updateParticles();
@@ -3037,6 +3056,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
             function updateParticles() {
                 const particles = container.querySelectorAll('.star-particle');
+                if (isTouch || isIOS || reduced) return; // pomiń na mobile/reduced motion
                 particles.forEach(particle => {
                     const rect = particle.getBoundingClientRect();
                     const particleX = rect.left + rect.width / 2;
@@ -3147,9 +3167,16 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     clearInterval(typingInterval);
                     window.__isTitleTyping = false;
                     
-                    // Po ostatnim znaku tytułu - pojawia się tło
-                    createStarFog();
-                    createInteractiveBackground();
+                    // Po ostatnim znaku tytułu - pojawia się tło (bez efektów na iOS/touch)
+                    (function(){
+                        const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
+                        const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                        if (!isIOS && !reduced) {
+                            createStarFog();
+                            createInteractiveBackground();
+                        }
+                    })();
                     
                     // Potem imię - pisanie jak timer
                     setTimeout(() => {
@@ -3293,8 +3320,11 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             '~+*_^~+*_^~+*_^~+*_^~+*_^',
             '_*^~+_*^~+_*^~+_*^~+_*^~+',
             '+*_~^+*_~^+*_~^+*_~^+*_~^',
-            '~+*_^~+*_^~+*_^~+*_^~+*_^',
-            '_*^~+_*^~+_*^~+_*^~+_*^~+',
+            '*^+_~*^+_~*^+_~*^+_~*^+_~',
+            '^~_*+^~_*+^~_*+^~_*+^~_*+',
+            '+_^*~+_^*~+_^*~+_^*~+_^*~',
+            '~*+^_~*+^_~*+^_~*+^_~*+^_',
+            '_^+*~_^+*~_^+*~_^+*~_^+*~',
             '*~_^+*~_^+*~_^+*~_^+*~_^+',
             '^+*_~^+*_~^+*_~^+*_~^+*_~',
             '+_~^*+_~^*+_~^*+_~^*+_~^*',
@@ -3304,6 +3334,12 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             '*~_+^*~_+^*~_+^*~_+^*~_+^',
             '~+*_^~+*_^~+*_^~+*_^~+*_^',
             '_*^~+_*^~+_*^~+_*^~+_*^~+',
+            '+*_~^+*_~^+*_~^+*_~^+*_~^',
+            '*^+_~*^+_~*^+_~*^+_~*^+_~',
+            '^~_*+^~_*+^~_*+^~_*+^~_*+',
+            '+_^*~+_^*~+_^*~+_^*~+_^*~',
+            '~*+^_~*+^_~*+^_~*+^_~*+^_',
+            '_^+*~_^+*~_^+*~_^+*~_^+*~',
             '*~_^+*~_^+*~_^+*~_^+*~_^+',
             '^+*_~^+*_~^+*_~^+*_~^+*_~',
             '+_~^*+_~^*+_~^*+_~^*+_~^*',
@@ -3313,6 +3349,12 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             '*~_+^*~_+^*~_+^*~_+^*~_+^',
             '~+*_^~+*_^~+*_^~+*_^~+*_^',
             '_*^~+_*^~+_*^~+_*^~+_*^~+',
+            '+*_~^+*_~^+*_~^+*_~^+*_~^',
+            '*^+_~*^+_~*^+_~*^+_~*^+_~',
+            '^~_*+^~_*+^~_*+^~_*+^~_*+',
+            '+_^*~+_^*~+_^*~+_^*~+_^*~',
+            '~*+^_~*+^_~*+^_~*+^_~*+^_',
+            '_^+*~_^+*~_^+*~_^+*~_^+*~',
             '*~_^+*~_^+*~_^+*~_^+*~_^+',
             '^+*_~^+*_~^+*_~^+*_~^+*_~',
             '+_~^*+_~^*+_~^*+_~^*+_~^*',
@@ -3322,6 +3364,12 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             '*~_+^*~_+^*~_+^*~_+^*~_+^',
             '~+*_^~+*_^~+*_^~+*_^~+*_^',
             '_*^~+_*^~+_*^~+_*^~+_*^~+',
+            '+*_~^+*_~^+*_~^+*_~^+*_~^',
+            '*^+_~*^+_~*^+_~*^+_~*^+_~',
+            '^~_*+^~_*+^~_*+^~_*+^~_*+',
+            '+_^*~+_^*~+_^*~+_^*~+_^*~',
+            '~*+^_~*+^_~*+^_~*+^_~*+^_',
+            '_^+*~_^+*~_^+*~_^+*~_^+*~',
             '*~_^+*~_^+*~_^+*~_^+*~_^+',
             '^+*_~^+*_~^+*_~^+*_~^+*_~',
             '+_~^*+_~^*+_~^*+_~^*+_~^*',
