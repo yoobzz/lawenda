@@ -1,0 +1,2471 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>wiersze — ~||-_^+*.</title>
+    <meta name="description" content="staś szpineta archiwum">
+    <meta property="og:title" content="~||-_^+*.">
+    <meta property="og:description" content="staś szpineta archiwum">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+    <meta property="og:url" content="https://szpineta.pl/poems.html">
+    <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="~||-_^+*.">
+    <meta name="twitter:description" content="staś szpineta archiwum">
+    <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <script defer data-domain="szpineta.pl" src="https://plausible.io/js/script.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wiersze — ~||-_^+*.</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    
+    <meta name="description" content="staś szpineta archiwum">
+    <meta property="og:title" content="~||-_^+*.">
+    <meta property="og:description" content="staś szpineta archiwum">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+    <meta property="og:url" content="https://szpineta.pl/poems.html">
+    <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="~||-_^+*.">
+    <meta name="twitter:description" content="staś szpineta archiwum">
+    <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Geist', sans-serif; background: #ffffff; color: #1a1a1a; }
+        .poems-section { min-height: 100vh; position: relative; perspective: 1200px; background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%); overflow: hidden; }
+        .poems-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .poem-particle { position: absolute; width: 2px; height: 2px; background: rgba(200, 200, 200, 0.3); border-radius: 50%; pointer-events: none; transition: all 0.3s ease; }
+        .poem { min-height: calc(100vh - 160px); display: none; align-items: center; justify-content: center; text-align: left; font-weight: 300; line-height: 1.6; color: #000000; padding: 2rem 2rem 160px 2rem; opacity: 0; transform: translateY(30px); }
+        .poem.active { display: flex; opacity: 1; transform: translateY(0); }
+        .navigation { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 1rem; z-index: 100; align-items: center; }
+        .nav-arrow { width: 40px; height: 40px; border: 2px solid #000000; background: transparent; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-family: 'Geist', sans-serif; font-size: 16px; color: #000000; }
+        .nav-arrow:hover { background: #000000; color: #ffffff; transform: scale(1.1); }
+        .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+        .nav-arrow:disabled:hover { background: transparent; color: #000000; transform: none; }
+        .nav-counter { font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; padding: 0 1rem; }
+        .back-button { position: fixed; top: 1rem; left: 1rem; background: transparent; border: 0; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; opacity: 0.4; cursor: pointer; padding: 6px 8px; z-index: 110; }
+        .back-button:hover { opacity: 0.8; }
+        .controls { position: fixed; right: 1rem; bottom: 1rem; display: flex; gap: 0.5rem; align-items: center; z-index: 102; }
+        .control-btn { background: transparent; border: 0; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; opacity: 0.8; cursor: pointer; padding: 6px 8px; }
+        .control-btn:hover, .control-btn:focus-visible { opacity: 1; outline: none; text-decoration: underline; }
+        .toast { position: fixed; left: 50%; bottom: calc(3.5rem + env(safe-area-inset-bottom)); transform: translateX(-50%); background: #000000; color: #ffffff; font-family: 'Geist', sans-serif; font-size: 12px; padding: 6px 10px; border-radius: 4px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 1500; }
+        .toast.show { opacity: 0.9; }
+        .poem-typing { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); font-family: 'Geist', sans-serif; font-size: 1.2rem; color: rgba(196, 181, 253, 0.7); z-index: 1000; font-weight: 300; letter-spacing: 0.1em; white-space: nowrap; opacity: 0; display: flex; }
+        .poem-typing.show { opacity: 1; }
+        .typing-cursor { display: inline-block; width: 3px; height: 1.2rem; background: #1a1a1a; margin-left: 3px; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+        /* goto popover */
+        .goto-popover { position: fixed; left: 50%; bottom: calc(2rem + 56px); transform: translateX(-50%); background: #ffffff; border: 1px solid #000000; border-radius: 4px; padding: 6px 8px; display: none; z-index: 120; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .goto-input { width: 72px; border: 0; outline: none; background: transparent; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; text-align: center; }
+        .goto-hint { margin-top: 4px; font-family: 'Geist', sans-serif; font-size: 11px; color: #555; text-align: center; }
+        /* search popover */
+        .search-popover { position: fixed; left: 50%; top: calc(1rem + env(safe-area-inset-top)); transform: translateX(-50%); width: min(560px, 92vw); background: #ffffff; border: 1px solid #000000; border-radius: 6px; padding: 8px; display: none; z-index: 130; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        .search-input { width: 100%; border: 0; outline: none; background: transparent; font-family: 'Geist', sans-serif; font-size: 16px; color: #000000; padding: 6px 4px; }
+        .search-results { margin-top: 6px; max-height: 50vh; overflow: auto; }
+        .search-item { display: block; width: 100%; text-align: left; background: transparent; border: 0; cursor: pointer; padding: 8px 6px; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; border-top: 1px solid #eee; }
+        .search-item:hover, .search-item:focus-visible { background: #f6f6f6; outline: none; }
+        @media (max-width: 640px) {
+            .controls { top: calc(1rem + env(safe-area-inset-top)); right: 1rem; bottom: auto; }
+        }
+        @media (max-width: 640px) {
+            #audioToggle { font-size: 10px !important; padding: 4px 6px !important; top: 0.75rem !important; right: 0.75rem !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="poems-section" id="poemsSection">
+        <div class="poems-background" id="poemsBackground"></div>
+        <button class="back-button" id="backToStart" title="wróć" onclick="window.location.href='index.html'">← start</button>
+        <div id="poemsMount">
+            <div class="poem active" data-index="0">
+                po pełni<br>
+                (z)nów<br><br>
+                na jednego<br>
+                z dwóch<br><br>
+                gdy księżyc i ów<br>
+                zakończy *_nowość^•<br>
+                "nowym"<br>
+                końcem<br><br>
+                popełni<br>
+                znów<br><br>
+                coś z niepełnych słów<br>
+                co znaczy ."chyba"*^<br><br>
+                ?<br><br>
+                jej -_zdrowy_<br>
+                odstęp
+            </div>
+            <div class="poem" data-index="1">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="poem" data-index="2">
+                szary kierunek<br>
+                to czary i takt<br>
+                i szyty na miarę<br>
+                za ciasny krawat<br>
+                (co w planie ma czas by oddychać)<br><br>
+                nieważny świat<br>
+                wpisują do strat<br>
+                najważniejszy<br>
+                stan i sława<br><br>
+                wielkie brawa!<br>
+                dla stanisława!<br>
+                !!!…zaraz, zaraz¡!¿<br>
+                ..!!stop!<br>
+                nie go tu przedstawiam!<br><br>
+                o!to ^staś. jest!<br>
+                ..i oto są oni<br>
+                to ci co dla stasia<br>
+                są bezwartościowi<br><br>
+                a, ten ^staś. też<br>
+                ich broni<br>
+                choć to ci co stasiowi<br>
+                zasłonili księżyc<br><br>
+                bo ^staś. sam jest<br>
+                i stroni<br>
+                od tych. co stasiowi<br>
+                chcą ś. przezwyciężyć
+            </div>
+            <div class="poem" data-index="3">
+                znaczek mówił<br>
+                w ich, o-sobie!<br>
+                to, co dla niego<br>
+                znaczy stado<br><br>
+                dla niego,<br>
+                |stado.<br>
+                to tylko to wszystko<br>
+                to tylko to jedno<br>
+                to tylko to, że dla stada<br>
+                zaznaczył by wszystko<br><br>
+                on dla stada to<br>
+                wszystko jedno<br><br>
+                bo dla stada,<br>
+                stado,<br>
+                bez znaczka<br>
+                znaczyło się samo
+            </div>
+            <div class="poem" data-index="4">
+                taty stary<br>
+                stratny lęk<br><br>
+                za dużo<br>
+                za mało<br>
+                nas było
+            </div>
+            <div class="poem" data-index="5">
+                tu.laś<br>
+                bez koloru<br>
+                inne piękno<br>
+                inna cisza<br>
+                w głośnej barwie<br><br>
+                tu pełno niczego<br>
+                i wszystkiego<br>
+                !!wszędzie!<br><br>
+                tu*las<br>
+                w nim twórca!<br>
+                ..i strach<br><br>
+                powtórka!
+            </div>
+            <div class="poem" data-index="6">
+                istnieć, inaczej:<br>
+                mieć możliwości<br>
+                a ja mogę móc<br>
+                mieć swoje wszystko<br><br>
+                istnieć inaczej<br>
+                nie chcieć niczego<br>
+                liczb z wierszy<br>
+                ludzkiego wzoru<br><br>
+                chcę widzieć!<br>
+                (w) pełni cykle<br>
+                tworzyć<br>
+                już! dorosło(ść)<br><br>
+                kochać<br>
+                możliwie młodo<br>
+                możliwie złoto<br>
+                tak po naszemu
+            </div>
+            <div class="poem" data-index="7">
+                widząc inaczej<br>
+                nie szukałem oczu!<br>
+                i nie chciałem gości!<br><br>
+                ..<br>
+                nie miałem gości<br><br>
+                +_+!!**<br>
+                więc miło mi gościć<br>
+                rozumiejąca ciebie!+_=<br><br>
+                **++ ty *~*•_!<br><br>
+                widzisz inaczej<br>
+                wiesz kim jest<br>
+                mój/nasz<br><br>
+                *~*znaczek^+^<br><br>
+                czuję że znaczę<br>
+                i to czyni ¡nasze..<br><br>
+                ..wszystko!<br><br>
+                nasze małe wszystko.
+            </div>
+            <div class="poem" data-index="8">
+                zrozum<br>
+                ulgę dorosłości<br>
+                to, co mi potrzebne<br><br>
+                jeśli jesteś<br>
+                mój, niezbędny<br>
+                opuść rękę<br><br>
+                i przez marmur<br>
+                złap za moją<br><br>
+                nie decyduj<br>
+                daj im pomóc
+            </div>
+            <div class="poem" data-index="9">
+                nie ma już miejsca<br>
+                na pustej widowni<br><br>
+                zająłem wszystkie<br>
+                swoimi wersjami<br>
+                i tymi maskami<br>
+                udaje ciszę<br><br>
+                kłaniam się niżej<br>
+                niż kiedyś byłem<br> 
+                <br>
+                przez brak braw<br>
+                kurtyna będzie lustrem
+            </div>
+            <div class="poem" data-index="10">
+                dość<br>
+                mam dość dźwięku<br><br>
+                zakryj chociaż jedno ucho<br>
+                i wysoko, niskim tonem<br>
+                skupiaj mnie na ciszy<br><br>
+                kto to śpiewa?<br>
+                kto tak tęskni?<br><br>
+                ten kto znał<br>
+                ~+*twój uśmiech!*++_<br>
+                tato<br>
+                i ten przez słuchawkę<br>
+                poznał ciszę<br><br>
+                myślał, zawsze<br>
+                bezgranicznie<br>
+                bez marmuru<br><br>
+                bez dźwięku
+            </div>
+            <div class="poem" data-index="11">
+                sunę<br>
+                przez chaos<br><br>
+                +_**++~+_+~/„-„*+*^_^*++~__
+            </div>
+            <div class="poem" data-index="12">
+                ta! piękna<br>
+                nie pęka<br><br>
+                ta! niteczka<br>
+                uczy czekać<br><br>
+                i czytać<br><br>
+                o: widać!<br>
+                a więc jestem<br>
+                i zszywam<br><br>
+                *_^*swoją+_+<br><br>
+                ]przestrzeń[
+            </div>
+            <div class="poem" data-index="13">
+                •*•_*<br>
+                płytkim oddechem<br>
+                wciąż myślę o świeczce ._=<br>
+                i o tym, że popiół *+<br>
+                nie czeka na płomień<br><br>
+                bo każda resztka^ |*<br>
+                cała• jest przecież<br>
+                zresztą| tak samo! +<br>
+                jak sama resztka<br>
+                •*^_+•
+            </div>
+            <div class="poem" data-index="14">
+                oh, wspólnie pisana poezjo<br><br>
+                myślałem<br>
+                o samotności dziennika spokoju<br><br>
+                w tych czasach ludzi coś łączy<br>
+                wrażliwości deficyt<br>
+                wartości bezwierni stoją<br>
+                szarzy zmęczeniem<br><br>
+                wiem jedno<br>
+                dla nas za ludzka jest miłość<br><br>
+                bo burzą się burze<br>
+                bielą pod łzami<br>
+                nadzieją nie nazwę<br>
+                zwyczaj zachowam<br><br>
+                oh, wspólnie pisana poezjo<br><br>
+                kochaj mnie gdy jestem<br>
+                znak postaw zanim wrócę
+            </div>
+            <div class="poem" data-index="15">
+                ja<br>
+                znów!<br>
+                w pełni czuje<br>
+                i jestem<br>
+                zdrów<br><br>
+                jak nów<br>
+                co w pełni snuje<br>
+                miejscem<br>
+                ów całokształt<br><br>
+                ha-halo?<br>
+                jak to się stało?<br>
+                kto tak jak ta stałość!?<br>
+                na stałe zmieniła mnie!<br><br>
+                mnie?<br>
+                czy ich?<br>
+                czy mnie nie?<br>
+                czy nie ich?<br><br>
+                czy?<br><br>
+                ich oczy<br>
+                mnie nie znają<br>
+                z mych wad<br>
+                z nieznajomych strat<br>
+                i znamion<br><br>
+                tak już zostało mi..<br><br>
+                stanąć!<br>
+                zostało im!<br>
+                łamiąc mnie<br>
+                i zostawiając<br><br>
+                samo ego<br><br>
+                i mnie! samego!<br>
+                zastanawiającego<br>
+                nad pytaniem:<br><br>
+                ahhhh<br><br>
+                ma damo z mych gwiazd<br>
+                czy dano mi czas<br>
+                by wziąć rękę?<br>
+                czy nie?<br><br>
+                !tak! !chcę!<br><br>
+                chcę więcej!<br>
+                a więc jak?<br>
+                jak to tak?<br><br>
+                a, no tak!<br>
+                tak, jak to !tak!<br>
+                wziąłem, tak uczynię<br><br>
+                (nie)znajomy(ch) las<br>
+                lawendowym snem
+            </div>
+            <div class="poem" data-index="16">
+                w czeluściach magii własnej<br>
+                łagodną iskrą pluskam<br><br>
+                uśmiechnięty<br>
+                w płaszczu z wrażliwości<br>
+                swoim głoskom daje brzmienie<br><br>
+                oh, jak dobrze nam bywa<br>
+                w lustro spojrzeć i siebie zobaczyć<br><br>
+                mówią, że fantazją<br>
+                smutek w ucieczce zamykam<br>
+                lecz ja, ku zdziwieniu<br>
+                kochając się otwieram<br><br>
+                wdzięczny za swój świat<br>
+                w nowych kolorach<br>
+                maluje swój portret<br><br>
+                tak czule tam płacze<br>
+                zaopiekowany dbałością<br>
+                dla dzieła mam istnieć<br>
+                po to je stworzyłem<br><br>
+                niech nikt nie rozumie<br>
+                tego rodzaju miłości<br>
+                gdy jestem dla siebie<br>
+                na swoje piękno wrażliwy
+            </div>
+            <div class="poem" data-index="17">
+                poczuj sztukę<br>
+                piękno doceń<br>
+                graj<br><br>
+                interpretuj<br>
+                umarłych poetów<br><br>
+                wiersze w prawdzie<br>
+                ciepłe, suche, chłodne, straszne<br>
+                każde!<br><br>
+                żyłka grzmi<br>
+                żywo grzmi<br><br>
+                powiedz mi<br>
+                liczysz dni?<br><br>
+                ja<br>
+                małym wstałem<br>
+                i przestałem!<br><br>
+                przychodzą jak ona,<br>
+                odchodzą jak nikt
+            </div>
+            <div class="poem" data-index="18">
+                mówią: wolnym bądź<br>
+                wolno błądź<br>
+                nie trać chwil dla siebie<br><br>
+                przeczę: granicą głowa<br>
+                graniczą słowa<br>
+                nie pozwalam im latać<br><br>
+                oh, świecie schematów<br>
+                w świetle wariatów<br>
+                tracę me racje<br><br>
+                i<br><br>
+                znikam<br>
+                niemowa o narkotykach<br>
+                tłumaczy: wynika<br>
+                z pewnego dziennika<br>
+                że wolność zamykam w mej głowie
+            </div>
+            <div class="poem" data-index="19">
+                litera wibruje wolno na wardze<br>
+                gdzie myśleć zaczynam<br>
+                bieg swój zgubiłem, choć nogi mam twarde<br>
+                chodzę i wspominam:<br><br>
+                śpiewała im głośniej, kąt kantu oka<br>
+                tu ciężko coś marzyć<br>
+                tam było prościej, krzywiłem po zmrokach<br>
+                z malunkiem na twarzy<br><br>
+                poetuś podreptał poezją tulony<br>
+                szukałem brzmiącego sam zgiełku<br>
+                niepewny swojego puściłem balony<br>
+                odbiłem swe piętno na pieńku<br><br>
+                detalem się stałem, w tle świat odmętów<br>
+                głoską mi płakać gdy wzrok mój dotykasz<br>
+                daleko jechałem, zabrakło zakrętu<br>
+                tak mały jest ze mnie twój pisarz
+            </div>
+            <div class="poem" data-index="20">
+                wdzięk dźwięku działa<br>
+                mówiła mi w ciszy<br>
+                ty w cis trafisz<br>
+                zmarznięty marzeniami<br><br>
+                spotkać spód<br>
+                spadając w przestworza<br>
+                tworzyć twór!<br><br>
+                kochaj kochanie<br>
+                rozkochany koc<br><br>
+                już<br><br>
+                kończ
+            </div>
+            <div class="poem" data-index="21">
+                rycerko<br><br>
+                odejmij te dwa<br>
+                i spójrz<br><br>
+                na czarne kanapy<br>
+                dom babci mirki<br>
+                podróże z tatą<br><br>
+                na wszystko co wspólne<br>
+                jak stary komputer<br>
+                i nasz cały artyzm<br><br>
+                dałaś mi imię<br>
+                i bezpieczeństwo<br>
+                i pierwsze klawisze<br>
+                i szóstą nad ranem<br><br>
+                i przede mną byłaś<br>
+                sama<br>
+                ty<br><br>
+                i byłaś ze mną<br>
+                gdy nie słyszał<br>
+                nikt<br><br>
+                inny *._++*niż ciemność~!!<br>
+                nasz<br>
+                krzyk
+            </div>
+            <div class="poem" data-index="22">
+                uwierz ma wierzbo<br>
+                uwiąż intencje<br><br>
+                interesując<br>
+                się mną<br><br>
+                tylko mną
+            </div>
+            <div class="poem" data-index="23">
+                wiersze mi pisać<br>
+                wrażliwe słowa<br>
+                na białym drewna kawałku<br><br>
+                walczyłem jak mogłem<br>
+                pisałem jak umiałem<br><br>
+                z zakładanym uśmiechem<br>
+                głębiej muszę pachnieć<br><br>
+                wszyj miłość w swą troskę<br>
+                chroń<br><br>
+                dna mi szukać<br>
+                dumą się dławić<br><br>
+                szukać nów w cierpieniu
+            </div>
+            <div class="poem" data-index="24">
+                dziś wiersze moje<br>
+                nic nie znaczą<br>
+                niepewnego bronię krzykiem<br><br>
+                boli, wysusza<br>
+                gdy wnet suknie ubierzesz<br>
+                a ja rezygnuje<br><br>
+                ona<br><br>
+                zmęczona decyzjami<br>
+                głaszcze po włosach<br>
+                nie tych których pragnie<br><br>
+                nie tej mi uśmiechać
+            </div>
+            <div class="poem" data-index="25">
+                ja<br><br>
+                miękkim wierszem<br>
+                zaklęty zakończę<br><br>
+                wrażliwie kudłaty<br>
+                pozornie poznany<br><br>
+                słowotwórca!<br><br>
+                …<br><br>
+                słowa zgubił<br><br>
+                wolność ma na skroni<br>
+                a łez kilka padnie<br>
+                zanim w nim zamilknie
+            </div>
+            <div class="poem" data-index="26">
+                oni się znajdą<br>
+                wiarą zaczną wierzyć<br>
+                gdy dziennik spokoju<br>
+                rozwojem dokończę<br><br>
+                zmianą nie znaczy<br>
+                dwustronność miłości<br>
+                tak krystalicznie czysto<br>
+                jest „kiedy" zapytać<br><br>
+                my w kociej istocie<br>
+                nadzieją w rozmowie<br>
+                czekamy na łaskę<br><br>
+                gdy czas ją zabiera:<br>
+                spóźniona decyzja<br>
+                bezradność sprzed chwili<br>
+                bezsilnie tłumaczy
+            </div>
+            <div class="poem" data-index="27">
+                bez głębokości<br>
+                deszcz kochać przestałem<br>
+                smutna ze mnie dusza<br><br>
+                sam, wole mówić ciszej<br>
+                w ogrodzie nie tej szukać<br>
+                przed lawendą chować sekrety<br><br>
+                piotra słysząc, rozumiem inaczej:<br>
+                „byłoby nam dobrze dzisiaj.."<br><br>
+                przestać się ograniczać!!!<br>
+                zamiast wypełniać, usuwać braki.
+            </div>
+            <div class="poem" data-index="28">
+                zwykle w krople wsłuchany<br>
+                ich ścieżkę od tak<br>
+                obserwowuje z daleka<br><br>
+                w legendówce zostałem<br>
+                cały dzień myśl podpowiada:<br>
+                w polu logiki rozsiane kwiaty<br>
+                potrafią płakać<br><br>
+                systemem schematów<br>
+                pamięci powtarzanej<br>
+                łza się pojawia<br>
+                prawdziwa jak nigdy<br><br>
+                i dzieje się chaos<br>
+                kojący i cichy<br>
+                bo wszystko co wiem<br>
+                znika w jej oczach<br><br>
+                jest ona i nikt<br>
+                i słów tez brakuje<br>
+                bo chwila ta pięknie<br>
+                jest zwana miłością
+            </div>
+            <div class="poem" data-index="29">
+                w jej chwile<br>
+                myśle<br>
+                jak o dzieciństwie
+            </div>
+            <div class="poem" data-index="30">
+                pełniejszym o miłość<br><br>
+                gdy losowo świecisz<br>
+                przede mną<br>
+                i we mnie<br><br>
+                tęsknie<br>
+                żałując chwil<br>
+                dziecinnych jak my<br><br>
+                wtedy<br>
+                byłem twoją<br>
+                znajomą mi lawendą<br>
+                którą się stałaś<br><br>
+                z czerniami<br>
+                kocham cię_
+            </div>
+            <div class="poem" data-index="31">
+                my wilki<br>
+                słowami<br>
+                zjadając swój rodzaj<br>
+                odrzucamy wiarę<br><br>
+                my wilki<br>
+                niechciani<br>
+                pragnąc mieć wodza<br>
+                szukamy ofiarę<br><br>
+                my wilki<br>
+                tak sami<br>
+                trafiając do morza<br>
+                zmywamy pianę<br><br>
+                my wilki<br>
+                wilkami<br>
+                za sobą na łowach<br>
+                bez ludzi na zmianę
+            </div>
+            <div class="poem" data-index="32">
+                nie mam pewności<br>
+                i świeża jest dzikość<br><br>
+                zacząłem biec<br>
+                bo szukałem tej<br>
+                która wierzy<br><br>
+                w inną magię<br>
+                w moment<br>
+                w zmianę<br><br>
+                +_*+_=wolność =_=_*=<br><br>
+                jeśli pobiegnie<br>
+                znajdę jej spokój<br><br>
+                spełnię potrzeby<br>
+                wspólne marzenia
+            </div>
+            <div class="poem" data-index="33">
+                sen mi powiedział, świadomą realnością<br>
+                rzekł: wiem coś na pewno<br>
+                twoja to wina, nie twoja epoka<br>
+                serce stęsknione jedno odbiera<br><br>
+                wylewa, zajmuje<br>
+                cicho, głośniej<br>
+                cel tak czysty<br>
+                słowa niemożliwe przestają znaczyć<br><br>
+                romantyk jednak bliskością się żywi<br>
+                i w drodze do nieba zatapia swe zęby<br>
+                wrażliwe, wyschnięte<br>
+                od braku krwi nigdy nie znanej<br><br>
+                w tym co zaświeci<br>
+                tak troszkę jak ona<br>
+                to serce tak dziwne, jak lód płonący<br>
+                wiele niewiast musi na drodze zranić
+            </div>
+            <div class="poem" data-index="34">
+                pamiętam<br><br>
+                myśliwską<br>
+                dłuższą niż teraz<br><br>
+                gdy wtedy<br>
+                chodziłem w kółko<br>
+                goniła mnie myśl<br>
+                że nie można uciekać<br><br>
+                bo uciekać trzeba<br>
+                i wtedy<br>
+                goniłem myśl<br>
+                że to jest chwilowe<br><br>
+                a zostało zawsze
+            </div>
+            <div class="poem" data-index="35">
+                w niebieskim<br>
+                błądzę<br><br>
+                w iluzji<br>
+                marzę<br><br>
+                labirynt<br>
+                ludzi smutnych<br><br>
+                ich melodia<br>
+                i dźwięk i brak i łza<br>
+                i ja<br><br>
+                zamknięty wrażliwiec<br>
+                zamknięty perswazją<br><br>
+                bez _<br>
+                bez siebie<br>
+                bez sensu
+            </div>
+            <div class="poem" data-index="36">
+                do trzech razy sztuka<br>
+                o czwartym szepnąłem<br>
+                pustej legendzie<br><br>
+                pustej z dodatkiem<br>
+                podobnego do mnie pana<br>
+                co podobnie do mnie<br>
+                zostawiał tu łzy<br><br>
+                chce mi się płakać<br>
+                i dać mu ciepło<br>
+                powiedzieć, że cztery<br>
+                to też przecież numer
+            </div>
+            <div class="poem" data-index="37">
+                miłość<br>
+                zimowa miłość<br>
+                druga piosenka<br><br>
+                +*^+wyjątkowość *~+=!<br><br>
+                pamiętam!<br><br>
+                po oświadczynach<br>
+                młode serca<br><br>
+                wczoraj mówiła:<br>
+                kocham dotyk swoich kości<br><br>
+                dzisiaj więc powiem:<br>
+                ja twoich też
+            </div>
+            <div class="poem" data-index="38">
+                myśliwska<br>
+                pamięta mój strach<br>
+                a ty?<br><br>
+                pierwszy raz<br>
+                czuje złość<br><br>
+                i choć rozum<br>
+                mamy wspólny<br><br>
+                nie chce być tobą<br><br>
+                klątwę dałeś<br>
+                dar przyjąłem
+            </div>
+            <div class="poem" data-index="39">
+                czyżby powstała<br>
+                nowa legenda?<br><br>
+                kto by pomyślał?<br><br>
+                to chwila wzruszenia<br>
+                definiuje miejsce<br><br>
+                w dół po schodach<br>
+                znalazł się on..<br><br>
+                … to skryty poetuś!<br>
+                co w skrytych kawiarniach<br>
+                wielbi się gościć<br><br>
+                dajcie mu moment<br><br>
+                niech patrzy na spokój<br>
+                na sentymentalność<br>
+                na kubek kawy i ludzi wokół<br><br>
+                -_^ocean!~|,*•<br>
+                to tego chce słuchać<br>
+                przy ciepłych melodiach<br>
+                bezpieczniej jest marzyć<br><br>
+                grajcie mu dalej<br>
+                niech pływa muzyka
+            </div>
+            <div class="poem" data-index="40">
+                w zwykłej kawiarni<br>
+                znajduje mu miejsce
+            </div>
+            <div class="poem" data-index="41">
+                jako zniszczeni dorośli<br>
+                lubimy wierzyć<br>
+                że kwiaty nie więdną<br>
+                a słońce świeci zawsze<br><br>
+                myślę o tym pięknie<br>
+                pięknie o tym myślę<br>
+                choć cicho mi przyznać:<br><br>
+                ja<br><br>
+                poetuś<br>
+                stanę się poetą..<br>
+                przez duże<br>
+                "*"p!^_~*<br><br>
+                wielkiej litery<br>
+                nie postawie<br>
+                zwykle uciekając<br>
+                przed wielkością<br><br>
+                tej<br><br>
+                pr-aw-dy
+            </div>
+            <div class="poem" data-index="42">
+                jest też zły spokój<br>
+                tego boje się<br><br>
+                bardziej<br><br>
+                te myśli, mój chaos<br>
+                mój brak świadomości<br><br>
+                szarpie się krzykiem<br>
+                i uciszam myślą:<br><br>
+                przestanę nas wzruszać
+            </div>
+            <div class="poem" data-index="43">
+                żegnaj<br>
+                to znaczy:<br>
+                zabieram ci pół<br><br>
+                a ja kocham być cały<br><br>
+                w szale<br>
+                w podróży<br>
+                na czerwonej dłoni<br>
+                położyłem umysł<br><br>
+                budziłem się<br>
+                płacząc<br>
+                i zdrowo dziękując<br>
+                przeprosiłem morze<br><br>
+                dziś nie dostanie<br>
+                połowy tej szklanki<br><br>
+                równo(i)ważnie<br>
+                umiem ją mieć<br>
+                a nie się wylewać<br><br>
+                napełnij mnie tak<br>
+                jak wtedy<br>
+                nad morzem
+            </div>
+            <div class="poem" data-index="44">
+                spadł śnieg<br>
+                na głośną warszawę<br>
+                legenda przywita<br>
+                chłodniejsze wiersze<br><br>
+                więcej więc<br><br>
+                skup się pisarzu<br>
+                pisząc jej uśmiech
+            </div>
+            <div class="poem" data-index="45">
+                my<br>
+                w chaosie<br>
+                patrzymy na zbędne<br>
+                płaczemy bez końca<br><br>
+                ahh, maski na maski ..<br>
+                to sztuka aktorstwa!<br>
+                mam siłe je nosić<br>
+                i tego żałuje<br><br>
+                to co pod nimi<br>
+                jest mi nieznane<br><br>
+                bo zapomniałem<br>
+                jak pachnie ciągłość
+            </div>
+            <div class="poem" data-index="46">
+                zrozum wiersz<br>
+                o samotności<br><br>
+                miedzy wersami<br>
+                wplątuje<br><br>
+                „&gt;**nic*^•<br><br>
+                śmiałek podważy<br>
+                ja podziękuje
+            </div>
+            <div class="poem" data-index="47">
+                taki<br>
+                to nowe słowo<br>
+                na nowo ukryłaś<br>
+                nowe określenie<br><br>
+                mamy takie kółko<br>
+                dawno zmęczone<br>
+                dalej się toczy<br><br>
+                przyjmę tą złość<br>
+                odrzucę agresje<br><br>
+                znowu, to boli<br>
+                nie poznaję głosu<br>
+                sił, raz ostatni<br>
+                starczyło gdy spadłem
+            </div>
+            <div class="poem" data-index="48">
+                w naturze poeci<br>
+                pusto się kryją<br>
+                wiedziałaś jedyna<br><br>
+                wróć.
+            </div>
+            <div class="poem" data-index="49">
+                mam swoje imiona<br>
+                wspomnienia<br><br>
+                i błędy<br>
+                nienawiść do chaosu
+            </div>
+            <div class="poem" data-index="50">
+                drobna chmura<br>
+                dla księżyca<br>
+                staję się….<br><br>
+                ką<br><br>
+                i łza w ką cię kocha<br><br>
+                świecisz<br>
+                na moją całość<br>
+                na moją, założę się<br><br>
+                sobą!<br>
+                bo z taką tobą<br><br>
+                każdy cień i dzień<br>
+                na świecie<br><br>
+                staję się jaśniejszy
+            </div>
+            <div class="poem" data-index="51">
+                rozbite drzewo<br>
+                nie znaczy piosenka<br>
+                więcej niż szarość mej duszy<br><br>
+                rozbite drzewo<br>
+                nie, znaczy piosenka<br>
+                o lustrze którego nie zobaczysz<br><br>
+                rozbite drzewo<br>
+                +nie**! znaczy piosenka<br>
+                nie będę tym kim być chce<br><br>
+                rozbite drzewo<br>
+                rozbita bańka<br>
+                rozbity ja
+            </div>
+            <div class="poem" data-index="52">
+                płakałem z miłości<br>
+                nie wiedząc nic więcej<br><br>
+                pogłaskałem siebie<br><br>
+                tak jedno pytanie<br>
+                jak jedna jest ona
+            </div>
+            <div class="poem" data-index="53">
+                "dom" jest tym<br><br>
+                tato<br><br>
+                czym go stworzyłeś<br><br>
+                zmieniłem już miejsce<br>
+                i ściany i siebie<br>
+                i wszystko co mogę<br><br>
+                a wciąż jest tak samo<br><br>
+                każdego dnia<br>
+                każdy ja<br><br>
+                boje się siebie
+            </div>
+            <div class="poem" data-index="54">
+                chociaż lęk o wtórność<br>
+                ścisnął mnie raz<br>
+                mam siłę go gasić<br><br>
+                to skóra jej<br>
+                wyjątkowy ma dźwięk<br>
+                bezpiecznie brzmi<br>
+                w mroźnej kopule<br><br>
+                pracuj<br>
+                czytaj całego<br>
+                ja stawiam litery<br>
+                niewinnie rozważne<br><br>
+                znaj mnie<br>
+                czuj mnie<br>
+                ciało i dusza<br>
+                twoimi się stały<br><br>
+                takie to ludzkie<br>
+                zwykle ją kochać<br><br>
+                więc niezwykłym zostanę<br>
+                dziwnym i szczerym<br>
+                bo w tym widzę prawdę<br>
+                i więcej<br><br>
+                !tych<br><br>
+                wierszy
+            </div>
+            <div class="poem" data-index="55">
+                pomyślałem<br>
+                warto napisać wiersz<br>
+                o leśnej kopule<br><br>
+                takiego spokoju szukam<br>
+                oh, jak dobrze wolnym się czuć<br>
+                złoto mi!<br><br>
+                w jasnej nocy<br>
+                wyższe drzewa<br>
+                głębiej przytulają<br><br>
+                mówisz:<br>
+                trzeźwość<br>
+                jest surowa, jak presja<br>
+                więc cię otwieram<br><br>
+                mówisz:<br>
+                my<br>
+                ludźmi nie jesteśmy<br>
+                póki nam wolno<br>
+                wzruszajmy się wszystkim<br><br>
+                mówisz:<br>
+                nigdy<br>
+                nie było tak blisko<br><br>
+                piękno jest proste<br>
+                jak złamany wzór
+            </div>
+            <div class="poem" data-index="56">
+                •_.*+•<br>
+                w męskiej rozmowie<br>
+                też można płakać ._*<br>
+                w tej ciszy bywamy<br>
+                wrażliwi!<br><br>
+                to kształt mój^_*<br>
+                w marmurze mnie słucha<br>
+                nikt tak nie umie<br><br>
+                sam.<br><br>
+                tamtego mnie szukaj +|<br>
+                on nadal tam czeka.•<br><br>
+                tęsknie za tobą<br>
+                za magią ojcostwa<br><br>
+                i za wszystkim co twoje<br>
+                choć sam jestem twój<br>
+                •_.*+=
+            </div>
+            <div class="poem" data-index="57">
+                nie umiem określić słowem<br>
+                jakie są nasze dusze<br>
+                w wyjątkowości śliczne<br>
+                dzieci tego świata<br><br>
+                dla nas, jest piękny<br>
+                choć troszkę za duży<br><br>
+                nim zdominowani<br>
+                marzymy o rozwoju<br><br>
+                wmówili, że w nas to<br>
+                że jako jednostki<br>
+                rośniemy dla siebie<br><br>
+                więc kim się stałem?<br>
+                to tylko jej dotyk<br>
+                niemo mnie nazwał<br><br>
+                ty zwykle zrozumiesz<br>
+                jedyna na świecie<br>
+                że do nauki samotności<br>
+                potrzebuje cię samej
+            </div>
+            <div class="poem" data-index="58">
+                ciekawe jak to jest<br>
+                milcząc uciąć miłość<br>
+                krzyknęłaś choć raz?<br><br>
+                ja<br>
+                zdarłem się w środku<br>
+                straciłem zmysły<br>
+                nagi się stałem<br><br>
+                nazwali dygotem<br>
+                niebezpieczeństwem<br>
+                chcieli już wiązać<br><br>
+                mówiłem:<br>
+                nie warto<br>
+                zaczekam na kropkę<br><br>
+                wbij mi ją w końcu<br>
+                w złości lub w strachu<br>
+                zdanie nowe zacznę<br>
+                tylko się pożegnaj
+            </div>
+            <div class="poem" data-index="59">
+                nad morzem ze stopów<br>
+                zaszyłem swój blask<br><br>
+                normy chcą zatrzymać<br>
+                szepcząc: nie tak!<br><br>
+                lecz moje jest sto mów<br>
+                mówiących, że ta<br><br>
+                natura ma grymas<br>
+                tak czysty jak ja
+            </div>
+            <div class="poem" data-index="60">
+                brakuje wdzięczności<br>
+                by obecnie<br>
+                obecność opisać<br><br>
+                było by nam dobrze dzisiaj<br>
+                przestać się ograniczać!
+            </div>
+            <div class="poem" data-index="61">
+                czekając na zwrot<br>
+                dostałem jej niechęć<br>
+                do straty osoby<br>
+                którą cicho gram<br><br>
+                w ciszy, od ran<br>
+                brakuje mi głowy<br>
+                muzyko!<br>
+                dziś tylko jej szczęść<br><br>
+                prowadź
+            </div>
+            <div class="poem" data-index="62">
+                jak to się stało?<br>
+                zanuciła<br>
+                od tak mi pokazując<br>
+                jak kropli w jej świecie<br><br>
+                czy wzrusza<br>
+                czy boli<br>
+                przecież poczekam<br><br>
+                by moja burzliwość<br>
+                ciszą stała<br>
+                przed tobą<br><br>
+                ty boisz się ludzi<br>
+                ja boje się stasia<br>
+                wiec wspólnie<br>
+                nie bójmy się siebie
+            </div>
+            <div class="poem" data-index="63">
+                na chwilkę udawajcie<br>
+                że ja nigdy nie powstałem<br><br>
+                bo bez siebie<br>
+                mogę wszystko i nic<br><br>
+                a ze sobą<br>
+                jedynie coś pomiędzy
+            </div>
+            <div class="poem" data-index="64">
+                pragnąłem<br>
+                wierzyć spokojnie<br>
+                istnieć i marzyć<br>
+                o nieobecności<br><br>
+                boje się prób<br>
+                i bywam zmęczony<br>
+                zamrożone kwiaty<br><br>
+                też kiedyś zwiędną
+            </div>
+            <div class="poem" data-index="65">
+                kryje się<br>
+                w wierszach<br>
+                w swetrach<br>
+                w niej<br><br>
+                w ciszy<br>
+                ze sobą<br><br>
+                wolę być bierny<br><br>
+                pytasz gdzie jestem<br>
+                nie chcesz mi ufać<br><br>
+                rozumiem
+            </div>
+            <div class="poem" data-index="66">
+                bliska mi burza<br>
+                w głębiach świadomości<br>
+                ja tak mało znaczę<br><br>
+                chciałbym istnieć<br>
+                tak troszkę<br>
+                w przyszłości<br><br>
+                świat jest za głośny<br>
+                by raz się w nim znaleść<br>
+                i chociaż próbuje<br>
+                to siebie nie słyszę
+            </div>
+            <div class="poem" data-index="67">
+                nadzieją spłoszony<br>
+                żar mam w oczach<br><br>
+                lustro mówi:<br>
+                wydoroślałeś!<br><br>
+                podziękowałem<br>
+                z poziomu twarzy dziecinnej<br>
+                chociaż poczułem<br>
+                dojrzałą na to zgodę<br><br>
+                dziwne<br>
+                że sobie dziś ufam<br>
+                to jakby natura<br>
+                przypomniała, że jest
+            </div>
+            <div class="poem" data-index="68">
+                zdrowie jest<br>
+                jak małe ziarenko<br>
+                podleję - rozkwitnie<br><br>
+                to muszę być ja
+            </div>
+            <div class="poem" data-index="69">
+                chaos<br>
+                to chaos mamy w głowach<br><br>
+                pokonam nawet miłość<br>
+                by zadbać o siebie<br>
+                pokocham nawet siebie<br>
+                by zadbać o miłość
+            </div>
+            <div class="poem" data-index="70">
+                dzwonią, piszą, tęsknią.<br>
+                dla nich bywam lustrem<br>
+                w którym widzą swe natręctwo<br><br>
+                nie byłem nigdy kogoś<br>
+                do siebie przywiązany<br><br>
+                to widać tylko z bliska<br>
+                gdy zacznę się oddalać<br><br>
+                kochać?<br>
+                kochałem<br>
+                klątwą romantyka<br><br>
+                bezsilny jestem przecież<br>
+                wyzywaj ile pragniesz<br><br>
+                jak przyjąłbym te słowo<br>
+                to nie byłbym poetą
+            </div>
+            <div class="poem" data-index="71">
+                przepraszam, znikam<br>
+                brak mój wam potrzebny<br>
+                czary me prawdziwie<br>
+                lecz niekontrolowane
+            </div>
+            <div class="poem" data-index="72">
+                jak to się stało?<br>
+                że z każdym mrugnięciem<br>
+                z nią budzę się w świecie<br><br>
+                szkło spada na wzrok mój<br>
+                i płynie do ust<br>
+                gdy dolna warga<br>
+                na zębach wibruje<br><br>
+                za mało mi<br>
+                dać więcej niż siebie<br>
+                nie starczy mi krtani<br><br>
+                więc mówię słowami<br><br>
+                wyższą cierpliwością<br>
+                na ciebie czekałem<br>
+                tak swojo być twoim<br>
+                i wzruszać się tobą<br><br>
+                wartością zostałaś<br>
+                tam się udomawiaj
+            </div>
+            <div class="poem" data-index="73">
+                choć kudłaty<br>
+                nie boje się deszczu<br>
+                a kropla mi włosy prostuje!<br><br>
+                własna trwoga<br>
+                stosem słów kryta<br>
+                niezbadana<br><br>
+                milknie<br><br>
+                knot jest iskrą<br>
+                a ja?<br><br>
+                sam<br>
+                pianą targnę na szczęście<br><br>
+                ciepła woda w ciepłych kolorach<br>
+                wdzięk ma za moje ciało<br><br>
+                tak mnie za dużo<br>
+                że aż za mało
+            </div>
+            <div class="poem" data-index="74">
+                skóra w brokacie<br>
+                morskich kropel<br><br>
+                usta jej słone<br>
+                od wiatru nie łez<br>
+                słoneczne perły<br>
+                letni piasek przytuli
+            </div>
+            <div class="poem" data-index="75">
+                ty czujesz chłód<br>
+                i w nim czujesz spokój<br><br>
+                zawsze pamiętam<br>
+                nienaturalną nocą<br>
+                szepnąłem ci miłość<br><br>
+                pamiętnik otwarty<br>
+                dniem zmieniał swój zapach<br>
+                strony żółciały<br>
+                druk więcej znaczył
+            </div>
+            <div class="poem" data-index="76">
+                trzy krople na stronie<br>
+                o uchu różowym<br>
+                rozmyślają o sensie<br><br>
+                patrzą nie tam<br><br>
+                to mnie<br>
+                częstuj spojrzeniem
+            </div>
+            <div class="poem" data-index="77">
+                podam sobie rękę<br>
+                ścisnę przebaczeniem<br><br>
+                krok zwykły wezmę<br>
+                w stronę jutra<br>
+                bez żalu<br><br>
+                a to nie jest zwykłe<br><br>
+                to paradoksalne<br>
+                poznać siebie<br>
+                i obcym się stać<br><br>
+                on kocha autorsko<br>
+                pisze po mojemu<br>
+                naturę trzyma tą samą<br><br>
+                on w oczach mi gaśnie<br>
+                znudzony sam sobą<br>
+                zmęczony osobą<br><br>
+                niczym ja<br>
+                choć w niczym jak ja
+            </div>
+            <div class="poem" data-index="78">
+                .sam.<br>
+                gdzieś gdzie drga<br><br>
+                droga ma<br>
+                w wspólnych snach<br>
+                kwitnąca<br><br>
+                świt w nocach<br>
+                wir w krokach<br>
+                myśl w oczach<br><br>
+                i staś<br><br>
+                tak mały gdy gra<br>
+                gdy truje do dna<br><br>
+                gdy psuje go złap<br>
+                w jego wierszykach<br><br>
+                myślenia doda<br><br>
+                do damy<br>
+                śle<br>
+                ja.
+            </div>
+            <div class="poem" data-index="79">
+                odsłoń swój komfort<br>
+                niewinnym spotkaniem<br>
+                uchyl mi ją<br><br>
+                dano mi wspierać<br>
+                w pierwszym spojrzeniu<br>
+                więcej wiedziałem
+            </div>
+            <div class="poem" data-index="80">
+                na imię jej anna<br>
+                w pełnej okazałości<br>
+                spoważniała<br><br>
+                dla pewnych powodów<br>
+                skutków burz wspólnych<br>
+                trafiliśmy na siebie<br><br>
+                w rozmowach<br>
+                kochamy ten moment<br>
+                w którym świadomie<br>
+                harmonia świeci głośniej<br><br>
+                połączeni miłością<br>
+                bez dzikich potrzeb<br><br>
+                anna i ja<br>
+                i chwile trzeźwości
+            </div>
+            <div class="poem" data-index="81">
+                lawendowy pałacu<br>
+                legendy sąsiedni<br><br>
+                pokornie dziś proszę<br>
+                wróć do wierszy<br><br>
+                niech duch mnie odwiedzi<br>
+                w następnej decyzji<br><br>
+                niech nie wieje wiatr mi<br>
+                gdy działam inaczej
+            </div>
+            <div class="poem" data-index="82">
+                przyjacielu<br>
+                mało mnie zostało<br><br>
+                gdy kwiat spada<br>
+                zadbaj<br>
+                ponuć głoską iluzji<br><br>
+                w lustrze<br>
+                spójrz ciepło<br>
+                raz ostatni raz<br><br>
+                jak nikt niknę<br><br>
+                jak oni inny
+            </div>
+            <div class="poem" data-index="83">
+                nowa jest pewność<br>
+                w której pusto obsesją<br>
+                obca mi sztuka<br><br>
+                zbyt zmienna jest stałość<br><br>
+                gdy chcemy w nią spojrzeć<br>
+                cierpliwie czekamy<br>
+                na zmianę jej w teraz<br><br>
+                to moje jest trwanie<br><br>
+                gdy rozwój poczeka<br>
+                ukłoni przed czasem<br>
+                płaszcz mu swój oddam<br>
+                pomacham z daleka<br><br>
+                gdy mrugnie<br><br>
+                zniknę<br><br>
+                bo własny mam rozdział
+            </div>
+            <div class="poem" data-index="84">
+                inny<br>
+                gdy suchy poranek<br>
+                więc wstaję myśląc o sobie<br><br>
+                chory<br><br>
+                czerń w jego oczach<br>
+                nie zniknie tak szybko<br><br>
+                jedyna rutyna<br>
+                jest biało niebieska<br>
+                przechodzi przez gardło<br><br>
+                w tym sens<br>
+                może znajdę
+            </div>
+            <div class="poem" data-index="85">
+                metalem wielkie orły<br>
+                i nieistniejąca półka z poezją<br><br>
+                bez szansy na wiersz<br>
+                nie mogę zrozumieć
+            </div>
+            <div class="poem" data-index="86">
+                jak latać bez prawdy<br><br>
+                waniliowymi myślami<br>
+                lolitę wybrałem<br><br>
+                ahhh, czarno-morska<br>
+                mogłaś nie palić<br><br>
+                szum<br>
+                cicha prostota jej kłamstw<br>
+                „trzy kroki"<br><br>
+                dwanaście zrobie bez ciebie
+            </div>
+            <div class="poem" data-index="87">
+                chłodny<br>
+                chętny niechęci<br><br>
+                stań przed rozwojem<br>
+                głębia cię przerazi<br><br>
+                jeśli potrafisz, mnie tylko pozbieraj<br>
+                pamięć nie sięgnie zbyt wczesnych kawałków<br><br>
+                i<br><br>
+                poczekaj na wiersz<br>
+                pomyśl chwilą<br>
+                słuchaj<br><br>
+                ona sama<br>
+                on sam<br>
+                sami<br><br>
+                patrz!<br>
+                lustrzane mamy lęki<br>
+                i dotyk ponadto
+            </div>
+            <div class="poem" data-index="88">
+                zmiany<br><br>
+                to księżyc na kliszy<br>
+                to ci którzy chcieli<br><br>
+                a są dorosłymi<br><br>
+                ja, niewidzialny<br>
+                nazywałem ślepymi<br><br>
+                znikając<br>
+                chcąc wszystko<br>
+                mając nic w rękach<br><br>
+                kwitniecie dalej<br>
+                to daje mi słońce<br><br>
+                ~="_^zamrożony kwiat
+            </div>
+            <div class="poem" data-index="89">
+                widzę, to ja!<br>
+                kudłatek na pieńku<br>
+                smutny istotnie<br><br>
+                poboli wspomnienie<br>
+                nie tak miałem wracać<br>
+                szanuje swą wartość<br><br>
+                a<br><br>
+                spadłem<br><br>
+                i<br><br>
+                łapać się zacznę
+            </div>
+            <div class="poem" data-index="90">
+                szumu, szumu miałem szukać<br>
+                szumi, szumieć miało<br>
+                cicho sza-szacunek<br>
+                ciszy cisza jak ja<br><br>
+                chce ciało<br>
+                ciche ciało<br><br>
+                mnie<br>
+                cało<br>
+                w całej<br>
+                cię<br><br>
+                zawieje<br>
+                zarumienię<br>
+                zniknie nikt<br>
+                prócz ich<br><br>
+                bo kochają<br>
+                jak kochać się mają<br><br>
+                daleko<br><br>
+                ze sobą<br>
+                mnie wleką
+            </div>
+            <div class="poem" data-index="91">
+                komfort zabolał<br>
+                przestaje iluzji<br>
+                gdy gaśnie nadzieja<br><br>
+                mocno<br>
+                krzycząc rozpaczą<br>
+                sił nie mam czekać<br><br>
+                łzy za gorące<br>
+                za nim<br>
+                i za nią<br><br>
+                płacze dziś trwogą<br>
+                zmysł jest za ciężki
+            </div>
+            <div class="poem" data-index="92">
+                naprawie siebie<br>
+                twoim bezpieczeństwem<br>
+                przyszłaś<br>
+                zabierając mi przyszłość<br>
+                zostań
+            </div>
+            <div class="poem" data-index="93">
+                mam dziś wiarę<br>
+                w zachodzące pola<br>
+                i lekkie kolorem kwiaty<br><br>
+                twoimi rękoma<br>
+                hebrosem napiszę<br>
+                list o wolności<br>
+                i dziennik rozwoju<br><br>
+                romantycy<br>
+                zagubieni w schematach realności<br>
+                duszą uciekną<br>
+                na jeden moment
+            </div>
+            <div class="poem" data-index="94">
+                kłuje mnie czasem<br>
+                poetyckie zakończenie<br><br>
+                co gdyby<br>
+                legendówka wyssała by magię<br>
+                wszystkich z powodów<br>
+                zapomniałby artysta<br><br>
+                co gdyby<br>
+                świat zmieniłby za bardzo<br>
+                wyschnąłby paryż<br>
+                rozwojem lawendy<br><br>
+                co gdyby<br>
+                kobieta pocałowała kobietę<br>
+                całą starość czekając<br>
+                na ciężkiej pościeli<br><br>
+                a krzesło drewniane<br>
+                bez stabilności zniknie<br>
+                jak ma stać bez podstaw?<br>
+                jak ja.
+            </div>
+            <div class="poem" data-index="95">
+                gdy zabraknie kiedyś kwiatów<br>
+                łzą będę zdobił twe barki<br>
+                tak chudą ciszą<br>
+                bywam zmęczony<br><br>
+                nie daję inaczej<br>
+                wręcz wprost zwykle łącze<br>
+                odruchy naturą pływają<br>
+                cierpliwość wiecznością<br><br>
+                znam to już głębiej<br>
+                spadając w rozmachu<br>
+                momentem mnie złapiesz<br>
+                ustawisz na nowo
+            </div>
+            <div class="poem" data-index="96">
+                ludzie dla ludzi<br>
+                strojenie do człowieka<br>
+                niektórzy mają wiarę<br><br>
+                swoją straciłem<br>
+                bo słyszę świadomiej<br>
+                złota w dźwięku czekam<br><br>
+                do zgubnych dyrygentów:<br>
+                instrument instrumentem<br>
+                a miłość miłością zostanie<br><br>
+                harmonii szukacie<br>
+                w sobie ją mając
+            </div>
+            <div class="poem" data-index="97">
+                kiedyś ludzie<br>
+                dramatem sztukę nazwali<br>
+                a żeby prościej coś tworzyć<br>
+                ograniczyli do doby<br><br>
+                oni swoją a ja swoją<br>
+                zasadą dwóch zachodów<br>
+                bo krócej, łatwiej jest myśleć<br>
+                nie wiedząc nic o odległości
+            </div>
+            <div class="poem" data-index="98">
+                skomplikowane<br>
+                tą dzienność tłumaczyć<br>
+                gdy starzec z kwiatami za długo jej czekał<br><br>
+                a ona nie przyszła<br>
+                tą dobą zostawiła
+            </div>
+            <div class="poem" data-index="99">
+                płakutek zapukał<br>
+                w samotne okienko<br>
+                mówił:<br><br>
+                ryska na rysce<br>
+                i pusto iluzją<br>
+                poeta sam żyje?<br><br>
+                myślą:<br>
+                ah, mój płakutku<br>
+                od zawsze na zawsze<br>
+                uchylę fantazji<br>
+                pokaże ci więcej<br><br>
+                i wszedł mój płakutek<br>
+                przytulił, w kąt zaniósł<br>
+                ja taki wyschnięty<br>
+                postaram się marzyć<br><br>
+                zostałem więc tutaj<br>
+                spłoszony nadzieją<br>
+                tęsknoty nie znałem<br><br>
+                wychodząc wydrapał:<br><br>
+                ty mój sentyment<br>
+                zaskoczysz mnie kiedyś<br>
+                wierzysz choć trochę?
+            </div>
+            <div class="poem" data-index="100">
+                czekam<br>
+                czekam aż zniknę<br>
+                duch mój zostanie<br><br>
+                i wierszy kilka
+            </div>
+            <div class="poem" data-index="101">
+                przy sennym poranku<br>
+                rozmawiałem<br>
+                o akceptacji moich nadzieji<br><br>
+                czuję<br><br>
+                i tak może być<br>
+                słońca wystarczy<br>
+                na każdy twój oddech<br><br>
+                robiąc co kocham<br>
+                wspomnę o paryżu<br>
+                i tęsknym uśmiechem<br>
+                powtórzę raz jeszcze:<br><br>
+                jestem sam<br><br>
+                szepczą ulice<br>
+                przyznaje im ciszej<br><br>
+                to czysty mój rozwój
+            </div>
+            <div class="poem" data-index="102">
+                nikt tak pięknie nie pachniał<br>
+                w miejscu gdzie milion zapachów<br>
+                nieskończone obrazy<br>
+                a więcej jeszcze myśli<br><br>
+                dziś przed decyzja stoję<br>
+                którą głowę karmić<br>
+                obie kłują szeroko<br><br>
+                instynkt podpowiada<br>
+                daleko, stracony<br>
+                żebym miłości trzymał<br>
+                tej co w głębi śpiewa
+            </div>
+            <div class="poem" data-index="103">
+                znowu za późno<br>
+                skupiam się na jednym<br>
+                a wszystko to mało<br><br>
+                szata młodości<br>
+                za ciężka na moje barki<br>
+                sunie się po ziemii<br>
+                szepcząc o skupieniu<br><br>
+                chodź za mną<br>
+                podnieś delikatnie<br>
+                otwórz mój głos<br>
+                nie znikaj<br><br>
+                gdy się zamyka<br><br>
+                i pamiętaj<br>
+                mnie, moje oczy<br>
+                każde odbicie<br>
+                szczerość moich chęci<br><br>
+                nie będę tym cierpiał<br>
+                obiecałem starości<br>
+                pisać przestanę<br>
+                bez odpowiedzi
+            </div>
+            <div class="poem" data-index="104">
+                czekam na słońce<br>
+                na moment daleko<br>
+                tak pięknie wyglądasz<br>
+                od miasta zabrana<br><br>
+                ja?<br>
+                już mówiłem<br>
+                z napiętymi na boki ustami<br>
+                miękkim wydechem<br>
+                o rozwoju życiowego spokoju<br><br>
+                osiem mam słów<br>
+                dla ciebie je marzę<br>
+                wybrałem rozważnie<br>
+                tak też poczekam<br><br>
+                na zwykła zgodę<br>
+                i chwil małych kilka<br>
+                nie szepnę mych myśli<br>
+                zwyczaj wciąż trzymam
+            </div>
+            <div class="poem" data-index="105">
+                nie wytłumaczę<br>
+                znowu zbliżyłem<br>
+                jakbym do domu wracał<br>
+                w ciepłe objęcia po chłodnym dniu<br><br>
+                mały poeto, to nie dom!<br>
+                to zwykła kawiarnia<br>
+                w której komfort codzienności<br>
+                kawą pachniał<br>
+                nie lawendą<br><br>
+                nie wytłumaczę<br>
+                w sobotni poranek<br>
+                ją ugościłem<br>
+                dziwnie długo oczekiwana<br><br>
+                oczy pamiętne<br>
+                stary przyjaciel w odbiciu zieleni<br>
+                lecz uśmiech był inny<br>
+                szczerszy, odbity<br><br>
+                nie wytłumaczę<br>
+                za ciche to, za wielkie<br>
+                zostałaś na dłużej<br>
+                więc mam na to miejsce
+            </div>
+            <div class="poem" data-index="106">
+                późny mój sen<br>
+                mam to czym ratuje<br>
+                stukając szkło<br><br>
+                w czterech miejscach pęknięty<br><br>
+                i dziwny mój szept<br>
+                nie patrzy na status
+            </div>
+            <div class="poem" data-index="107">
+                jak instynkt w naturze<br>
+                czuje powinność<br><br>
+                pewniejszą podpowiedź<br>
+                z przypadku natkniętą
+            </div>
+            <div class="poem" data-index="108">
+                obiecam<br>
+                przypływ cieplejszy<br>
+                ze mną znajdzie swoje miejsce<br><br>
+                blisko czy dalej<br>
+                nie znaczę zbyt wiele<br><br>
+                gdy uśmiech zobaczę<br><br>
+                macham z daleka
+            </div>
+            <div class="poem" data-index="109">
+                znasz mnie<br>
+                żyje sztuką<br>
+                dam ci jej fragment<br>
+                bo lepiej znasz całość<br><br>
+                męsko wrażliwy<br>
+                dbasz o skrzywdzonych<br>
+                ratujesz ich z pasją<br><br>
+                patrz, nasze cele<br>
+                są jak kropla<br>
+                a ty?<br><br>
+                !wszystkie łzy!<br><br>
+                to twoje dzieci<br>
+                znasz ich powody<br>
+                potrafisz je łapać<br><br>
+                ja bywam tą łzą<br>
+                gdy się zgubie<br>
+                nic nie znacząc(o)<br><br>
+                spadam.<br><br>
+                wiesz gdzie<br>
+                wiedząc, że mogę
+            </div>
+            <div class="poem" data-index="110">
+                wiedzą być chmurą<br><br>
+                nie moim ojcem<br>
+                bo ojciec<br>
+                którego tłumaczysz<br>
+                powinien być taki<br><br>
+                jaki jesteś ty.
+            </div>
+            <div class="poem" data-index="111">
+                trafiłem w punkt<br>
+                który rozmył się w linie<br><br>
+                rozmazany<br>
+                w to całe wszystko<br><br>
+                znów<br>
+                mało znaczek<br>
+                chce ciszę za kwiatek<br><br>
+                za nów<br>
+                niech stracę, ty mów<br><br>
+                wśród zranionych burz<br>
+                masz kilka kwiatków<br>
+                czekamy, chodź tu!
+            </div>
+            <div class="poem" data-index="112">
+                to krzykliwe lustra<br>
+                zabrały nam wszystko<br><br>
+                pozwól mi na nią<br>
+                głupi poeto<br>
+                pozwól i oddaj marzenia<br><br>
+                !jego!<br>
+                następna walka<br>
+                jego<br>
+                zabierze<br><br>
+                =_*_*^*jej<br><br>
+                niczym<br>
+                ja<br>
+                niczym!<br><br>
+                krzyczę do luster<br>
+                oddajcie mi spokoj<br>
+                oddajcie nam wszystko
+            </div>
+            <div class="poem" data-index="113">
+                szał<br>
+                to nie rozwój poety<br>
+                błyski mnie męczą<br>
+                chcą mnie zastąpić<br><br>
+                lawenda<br>
+                oznacza jej wybór<br>
+                i zgodę na czerwień<br>
+                w drodze po spokój<br><br>
+                rycerzyk<br>
+                w całości nieznany<br>
+                chce nową całość<br>
+                chce nową oddychać
+            </div>
+            <div class="poem" data-index="114">
+                kiedyś<br>
+                narzekałem na braki<br>
+                nie wiedząc czym jest<br><br>
+                nicość
+            </div>
+            <div class="poem" data-index="115">
+                jak swojo na białym<br>
+                nie czuje się sobą<br><br>
+                przywykłem zaczynać<br>
+                „-"tutaj‚-"'"<br>
+                się kończąc<br><br>
+                porani mnie obco<br>
+                poranny chłód płaczu<br><br>
+                więc znowu założę<br>
+                moje, jej ciepło
+            </div>
+            <div class="poem" data-index="116">
+                cicho spadam<br>
+                już za długo<br>
+                odwróć się i bądź sobą<br><br>
+                zagubiony<br>
+                wykończony<br>
+                źle nazwany<br><br>
+                "przyjaciel"
+            </div>
+            <div class="poem" data-index="117">
+                on rozumie<br><br>
+                że się boje<br>
+                że nie umiem<br>
+                że ja gardzę realnością<br><br>
+                on nie czuje<br>
+                gdy się truje
+            </div>
+            <div class="poem" data-index="118">
+                moja fałszywa dorosłość
+            </div>
+            <div class="poem" data-index="119">
+                widziałem szkło<br>
+                za nim płonie zawiść<br>
+                to on<br><br>
+                widziałem dom<br>
+                i brak jego mamy<br>
+                i to<br>
+                że to przetrwał
+            </div>
+            <div class="poem" data-index="120">
+                północny podróżnik<br>
+                w pół nocy zniknie<br>
+                widzę swój księżyc<br><br>
+                chce znowu uciekać
+            </div>
+            <div class="poem" data-index="121">
+                to moja kawiarnia<br>
+                to moja legenda<br><br>
+                to mój jest wiersz<br>
+                który trzyma przy sobie<br><br>
+                oh, tak było łatwo<br>
+                pokazać im wszystkim<br>
+                że nie muszę niszczyć<br>
+                i palić mostów
+            </div>
+            <div class="poem" data-index="122">
+                chciałem na nią spojrzeć<br><br>
+                jako wygrany<br>
+                połączony<br>
+                jako złoty wilk<br><br>
+                bo ja<br>
+                to zły wilk<br>
+                i ja złem się karmie<br>
+                i ja w środku tęsknie<br><br>
+                za stadem<br>
+                jej ciepłem<br>
+                i sobą
+            </div>
+            <div class="poem" data-index="123">
+                chce wybuchu<br>
+                rewolucji<br>
+                zmiany<br><br>
+                miłości<br><br>
+                chce umrzeć<br>
+                i się urodzić<br><br>
+                być wielkim i małym<br>
+                wszystkimi i nikim<br>
+                synem i bratem<br><br>
+                być dobrym<br><br>
+                dla mamy
+            </div>
+            <div class="poem" data-index="124">
+                znowu czuje<br>
+                że nie mogę istnieć<br><br>
+                powstałem zbyt niepotrzebnie<br><br>
+                chce dalej oddychać<br>
+                a to im przecież się należy<br>
+                wartych tlenu istot
+            </div>
+            <div class="poem" data-index="125">
+                mówię nam: nie!<br>
+                jesteśmy sami<br>
+                samymi chwilami<br>
+                pusta jest przestrzeń<br><br>
+                nam, mówienie<br>
+                bywa trudami<br>
+                słonymi słowami<br>
+                zepsute szczęście<br><br>
+                mówię: na mnie<br>
+                bo winowajcami<br>
+                są wersje w oddali<br>
+                którymi jestem
+            </div>
+            <div class="poem" data-index="126">
+                nie mam szacunku<br>
+                do liczb<br>
+                od których uzależniony jest świat<br><br>
+                nas<br>
+                nie widział jeszcze nikt<br>
+                nie dałem oswoić się tej prawdzie<br><br>
+                bo paradoks jest tym:<br>
+                wstaje by znów się położyć<br><br>
+                i tym:<br>
+                zamykam by znowu być wolnym<br><br>
+                i tym:<br>
+                nie pogodzę się z sobą
+            </div>
+            <div class="poem" data-index="127">
+                ten ktoś<br>
+                w moim lustrze<br>
+                zaczyna wyglądać jak<br>
+                ==++on+*<br><br>
+                taką mam krew<br>
+                po drugiej stronie<br>
+                łatwo jest kłamać
+            </div>
+            <div class="poem" data-index="128">
+                w tym wyścigu grają<br>
+                morskie piosenki<br>
+                lecz morze mijałem
+            </div>
+            <div class="poem" data-index="129">
+                za kim teraz gonie?<br><br>
+                dwie drogi<br>
+                o których śpiewałem<br>
+                zwężają się w jedną<br>
+                i tam się rozpędzam
+            </div>
+            <div class="poem" data-index="130">
+                teraz już wiem<br>
+                gdzie<br>
+                kiedy<br>
+                +*^dlaczego?<br>
+                chyba rozumiem<br><br>
+                +**^+<br><br>
+                stanę się piątym<br>
+                dysocjującym<br>
+                ślepym
+            </div>
+            <div class="poem" data-index="131">
+                wyścig był niczym<br>
+                innym niż drogą<br>
+                z jednym celem<br><br>
+                jeśli mógłbym<br>
+                zostawić coś w wierszu<br>
+                to tylko prośbę<br><br>
+                wszyscy<br>
+                niech wszystkie zobaczą
+            </div>
+            <div class="poem" data-index="132">
+                jestem taki jaki chciałem<br>
+                znalazłem siebie<br>
+                w „‚+**^=drugim!!<br>
+                miejscu mocy<br><br>
+                i to właśnie tu<br>
+                czuje się swój<br><br>
+                ah, obca swobodo<br>
+                tęskniłem<br>
+                za oddychaniem<br><br>
+                tęskniłem za tym<br>
+                i nami, tak myśle<br>
+                też nasi jesteśmy<br>
+                we własnych<br><br>
+                swoich<br><br>
+                naszych<br><br>
+                miejscach mocy
+            </div>
+            <div class="poem" data-index="133">
+                ten świat ma braki<br>
+                wrażliwszej istoty<br>
+                znaleźć się nie da<br><br>
+                ci wszyscy oni<br>
+                więzieni schematem<br>
+                mówią: nie dzisiaj<br><br>
+                ku twojej dacie<br>
+                rezygnuje<br>
+                z ośmiu słów<br><br>
+                podziwiaj swą wolność<br>
+                nazywaj ją darem<br>
+                lub własną ucieczką<br><br>
+                tylko tak się znajdziesz
+            </div>
+            <div class="poem" data-index="134">
+                monotematyczny<br>
+                w mono temacie<br><br>
+                i tak sobie myśle<br>
+                że chciałbym nie myśleć<br><br>
+                nie tęsknić<br>
+                nie czuć<br>
+                nie kochać<br><br>
+                być w ogóle na nie<br>
+                albo<br>
+                w ogóle nie być<br><br>
+                nie tu<br>
+                nie teraz<br>
+                nigdzie, nigdy,<br>
+                nie!<br><br>
+                taki dziś jestem<br>
+                mono na nie.
+            </div>
+            <div class="poem" data-index="135">
+                świat zasłania mi księżyc<br>
+                a ostatnia pełnia<br>
+                nie była przecież nasza<br><br>
+                +]*^]*kocha morze +]*]+]=<br>
+                lecz chce być tam sama<br><br>
+                ,~,<br>
+                ja też chciałem
+            </div>
+            <div class="poem" data-index="136">
+                lubisz trochę smutków na jesień<br>
+                i cicho dodajesz<br>
+                i to podtrzymujesz<br><br>
+                dalej słucham!
+            </div>
+            <div class="poem" data-index="137">
+                to kolor na niebie<br>
+                i fałszywy błysk<br>
+                to dym w prawym oku<br><br>
+                wciąż jestem<br><br>
+                w zwyczaju mam<br>
+                nie patrzeć<br>
+                bo takie to ludzkie<br><br>
+                być nikim we wszystkim
+            </div>
+            <div class="poem" data-index="138">
+                to start jest i koniec<br><br>
+                droga jest cicha<br>
+                jak łza<br><br>
+                jak sen<br>
+                stane się warunkiem
+            </div>
+            <div class="poem" data-index="139">
+                dziennik ciszy<br>
+                wiele znaczy<br>
+                nim krzycząc<br>
+                w końcu zamilkłem<br><br>
+                mamo, to ja<br>
+                nie mówmy inaczej<br><br>
+                to start jest<br><br>
+                i koniec
+            </div>
+            <div class="poem" data-index="140">
+                czym się stałem<br>
+                gdy mgnienie<br>
+                zmieniło wszystko<br><br>
+                kim są ci ludzie<br>
+                błyski tych chorych<br>
+                i smutnych<br><br>
+                ja<br>
+                to czerwcowa podróż<br>
+                skrywam dla siebie<br>
+                pełno chaosu<br><br>
+                jakbym zaczynał<br>
+                \^^coś**_^<br>
+                długo się kończąc
+            </div>
+            <div class="poem" data-index="141">
+                ta wartość nie istniała<br>
+                ja! stawiam kroki<br>
+                egoista bez ego<br><br>
+                czy zbliża się koniec<br>
+                czy nowy początek<br>
+                lawendę na marmurze postawie
+            </div>
+
+            <div class="poem" data-index="142">
+                śnił mi się protest <br>
+                okłamanych delikatnych <br>
+                ich bunt przed niepewnym <br>
+                niepełnym głaskaniem <br>
+                <br>
+                by przetrwać zimę <br>
+                odwiedziłem korzeń<br>
+                on dalej wrasta<br>
+                w piekło<br>
+                <br>
+                chciałbym go przeprosić<br>
+                sam, go zauważyć <br>
+                podziękować, docenić<br>
+                i zapytać<br>
+                <br>
+                czy przesadzam? 
+            </div>
+</div>
+    </div>
+
+    <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk" style="position: fixed; top: 1rem; right: 1rem; background: none; border: 0; color: #000; font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.8; z-index: 1200; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s ease, transform 0.2s ease;">dźwięk: off</button>
+    <div class="navigation" id="navigation">
+        <button class="nav-arrow" id="prevBtn">‹</button>
+        <div class="nav-counter" id="navCounter">1 / 1</div>
+        <button class="nav-arrow" id="nextBtn">›</button>
+    </div>
+    <div class="goto-popover" id="gotoPopover" aria-hidden="true">
+        <form id="gotoForm">
+            <input class="goto-input" id="gotoInput" type="number" inputmode="numeric" min="1" step="1" placeholder="nr" aria-label="idź do wiersza" enterkeyhint="go" />
+            <button type="submit" style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;">go</button>
+        </form>
+        <div class="goto-hint">enter ⏎ • esc ✕</div>
+    </div>
+
+    <div class="controls" id="controls" aria-label="kontrolki">
+        <button class="control-btn" id="fontSmaller" title="mniejszy tekst">a</button>
+        <button class="control-btn" id="fontBigger" title="większy tekst">A</button>
+        <button class="control-btn" id="openSearch" title="szukaj">szukaj</button>
+        <button class="control-btn" id="reshuffleOrder" title="przetasuj">tasuj</button>
+        <button class="control-btn" id="copyLink" title="kopiuj link">link</button>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite">skopiowano link</div>
+
+    <div class="poem-typing" id="poemTyping">
+        <span id="poemTypedText"></span><span class="typing-cursor"></span>
+    </div>
+    <div class="search-popover" id="searchPopover" aria-hidden="true">
+        <input class="search-input" id="searchInput" type="search" placeholder="szukaj w wierszach…" aria-label="szukaj w wierszach" enterkeyhint="search">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <script src="audio.js"></script>
+    <script>
+        // Minimalny runtime: po wklejeniu .poems zastąpi #poemsMount i odpali interakcje
+        function createPoemsBackground() {
+            const background = document.getElementById('poemsBackground');
+            if (!background) return;
+            background.innerHTML = '';
+            const particleCount = 15;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'poem-particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                const size = 1 + Math.random() * 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.opacity = 0.1 + Math.random() * 0.2;
+                background.appendChild(particle);
+            }
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX; mouseY = e.clientY;
+                const particles = background.querySelectorAll('.poem-particle');
+                particles.forEach((particle) => {
+                    const rect = particle.getBoundingClientRect();
+                    const particleX = rect.left + rect.width / 2;
+                    const particleY = rect.top + rect.height / 2;
+                    const distance = Math.hypot(mouseX - particleX, mouseY - particleY);
+                    if (distance < 100) {
+                        const force = (100 - distance) / 100;
+                        const angle = Math.atan2(particleY - mouseY, particleX - mouseX);
+                        const moveX = Math.cos(angle) * force * 10;
+                        const moveY = Math.sin(angle) * force * 10;
+                        particle.style.transform = `translate(${moveX}px, ${moveY}px) scale(${1 + force * 0.5})`;
+                        particle.style.opacity = 0.3 + force * 0.2;
+                    } else {
+                        particle.style.transform = 'translate(0, 0) scale(1)';
+                        particle.style.opacity = 0.1 + Math.random() * 0.2;
+                    }
+                });
+            });
+        }
+
+        let currentPoem = 0; let poems = [];
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const navCounter = document.getElementById('navCounter');
+            prevBtn.disabled = currentPoem === 0;
+            nextBtn.disabled = currentPoem === poems.length - 1;
+            navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
+        }
+        function goToPoem(index){
+            if (index === currentPoem) return;
+            const currentPoemEl = poems[currentPoem];
+            const newPoemEl = poems[index];
+            currentPoemEl.classList.remove('active');
+            newPoemEl.classList.add('active');
+            currentPoem = index;
+            try { localStorage.setItem('poemIndex', String(currentPoem + 1)); } catch(e) {}
+            const newHash = `#wiersz-${currentPoem + 1}`;
+            if (location.hash !== newHash) history.replaceState(null, '', location.pathname + newHash);
+            updateNavigation();
+        }
+        function adjustFontScale(delta) {
+            const root = document.documentElement;
+            const current = parseFloat(getComputedStyle(root).fontSize) || 16;
+            const next = Math.min(22, Math.max(12, current + delta));
+            root.style.fontSize = next + 'px';
+        }
+        async function copyToClipboard(text) {
+            try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch(e) {}
+            try { const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok; } catch(e2){ return false; }
+        }
+        function showToast(msg){ const t=document.getElementById('toast'); if(!t){ try{ console.log(msg);}catch(e){} return;} t.textContent=msg; t.classList.add('show'); clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>t.classList.remove('show'),1200); }
+
+        document.getElementById('prevBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem>0) goToPoem(currentPoem-1); });
+        document.getElementById('nextBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem<poems.length-1) goToPoem(currentPoem+1); });
+        document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(-1); });
+        document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(1); });
+        document.getElementById('copyLink').addEventListener('click', async (e)=>{ e.preventDefault(); const link = location.origin + location.pathname + `#wiersz-${currentPoem + 1}`; const ok = await copyToClipboard(link); showToast(ok ? 'skopiowano link' : 'kopiuj: ' + link); });
+
+        // Oczekuje, że wkleisz tu wiersze: skopiuj cały <div class="poems-section"> z index i wklej wewnątrz #poemsMount
+        window.addEventListener('DOMContentLoaded', () => {
+            const mount = document.getElementById('poemsMount');
+            // jeżeli użytkownik wkleił sekcję .poem(y), znajdź je i zainicjalizuj
+            poems = Array.from(document.querySelectorAll('.poem'));
+            if (poems.length === 0 && mount) {
+                // nic nie ma – zostaw miejsce i wyjdź
+                updateNavigation();
+                return;
+            }
+            // losowa kolejność wierszy (zachowana w localStorage)
+            (function randomizePoemsOrder(){
+                try {
+                    let order = [];
+                    try { order = JSON.parse(localStorage.getItem('poemOrderV1') || '[]'); } catch(e) { order = []; }
+                    if (!Array.isArray(order) || order.length !== poems.length) {
+                        order = Array.from({length: poems.length}, (_, i) => i);
+                        for (let i = order.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [order[i], order[j]] = [order[j], order[i]];
+                        }
+                        localStorage.setItem('poemOrderV1', JSON.stringify(order));
+                    }
+                    const frag = document.createDocumentFragment();
+                    order.forEach(i => frag.appendChild(poems[i]));
+                    if (mount) { mount.innerHTML = ''; mount.appendChild(frag); }
+                    poems = Array.from(document.querySelectorAll('.poem'));
+                    poems.forEach((el, idx) => el.setAttribute('data-index', String(idx)));
+                } catch(e) { /* ignore */ }
+            })();
+
+            // aktywuj pierwszy
+            poems.forEach(p=>p.classList.remove('active'));
+            const hashMatch = location.hash.match(/^#wiersz-(\d+)$/);
+            const savedIndex = parseInt(localStorage.getItem('poemIndex') || '1');
+            let startIndex = 1;
+            if (hashMatch) startIndex = Math.max(1, Math.min(poems.length, parseInt(hashMatch[1])));
+            else if (!isNaN(savedIndex) && savedIndex >= 1 && savedIndex <= poems.length) startIndex = savedIndex;
+            currentPoem = startIndex - 1;
+            poems[currentPoem]?.classList.add('active');
+            updateNavigation();
+            createPoemsBackground();
+            try { document.getElementById('gotoInput')?.setAttribute('max', String(poems.length)); } catch(e) {}
+
+            // subtle goto on counter click
+            const navCounter = document.getElementById('navCounter');
+            const gotoPopover = document.getElementById('gotoPopover');
+            const gotoInput = document.getElementById('gotoInput');
+            if (navCounter && gotoPopover && gotoInput) {
+                navCounter.style.cursor = 'pointer';
+                function openGoto(){
+                    gotoPopover.style.display = 'block';
+                    gotoPopover.setAttribute('aria-hidden','false');
+                    gotoInput.value = String(currentPoem + 1);
+                    setTimeout(()=>{ try { gotoInput.select(); gotoInput.focus(); } catch(e){} }, 0);
+                }
+                function closeGoto(){
+                    gotoPopover.style.display = 'none';
+                    gotoPopover.setAttribute('aria-hidden','true');
+                }
+                function commitGo(){
+                    const number = parseInt(gotoInput.value, 10);
+                    if (!isNaN(number) && number >= 1 && number <= poems.length) {
+                        goToPoem(number - 1);
+                        closeGoto();
+                    } else {
+                        showToast(`podaj 1–${poems.length}`);
+                    }
+                }
+                navCounter.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); openGoto(); });
+                gotoInput.addEventListener('keydown', (e)=>{
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        commitGo();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeGoto();
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const cur = parseInt(gotoInput.value, 10) || (currentPoem + 1);
+                        gotoInput.value = String(Math.min(poems.length, cur + 1));
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const cur = parseInt(gotoInput.value, 10) || (currentPoem + 1);
+                        gotoInput.value = String(Math.max(1, cur - 1));
+                    }
+                });
+                gotoInput.addEventListener('change', ()=>{ commitGo(); });
+                const gotoForm = document.getElementById('gotoForm');
+                if (gotoForm) {
+                    gotoForm.addEventListener('submit', (e)=>{ e.preventDefault(); commitGo(); });
+                }
+                document.addEventListener('click', (e)=>{
+                    if (gotoPopover.style.display === 'block') {
+                        if (!e.target.closest('#gotoPopover') && !e.target.closest('#navigation')) {
+                            closeGoto();
+                        }
+                    }
+                });
+                window.addEventListener('resize', ()=>{ if (gotoPopover.style.display === 'block') closeGoto(); });
+            }
+
+            // search index
+            const searchBtn = document.getElementById('openSearch');
+            const searchPopover = document.getElementById('searchPopover');
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
+            function normalizePl(s){
+                const base = (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                return base.replace(/ł/g,'l').replace(/Ł/g,'l');
+            }
+            function firstNonEmptyLine(el){
+                const raw = (el.innerText || '');
+                const line = raw.split('\n').map(x=>x.trim()).find(x=>x.length>0) || '';
+                return line;
+            }
+            const poemsIndex = poems.map((el, idx) => {
+                const text = (el.innerText || '').trim();
+                const preview = firstNonEmptyLine(el);
+                return { idx, text, normText: normalizePl(text), preview };
+            });
+            function openSearchPopover(){
+                if (!searchPopover) return;
+                searchPopover.style.display = 'block';
+                searchPopover.setAttribute('aria-hidden','false');
+                if (searchInput) {
+                    searchInput.value = '';
+                    setTimeout(()=>{ try { searchInput.focus(); } catch(e){} }, 0);
+                }
+                renderSearch('');
+            }
+            function closeSearchPopover(){
+                if (!searchPopover) return;
+                searchPopover.style.display = 'none';
+                searchPopover.setAttribute('aria-hidden','true');
+            }
+            let filteredItems = poemsIndex;
+            let renderedCount = 0;
+            const PAGE = 12;
+            function attachItemHandlers(scopeEl){
+                Array.from(scopeEl.querySelectorAll('.search-item')).forEach(btn => {
+                    btn.addEventListener('click', (e)=>{
+                        const i = parseInt(e.currentTarget.getAttribute('data-i') || '0', 10);
+                        goToPoem(i);
+                        closeSearchPopover();
+                    });
+                });
+            }
+            function clearResults(){ if (searchResults) searchResults.innerHTML = ''; renderedCount = 0; }
+            function appendNextChunk(){
+                if (!searchResults) return;
+                if (renderedCount >= filteredItems.length) return;
+                const next = filteredItems.slice(renderedCount, renderedCount + PAGE);
+                const html = next.map(p => `<button class="search-item" data-i="${p.idx}">${p.idx + 1}. ${p.preview}</button>`).join('');
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                while (temp.firstChild) searchResults.appendChild(temp.firstChild);
+                attachItemHandlers(searchResults);
+                renderedCount += next.length;
+            }
+            function renderSearch(q){
+                if (!searchResults) return;
+                const query = (q || '').trim();
+                const normQ = normalizePl(query);
+                filteredItems = normQ ? poemsIndex.filter(p => p.normText.includes(normQ)) : poemsIndex;
+                clearResults();
+                appendNextChunk();
+            }
+            if (searchBtn) {
+                searchBtn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); openSearchPopover(); });
+            }
+            if (searchInput) {
+                let t;
+                searchInput.addEventListener('input', ()=>{ clearTimeout(t); t = setTimeout(()=> renderSearch(searchInput.value), 120); });
+                searchInput.addEventListener('keydown', (e)=>{
+                    if (e.key === 'Escape') { e.preventDefault(); closeSearchPopover(); }
+                    if (e.key === 'Enter') {
+                        const first = searchResults?.querySelector('.search-item');
+                        if (first) { first.click(); }
+                    }
+                });
+            }
+            if (searchResults) {
+                let loading = false;
+                searchResults.addEventListener('scroll', ()=>{
+                    if (loading) return;
+                    const nearBottom = searchResults.scrollTop + searchResults.clientHeight >= searchResults.scrollHeight - 24;
+                    if (nearBottom) {
+                        loading = true;
+                        requestAnimationFrame(()=>{ appendNextChunk(); loading = false; });
+                    }
+                });
+            }
+
+            function getActivePoemText(){
+                const el = document.querySelector('.poem.active');
+                if (!el) return '';
+                // zachowaj podziały wierszy
+                return (el.innerText || '').trim();
+            }
+            function wrapLines(ctx, text, maxWidth, lineHeight){
+                const words = text.split(/\s+/);
+                const lines = [];
+                let line = '';
+                for (let i = 0; i < words.length; i++) {
+                    const test = line ? line + ' ' + words[i] : words[i];
+                    if (ctx.measureText(test).width <= maxWidth) {
+                        line = test;
+                    } else {
+                        if (line) lines.push(line);
+                        // jeśli bardzo długie słowo, dziel po znakach
+                        if (ctx.measureText(words[i]).width > maxWidth) {
+                            let chunk = '';
+                            for (const ch of words[i]) {
+                                const test2 = chunk + ch;
+                                if (ctx.measureText(test2).width <= maxWidth) chunk = test2; else { lines.push(chunk); chunk = ch; }
+                            }
+                            line = chunk;
+                        } else {
+                            line = words[i];
+                        }
+                    }
+                }
+                if (line) lines.push(line);
+                return lines;
+            }
+            async function renderPoemToCanvasBlob(){
+                const poemText = getActivePoemText();
+                const W = 1080, H = 1920; // IG stories
+                const canvas = document.createElement('canvas');
+                canvas.width = W; canvas.height = H;
+                const ctx = canvas.getContext('2d');
+                // tło (lekko kremowe)
+                const bg = ctx.createLinearGradient(0, 0, 0, H);
+                bg.addColorStop(0, '#fffdfa');
+                bg.addColorStop(1, '#f9f6ef');
+                ctx.fillStyle = bg;
+                ctx.fillRect(0, 0, W, H);
+                // marginesy
+                const padX = 120; const padY = 200; const contentW = W - padX * 2; const contentH = H - padY * 2;
+                // ustawienia tekstu
+                ctx.fillStyle = '#000000';
+                ctx.textBaseline = 'top';
+                ctx.textAlign = 'center';
+                // tekst
+                let fontSize = 44; // mniejszy start
+                let lines;
+                const originalLines = (poemText || '').split('\n');
+                do {
+                    ctx.font = `300 ${fontSize}px Geist, IBM Plex Mono, system-ui, sans-serif`;
+                    lines = [];
+                    for (let p = 0; p < originalLines.length; p++) {
+                        const rawLine = originalLines[p];
+                        if ((rawLine || '').trim().length === 0) {
+                            lines.push(''); // zachowaj pustą linię jako odstęp
+                        } else {
+                            const wrapped = wrapLines(ctx, rawLine, contentW, fontSize * 1.4);
+                            lines.push(...wrapped);
+                        }
+                    }
+                    const totalHeightTest = lines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : fontSize * 1.4), 0);
+                    if (totalHeightTest > contentH) fontSize -= 2; else break;
+                } while (fontSize >= 28);
+                ctx.font = `300 ${fontSize}px Geist, IBM Plex Mono, system-ui, sans-serif`;
+                const lh = fontSize * 1.4;
+                // wyśrodkuj blok w pionie
+                const totalHeight = lines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : lh), 0);
+                let y = padY + Math.max(0, (contentH - totalHeight) / 2);
+                for (const ln of lines) {
+                    if (ln === '') { y += fontSize * 0.9; continue; }
+                    ctx.fillText(ln, W / 2, y);
+                    y += lh;
+                    if (y > H - padY) break;
+                }
+                // stopka
+                ctx.font = '400 22px Geist, IBM Plex Mono, system-ui, sans-serif';
+                ctx.globalAlpha = 0.18;
+                ctx.textAlign = 'right';
+                const footer = '~ staś szpineta · lawenda · szpineta.pl';
+                ctx.fillText(footer, W - padX, H - padY + 8);
+                ctx.globalAlpha = 1;
+                return await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png', 1.0));
+            }
+            document.addEventListener('keydown', (e)=>{
+                if (e.key === '/' && hasTransitioned) { e.preventDefault(); openSearchPopover(); }
+            });
+            document.addEventListener('click', (e)=>{
+                if (searchPopover && searchPopover.style.display === 'block') {
+                    if (!e.target.closest('#searchPopover') && !e.target.closest('#controls')) closeSearchPopover();
+                }
+            });
+            window.addEventListener('resize', ()=>{ if (searchPopover && searchPopover.style.display === 'block') closeSearchPopover(); });
+
+            // reshuffle
+            const reshuffleBtn = document.getElementById('reshuffleOrder');
+            if (reshuffleBtn) {
+                reshuffleBtn.addEventListener('click', (e)=>{
+                    e.preventDefault();
+                    try {
+                        // wygeneruj nową kolejność
+                        const order = Array.from({length: poems.length}, (_, i) => i);
+                        for (let i = order.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [order[i], order[j]] = [order[j], order[i]];
+                        }
+                        localStorage.setItem('poemOrderV1', JSON.stringify(order));
+
+                        // przestaw wiersze bez przeładowania strony, zachowując aktualny wiersz
+                        const mount = document.getElementById('poemsMount');
+                        if (!mount) return;
+                        const oldPoems = poems.slice();
+                        const activeOldIndex = currentPoem;
+                        const newActiveIndex = order.indexOf(activeOldIndex);
+
+                        const frag = document.createDocumentFragment();
+                        order.forEach(i => frag.appendChild(oldPoems[i]));
+                        mount.innerHTML = '';
+                        mount.appendChild(frag);
+
+                        poems = Array.from(document.querySelectorAll('.poem'));
+                        poems.forEach((el, idx) => el.setAttribute('data-index', String(idx)));
+                        poems.forEach(p => p.classList.remove('active'));
+                        if (poems[newActiveIndex]) {
+                            poems[newActiveIndex].classList.add('active');
+                            currentPoem = newActiveIndex;
+                        } else {
+                            currentPoem = 0;
+                            poems[0]?.classList.add('active');
+                        }
+                        updateNavigation();
+                        showToast('przetasowano');
+                    } catch (err) {
+                        showToast('nie udało się przetasować');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

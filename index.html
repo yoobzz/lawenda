@@ -2,50 +2,36 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>~||-_^+*.</title>
-    <meta name="description" content="wiersze stanisława szpinety — minimalistyczna interaktywna strona z poezją.">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="color-scheme" content="light">
-    <meta name="format-detection" content="telephone=no">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="~||-_^+*.">
-    <meta property="og:description" content="wiersze stanisława szpinety — minimalistyczna interaktywna strona z poezją.">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="~||-_^+*.">
-    <meta name="twitter:description" content="wiersze stanisława szpinety — minimalistyczna interaktywna strona z poezją.">
-    <link rel="icon" href="favicon.ico">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
-    <script>try{if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('reduced-motion')}}catch(e){}</script>
-    <script>
-      // ustaw --vh (1% wysokości okna) dla iOS i mobilnych przeglądarek
-      function setVh(){
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-      }
-      setVh();
-      window.addEventListener('resize', setVh);
-      window.addEventListener('orientationchange', setVh);
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    
+    <meta name="description" content="staś szpineta archiwum">
+    <meta property="og:title" content="~||-_^+*.">
+    <meta property="og:description" content="staś szpineta archiwum">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+    <meta property="og:url" content="https://szpineta.pl/">
+    <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="~||-_^+*.">
+    <meta name="twitter:description" content="staś szpineta archiwum">
+    <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
     <style>
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
-        /* iOS 100vh fix i safe areas */
-        :root { --vh: 1vh; }
-        body { min-height: calc(var(--vh) * 100); }
-        .container, .poems-section { min-height: calc(var(--vh) * 100); }
-        .navigation, .controls {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .navigation { left: 50%; transform: translateX(-50%); }
 
         body {
             font-family: 'Geist', sans-serif;
@@ -79,7 +65,7 @@
             white-space: nowrap;
         }
 
-        /* hover tytułu celowo bez efektów */
+        /* hover tytułu bez efektów */
 
         .poems-section {
             display: none;
@@ -149,8 +135,8 @@
         }
 
         .nav-arrow {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border: 2px solid #000000;
             background: transparent;
             cursor: pointer;
@@ -159,7 +145,7 @@
             align-items: center;
             justify-content: center;
             font-family: 'Geist Mono', monospace;
-            font-size: 18px;
+            font-size: 16px;
             color: #000000;
         }
 
@@ -180,37 +166,38 @@
             transform: none;
         }
 
+        /* powrót do startu */
+        .back-button {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: transparent;
+            border: 0;
+            font-family: 'Geist Mono', monospace;
+            font-size: 14px;
+            color: #000000;
+            opacity: 0.4;
+            cursor: pointer;
+            padding: 6px 8px;
+            display: none;
+            z-index: 110;
+        }
+
+        .back-button:hover { opacity: 0.8; }
+
         .nav-counter {
             font-family: 'Geist Mono', monospace;
-            font-size: 16px;
+            font-size: 14px;
             color: #000000;
             padding: 0 1rem;
         }
 
 
-        /* pasek postępu wierszy */
-        .progress {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            height: 2px;
-            background: rgba(0, 0, 0, 0.08);
-            z-index: 101;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: #000000;
-            transition: width 0.3s ease;
-        }
-
-        /* kontrolki: tryb czytania + rozmiar tekstu */
+        /* kontrolki minimalne */
         .controls {
             position: fixed;
-            right: 2rem;
-            bottom: 2rem;
+            right: 1rem;
+            bottom: 1rem;
             display: none;
             gap: 0.5rem;
             align-items: center;
@@ -220,55 +207,19 @@
             background: transparent;
             border: 0;
             font-family: 'Geist Mono', monospace;
-            font-size: 16px;
+            font-size: 14px;
             color: #000000;
             opacity: 0.8;
             cursor: pointer;
-            padding: 8px 10px;
-            min-width: 44px; min-height: 44px; /* tap target */
+            padding: 6px 8px;
         }
-        .control-btn:hover, .control-btn:focus-visible {
-            opacity: 1;
-            text-decoration: underline;
-            outline: none;
-        }
-        .control-sep { color: rgba(0,0,0,0.25); }
-
-        /* focus states minimalne */
-        .nav-arrow:focus-visible, .bio-link:focus-visible, .help-close:focus-visible {
-            outline: 1px dotted #000000;
-            outline-offset: 3px;
-        }
-        .control-btn:focus-visible {
-            outline: 1px dotted #000000;
-            outline-offset: 2px;
-        }
-
-        /* skala czcionki wierszy */
-        :root { --poem-font-scale: 1; }
-        .poem { font-size: calc(1rem * var(--poem-font-scale)); }
-
-        /* tryb czytania */
-        .reading-mode .star-fog,
-        .reading-mode .poems-background,
-        .reading-mode #instructions { display: none !important; }
-        .reading-mode .poem { color: #000000; }
-
-        /* drukowanie */
-        @media print {
-            .star-fog, #navigation, #progress, #controls, #helpOverlay, #typingText, #poemTyping, #bioOverlay { display: none !important; }
-            .poems-section { display: block !important; }
-            .poem { display: none !important; }
-            .poem.active { display: block !important; opacity: 1 !important; transform: none !important; }
-            body { color: #000000; background: #ffffff; }
-            @page { margin: 20mm; }
-        }
+        .control-btn:hover, .control-btn:focus-visible { opacity: 1; outline: none; text-decoration: underline; }
 
         /* toast kopiowania linku */
         .toast {
             position: fixed;
             left: 50%;
-            bottom: 3.5rem;
+            bottom: calc(3.5rem + env(safe-area-inset-bottom));
             transform: translateX(-50%);
             background: #000000;
             color: #ffffff;
@@ -281,42 +232,33 @@
             transition: opacity 0.2s ease;
             z-index: 1500;
         }
-        .toast.show { opacity: 0.85; }
+        .toast.show { opacity: 0.9; }
 
 
-        .instructions {
+
+        /* instrukcje nawigacji usunięte */
+
+
+        /* audio toggle */
+        .audio-toggle {
             position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.9rem;
-            color: rgba(196, 181, 253, 0.7);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-
-        /* overlay pomocy */
-        .help-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,0.95);
-            display: none;
-            z-index: 2000;
-        }
-        .help-overlay.show { display: block; }
-        .help-content {
-            max-width: 720px;
-            margin: 10vh auto;
-            padding: 2rem;
-            font-family: 'Geist Mono', monospace;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: 0;
             color: #000000;
+            font-family: 'Geist Mono', monospace;
+            font-size: 12px;
+            opacity: 0.8;
+            z-index: 1200;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
-        .help-title { font-size: 1.2rem; margin-bottom: 1rem; }
-        .help-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
-        .help-key { color: #666666; }
-        .help-close { position: fixed; top: 1rem; right: 1rem; background: transparent; border: 0; font-size: 1.5rem; cursor: pointer; }
+        .audio-toggle:hover { opacity: 1; transform: translateY(-1px); }
 
+        /* ukryj przycisk dźwięku na stronie startowej */
+        #landingContainer #audioToggle { display: none; }
 
         .star-fog {
             position: fixed;
@@ -335,7 +277,7 @@
         .star-container {
             position: relative;
             width: 100vw;
-            height: calc(var(--vh) * 100);
+            height: 100vh;
             animation: starMorph 15s ease-in-out infinite;
         }
 
@@ -348,12 +290,20 @@
             transform-style: preserve-3d;
             user-select: none;
             will-change: transform;
-            animation: particleFloat 15s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: particleSway 10s ease-in-out infinite alternate;
             opacity: 0;
         }
 
         .star-particle.typing-in {
-            opacity: 1;
+            opacity: 0.4;
+        }
+
+        @keyframes particleSway {
+            0% { transform: translate3d(0px, 0px, 0px); }
+            25% { transform: translate3d(3px, -4px, 0px); }
+            50% { transform: translate3d(0px, -6px, 0px); }
+            75% { transform: translate3d(-3px, -4px, 0px); }
+            100% { transform: translate3d(0px, 0px, 0px); }
         }
 
         @keyframes particleFloat {
@@ -526,7 +476,7 @@
             opacity: 1;
         }
 
-        /* .typing-text.completed bez zmian wizualnych */
+        /* .typing-text.completed bez dodatkowych zmian */
 
         .typing-cursor {
             display: inline-block;
@@ -546,6 +496,9 @@
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
 
         .poem-typing {
             position: fixed;
@@ -560,9 +513,8 @@
             letter-spacing: 0.1em;
             white-space: nowrap;
             opacity: 0;
-            display: none; /* ukryj sekwencje znaków */
-            pointer-events: none;
-        }
+            display: flex; /* ukryj sekwencje znaków */
+        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               j
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
         .poem-typing.show {
@@ -725,35 +677,9 @@
             transform: translate(150px, -50%);
             width: 300px;
         }
-        /* respektuj preferencje reduced motion */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation: none !important;
-                transition: none !important;
-                scroll-behavior: auto !important;
-            }
-            .star-container {
-                animation: none !important;
-            }
-        }
-        html.reduced-motion * {
-            animation: none !important;
-            transition: none !important;
-        }
-
+        
         /* mobile layout dla bio */
         @media (max-width: 640px) {
-            /* kontrolki i nawigacja nie powinny nachodzić na tekst */
-            .controls {
-                top: calc(env(safe-area-inset-top) + 8px);
-                right: 8px;
-                bottom: auto;
-                left: auto;
-                gap: 0.25rem;
-            }
-            .navigation {
-                bottom: calc(1rem + env(safe-area-inset-bottom));
-            }
             .bio-overlay {
                 padding: 16px;
                 overflow-y: auto;
@@ -778,46 +704,33 @@
                 height: auto;
                 max-height: 40vh;
             }
-            .bio-photo video { height: 100%; }
-            .bio-title {
-                position: static;
-                margin-top: 4px;
-            }
-            .bio-text {
-                position: static;
-                width: auto;
-                font-size: 1rem;
-            }
-            .bio-links {
-                position: static;
-                gap: 0.6rem;
-            }
-            .spotify-widget {
-                position: static;
-                transform: none;
-                width: 100%;
-            }
+            .bio-photo video { width: 100%; height: 100%; object-fit: cover; }
+            .bio-title { position: static; margin-top: 4px; }
+            .bio-text { position: static; width: auto; font-size: 1rem; }
+            .bio-links { position: static; gap: 0.6rem; }
+            .spotify-widget { position: static; transform: none; width: 100%; }
             .bio-extra-text-1 { display: none; }
             .bio-close { top: 0.5rem; right: 0.5rem; }
         }
     </style>
 </head>
 <body>
-    <noscript>ta strona wymaga włączonego javascriptu, aby działać poprawnie.</noscript>
     <div class="star-fog" id="starFog">
         <div class="star-container" id="starContainer"></div>
     </div>
     
     <div class="container" id="landingContainer">
+        <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
         <h1 class="title title-emerging" id="title">~||-_^+*.</h1>
-        <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.8rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.15em; font-family: 'Geist Mono', monospace; cursor: pointer; transition: all 0.3s ease;">
+        <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.8rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.15em; font-family: 'IBM Plex Mono', 'Geist Mono', monospace; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
         </div>
     </div>
 
     <div class="poems-section" id="poemsSection">
         <div class="poems-background" id="poemsBackground"></div>
-        <div class="poem active poem-breathing" data-index="0">
+        <button class="back-button" id="backToStart" title="wróć">← start</button>
+        <div class="poem active" data-index="0">
             po pełni<br>
             (z)nów<br><br>
             na jednego<br>
@@ -826,6 +739,7 @@
             zakończy *_nowość^•<br>
             "nowym"<br>
             końcem<br><br>
+            a<br> <br>
             popełni<br>
             znów<br><br>
             coś z niepełnych słów<br>
@@ -2723,7 +2637,27 @@
             czy nowy początek<br>
             lawendę na marmurze postawie
         </div>
-    </div>
+    
+
+        <div class="poem" data-index="142">
+            śnił mi się protest <br>
+                okłamanych delikatnych <br>
+                ich bunt przed niepewnym <br>
+                niepełnym głaskaniem <br>
+                <br>
+                by przetrwać zimę <br>
+                odwiedziłem korzeń<br>
+                on dalej wrasta<br>
+                w piekło<br>
+                <br>
+                chciałbym go przeprosić<br>
+                sam, go zauważyć <br>
+                podziękować, docenić<br>
+                i zapytać<br>
+                <br>
+                czy przesadzam? 
+        </div>
+</div>
 
     <div class="navigation" id="navigation">
         <button class="nav-arrow" id="prevBtn">‹</button>
@@ -2731,47 +2665,24 @@
         <button class="nav-arrow" id="nextBtn">›</button>
     </div>
 
-    <div class="progress" id="progress">
-        <div class="progress-fill" id="progressFill"></div>
-    </div>
-
-    <div class="controls" id="controls" aria-label="kontrolki czytania">
+    <div class="controls" id="controls" aria-label="kontrolki">
         <button class="control-btn" id="fontSmaller" title="mniejszy tekst">a</button>
         <button class="control-btn" id="fontBigger" title="większy tekst">A</button>
-        <span class="control-sep">/</span>
-        <button class="control-btn" id="copyLink" title="kopiuj link do wiersza">link</button>
+        <button class="control-btn" id="copyLink" title="kopiuj link">link</button>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite">skopiowano link</div>
 
-    <div class="instructions" id="instructions">
-        scroll: nawigacja • przyciski: poprzedni/następny • kliknij lewą/prawą stronę ekranu
-    </div>
     
-    <div class="help-overlay" id="helpOverlay" aria-hidden="true">
-        <button class="help-close" id="helpClose" aria-label="zamknij pomoc">×</button>
-        <div class="help-content">
-            <div class="help-title">skrót klawiszowy „?” — pomoc</div>
-            <div class="help-grid">
-                <div class="help-key">← / →</div><div>poprzedni / następny wiersz</div>
-                <div class="help-key">↑ / ↓</div><div>poprzedni / następny wiersz</div>
-                <div class="help-key">PageUp / PageDown</div><div>o jeden wiersz</div>
-                <div class="help-key">Home / End</div><div>pierwszy / ostatni</div>
-                <div class="help-key">1–9</div><div>szybki skok</div>
-                <div class="help-key">g</div><div>skok do numeru</div>
-                <div class="help-key">r</div><div>losowy wiersz</div>
-                <div class="help-key">klik lewa/prawa</div><div>poprzedni / następny</div>
-                <div class="help-key">#wiersz-N</div><div>link bezpośredni</div>
-            </div>
-        </div>
-    </div>
-
+    
     
     
 
     <div class="typing-text" id="typingText">
         <span id="typedText"></span><span class="typing-cursor"></span>
     </div>
-    <!-- sekwencja znaków wyłączona -->
+    <div class="poem-typing" id="poemTyping">
+        <span id="poemTypedText"></span><span class="typing-cursor"></span>
+    </div>
 
     <div class="bio-overlay" id="bioOverlay">
         <button class="bio-close" id="bioClose">×</button>
@@ -2782,7 +2693,7 @@
             </video>
             <h2 class="bio-title"><span class="bio-first-name">staś</span> <span class="bio-last-name">szpineta</span></h2>
             <p class="bio-text">
-to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszystko musi mieć sens. piszę, bo wiersze są dla mnie naturalnym i jedynym sposobem, żeby nie zgubić siebie w sobie i w świecie. to moja codzienność, pamięć, myśli, emocje, wspomnienia, a czasem rozmowa z kimś, kogo już nie ma albo kto jest bardzo blisko. w tekstach dodaję znaki, traktując je jako coś, czego nie da się zapisać słowami. to mój własny język. mój tworzony od kilku lat zbiór „lawenda" to pierwszy krok do pokazania ludziom mojego świata. oprócz pisania tworzę muzykę, biżuterię, maluję, projektuję. kocham naturę, wschody słońca, ciszę i dźwięk analogowych kaset audio.
+nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszystko musi mieć sens. piszę, bo wiersze są dla mnie naturalnym i jedynym sposobem, żeby nie zgubić siebie w sobie i w świecie. to moja codzienność, pamięć, myśli, emocje, wspomnienia, a czasem rozmowa z kimś, kogo już nie ma albo kto jest bardzo blisko. w tekstach dodaję znaki, traktując je jako coś, czego nie da się zapisać słowami. to mój własny język. mój tworzony od kilku lat zbiór „lawenda" to pierwszy krok do pokazania ludziom mojego świata. oprócz pisania tworzę muzykę, biżuterię, maluję, projektuję. kocham naturę, wschody słońca, ciszę i dźwięk analogowych kaset audio.
             </p>
             <div class="bio-links">
                 <a href="mailto:stas.mono123@gmail.com" class="bio-link">email</a>
@@ -2799,13 +2710,14 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         </div>
     </div>
 
+    <script src="audio.js"></script>
     <script>
         let currentPoem = 0;
         let hasTransitioned = false;
         let isAnimating = false;
         const poems = document.querySelectorAll('.poem');
         const navDots = document.querySelectorAll('.nav-dot');
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        
 
         // super wydajna fala 3d z więcej znaków
         function createStarFog() {
@@ -2814,27 +2726,21 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             
             // Mniej gęste, bardziej losowe cząsteczki
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            const count = isTouch ? 500 : 1200;
+            const count = isTouch ? 900 : 2000;
             for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'star-particle';
                 particle.textContent = chars[Math.floor(Math.random() * chars.length)];
                 
-                // Bardziej losowa pozycja
+                // Losowa pozycja
                 const x = Math.random() * window.innerWidth;
                 const y = Math.random() * window.innerHeight;
                 
-                // Bardziej losowa fala 3d
-                const wave1 = Math.sin(x * (0.001 + Math.random() * 0.005)) * (50 + Math.random() * 100);
-                const wave2 = Math.cos(y * (0.002 + Math.random() * 0.004)) * (40 + Math.random() * 80);
-                const wave3 = Math.sin(x * 0.0005 + y * 0.0005) * (30 + Math.random() * 60);
-                const z = wave1 + wave2 + wave3 + (Math.random() - 0.5) * 200;
-                
                 particle.style.left = x + 'px';
                 particle.style.top = y + 'px';
-                particle.style.transform = `translateZ(${z}px)`;
-                particle.style.animationDelay = Math.random() * 12 + 's';
-                particle.style.animationDuration = (8 + Math.random() * 8) + 's';
+                // delikatne różnicowanie rytmu
+                particle.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
+                particle.style.animationDuration = (9 + Math.random() * 6).toFixed(2) + 's';
                 
                 container.appendChild(particle);
             }
@@ -2847,6 +2753,8 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 }, index * 50); // 50ms między każdą cząsteczką (jak timer)
             });
         }
+
+        // audio sterowane przez audio.js
 
         // Przejście do sekcji wierszy
         function transitionToPoems() {
@@ -2886,41 +2794,27 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 // Pokaż nawigację i kontrolki
                 document.getElementById('navigation').style.display = 'flex';
                 document.getElementById('controls').style.display = 'flex';
+                document.getElementById('backToStart').style.display = 'block';
                 
-                // Ustal indeks startowy: hash lub pamięć lokalna
-                const hashMatch = window.location.hash.match(/^#wiersz-(\d+)$/);
-                const stored = localStorage.getItem('lastPoemIndex');
-                let startIndex = 0;
+                // Uruchom animacje dla pierwszego wiersza
+                // Jeśli hash lub zapis w localStorage, ustaw odpowiedni wiersz
+                const hashMatch = location.hash.match(/^#wiersz-(\d+)$/);
+                const savedIndex = parseInt(localStorage.getItem('poemIndex') || '1');
+                let startIndex = 1;
                 if (hashMatch) {
-                    const n = parseInt(hashMatch[1], 10);
-                    if (!Number.isNaN(n) && n >= 1 && n <= poems.length) startIndex = n - 1;
-                } else if (stored !== null) {
-                    const n = parseInt(stored, 10);
-                    if (!Number.isNaN(n) && n >= 0 && n < poems.length) startIndex = n;
+                    startIndex = Math.max(1, Math.min(poems.length, parseInt(hashMatch[1])));
+                } else if (!isNaN(savedIndex) && savedIndex >= 1 && savedIndex <= poems.length) {
+                    startIndex = savedIndex;
                 }
 
-                // Aktywuj właściwy wiersz
-                document.querySelector('.poem.active')?.classList.remove('active');
-                poems[startIndex].classList.add('active');
-                currentPoem = startIndex;
+                if (startIndex > 1) {
+                    currentPoem = 0;
+                    goToPoem(startIndex - 1);
+                }
 
-                // Animacje i nawigacja
                 startPoemBreathing();
-                // startPoemTyping(currentPoem); // wyłączone
+                startPoemTyping(currentPoem);
                 updateNavigation();
-                updateHashAndStore();
-
-                // Pokaż instrukcje na kilka sekund po przejściu
-                const instr = document.getElementById('instructions');
-                if (instr) {
-                    instr.style.opacity = '1';
-                    setTimeout(() => { instr.style.opacity = '0'; }, 3500);
-                }
-            
-                // wyczyść automatyczne animacje na mobile
-                try { if (__autoLawendaStop) clearTimeout(__autoLawendaStop); } catch(e) {}
-                try { if (__autoStasTimer) clearInterval(__autoStasTimer); } catch(e) {}
-            
             }, 500);
         }
 
@@ -2936,17 +2830,6 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             
             // Aktualizuj licznik
             navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
-
-            // Aktualizuj pasek postępu
-            updateProgress();
-        }
-
-        // Pasek postępu
-        function updateProgress() {
-            const fill = document.getElementById('progressFill');
-            if (!fill) return;
-            const percent = poems.length > 0 ? ((currentPoem + 1) / poems.length) * 100 : 0;
-            fill.style.width = percent + '%';
         }
 
         // Nawigacja między wierszami
@@ -2975,7 +2858,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                     // Uruchom animacje po zakończeniu
                     setTimeout(() => {
                         startPoemBreathing();
-                        // startPoemTyping(index); // wyłączone
+                        startPoemTyping(index);
                         isAnimating = false;
                     }, 300);
                 }, 50);
@@ -2983,40 +2866,23 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             
             currentPoem = index;
             
+            // zapamiętaj pozycję
+            try { localStorage.setItem('poemIndex', String(currentPoem + 1)); } catch(e) {}
+            // aktualizuj hash bez przewijania
+            const newHash = `#wiersz-${currentPoem + 1}`;
+            if (location.hash !== newHash) {
+                history.replaceState(null, '', location.pathname + newHash);
+            }
+
             // Aktualizuj nawigację
             updateNavigation();
-            updateHashAndStore();
         
         }
-
-        // Hash i zapamiętywanie pozycji
-        function updateHashAndStore() {
-            const newHash = `#wiersz-${currentPoem + 1}`;
-            if (window.location.hash !== newHash) {
-                history.replaceState(null, '', newHash);
-            }
-            try { localStorage.setItem('lastPoemIndex', String(currentPoem)); } catch(e) {}
-        }
-
-        // Obsługa wejścia przez hash po załadowaniu (gdy już przeszliśmy do wierszy)
-        window.addEventListener('hashchange', () => {
-            if (!hasTransitioned) return;
-            const m = window.location.hash.match(/^#wiersz-(\d+)$/);
-            if (m) {
-                const n = parseInt(m[1], 10);
-                if (!Number.isNaN(n) && n >= 1 && n <= poems.length) {
-                    goToPoem(n - 1);
-                }
-            }
-        });
 
 
         // Animacja oddychania wiersza
         function startPoemBreathing() {
-            const activePoem = document.querySelector('.poem.active');
-            if (activePoem) {
-                activePoem.classList.add('poem-breathing');
-            }
+            // wyłączone oddychanie wierszy
         }
 
         // Interaktywne tło dla sekcji wierszy
@@ -3095,63 +2961,136 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             let mouseY = window.innerHeight / 2;
             let timerX = window.innerWidth / 2;
             let timerY = 2 * 16; // 2rem w pikselach
-            
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const gyroMultiplier = 5; // zwiększona czułość
+            const maxDistMouse = isTouch ? 220 : 100;
+            const maxDistTimer = isTouch ? 280 : 150;
+            const pushMouse = isTouch ? 80 : 30;
+            const pushTimer = isTouch ? 140 : 50;
+            let animId = null;
+
             document.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
                 updateParticles();
             });
-            
+
+            // żyroskop na telefonach: reaguj na przechylenie
+            if (isTouch) {
+                let gyroActive = false;
+
+                function handleOrientation(e) {
+                    const g = (typeof e.gamma === 'number') ? e.gamma : 0; // lewo prawo ~ -90..90
+                    const b = (typeof e.beta === 'number') ? e.beta : 0;   // przód tył ~ -180..180
+                    const gamma = Math.max(-45, Math.min(45, g * gyroMultiplier));
+                    const beta = Math.max(-45, Math.min(45, b * gyroMultiplier));
+                    const nx = (gamma + 45) / 90; // 0..1
+                    const ny = (beta + 45) / 90;  // 0..1
+                    mouseX = nx * window.innerWidth;
+                    mouseY = ny * window.innerHeight;
+                    updateParticles();
+                }
+
+                function handleMotion(e){
+                    const acc = e.accelerationIncludingGravity || {};
+                    const ax = typeof acc.x === 'number' ? acc.x : 0;
+                    const ay = typeof acc.y === 'number' ? acc.y : 0;
+                    const g = 9.81;
+                    const nx = Math.max(-1, Math.min(1, (ax / g) * gyroMultiplier));
+                    const ny = Math.max(-1, Math.min(1, (ay / g) * gyroMultiplier));
+                    mouseX = ((nx + 1) / 2) * window.innerWidth;
+                    mouseY = ((ny + 1) / 2) * window.innerHeight;
+                    updateParticles();
+                }
+
+                async function enableGyro() {
+                    if (gyroActive) return;
+                    try {
+                        if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                            const res = await DeviceOrientationEvent.requestPermission();
+                            if (res !== 'granted') return;
+                        }
+                        if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') {
+                            try { await DeviceMotionEvent.requestPermission(); } catch(_) {}
+                        }
+                    } catch(_) {}
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                    if (window.DeviceMotionEvent) {
+                        window.addEventListener('devicemotion', handleMotion, true);
+                    }
+                    gyroActive = true;
+                }
+
+                // android: bez proszenia o zgodę; ios: po pierwszym dotyku
+                if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                    if (window.DeviceMotionEvent) {
+                        window.addEventListener('devicemotion', handleMotion, true);
+                    }
+                    gyroActive = true;
+                } else {
+                    const primeGyro = () => { enableGyro(); document.removeEventListener('touchend', primeGyro); document.removeEventListener('click', primeGyro); };
+                    document.addEventListener('touchend', primeGyro, { once: true, passive: true });
+                    document.addEventListener('click', primeGyro, { once: true });
+                }
+            }
+
             function updateParticles() {
                 const particles = container.querySelectorAll('.star-particle');
                 particles.forEach(particle => {
                     const rect = particle.getBoundingClientRect();
                     const particleX = rect.left + rect.width / 2;
                     const particleY = rect.top + rect.height / 2;
-                    
+
                     // Odległość od myszy
                     const dx = mouseX - particleX;
                     const dy = mouseY - particleY;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    
+
                     // Odległość od timera (tylko gdy jest widoczny)
                     const timerDx = timerX - particleX;
                     const timerDy = timerY - particleY;
                     const timerDistance = Math.sqrt(timerDx * timerDx + timerDy * timerDy);
-                    
+
                     let totalPushX = 0;
                     let totalPushY = 0;
-                    
-                    // Siła odpychania od myszy
-                    const maxDistance = 100;
+
+                    // Siła odpychania od myszy/żyroskopu
+                    const maxDistance = maxDistMouse;
                     if (distance < maxDistance) {
                         const force = (maxDistance - distance) / maxDistance;
                         const angle = Math.atan2(dy, dx);
-                        totalPushX += Math.cos(angle) * force * 30;
-                        totalPushY += Math.sin(angle) * force * 30;
+                        totalPushX += Math.cos(angle) * force * pushMouse;
+                        totalPushY += Math.sin(angle) * force * pushMouse;
                     }
-                    
+
                     // Siła odpychania od timera (większa)
-                    const timerMaxDistance = 150;
+                    const timerMaxDistance = maxDistTimer;
                     if (timerDistance < timerMaxDistance) {
                         const timerForce = (timerMaxDistance - timerDistance) / timerMaxDistance;
                         const timerAngle = Math.atan2(timerDy, timerDx);
-                        totalPushX += Math.cos(timerAngle) * timerForce * 50;
-                        totalPushY += Math.sin(timerAngle) * timerForce * 50;
+                        totalPushX += Math.cos(timerAngle) * timerForce * pushTimer;
+                        totalPushY += Math.sin(timerAngle) * timerForce * pushTimer;
                     }
-                    
+
                     // Aktualizuj pozycję
                     if (totalPushX !== 0 || totalPushY !== 0) {
                         const currentX = parseFloat(particle.style.left) || 0;
                         const currentY = parseFloat(particle.style.top) || 0;
                         const newX = currentX - totalPushX;
                         const newY = currentY - totalPushY;
-                        
+
                         particle.style.left = newX + 'px';
                         particle.style.top = newY + 'px';
                     }
                 });
             }
+
+            // płynna pętla animacji
+            (function loop(){
+                updateParticles();
+                animId = requestAnimationFrame(loop);
+            })();
         }
 
         // Typing animation - timer
@@ -3192,19 +3131,21 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         // Animacja pisania tytułu po timerze
         function startTitleTyping() {
             const title = document.getElementById('title');
-            const text = '"~||-_^+*.';
+            const text = '~||-_^+*.';
             const charDelay = 120; // 120ms między znakami (przyspieszone)
             
             title.textContent = '';
             title.style.opacity = '0.6';
             
             let index = 0;
+            window.__isTitleTyping = true;
             const typingInterval = setInterval(() => {
                 if (index < text.length) {
                     title.textContent += text[index];
                     index++;
                 } else {
                     clearInterval(typingInterval);
+                    window.__isTitleTyping = false;
                     
                     // Po ostatnim znaku tytułu - pojawia się tło
                     createStarFog();
@@ -3472,7 +3413,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
 
         // Animacja "lawenda" - zamienia znaczki na "lawenda" i z powrotem
         function animateLawenda() {
-            if (isAnimating) return; // Nie uruchamiaj jeśli już trwa animacja
+            if (isAnimating || window.__isTitleTyping) return; // Nie uruchamiaj jeśli trwa pisanie tytułu lub animacja
             
             isAnimating = true;
             const title = document.getElementById('title');
@@ -3589,35 +3530,40 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         
         // Start typing animation - pisze tytuł dużymi literami
         startTyping();
-        // Na urządzeniach dotykowych: automatyczne animacje na landing page
-        let __autoLawendaStop = null;
-        let __autoStasTimer = null;
-        if (isTouchDevice) {
-            // odczekaj aż canTransition będzie true (koniec timera)
-            const waitForReady = setInterval(() => {
-                if (typeof canTransition !== 'undefined' && canTransition) {
-                    clearInterval(waitForReady);
-                    // losowo co 6–14s animuj tytuł
-                    let alive = true;
-                    (function loopLawenda(){
-                        if (!alive || hasTransitioned) return;
-                        const delay = 6000 + Math.random()*8000;
-                        __autoLawendaStop = setTimeout(() => { animateLawenda(); loopLawenda(); }, delay);
-                    })();
-                    // co 10s delikatnie animuj "staś"
-                    __autoStasTimer = setInterval(() => {
-                        if (hasTransitioned) return;
-                        animateStas();
-                    }, 10000);
+        // Autoanimacje: najpierw jednorazowo po chwili, potem co ~10s (naprzemiennie)
+        (function setupAutoAnimations(){
+            let cleared = false;
+            const clearAll = () => { cleared = true; };
+            // wyczyść przy przejściu do wierszy
+            const origTransition = transitionToPoems;
+            window.transitionToPoems = function(){ clearAll(); return origTransition.apply(this, arguments); };
+
+            // uruchom po gotowości (canTransition)
+            const readyInt = setInterval(() => {
+                if (canTransition) {
+                    clearInterval(readyInt);
+                    if (cleared) return;
+                    // jednorazowo: tytuł po 1200ms, imię po 2500ms
+                    setTimeout(() => { if (!cleared) animateLawenda(); }, 1200);
+                    setTimeout(() => { if (!cleared) animateStas(); }, 2500);
+                    // cyklicznie naprzemiennie co ~10s
+                    let toggle = true;
+                    const loop = () => {
+                        if (cleared || hasTransitioned) return;
+                        if (toggle) animateLawenda(); else animateStas();
+                        toggle = !toggle;
+                        setTimeout(loop, 10000);
+                    };
+                    setTimeout(loop, 10000);
                 }
-            }, 300);
-        }
+            }, 200);
+        })();
         
         // Apply glitch animation to poems will be called when needed
 
         document.getElementById('title').addEventListener('click', () => {
             if (canTransition) {
-                transitionToPoems();
+                window.location.href = 'poems.html';
             } else {
                 // Pokaż komunikat że trzeba poczekać
                 const title = document.getElementById('title');
@@ -3631,6 +3577,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 }, 1000);
             }
         });
+
 
         // Animacja "lawenda" przy najezdzaniu na tytuł
         document.getElementById('title').addEventListener('mouseenter', () => {
@@ -3651,7 +3598,7 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     if (canTransition) {
-                        transitionToPoems();
+                        window.location.href = 'poems.html';
                     } else {
                         // Pokaż komunikat że trzeba poczekać
                         const title = document.getElementById('title');
@@ -3683,15 +3630,6 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 goToPoem(currentPoem + 1);
             }
             
-            // Pomoc — overlay pod "?"
-            if (e.key === '?') {
-                e.preventDefault();
-                const help = document.getElementById('helpOverlay');
-                help.classList.add('show');
-                help.setAttribute('aria-hidden', 'false');
-                return;
-            }
-
             // Szybki skok do pierwszych 9 wierszy
             else if (e.key >= '1' && e.key <= '9') {
                 e.preventDefault();
@@ -3750,25 +3688,13 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
                 const randomIndex = Math.floor(Math.random() * poems.length);
                 goToPoem(randomIndex);
             }
-            // zmiana rozmiaru tekstu (cmd/ctrl + + / -)
-            else if ((e.key === '+' || e.key === '=') && (e.ctrlKey || e.metaKey)) {
+            // wyjście Esc
+            else if (e.key === 'Escape' && hasTransitioned) {
                 e.preventDefault();
-                adjustFontScale(0.05);
-            } else if (e.key === '-' && (e.ctrlKey || e.metaKey)) {
-                e.preventDefault();
-                adjustFontScale(-0.05);
-            }
-        });
-
-        // zamknięcie overlayu pomocy
-        document.getElementById('helpClose').addEventListener('click', () => {
-            const help = document.getElementById('helpOverlay');
-            help.classList.remove('show');
-            help.setAttribute('aria-hidden', 'true');
-        });
-        document.getElementById('helpOverlay').addEventListener('click', (e) => {
-            if (e.target.id === 'helpOverlay') {
-                document.getElementById('helpClose').click();
+                const backBtn = document.getElementById('backToStart');
+                if (backBtn && backBtn.style.display !== 'none') {
+                    backBtn.click();
+                }
             }
         });
 
@@ -3781,57 +3707,58 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             }
         });
 
-        // Kontrolki
-        function toggleReadingMode() {
-            const pressed = document.body.classList.toggle('reading-mode');
-            // kontrolka trybu czytania usunięta
-        }
-
-        function adjustFontScale(delta) {
-            const root = document.documentElement;
-            const current = parseFloat(getComputedStyle(root).getPropertyValue('--poem-font-scale')) || 1;
-            const next = Math.min(1.6, Math.max(0.8, current + delta));
-            root.style.setProperty('--poem-font-scale', String(next));
-            try { localStorage.setItem('poemFontScale', String(next)); } catch(e) {}
-        }
-
-        function restoreFontScale() {
-            try {
-                const v = parseFloat(localStorage.getItem('poemFontScale'));
-                if (!Number.isNaN(v) && v >= 0.8 && v <= 1.6) {
-                    document.documentElement.style.setProperty('--poem-font-scale', String(v));
-                }
-            } catch(e) {}
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            if (!t) return;
-            t.textContent = msg;
-            t.classList.add('show');
-            clearTimeout(window.__toastTimer);
-            window.__toastTimer = setTimeout(() => t.classList.remove('show'), 1200);
-        }
-
-        // przycisk trybu czytania usunięty
-        document.getElementById('fontSmaller').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); adjustFontScale(-0.05); });
-        document.getElementById('fontBigger').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); adjustFontScale(0.05); });
-        document.getElementById('copyLink').addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const link = location.origin + location.pathname + `#wiersz-${currentPoem + 1}`;
-            try { await navigator.clipboard.writeText(link); showToast('skopiowano link'); }
-            catch(e) { showToast('nie udało się skopiować'); }
-        });
-
-        // przy wejściu przywróć skalę czcionki
-        restoreFontScale();
         document.getElementById('nextBtn').addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             if (currentPoem < poems.length - 1) {
                 goToPoem(currentPoem + 1);
             }
+        });
+
+        // kontrolki
+        function adjustFontScale(delta) {
+            const root = document.documentElement;
+            const current = parseFloat(getComputedStyle(root).fontSize) || 16;
+            const next = Math.min(22, Math.max(12, current + delta));
+            root.style.fontSize = next + 'px';
+        }
+        async function copyToClipboard(text) {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                }
+            } catch (e) {}
+            // fallback dla nieszyfrowanych originów (np. 192.168.x.x)
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.setAttribute('readonly', '');
+                ta.style.position = 'fixed';
+                ta.style.top = '-9999px';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                return ok;
+            } catch (e2) { return false; }
+        }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            if (!t) { try { console.log(msg); } catch(e) {} return; }
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => t.classList.remove('show'), 1200);
+        }
+        document.getElementById('fontSmaller').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); adjustFontScale(-1); });
+        document.getElementById('fontBigger').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); adjustFontScale(1); });
+        document.getElementById('copyLink').addEventListener('click', async (e) => {
+            e.preventDefault(); e.stopPropagation();
+            const link = location.origin + location.pathname + `#wiersz-${currentPoem + 1}`;
+            const ok = await copyToClipboard(link);
+            showToast(ok ? 'skopiowano link' : 'kopiuj: ' + link);
         });
 
         // Scroll wheel support z debounce
@@ -3858,63 +3785,16 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             }
         }, { passive: false });
 
-        // Swipe na urządzeniach dotykowych
-        let touchStartX = null;
-        let touchStartY = null;
-        let touchStartTime = 0;
-        const SWIPE_DISTANCE = 40; // px
-        const SWIPE_TIME = 500; // ms
-
-        document.addEventListener('touchstart', (e) => {
-            if (!hasTransitioned) return;
-            const t = e.changedTouches[0];
-            touchStartX = t.clientX;
-            touchStartY = t.clientY;
-            touchStartTime = Date.now();
-        }, { passive: true });
-
-        document.addEventListener('touchend', (e) => {
-            if (!hasTransitioned || touchStartX === null) return;
-            const t = e.changedTouches[0];
-            const dx = t.clientX - touchStartX;
-            const dy = t.clientY - touchStartY;
-            const dt = Date.now() - touchStartTime;
-
-            // horyzontalny gest, niewielki dryf pionowy i w czasie
-            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_DISTANCE && dt < SWIPE_TIME) {
-                if (dx < 0 && currentPoem < poems.length - 1) {
-                    goToPoem(currentPoem + 1);
-                } else if (dx > 0 && currentPoem > 0) {
-                    goToPoem(currentPoem - 1);
-                }
-            }
-
-            touchStartX = touchStartY = null;
-        }, { passive: true });
-
         // Kliknięcie w lewą/prawą stronę ekranu
         document.addEventListener('click', (e) => {
             if (!hasTransitioned) return;
             
-            // na mobile wyłącz klik na pół ekranu
-            if (isTouchDevice) return;
-
-            // zignoruj kliknięcia w interaktywne elementy
+            // Sprawdź czy kliknięcie nie jest w przycisku nawigacji
             if (e.target.id === 'prevBtn' || e.target.id === 'nextBtn' || 
-                e.target.closest('#prevBtn') || e.target.closest('#nextBtn') ||
-                e.target.closest('#controls') ||
-                e.target.closest('#navigation') ||
-                e.target.closest('#helpOverlay') ||
-                e.target.closest('#bioOverlay') ||
-                e.target.closest('a') ||
-                e.target.closest('#authorName') ||
-                e.target.closest('#toast')) {
+                e.target.closest('#prevBtn') || e.target.closest('#nextBtn') || e.target.closest('#backToStart')) {
                 return;
             }
             
-            // tylko klik w obszarze sekcji wierszy steruje nawigacją
-            if (!e.target.closest('#poemsSection')) return;
-
             const windowWidth = window.innerWidth;
             const clickX = e.clientX;
             
@@ -3926,6 +3806,104 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
             else if (clickX > windowWidth / 2 && currentPoem < poems.length - 1) {
                 goToPoem(currentPoem + 1);
             }
+        });
+
+        // powrót do ekranu startowego
+        function returnToLanding() {
+            if (!hasTransitioned) return;
+            hasTransitioned = false;
+            document.getElementById('poemsSection').style.display = 'none';
+            document.getElementById('navigation').style.display = 'none';
+            document.getElementById('controls').style.display = 'none';
+            document.getElementById('backToStart').style.display = 'none';
+            
+            // resetuj stan strony tytułowej
+            const starFog = document.getElementById('starFog');
+            const landing = document.getElementById('landingContainer');
+            const title = document.getElementById('title');
+            const authorName = document.getElementById('authorName');
+            const typingText = document.getElementById('typingText');
+            
+            // przywróć elementy
+            starFog.style.display = 'flex';
+            starFog.style.opacity = '1';
+            starFog.style.position = 'fixed';
+            starFog.style.top = '0';
+            starFog.style.left = '0';
+            starFog.style.width = '100%';
+            starFog.style.height = '100%';
+            starFog.style.pointerEvents = 'none';
+            starFog.style.zIndex = '1';
+            starFog.style.perspective = '2000px';
+            starFog.style.alignItems = 'center';
+            starFog.style.justifyContent = 'center';
+            landing.style.display = 'block';
+            landing.style.opacity = '0';
+            typingText.style.display = 'block';
+            
+            // resetuj tytuł i imię do stanu początkowego
+            title.textContent = '~||-_^+*.';
+            title.style.color = '#1a1a1a';
+            title.style.opacity = '0';
+            authorName.style.opacity = '0';
+            authorName.style.position = 'absolute';
+            authorName.style.bottom = '3rem';
+            
+            // resetuj timer
+            const typedText = document.getElementById('typedText');
+            if (typedText) typedText.textContent = '';
+            
+            // resetuj canTransition
+            canTransition = false;
+            
+            // resetuj tło body
+            document.body.style.background = '';
+            
+            // usuń hash z URL (ale zachowaj localStorage)
+            history.replaceState(null, '', location.pathname);
+            
+            // nie regeneruj tła - zostaw istniejące cząsteczki
+            // tylko upewnij się że są widoczne
+            const starContainer = document.getElementById('starContainer');
+            const particles = starContainer.querySelectorAll('.star-particle');
+            particles.forEach(particle => {
+                particle.style.opacity = '1';
+                particle.classList.remove('typing-in');
+                particle.classList.add('typing-in');
+            });
+            
+            // uruchom animacje od nowa - identycznie jak przy pierwszym załadowaniu
+            setTimeout(() => {
+                landing.style.opacity = '1';
+                // uruchom timer od nowa
+                startTyping();
+                
+                // uruchom autoanimacje po gotowości - identycznie jak w setupAutoAnimations
+                const readyInt = setInterval(() => {
+                    if (canTransition) {
+                        clearInterval(readyInt);
+                        // jednorazowo: tytuł po 1200ms, imię po 2500ms
+                        setTimeout(() => { if (!hasTransitioned) animateLawenda(); }, 1200);
+                        setTimeout(() => { if (!hasTransitioned) animateStas(); }, 2500);
+                        // cyklicznie naprzemiennie co ~10s
+                        let toggle = true;
+                        const loop = () => {
+                            if (hasTransitioned) return;
+                            if (toggle) animateLawenda(); else animateStas();
+                            toggle = !toggle;
+                            setTimeout(loop, 10000);
+                        };
+                        setTimeout(loop, 10000);
+                    }
+                }, 200);
+            }, 100);
+        }
+
+        // klik przycisku powrotu
+        document.getElementById('backToStart').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            returnToLanding();
         });
 
 
@@ -3940,17 +3918,17 @@ to nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wsz
         // Animacja imienia przeniesiona do startTyping
 
         // Interaktywność imienia - bio overlay
-        document.getElementById('authorName').addEventListener('click', () => {
-            const bioOverlay = document.getElementById('bioOverlay');
-            bioOverlay.classList.add('show');
-            
-            // Prosta animacja wejścia
-            setTimeout(() => {
-                gsap.fromTo('.bio-content', 
-                    { opacity: 0 },
-                    { opacity: 1, duration: 0.5, ease: "power2.out" }
-                );
-            }, 100);
+        const authorEl = document.getElementById('authorName');
+        authorEl.addEventListener('click', () => {
+            window.location.href = 'bio.html';
+        });
+        authorEl.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); authorEl.click(); }, { passive: false });
+
+        // klik poza bio-content zamyka bio
+        document.getElementById('bioOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'bioOverlay') {
+                document.getElementById('bioClose').click();
+            }
         });
 
         // Zamknij bio

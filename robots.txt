@@ -1,0 +1,6 @@
+User-agent: *
+Disallow:
+Sitemap: https://szpineta.pl/sitemap.xml
+Disallow: /admin
+
+
