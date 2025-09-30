@@ -25,6 +25,8 @@ strona prezentująca zbiór wierszy "lawenda" stanisława szpinety.
 - `poetry-landing.html` - główna strona
 - `08AE25F8-768F-4E1D-8721-A1E8599935AFMVI_0843.mov` - video w bio
 
+- `B56BC6D5-CF48-4117-BAC9-B44FD68F9F29_1_102_o.jpeg` - zdjęcie
+
 ## technologie
 
 - vanilla javascript
