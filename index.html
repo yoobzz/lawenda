@@ -281,24 +281,24 @@
             position: relative;
             width: 100vw;
             height: 100dvh;
-            animation: starMorph 15s ease-in-out infinite;
+            animation: starMorph 45s ease-in-out infinite;
         }
 
         .star-particle {
             position: absolute;
             font-family: 'Geist Mono', monospace;
             color: rgb(144, 128, 207);
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: 300;
             transform-style: preserve-3d;
             user-select: none;
             will-change: transform;
-            animation: particleSway 10s ease-in-out infinite alternate;
+            animation: particleSway 22s ease-in-out infinite alternate;
             opacity: 0;
         }
 
         .star-particle.typing-in {
-            opacity: 0.4;
+            opacity: 0.18;
         }
 
         @keyframes particleSway {
@@ -2737,7 +2737,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             if (reduced) return; // nie generuj cząsteczek przy reduced motion
-            const count = isIOS ? 0 : (isTouch ? 400 : 1500);
+            const count = isIOS ? 0 : (isTouch ? 200 : 600);
             for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'star-particle';
@@ -2759,9 +2759,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             // Stopniowe pojawianie się cząsteczek jak timer - jedna po drugiej
             const particles = container.querySelectorAll('.star-particle');
             particles.forEach((particle, index) => {
+                const delay = Math.min(index * 10, 800);
                 setTimeout(() => {
                     particle.classList.add('typing-in');
-                }, Math.min(index * 30, 1200));
+                }, delay);
             });
         }
 
