@@ -42,9 +42,41 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Geist', sans-serif; background: #ffffff; color: #1a1a1a; }
-        .poems-section { min-height: 100vh; position: relative; perspective: 1200px; background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%); overflow: hidden; }
+        .poems-section { 
+            min-height: 100vh; 
+            position: relative; 
+            perspective: 1200px; 
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(196, 181, 253, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(144, 128, 207, 0.02) 0%, transparent 50%),
+                linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #fafafa 100%); 
+            overflow: hidden; 
+        }
         .poems-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        .poem-particle { position: absolute; width: 2px; height: 2px; background: rgba(200, 200, 200, 0.3); border-radius: 50%; pointer-events: none; transition: all 0.3s ease; }
+        .poem-particle { 
+            position: absolute; 
+            border-radius: 50%; 
+            pointer-events: none; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity;
+            animation: particleFloat 20s infinite ease-in-out;
+        }
+        
+        @keyframes particleFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(20px, -30px) scale(1.1); }
+            50% { transform: translate(-15px, -20px) scale(0.9); }
+            75% { transform: translate(10px, 25px) scale(1.05); }
+        }
+        
+        @keyframes particlePulse {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.4; }
+        }
+        
+        .poem-particle.pulse {
+            animation: particleFloat 20s infinite ease-in-out, particlePulse 3s infinite ease-in-out;
+        }
         .poem { min-height: calc(100vh - 160px); display: none; align-items: center; justify-content: center; text-align: left; font-weight: 300; line-height: 1.6; color: #000000; padding: 2rem 2rem 160px 2rem; opacity: 0; transform: translateY(30px); }
         .poem.active { display: flex; opacity: 1; transform: translateY(0); }
         .navigation { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 1rem; z-index: 100; align-items: center; }
@@ -1743,10 +1775,26 @@
                 że nie umiem<br>
                 że ja gardzę realnością<br><br>
                 on nie czuje<br>
-                gdy się truje
+                gdy się truje<br><br>
+                moja fałszywa dorosłość<br>
             </div>
             <div class="poem" data-index="118">
-                moja fałszywa dorosłość
+                lepiej było<br>
+                gdy by wcześniej<br>
+                niż wcale<br><br>
+                zawsze stale<br>
+                chciałem by ś powstał<br>
+                wiedział co,ś o sobie<br>
+                zanim ]wszystko•.=<br>
+                straci .sz<br><br>
+                s.obie chciałem<br>
+                s.próbowałem<br><br>
+                za to nie!+ mu obiecałem<br>
+                sobie samemu ogień<br><br>
+                chciałem by-ś<br>
+                chciał być<br><br>
+                sam<br>
+                o-dzielny
             </div>
             <div class="poem" data-index="119">
                 widziałem szkło<br>
@@ -2012,6 +2060,99 @@
                 <br>
                 czy przesadzam? 
             </div>
+            <div class="poem" data-index="143">
+                inny<br>
+                gdy instynkt<br>
+                krzyczy<br>
+                bym przetrwał
+            </div>
+            <div class="poem" data-index="144">
+                ~||-_^+*.<br>
+                !miłość!<br>
+                {¡pełnia¡}<br>
+                _++_+=<br>
+                +_*^_^++_++**_**_*+_++_+<br>
+                +_+==+_*^_^_^^__^*_+_+_+_+__=+_*_*_*^^_^~||++\=|+~**\+__=+\+=
+            </div>
+            <div class="poem" data-index="145">
+                chciałbym pamiętać,<br>
+                że jeśli coś odbija blask<br>
+                nie wszystko błyszczy<br><br>
+                chciałbym myśleć,<br>
+                o innych planetach<br><br>
+                i o tym,<br>
+                że !_każdy!!<br>
+                ma prawo do słońca<br>
+                i ciepła<br><br>
+                i mimo, że gwiazdy<br>
+                nie zawsze świecą<br>
+                ich światło czeka<br>
+                aż ''~|ktoś|-_^*. je zobaczy
+            </div>
+            <div class="poem" data-index="146">
+                o,szukaj wampira<br>
+                o krwi w jego żyłach<br>
+                dla siebie, sam^a<br>
+                nie masz  •.jej•.<br>
+                _nic!<br><br>
+                a! to co łączyła<br>
+                z)nów odrzuciła<br>
+                i choć wysycham<br>
+                to nie chce jej pić<br><br>
+                próbuj, wytrzymaj<br>
+                parę chwil w jeden wyraz<br>
+                te kły odpadną<br>
+                a ja nie będę wiecznie żyć<br><br>
+                słońce świeci mi<br><br>
+                dziś
+            </div>
+            <div class="poem" data-index="147">
+                mógłbym dalej<br>
+                być _•tym sobą<br>
+                bać się tego kim się stałem<br><br>
+                kochać, ranić<br>
+                tworzyć, nie móc<br>
+                =_*być,, [nie będąc nigdy wcale<br><br>
+                męczyć lustro<br>
+                tworzyć wtórność<br>
+                łamać serca<br><br>
+                blizną ciąć te sobowtóry
+            </div>
+            <div class="poem" data-index="148">
+                wierzę w magię<br>
+                w miłość<br>
+                w szczęście<br><br>
+                w przeznaczenie nie<br>
+                przyznana część mnie<br>
+                kiedy+_ś zobaczy lawendę
+            </div>
+            <div class="poem" data-index="149">
+                już nie pisze<br>
+                o nich<br>
+                po nic<br><br>
+                bo nikt<br>
+                nie stoi<br>
+                ze mną<br>
+                zawsze
+            </div>
+            <div class="poem" data-index="150">
+                prosze!<br>
+                o trochę prostsze<br>
+                protesty<br><br>
+                *_takciutek +<br>
+                cię więcej<br>
+                mi trzeba<br><br>
+                od.,*zgaś światło<br>
+                od*,.puść pustkę<br><br>
+                owiń mnie<br>
+                oswój<br><br>
+                uznaj<br>
+                kolorem<br><br>
+                i ponoś te„^barwy*_.<br>
+                *•bo ja, muszę płonąć.<br>
+                ….i odnoś!nie prawdy<br>
+                bo ty, to też kolor.
+            </div>
 </div>
     </div>
 
@@ -2053,38 +2194,97 @@
             const background = document.getElementById('poemsBackground');
             if (!background) return;
             background.innerHTML = '';
-            const particleCount = 15;
+            
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
+            const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const particleCount = (reduced || isIOS) ? 0 : (isTouch ? 25 : 60);
+            
+            // Kolory dla cząsteczek - subtelne odcienie
+            const colors = [
+                'rgba(144, 128, 207, 0.15)',
+                'rgba(196, 181, 253, 0.12)',
+                'rgba(200, 200, 200, 0.18)',
+                'rgba(180, 180, 200, 0.15)',
+                'rgba(160, 160, 180, 0.12)'
+            ];
+            
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'poem-particle';
+                
+                // Losowa pozycja
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
-                const size = 1 + Math.random() * 2;
+                
+                // Różne rozmiary
+                const size = 1.5 + Math.random() * 4;
                 particle.style.width = size + 'px';
                 particle.style.height = size + 'px';
-                particle.style.opacity = 0.1 + Math.random() * 0.2;
+                
+                // Losowy kolor
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Losowa opcja pulsowania
+                if (Math.random() > 0.7) {
+                    particle.classList.add('pulse');
+                }
+                
+                // Losowe opóźnienie animacji
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                
                 background.appendChild(particle);
             }
+            
+            // Ulepszona interaktywność z myszką
             let mouseX = 0, mouseY = 0;
-            document.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX; mouseY = e.clientY;
+            let rafId = null;
+            
+            function updateParticles() {
                 const particles = background.querySelectorAll('.poem-particle');
                 particles.forEach((particle) => {
                     const rect = particle.getBoundingClientRect();
                     const particleX = rect.left + rect.width / 2;
                     const particleY = rect.top + rect.height / 2;
                     const distance = Math.hypot(mouseX - particleX, mouseY - particleY);
-                    if (distance < 100) {
-                        const force = (100 - distance) / 100;
+                    
+                    if (distance < 150) {
+                        const force = (150 - distance) / 150;
                         const angle = Math.atan2(particleY - mouseY, particleX - mouseX);
-                        const moveX = Math.cos(angle) * force * 10;
-                        const moveY = Math.sin(angle) * force * 10;
-                        particle.style.transform = `translate(${moveX}px, ${moveY}px) scale(${1 + force * 0.5})`;
-                        particle.style.opacity = 0.3 + force * 0.2;
+                        const moveX = Math.cos(angle) * force * 15;
+                        const moveY = Math.sin(angle) * force * 15;
+                        const scale = 1 + force * 0.8;
+                        particle.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+                        particle.style.opacity = Math.min(0.6, parseFloat(particle.style.opacity || '0.2') + force * 0.3);
                     } else {
-                        particle.style.transform = 'translate(0, 0) scale(1)';
-                        particle.style.opacity = 0.1 + Math.random() * 0.2;
+                        // Płynny powrót do normalnego stanu
+                        const currentTransform = particle.style.transform || 'translate(0, 0) scale(1)';
+                        if (currentTransform !== 'translate(0, 0) scale(1)') {
+                            particle.style.transform = 'translate(0, 0) scale(1)';
+                        }
                     }
+                });
+                rafId = requestAnimationFrame(updateParticles);
+            }
+            
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                if (!rafId) {
+                    updateParticles();
+                }
+            });
+            
+            // Zatrzymaj animację gdy myszka opuści obszar
+            document.addEventListener('mouseleave', () => {
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+                const particles = background.querySelectorAll('.poem-particle');
+                particles.forEach((particle) => {
+                    particle.style.transform = 'translate(0, 0) scale(1)';
                 });
             });
         }

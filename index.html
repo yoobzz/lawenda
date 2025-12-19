@@ -48,6 +48,12 @@
             justify-content: center;
             position: relative;
             perspective: 1000px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .container > * {
+            pointer-events: auto;
         }
 
         .title {
@@ -270,11 +276,16 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
             perspective: 2000px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        /* Cząsteczki muszą być wyżej niż landingContainer (z-index: 1) */
+        .star-fog .star-particle {
+            z-index: 10 !important;
         }
 
         .star-container {
@@ -282,6 +293,7 @@
             width: 100vw;
             height: 100dvh;
             animation: starMorph 45s ease-in-out infinite;
+            pointer-events: none;
         }
 
         .star-particle {
@@ -295,6 +307,9 @@
             will-change: transform;
             animation: particleSway 22s ease-in-out infinite alternate;
             opacity: 0;
+            pointer-events: auto !important;
+            z-index: 10 !important;
+            cursor: pointer;
         }
 
         .star-particle.typing-in {
@@ -473,6 +488,16 @@
             font-weight: 500;
             letter-spacing: 0.15em;
             white-space: nowrap;
+        }
+
+        #typedText.selecting {
+            background: rgba(144, 128, 207, 0.4);
+            color: #1a1a1a;
+            transition: background 0.2s ease;
+        }
+        
+        #typedText.selecting::selection {
+            background: rgba(144, 128, 207, 0.6);
         }
 
         .typing-text.show {
@@ -2724,6 +2749,16 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
         const navDots = document.querySelectorAll('.nav-dot');
         
 
+        // Funkcja do generowania losowego krótkiego ciągu znaków
+        function generateRandomString(chars, minLength = 2, maxLength = 4) {
+            const length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return result;
+        }
+
         // super wydajna fala 3d z więcej znaków
         function createStarFog() {
             const container = document.getElementById('starContainer');
@@ -2734,11 +2769,11 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             if (reduced) return; // nie generuj cząsteczek przy reduced motion
-            const count = isIOS ? 0 : (isTouch ? 200 : 600);
+            const count = isIOS ? 0 : (isTouch ? 60 : 200);
             for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'star-particle';
-                particle.textContent = chars[Math.floor(Math.random() * chars.length)];
+                particle.textContent = generateRandomString(chars, 2, 4);
                 
                 // Losowa pozycja
                 const x = Math.random() * window.innerWidth;
@@ -2753,6 +2788,12 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 container.appendChild(particle);
             }
             
+            // Ustaw z-index star-fog wyżej niż landingContainer
+            const starFog = document.getElementById('starFog');
+            if (starFog) {
+                starFog.style.zIndex = '2';
+            }
+            
             // Stopniowe pojawianie się cząsteczek jak timer - jedna po drugiej
             const particles = container.querySelectorAll('.star-particle');
             particles.forEach((particle, index) => {
@@ -2760,6 +2801,68 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 setTimeout(() => {
                     particle.classList.add('typing-in');
                 }, delay);
+                
+                // Dodaj interaktywność - zmiana symbolu przy kliknięciu/najechaniu
+                particle.style.cursor = 'pointer';
+                particle.style.transition = 'all 0.3s ease';
+                particle.style.pointerEvents = 'auto';
+                
+                const originalChar = particle.textContent;
+                let currentChar = originalChar;
+                let hoverChar = null;
+                
+                // Losowo zdecyduj, czy ta cząsteczka przenosi do wierszy (25% szansy)
+                const isClickableToPoems = Math.random() < 0.25;
+                if (isClickableToPoems) {
+                    // Dodaj wizualną wskazówkę - lekko jaśniejsza
+                    particle.style.opacity = '0.25';
+                }
+                
+                // Zmiana przy najechaniu
+                particle.addEventListener('mouseenter', () => {
+                    hoverChar = generateRandomString(chars, 2, 4);
+                    particle.textContent = hoverChar;
+                    particle.style.opacity = isClickableToPoems ? '0.5' : '0.4';
+                    particle.style.transform = 'scale(1.5)';
+                });
+                
+                particle.addEventListener('mouseleave', () => {
+                    particle.textContent = currentChar;
+                    particle.style.opacity = isClickableToPoems ? '0.25' : '0.18';
+                    particle.style.transform = 'scale(1)';
+                    hoverChar = null;
+                });
+                
+                // Zmiana przy kliknięciu/touch
+                const handleClick = (e) => {
+                    e.stopPropagation();
+                    
+                    // Jeśli to cząsteczka przenosząca do wierszy
+                    if (isClickableToPoems) {
+                        // Losowy wiersz z zakresu 1-143
+                        const randomPoemIndex = Math.floor(Math.random() * 143) + 1;
+                        window.location.href = `poems.html#wiersz-${randomPoemIndex}`;
+                        return;
+                    }
+                    
+                    // Normalna zmiana znaku
+                    const newChar = generateRandomString(chars, 2, 4);
+                    currentChar = newChar;
+                    particle.textContent = newChar;
+                    particle.style.opacity = isClickableToPoems ? '0.6' : '0.6';
+                    particle.style.transform = 'scale(1.8)';
+                    setTimeout(() => {
+                        particle.style.opacity = isClickableToPoems ? '0.25' : '0.18';
+                        particle.style.transform = 'scale(1)';
+                    }, 200);
+                };
+                
+                particle.addEventListener('click', handleClick);
+                particle.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClick(e);
+                }, { passive: false });
             });
         }
 
@@ -2772,6 +2875,9 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
             const starFog = document.getElementById('starFog');
             const typingText = document.getElementById('typingText');
+            
+            // Zatrzymaj animację symboli w timerze
+            typedTextAnimationStopped = true;
             
             // Ukryj timer natychmiast
             typingText.style.display = 'none';
@@ -3141,9 +3247,141 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     document.getElementById('title').style.cursor = 'pointer';
                     document.getElementById('title').style.opacity = '1';
                     
+                    // Uruchom losową animację dla symboli w timerze
+                    startRandomTypedTextAnimation();
+                    
                     // Animacja "lawenda" uruchamia się tylko przy hover
                 }
             }, charDelay);
+        }
+
+        // Losowa animacja dla symboli w timerze - usuwa i pisze losowo
+        let isTypedTextAnimating = false;
+        let typedTextAnimationStopped = false;
+        function startRandomTypedTextAnimation() {
+            const typedText = document.getElementById('typedText');
+            if (!typedText || isTypedTextAnimating || typedTextAnimationStopped) return;
+            
+            const chars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!', '/', '\\', '[', ']', '{', '}', '<', '>'];
+            const originalText = typedText.textContent;
+            
+            function randomAnimation() {
+                if (isTypedTextAnimating || typedTextAnimationStopped || !typedText || !typedText.parentElement || typedText.parentElement.style.display === 'none') return;
+                
+                isTypedTextAnimating = true;
+                const currentText = typedText.textContent;
+                
+                // Losowy typ animacji
+                const animationType = Math.random();
+                
+                if (animationType < 0.3) {
+                    // Usuń kilka znaków od końca
+                    const deleteCount = Math.floor(Math.random() * Math.min(5, currentText.length)) + 1;
+                    let remaining = currentText.length - deleteCount;
+                    
+                    const deleteInterval = setInterval(() => {
+                        if (remaining > 0 && typedText) {
+                            typedText.textContent = currentText.slice(0, remaining);
+                            remaining--;
+                        } else {
+                            clearInterval(deleteInterval);
+                            
+                            // Potem napisz kilka nowych znaków
+                            setTimeout(() => {
+                                const newCharsCount = Math.floor(Math.random() * 8) + 2;
+                                let newIndex = 0;
+                                const writeInterval = setInterval(() => {
+                                    if (newIndex < newCharsCount && typedText) {
+                                        typedText.textContent += chars[Math.floor(Math.random() * chars.length)];
+                                        newIndex++;
+                                    } else {
+                                        clearInterval(writeInterval);
+                                        isTypedTextAnimating = false;
+                                        scheduleNext();
+                                    }
+                                }, 80);
+                            }, 300);
+                        }
+                    }, 100);
+                    
+                } else if (animationType < 0.6) {
+                    // Zaznacz wszystko i usuń, potem napisz nowe
+                    // Animacja zaznaczenia
+                    if (typedText) {
+                        typedText.classList.add('selecting');
+                    }
+                    
+                    // Czekaj chwilę z zaznaczeniem
+                    setTimeout(() => {
+                        let deleteIndex = currentText.length - 1;
+                        const deleteAllInterval = setInterval(() => {
+                            if (deleteIndex >= 0 && typedText) {
+                                typedText.textContent = currentText.slice(0, deleteIndex);
+                                deleteIndex--;
+                            } else {
+                                clearInterval(deleteAllInterval);
+                                
+                                // Usuń klasę zaznaczenia
+                                if (typedText) {
+                                    typedText.classList.remove('selecting');
+                                }
+                                
+                                // Napisz całkowicie nowy tekst
+                                setTimeout(() => {
+                                    const newTextLength = Math.floor(Math.random() * 15) + 5;
+                                    let writeIndex = 0;
+                                    let newText = '';
+                                    const writeNewInterval = setInterval(() => {
+                                        if (writeIndex < newTextLength && typedText) {
+                                            newText += chars[Math.floor(Math.random() * chars.length)];
+                                            typedText.textContent = newText;
+                                            writeIndex++;
+                                        } else {
+                                            clearInterval(writeNewInterval);
+                                            isTypedTextAnimating = false;
+                                            scheduleNext();
+                                        }
+                                    }, 80);
+                                }, 200);
+                            }
+                        }, 60);
+                    }, 300);
+                    
+                } else {
+                    // Zamień kilka losowych znaków
+                    const replaceCount = Math.floor(Math.random() * Math.min(4, currentText.length)) + 1;
+                    let replaced = 0;
+                    let newText = currentText;
+                    
+                    const replaceInterval = setInterval(() => {
+                        if (replaced < replaceCount && typedText) {
+                            const randomIndex = Math.floor(Math.random() * newText.length);
+                            const charArray = newText.split('');
+                            charArray[randomIndex] = chars[Math.floor(Math.random() * chars.length)];
+                            newText = charArray.join('');
+                            typedText.textContent = newText;
+                            replaced++;
+                        } else {
+                            clearInterval(replaceInterval);
+                            isTypedTextAnimating = false;
+                            scheduleNext();
+                        }
+                    }, 120);
+                }
+            }
+            
+            function scheduleNext() {
+                if (typedTextAnimationStopped || !typedText || !typedText.parentElement || typedText.parentElement.style.display === 'none') return;
+                const delay = Math.random() * 2000 + 1000; // 1-3 sekundy (częściej)
+                setTimeout(() => {
+                    randomAnimation();
+                }, delay);
+            }
+            
+            // Start pierwszej animacji po chwili
+            setTimeout(() => {
+                scheduleNext();
+            }, 1000);
         }
 
         // Animacja pisania tytułu po timerze
