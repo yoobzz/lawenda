@@ -58,7 +58,7 @@
 
         .title {
             font-family: 'Geist Mono', monospace;
-            font-size: clamp(1.8rem, 5vw, 4rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.8rem);
             font-weight: 400;
             letter-spacing: 0.15em;
             color: #000000;
@@ -3475,7 +3475,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             
             function scheduleNext() {
                 if (typedTextAnimationStopped || !typedText || !typedText.parentElement || typedText.parentElement.style.display === 'none') return;
-                const delay = Math.random() * 2000 + 1000; // 1-3 sekundy (częściej)
+                const delay = Math.random() * 1000 + 500; // 0.5-1.5 sekundy (częściej)
                 setTimeout(() => {
                     randomAnimation();
                 }, delay);
@@ -3700,15 +3700,15 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     // jednorazowo: tytuł po 1200ms, imię po 2500ms
                     setTimeout(() => { if (!cleared) animateLawenda(); }, 1200);
                     setTimeout(() => { if (!cleared) animateStas(); }, 2500);
-                    // cyklicznie naprzemiennie co ~10s
+                    // cyklicznie naprzemiennie co ~5s (częściej)
                     let toggle = true;
                     const loop = () => {
                         if (cleared || hasTransitioned) return;
                         if (toggle) animateLawenda(); else animateStas();
                         toggle = !toggle;
-                        setTimeout(loop, 10000);
+                        setTimeout(loop, 5000);
                     };
-                    setTimeout(loop, 10000);
+                    setTimeout(loop, 5000);
                 }
             }, 200);
         })();
@@ -4124,15 +4124,15 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         // jednorazowo: tytuł po 1200ms, imię po 2500ms
                         setTimeout(() => { if (!hasTransitioned) animateLawenda(); }, 1200);
                         setTimeout(() => { if (!hasTransitioned) animateStas(); }, 2500);
-                        // cyklicznie naprzemiennie co ~10s
+                        // cyklicznie naprzemiennie co ~5s (częściej)
                         let toggle = true;
                         const loop = () => {
                             if (hasTransitioned) return;
                             if (toggle) animateLawenda(); else animateStas();
                             toggle = !toggle;
-                            setTimeout(loop, 10000);
+                            setTimeout(loop, 5000);
                         };
-                        setTimeout(loop, 10000);
+                        setTimeout(loop, 5000);
                     }
                 }, 200);
             }, 100);

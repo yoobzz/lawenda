@@ -2290,6 +2290,60 @@
         }
 
         let currentPoem = 0; let poems = [];
+        
+        // System przypisywania unikalnych ciągów znaków do wierszy
+        const chars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+        
+        function generateRandomString(minLength = 3, maxLength = 8) {
+            const length = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return result;
+        }
+        
+        function getPoemTextKey(poemIndex) {
+            // Użyj oryginalnego data-index z elementu poem (zachowanego przed tasowaniem)
+            const poem = poems[poemIndex];
+            if (!poem) {
+                return `poemText_${poemIndex}`;
+            }
+            
+            // ZAWSZE używaj data-original-index jeśli istnieje (zapisanego przed tasowaniem)
+            const originalIndex = poem.getAttribute('data-original-index');
+            if (originalIndex !== null && originalIndex !== undefined && originalIndex !== '') {
+                return `poemText_${originalIndex}`;
+            }
+            
+            // Jeśli nie ma data-original-index, użyj data-index (może być oryginalny z HTML)
+            const dataIndex = poem.getAttribute('data-index');
+            if (dataIndex !== null && dataIndex !== undefined && dataIndex !== '') {
+                return `poemText_${dataIndex}`;
+            }
+            
+            // Ostateczny fallback - użyj pozycji w tablicy
+            return `poemText_${poemIndex}`;
+        }
+        
+        function getOrAssignPoemText(poemIndex) {
+            const key = getPoemTextKey(poemIndex);
+            try {
+                let stored = localStorage.getItem(key);
+                if (!stored || stored === '') {
+                    // Generuj nowy ciąg znaków TYLKO jeśli nie istnieje
+                    stored = generateRandomString(4, 10);
+                    localStorage.setItem(key, stored);
+                }
+                // Zawsze zwracaj zapisany ciąg - nigdy nie generuj nowego jeśli już istnieje
+                return stored;
+            } catch(e) {
+                // Fallback jeśli localStorage nie działa - ale to nie powinno się zdarzyć
+                console.warn('localStorage error:', e);
+                return generateRandomString(4, 10);
+            }
+        }
+        
         function updateNavigation() {
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
@@ -2419,6 +2473,19 @@
             // losowa kolejność wierszy (zachowana w localStorage)
             (function randomizePoemsOrder(){
                 try {
+                    // NAJPIERW zachowaj oryginalne data-index PRZED jakimikolwiek zmianami
+                    // To jest kluczowe - musimy zapisać oryginalny indeks z HTML
+                    poems.forEach((el, idx) => {
+                        const originalIndex = el.getAttribute('data-index');
+                        // Zapisz oryginalny indeks (z HTML) jako data-original-index
+                        // Jeśli nie ma data-index w HTML, użyj pozycji w tablicy jako oryginalnego indeksu
+                        if (originalIndex === null || originalIndex === undefined) {
+                            el.setAttribute('data-original-index', String(idx));
+                        } else {
+                            el.setAttribute('data-original-index', originalIndex);
+                        }
+                    });
+                    
                     let order = [];
                     try { order = JSON.parse(localStorage.getItem('poemOrderV1') || '[]'); } catch(e) { order = []; }
                     if (!Array.isArray(order) || order.length !== poems.length) {
@@ -2429,10 +2496,13 @@
                         }
                         localStorage.setItem('poemOrderV1', JSON.stringify(order));
                     }
+                    
                     const frag = document.createDocumentFragment();
                     order.forEach(i => frag.appendChild(poems[i]));
                     if (mount) { mount.innerHTML = ''; mount.appendChild(frag); }
                     poems = Array.from(document.querySelectorAll('.poem'));
+                    // Po tasowaniu ustaw nowe data-index (pozycja w tablicy po tasowaniu)
+                    // ale data-original-index pozostaje niezmienione
                     poems.forEach((el, idx) => el.setAttribute('data-index', String(idx)));
                 } catch(e) { /* ignore */ }
             })();
