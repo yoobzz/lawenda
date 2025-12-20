@@ -20,6 +20,86 @@ app.use('/admin', basicAuth({
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Funkcja do parsowania wiersza z poems.html
+function getPoemFromHtml(html, poemIndex) {
+  // Szukaj div z data-index="poemIndex"
+  const re = new RegExp(`<div\\s+class=["']poem["'][^>]*data-index=["']${poemIndex}["'][^>]*>([\\s\\S]*?)<\\/div>`, 'i');
+  const match = re.exec(html);
+  if (!match) return null;
+  
+  const poemHtml = match[1];
+  // Usuń HTML i wyciągnij tekst
+  let text = poemHtml
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .trim();
+  
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  return {
+    text: text,
+    lines: lines,
+    firstLine: lines[0] || 'wiersz',
+    preview: lines.slice(0, 3).join(' ').substring(0, 150) || 'staś szpineta archiwum'
+  };
+}
+
+// Endpoint do renderowania poems.html z właściwymi meta tagami dla crawlerów
+app.get('/poems.html', (req, res) => {
+  const poemsPath = path.join(__dirname, 'poems.html');
+  if (!fs.existsSync(poemsPath)) {
+    return res.status(404).send('Not found');
+  }
+  
+  let html = fs.readFileSync(poemsPath, 'utf8');
+  
+  // Sprawdź czy jest query parameter ?poem=X (dla crawlerów Facebook/Twitter)
+  const poemParam = req.query.poem;
+  if (poemParam) {
+    const poemIndex = parseInt(poemParam, 10) - 1; // data-index jest 0-based
+    if (!isNaN(poemIndex) && poemIndex >= 0) {
+      const poem = getPoemFromHtml(html, poemIndex);
+      
+      if (poem) {
+        const poemNumber = poemIndex + 1;
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const currentUrl = `${baseUrl}/poems.html#wiersz-${poemNumber}`;
+        
+        // Aktualizuj meta tagi - znajdź i zamień każdy
+        html = html.replace(
+          /<meta\s+property=["']og:title["'][^>]*>/i,
+          `<meta property="og:title" content="wiersz ${poemNumber} — ${escapeHtml(poem.firstLine.substring(0, 50))}">`
+        );
+        html = html.replace(
+          /<meta\s+property=["']og:description["'][^>]*>/i,
+          `<meta property="og:description" content="${escapeHtml(poem.preview)}">`
+        );
+        html = html.replace(
+          /<meta\s+property=["']og:url["'][^>]*>/i,
+          `<meta property="og:url" content="${escapeHtml(currentUrl)}">`
+        );
+        html = html.replace(
+          /<meta\s+name=["']twitter:title["'][^>]*>/i,
+          `<meta name="twitter:title" content="wiersz ${poemNumber} — ${escapeHtml(poem.firstLine.substring(0, 50))}">`
+        );
+        html = html.replace(
+          /<meta\s+name=["']twitter:description["'][^>]*>/i,
+          `<meta name="twitter:description" content="${escapeHtml(poem.preview)}">`
+        );
+        html = html.replace(
+          /<title>[^<]*<\/title>/i,
+          `<title>wiersz ${poemNumber} — ~||-_^+*.</title>`
+        );
+      }
+    }
+  }
+  
+  res.send(html);
+});
+
 // Serwowanie plików statycznych (publicznych)
 app.use(express.static(__dirname, { extensions: ['html'] }));
 

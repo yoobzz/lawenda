@@ -2298,6 +2298,51 @@
             nextBtn.disabled = currentPoem === poems.length - 1;
             navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
         }
+        // Funkcja do aktualizacji meta tagów Open Graph
+        function updateMetaTags(poemIndex) {
+            const poem = poems[poemIndex];
+            if (!poem) return;
+            
+            // Pobierz tekst wiersza (pierwsze kilka linijek)
+            const text = (poem.innerText || poem.textContent || '').trim();
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const firstLine = lines[0] || 'wiersz';
+            const preview = lines.slice(0, 3).join(' ').substring(0, 150) || 'staś szpineta archiwum';
+            
+            // Aktualizuj meta tagi
+            const updateMeta = (property, content) => {
+                let meta = document.querySelector(`meta[property="${property}"]`);
+                if (!meta) {
+                    meta = document.createElement('meta');
+                    meta.setAttribute('property', property);
+                    document.head.appendChild(meta);
+                }
+                meta.setAttribute('content', content);
+            };
+            
+            const updateMetaName = (name, content) => {
+                let meta = document.querySelector(`meta[name="${name}"]`);
+                if (!meta) {
+                    meta = document.createElement('meta');
+                    meta.setAttribute('name', name);
+                    document.head.appendChild(meta);
+                }
+                meta.setAttribute('content', content);
+            };
+            
+            const poemNumber = poemIndex + 1;
+            const currentUrl = `${location.origin}${location.pathname}#wiersz-${poemNumber}`;
+            
+            updateMeta('og:title', `wiersz ${poemNumber} — ${firstLine.substring(0, 50)}`);
+            updateMeta('og:description', preview);
+            updateMeta('og:url', currentUrl);
+            updateMetaName('twitter:title', `wiersz ${poemNumber} — ${firstLine.substring(0, 50)}`);
+            updateMetaName('twitter:description', preview);
+            
+            // Aktualizuj tytuł strony
+            document.title = `wiersz ${poemNumber} — ~||-_^+*.`;
+        }
+
         function goToPoem(index){
             if (index === currentPoem) return;
             const currentPoemEl = poems[currentPoem];
@@ -2309,6 +2354,7 @@
             const newHash = `#wiersz-${currentPoem + 1}`;
             if (location.hash !== newHash) history.replaceState(null, '', location.pathname + newHash);
             updateNavigation();
+            updateMetaTags(currentPoem);
         }
         function adjustFontScale(delta) {
             const root = document.documentElement;
@@ -2326,10 +2372,42 @@
         document.getElementById('nextBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem<poems.length-1) goToPoem(currentPoem+1); });
         document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(-1); });
         document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(1); });
-        document.getElementById('copyLink').addEventListener('click', async (e)=>{ e.preventDefault(); const link = location.origin + location.pathname + `#wiersz-${currentPoem + 1}`; const ok = await copyToClipboard(link); showToast(ok ? 'skopiowano link' : 'kopiuj: ' + link); });
+        document.getElementById('copyLink').addEventListener('click', async (e)=>{ 
+            e.preventDefault(); 
+            // Dla crawlerów dodaj ?poem=X do URL
+            const link = location.origin + location.pathname + `?poem=${currentPoem + 1}#wiersz-${currentPoem + 1}`; 
+            const ok = await copyToClipboard(link); 
+            showToast(ok ? 'skopiowano link' : 'kopiuj: ' + link); 
+        });
 
         // Oczekuje, że wkleisz tu wiersze: skopiuj cały <div class="poems-section"> z index i wklej wewnątrz #poemsMount
         window.addEventListener('DOMContentLoaded', () => {
+            // Sprawdź czy jest overlay do wygaszenia (z przejścia z index.html)
+            try {
+                const hasOverlay = sessionStorage.getItem('hasTransitionOverlay');
+                if (hasOverlay === '1') {
+                    // Stwórz overlay z białym tłem i pełną nieprzezroczystością
+                    const overlay = document.createElement('div');
+                    overlay.className = 'transition-overlay';
+                    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 10000; opacity: 1; pointer-events: none;';
+                    document.body.appendChild(overlay);
+                    
+                    // Wygaś overlay po krótkim opóźnieniu
+                    setTimeout(() => {
+                        overlay.style.transition = 'opacity 0.4s ease';
+                        overlay.style.opacity = '0';
+                        setTimeout(() => {
+                            if (overlay.parentNode) {
+                                document.body.removeChild(overlay);
+                            }
+                        }, 400);
+                    }, 50);
+                    
+                    // Usuń flagę z sessionStorage
+                    sessionStorage.removeItem('hasTransitionOverlay');
+                }
+            } catch(e) {}
+            
             const mount = document.getElementById('poemsMount');
             // jeżeli użytkownik wkleił sekcję .poem(y), znajdź je i zainicjalizuj
             poems = Array.from(document.querySelectorAll('.poem'));
@@ -2369,6 +2447,7 @@
             currentPoem = startIndex - 1;
             poems[currentPoem]?.classList.add('active');
             updateNavigation();
+            updateMetaTags(currentPoem);
             createPoemsBackground();
             try { document.getElementById('gotoInput')?.setAttribute('max', String(poems.length)); } catch(e) {}
 

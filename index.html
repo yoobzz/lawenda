@@ -299,21 +299,26 @@
         .star-particle {
             position: absolute;
             font-family: 'Geist Mono', monospace;
-            color: rgb(144, 128, 207);
-            font-size: 1.2rem;
+            color: rgb(150, 130, 220);
+            font-size: 0.85rem;
             font-weight: 300;
             transform-style: preserve-3d;
             user-select: none;
-            will-change: transform;
+            will-change: transform, opacity;
             animation: particleSway 22s ease-in-out infinite alternate;
             opacity: 0;
             pointer-events: auto !important;
             z-index: 10 !important;
             cursor: pointer;
+            --appear-x: 0px;
+            --appear-y: 0px;
+            transform: scale(0.2) translate(calc(var(--appear-x) * 2), calc(var(--appear-y) * 2)) translateZ(0);
+            transition: opacity 1s ease-out, transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .star-particle.typing-in {
-            opacity: 0.18;
+            opacity: 0.5;
+            transform: scale(1) translate(0, 0) translateZ(0);
         }
 
         @keyframes particleSway {
@@ -742,6 +747,60 @@
             .bio-extra-text-1 { display: none; }
             .bio-close { top: 0.5rem; right: 0.5rem; }
         }
+        
+        /* Animacja przejścia - wypełnienie ekranu znakami */
+        .transition-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            overflow: hidden;
+        }
+        
+        .transition-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .transition-char {
+            font-family: 'Geist Mono', monospace;
+            font-size: clamp(0.8rem, 1.5vw, 1.5rem);
+            color: #000000;
+            opacity: 0;
+            animation: charAppear 0.08s forwards, charFadeOut 0.4s forwards;
+            white-space: nowrap;
+            font-weight: 300;
+        }
+        
+        @keyframes charAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes charFadeOut {
+            0% {
+                opacity: 0.9;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
     </style>
 </head>
 <body>
@@ -752,7 +811,7 @@
     <div class="container" id="landingContainer">
         <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
         <h1 class="title title-emerging" id="title">~||-_^+*.</h1>
-        <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.8rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.15em; font-family: 'IBM Plex Mono', 'Geist Mono', monospace; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
+        <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
         </div>
     </div>
@@ -2770,10 +2829,20 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             if (reduced) return; // nie generuj cząsteczek przy reduced motion
             const count = isIOS ? 0 : (isTouch ? 60 : 200);
+            
             for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'star-particle';
+                
+                // Użyj tylko losowych ciągów znaków
                 particle.textContent = generateRandomString(chars, 2, 4);
+                
+                // Pomniejszona czcionka
+                particle.style.fontSize = '0.85rem';
+                
+                // Lawendowe, bardziej widoczne
+                particle.style.color = 'rgb(150, 130, 220)';
+                particle.style.opacity = '0.5';
                 
                 // Losowa pozycja
                 const x = Math.random() * window.innerWidth;
@@ -2794,10 +2863,21 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 starFog.style.zIndex = '2';
             }
             
-            // Stopniowe pojawianie się cząsteczek jak timer - jedna po drugiej
+            // Stopniowe pojawianie się cząsteczek z animacją
             const particles = container.querySelectorAll('.star-particle');
             particles.forEach((particle, index) => {
-                const delay = Math.min(index * 10, 800);
+                // Losowy delay dla bardziej naturalnego pojawiania się
+                // Pierwsze cząsteczki pojawiają się szybciej, późniejsze wolniej
+                const baseDelay = index * 12;
+                const randomOffset = Math.random() * 200; // losowe opóźnienie 0-200ms
+                const delay = Math.min(baseDelay + randomOffset, 2500); // max 2.5 sekundy
+                
+                // Losowy kierunek pojawiania się (lekkie przesunięcie)
+                const randomX = (Math.random() - 0.5) * 30;
+                const randomY = (Math.random() - 0.5) * 30;
+                particle.style.setProperty('--appear-x', randomX + 'px');
+                particle.style.setProperty('--appear-y', randomY + 'px');
+                
                 setTimeout(() => {
                     particle.classList.add('typing-in');
                 }, delay);
@@ -2887,7 +2967,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             
             // Ukryj landing page
             document.getElementById('landingContainer').style.opacity = '0';
-            document.getElementById('landingContainer').style.transition = 'opacity 0.5s ease';
+            document.getElementById('landingContainer').style.transition = 'opacity 0.3s ease';
             
             setTimeout(() => {
                 document.getElementById('landingContainer').style.display = 'none';
@@ -2900,7 +2980,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 // Płynne pojawienie się wierszy
                 setTimeout(() => {
                     document.getElementById('poemsSection').style.opacity = '1';
-                    document.getElementById('poemsSection').style.transition = 'opacity 0.5s ease';
+                    document.getElementById('poemsSection').style.transition = 'opacity 0.3s ease';
                     
                     // Uruchom interaktywne tło dla wierszy
                     createPoemsBackground();
@@ -3305,32 +3385,55 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     }, 100);
                     
                 } else if (animationType < 0.6) {
-                    // Zaznacz wszystko i usuń, potem napisz nowe
-                    // Animacja zaznaczenia
-                    if (typedText) {
-                        typedText.classList.add('selecting');
+                    // Losowe zaznaczanie fragmentów tekstu (najczęściej całość)
+                    if (!typedText) return;
+                    
+                    // Losowo zdecyduj czy zaznaczyć całość (70% szansy) czy fragment
+                    const selectAll = Math.random() < 0.7;
+                    let startIndex, endIndex;
+                    
+                    if (selectAll || currentText.length <= 3) {
+                        // Zaznacz całość
+                        startIndex = 0;
+                        endIndex = currentText.length;
+                    } else {
+                        // Zaznacz losowy fragment
+                        startIndex = Math.floor(Math.random() * currentText.length);
+                        const fragmentLength = Math.floor(Math.random() * Math.min(currentText.length - startIndex, 8)) + 1;
+                        endIndex = Math.min(startIndex + fragmentLength, currentText.length);
                     }
                     
-                    // Czekaj chwilę z zaznaczeniem
-                    setTimeout(() => {
-                        let deleteIndex = currentText.length - 1;
-                        const deleteAllInterval = setInterval(() => {
-                            if (deleteIndex >= 0 && typedText) {
-                                typedText.textContent = currentText.slice(0, deleteIndex);
-                                deleteIndex--;
-                            } else {
-                                clearInterval(deleteAllInterval);
-                                
-                                // Usuń klasę zaznaczenia
+                    // Zaznaczanie po kolei od startIndex do endIndex
+                    let selectIndex = startIndex;
+                    const selectInterval = setInterval(() => {
+                        if (selectIndex < endIndex && typedText) {
+                            // Symuluj zaznaczanie przez stopniowe dodawanie tła
+                            const beforePart = currentText.slice(0, startIndex);
+                            const selectedPart = currentText.slice(startIndex, selectIndex + 1);
+                            const afterPart = currentText.slice(selectIndex + 1);
+                            
+                            // Użyj spanów do wizualizacji zaznaczenia
+                            typedText.innerHTML = beforePart + `<span style="background: rgba(144, 128, 207, 0.4);">${selectedPart}</span>` + afterPart;
+                            selectIndex++;
+                        } else {
+                            clearInterval(selectInterval);
+                            
+                            // Zatrzymaj się na chwilę (losowy czas 100-400ms)
+                            const pauseTime = 100 + Math.random() * 300;
+                            
+                            setTimeout(() => {
+                                // Usuń zaznaczony fragment natychmiast
                                 if (typedText) {
-                                    typedText.classList.remove('selecting');
+                                    const beforePart = currentText.slice(0, startIndex);
+                                    const afterPart = currentText.slice(endIndex);
+                                    typedText.textContent = beforePart + afterPart;
                                 }
                                 
-                                // Napisz całkowicie nowy tekst
+                                // Napisz nowy tekst (losowa długość)
                                 setTimeout(() => {
                                     const newTextLength = Math.floor(Math.random() * 15) + 5;
                                     let writeIndex = 0;
-                                    let newText = '';
+                                    let newText = typedText ? typedText.textContent : '';
                                     const writeNewInterval = setInterval(() => {
                                         if (writeIndex < newTextLength && typedText) {
                                             newText += chars[Math.floor(Math.random() * chars.length)];
@@ -3342,10 +3445,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                                             scheduleNext();
                                         }
                                     }, 80);
-                                }, 200);
-                            }
-                        }, 60);
-                    }, 300);
+                                }, 150 + Math.random() * 150);
+                            }, pauseTime);
+                        }
+                    }, 25 + Math.random() * 15); // Losowa szybkość zaznaczania
                     
                 } else {
                     // Zamień kilka losowych znaków
@@ -3406,7 +3509,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     // Po ostatnim znaku tytułu - pojawia się tło (bez efektów na iOS/touch)
                     // zawsze odpal tło, ale bez reaktywności
                     (function(){
-                        createStarFog();
+                        // Opóźnienie przed startem animacji symboli
+                        setTimeout(() => {
+                            createStarFog();
+                        }, 2200);
                         // NIE wołamy createInteractiveBackground (wyłączamy mouse/gyro interakcje)
                     })();
                     
@@ -3609,9 +3715,94 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
         
         // Apply glitch animation to poems will be called when needed
 
+        // Funkcja animacji przejścia - wypełnienie ekranu znakami z tytułu, imienia i timera
+        function animateTransitionToPoems() {
+            const overlay = document.createElement('div');
+            overlay.className = 'transition-overlay';
+            document.body.appendChild(overlay);
+            
+            // Pobierz tekst z tytułu, imienia i timera
+            const title = document.getElementById('title');
+            const firstName = document.getElementById('firstName');
+            const lastName = document.getElementById('lastName');
+            const typedText = document.getElementById('typedText');
+            
+            let sourceText = '';
+            if (title) sourceText += title.textContent;
+            if (firstName) sourceText += firstName.textContent;
+            if (lastName) sourceText += ' ' + lastName.textContent;
+            if (typedText) sourceText += typedText.textContent;
+            
+            // Usuń spacje i przygotuj znaki do rozpisywania
+            const chars = sourceText.split('').filter(c => c.trim() !== '' || c === ' ');
+            
+            if (chars.length === 0) {
+                // Fallback jeśli nie ma tekstu
+                chars.push(...['~', '|', '|', '-', '_', '^', '+', '*', '.']);
+            }
+            
+            // Powtórz znaki, żeby wypełnić ekran
+            const charCount = Math.floor((window.innerWidth / 12) * (window.innerHeight / 20));
+            const repeatedChars = [];
+            for (let i = 0; i < charCount; i++) {
+                repeatedChars.push(chars[i % chars.length]);
+            }
+            
+            // Twórz znaki jeden po drugim, jakby się pisały
+            let charIndex = 0;
+            const charsPerFrame = 12; // Ile znaków na klatkę (szybkość pisania - zwiększone)
+            const fillDuration = 800; // 0.8 sekundy na wypełnienie (skrócone)
+            const fadeStart = 600; // Kiedy zaczyna się wygaszanie (wcześniej)
+            const frameTime = fillDuration / (charCount / charsPerFrame);
+            
+            function addChars() {
+                if (charIndex >= repeatedChars.length) {
+                    // Wszystkie znaki dodane, przejdź do poems.html
+                    // Overlay pozostanie widoczny i wygaśnie na poems.html
+                    setTimeout(() => {
+                        // Zapisz overlay w sessionStorage, żeby poems.html wiedział, że ma go wygasić
+                        try {
+                            sessionStorage.setItem('hasTransitionOverlay', '1');
+                        } catch(e) {}
+                        window.location.href = 'poems.html';
+                    }, 200);
+                    return;
+                }
+                
+                // Dodaj kilka znaków na raz
+                for (let i = 0; i < charsPerFrame && charIndex < repeatedChars.length; i++) {
+                    const char = document.createElement('span');
+                    char.className = 'transition-char';
+                    char.textContent = repeatedChars[charIndex];
+                    char.style.position = 'absolute';
+                    char.style.left = Math.random() * 100 + '%';
+                    char.style.top = Math.random() * 100 + '%';
+                    
+                    // Losowe opóźnienie animacji pojawienia się (efekt pisania)
+                    const appearDelay = (charIndex / repeatedChars.length) * 0.3 + Math.random() * 0.1;
+                    // Nie wygaszaj znaków - pozostaną widoczne do przejścia
+                    char.style.animationDelay = `${appearDelay}s`;
+                    char.style.animation = 'charAppear 0.08s forwards';
+                    
+                    overlay.appendChild(char);
+                    charIndex++;
+                }
+                
+                setTimeout(() => {
+                    requestAnimationFrame(addChars);
+                }, frameTime);
+            }
+            
+            // Rozpocznij animację
+            setTimeout(() => {
+                overlay.classList.add('active');
+                addChars();
+            }, 50);
+        }
+
         document.getElementById('title').addEventListener('click', () => {
             if (canTransition) {
-                window.location.href = 'poems.html';
+                animateTransitionToPoems();
             } else {
                 // Pokaż komunikat że trzeba poczekać
                 const title = document.getElementById('title');
@@ -3646,7 +3837,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     if (canTransition) {
-                        window.location.href = 'poems.html';
+                        animateTransitionToPoems();
                     } else {
                         // Pokaż komunikat że trzeba poczekać
                         const title = document.getElementById('title');

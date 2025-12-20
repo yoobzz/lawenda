@@ -2,7 +2,13 @@
 // usage: place a button with id="audioToggle" on the page; include this script.
 
 (function(){
-  const AUDIO_URL = 'kaziu mergedfinal tylko ja.wav';
+  // Lista plików audio - możesz dodać więcej plików tutaj
+  const AUDIO_FILES = [
+    'kaziu mergedfinal tylko ja.wav',
+    // Dodaj tutaj kolejne pliki audio, np.:
+    // 'drugi-plik-audio.wav',
+    // 'trzeci-plik-audio.mp3',
+  ];
 
   let audioCtx = null;
   let audioGain = null;
@@ -10,6 +16,7 @@
   let isOn = false;
   let audioEl = null;
   let mediaSource = null;
+  let currentAudioIndex = 0;
 
   function initAudio() {
     if (audioCtx) return;
@@ -17,6 +24,28 @@
     audioGain = audioCtx.createGain();
     audioGain.gain.value = 0.0;
     audioGain.connect(audioCtx.destination);
+
+    loadAudioFile(currentAudioIndex);
+  }
+
+  function loadAudioFile(index) {
+    if (index < 0 || index >= AUDIO_FILES.length) return;
+    
+    // Jeśli już istnieje audio element, odłącz go
+    if (mediaSource) {
+      try {
+        mediaSource.disconnect();
+      } catch(e) {}
+    }
+    if (audioEl) {
+      try {
+        audioEl.pause();
+        audioEl.src = '';
+      } catch(e) {}
+    }
+
+    currentAudioIndex = index;
+    const AUDIO_URL = AUDIO_FILES[index];
 
     // html audio element as source (looped)
     audioEl = new Audio(encodeURI(AUDIO_URL));
@@ -26,6 +55,20 @@
 
     mediaSource = audioCtx.createMediaElementSource(audioEl);
     mediaSource.connect(audioGain);
+
+    // Jeśli audio było włączone, odtwórz nowy plik
+    if (isOn && audioCtx) {
+      if (audioCtx.state !== 'running') {
+        audioCtx.resume().catch(()=>{});
+      }
+      audioEl.play().catch(()=>{});
+    }
+  }
+
+  function switchToNextAudio() {
+    if (AUDIO_FILES.length <= 1) return;
+    const nextIndex = (currentAudioIndex + 1) % AUDIO_FILES.length;
+    loadAudioFile(nextIndex);
   }
 
   function setOn(on){
@@ -63,7 +106,11 @@
   function updateButton(btn){
     if (!btn) return;
     btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-    btn.textContent = isOn ? 'dźwięk: on' : 'dźwięk: off';
+    let text = isOn ? 'dźwięk: on' : 'dźwięk: off';
+    if (AUDIO_FILES.length > 1) {
+      text += ` (${currentAudioIndex + 1}/${AUDIO_FILES.length})`;
+    }
+    btn.textContent = text;
   }
 
   function setupButton(){
@@ -71,7 +118,16 @@
     if (!btn) return;
 
     let saved = null;
-    try { saved = localStorage.getItem('audioOn'); } catch(e) {}
+    try { 
+      saved = localStorage.getItem('audioOn');
+      const savedIndex = localStorage.getItem('audioIndex');
+      if (savedIndex !== null) {
+        const idx = parseInt(savedIndex, 10);
+        if (!isNaN(idx) && idx >= 0 && idx < AUDIO_FILES.length) {
+          currentAudioIndex = idx;
+        }
+      }
+    } catch(e) {}
     isOn = saved === '1';
     updateButton(btn);
 
@@ -80,10 +136,53 @@
       isOn = !isOn;
       updateButton(btn);
       setOn(isOn);
+      try { localStorage.setItem('audioOn', isOn ? '1' : '0'); } catch(e) {}
     };
 
-    btn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); toggle(); });
-    btn.addEventListener('touchend', (e)=>{ e.preventDefault(); e.stopPropagation(); toggle(); }, { passive: false });
+    // Kliknięcie lewym przyciskiem - włącz/wyłącz
+    btn.addEventListener('click', (e)=>{ 
+      if (e.button === 0 || e.button === undefined) {
+        e.preventDefault(); 
+        e.stopPropagation(); 
+        toggle(); 
+      }
+    });
+    
+    // Kliknięcie prawym przyciskiem lub długie naciśnięcie - zmień plik
+    btn.addEventListener('contextmenu', (e)=>{ 
+      e.preventDefault(); 
+      e.stopPropagation();
+      if (AUDIO_FILES.length > 1) {
+        ensurePrime();
+        switchToNextAudio();
+        updateButton(btn);
+        try { localStorage.setItem('audioIndex', currentAudioIndex.toString()); } catch(e) {}
+      }
+    });
+
+    // Długie naciśnięcie na urządzeniach dotykowych
+    let longPressTimer = null;
+    btn.addEventListener('touchstart', (e)=>{ 
+      longPressTimer = setTimeout(() => {
+        if (AUDIO_FILES.length > 1) {
+          ensurePrime();
+          switchToNextAudio();
+          updateButton(btn);
+          try { localStorage.setItem('audioIndex', currentAudioIndex.toString()); } catch(e) {}
+        }
+        longPressTimer = null;
+      }, 500);
+    }, { passive: true });
+    
+    btn.addEventListener('touchend', (e)=>{ 
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+        e.preventDefault(); 
+        e.stopPropagation(); 
+        toggle(); 
+      }
+    }, { passive: false });
 
     // global first interaction primes audio; if saved on, fade in and play
     const prime = () => {
