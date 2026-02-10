@@ -4,6 +4,16 @@ const fs = require('fs');
 const express = require('express');
 const basicAuth = require('express-basic-auth');
 
+// Canvas do generowania obrazów (opcjonalne - jeśli nie zainstalowane, endpoint zwróci błąd)
+let createCanvas, loadFont;
+try {
+  const canvas = require('canvas');
+  createCanvas = canvas.createCanvas;
+  loadFont = canvas.loadFont;
+} catch (e) {
+  console.warn('canvas nie jest zainstalowany - endpoint obrazów nie będzie działał. Zainstaluj: npm install canvas');
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -28,7 +38,7 @@ function getPoemFromHtml(html, poemIndex) {
   if (!match) return null;
   
   const poemHtml = match[1];
-  // Usuń HTML i wyciągnij tekst
+  // Usuń HTML i wyciągnij tekst - zachowaj wszystkie znaki specjalne
   let text = poemHtml
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<[^>]+>/g, '')
@@ -36,14 +46,25 @@ function getPoemFromHtml(html, poemIndex) {
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
     .trim();
   
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  // Dekoduj wszystkie HTML entities
+  text = text.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec));
+  text = text.replace(/&#x([a-f\d]+);/gi, (match, hex) => String.fromCharCode(parseInt(hex, 16)));
+  
+  // Podziel na linie - ZACHOWAJ puste linie (nie filtruj ich!)
+  const lines = text.split('\n').map(l => l.trim());
+  // Filtruj tylko dla preview (nie dla głównego tekstu)
+  const nonEmptyLines = lines.filter(l => l.length > 0);
+  
   return {
     text: text,
-    lines: lines,
-    firstLine: lines[0] || 'wiersz',
-    preview: lines.slice(0, 3).join(' ').substring(0, 150) || 'staś szpineta archiwum'
+    lines: lines, // ZACHOWAJ wszystkie linie, w tym puste
+    firstLine: nonEmptyLines[0] || 'wiersz',
+    preview: nonEmptyLines.slice(0, 3).join(' ').substring(0, 150) || 'staś szpineta archiwum'
   };
 }
 
@@ -89,6 +110,16 @@ app.get('/poems.html', (req, res) => {
           /<meta\s+name=["']twitter:description["'][^>]*>/i,
           `<meta name="twitter:description" content="${escapeHtml(poem.preview)}">`
         );
+        // Aktualizuj obraz - użyj endpoint do generowania obrazu
+        const imageUrl = `${baseUrl}/poem-image.png?poem=${poemNumber}`;
+        html = html.replace(
+          /<meta\s+property=["']og:image["'][^>]*>/i,
+          `<meta property="og:image" content="${escapeHtml(imageUrl)}">`
+        );
+        html = html.replace(
+          /<meta\s+name=["']twitter:image["'][^>]*>/i,
+          `<meta name="twitter:image" content="${escapeHtml(imageUrl)}">`
+        );
         html = html.replace(
           /<title>[^<]*<\/title>/i,
           `<title>wiersz ${poemNumber} — ~||-_^+*.</title>`
@@ -98,6 +129,179 @@ app.get('/poems.html', (req, res) => {
   }
   
   res.send(html);
+});
+
+// Endpoint do generowania obrazu z treścią wiersza (dla Instagram Stories)
+app.get('/poem-image.png', async (req, res) => {
+  if (!createCanvas) {
+    return res.status(503).send('Canvas library not installed');
+  }
+  
+  const poemParam = req.query.poem;
+  if (!poemParam) {
+    return res.status(400).send('Missing ?poem parameter');
+  }
+  
+  const poemsPath = path.join(__dirname, 'poems.html');
+  if (!fs.existsSync(poemsPath)) {
+    return res.status(404).send('poems.html not found');
+  }
+  
+  const html = fs.readFileSync(poemsPath, 'utf8');
+  const poemIndex = parseInt(poemParam, 10) - 1;
+  if (isNaN(poemIndex) || poemIndex < 0) {
+    return res.status(400).send('Invalid poem index');
+  }
+  
+  const poem = getPoemFromHtml(html, poemIndex);
+  if (!poem) {
+    return res.status(404).send('Poem not found');
+  }
+  
+  try {
+    // Załaduj czcionkę ABC Diatype Rounded jeśli dostępna
+    const fontPath = path.join(__dirname, 'fonts', 'ABCDiatypeRoundedVariable-Trial.woff2');
+    if (loadFont && fs.existsSync(fontPath)) {
+      try {
+        await loadFont(fontPath);
+      } catch (e) {
+        console.warn('Nie można załadować czcionki ABC Diatype Rounded:', e.message);
+      }
+    }
+    // Spróbuj też załadować ABC Helveesti Plus Variable (fallback)
+    const helveestiPath = path.join(__dirname, 'fonts', 'ABCHelveestiPlusVariable-Trial.woff2');
+    if (loadFont && fs.existsSync(helveestiPath)) {
+      try {
+        await loadFont(helveestiPath);
+      } catch (e) {
+        // Ignoruj błąd - to tylko fallback
+      }
+    }
+    
+    // Wymiary Instagram Stories
+    const W = 1080;
+    const H = 1920;
+    const canvas = createCanvas(W, H);
+    const ctx = canvas.getContext('2d');
+    
+    // Tło (lekko kremowe gradient)
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#fffdfa');
+    bg.addColorStop(1, '#f9f6ef');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+    
+    // Marginesy
+    const padX = 120;
+    const padY = 200;
+    const contentW = W - padX * 2;
+    const contentH = H - padY * 2;
+    
+    // Ustawienia tekstu
+    ctx.fillStyle = '#000000';
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'center';
+    
+    // Tekst wiersza - podziel na linie
+    const originalLines = poem.lines;
+    let fontSize = 44;
+    let allLines = [];
+    
+    // Funkcja do zawijania długich linii
+    const wrapLine = (text, maxWidth, currentFontSize) => {
+      const words = text.split(/\s+/);
+      const lines = [];
+      let line = '';
+      ctx.font = `300 ${currentFontSize}px 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+      for (const word of words) {
+        const test = line ? line + ' ' + word : word;
+        const metrics = ctx.measureText(test);
+        if (metrics.width <= maxWidth) {
+          line = test;
+        } else {
+          if (line) lines.push(line);
+          // Jeśli słowo jest za długie, dziel po znakach
+          if (ctx.measureText(word).width > maxWidth) {
+            let chunk = '';
+            for (const ch of word) {
+              const test2 = chunk + ch;
+              if (ctx.measureText(test2).width <= maxWidth) {
+                chunk = test2;
+              } else {
+                if (chunk) lines.push(chunk);
+                chunk = ch;
+              }
+            }
+            line = chunk;
+          } else {
+            line = word;
+          }
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    };
+    
+    // Znajdź odpowiedni rozmiar czcionki
+    do {
+      allLines = [];
+      ctx.font = `300 ${fontSize}px 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+      for (const rawLine of originalLines) {
+        if ((rawLine || '').trim().length === 0) {
+          allLines.push(''); // zachowaj pustą linię jako odstęp
+        } else {
+          const wrapped = wrapLine(rawLine, contentW, fontSize);
+          allLines.push(...wrapped);
+        }
+      }
+      const lineHeight = fontSize * 1.4;
+      const totalHeight = allLines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : lineHeight), 0);
+      if (totalHeight > contentH) {
+        fontSize -= 2;
+      } else {
+        break;
+      }
+    } while (fontSize >= 28);
+    
+    // Rysuj tekst - wyśrodkuj w pionie
+    ctx.font = `300 ${fontSize}px 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+    const lineHeight = fontSize * 1.4;
+    const totalHeight = allLines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : lineHeight), 0);
+    let y = padY + Math.max(0, (contentH - totalHeight) / 2);
+    
+    for (const ln of allLines) {
+      if (ln === '') {
+        y += fontSize * 0.9;
+        continue;
+      }
+      // Upewnij się, że wszystkie znaki są renderowane (w tym znaki specjalne)
+      try {
+        ctx.fillText(ln, W / 2, y);
+      } catch (err) {
+        // Jeśli błąd renderowania, spróbuj bez problematycznych znaków
+        console.warn('Błąd renderowania linii:', ln, err);
+        const safeLine = ln.replace(/[^\x20-\x7E\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]/g, '?');
+        ctx.fillText(safeLine, W / 2, y);
+      }
+      y += lineHeight;
+      if (y > H - padY) break;
+    }
+    
+    // Stopka z autorem
+    ctx.font = '700 22px \'ABC Diatype Rounded\', \'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif';
+    ctx.fillStyle = '#666666';
+    ctx.fillText('~||-_^+*.', W / 2, H - 100);
+    
+    // Konwertuj do PNG
+    const buffer = canvas.toBuffer('image/png');
+    
+    res.set('Content-Type', 'image/png');
+    res.set('Cache-Control', 'public, max-age=86400'); // Cache na 24h
+    res.send(buffer);
+  } catch (error) {
+    console.error('Error generating image:', error);
+    res.status(500).send('Error generating image');
+  }
 });
 
 // Serwowanie plików statycznych (publicznych)
@@ -113,7 +317,7 @@ app.get('/admin', (req, res) => {
   <title>panel — dodaj wiersz</title>
   <meta name="robots" content="noindex,nofollow" />
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; margin: 24px; }
+    body { font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 24px; }
     label { display:block; margin: 12px 0 6px; font-weight: 600; }
     input[type=text], textarea { width: 100%; max-width: 820px; padding: 10px; font: inherit; }
     textarea { height: 320px; }

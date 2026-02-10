@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "@grapesjs/studio-sdk": "^1.0.56",
+    "canvas": "^3.2.1",
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1"
   }

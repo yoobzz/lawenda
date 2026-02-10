@@ -19,10 +19,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wiersze — ~||-_^+*.</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
     
     <meta name="description" content="staś szpineta archiwum">
     <meta property="og:title" content="~||-_^+*.">
@@ -40,8 +36,23 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
     <style>
+        @font-face {
+            font-family: 'ABC Diatype Rounded';
+            src: url('fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'ABC Helveesti';
+            src: url('fonts/ABCHelveestiPlusVariable-Trial.woff2') format('woff2'),
+                 url('fonts/ABCHelveestiPlusVariable-Trial.woff') format('woff');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Geist', sans-serif; background: #ffffff; color: #1a1a1a; }
+        body { font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #1a1a1a; }
         .poems-section { 
             min-height: 100vh; 
             position: relative; 
@@ -77,47 +88,353 @@
         .poem-particle.pulse {
             animation: particleFloat 20s infinite ease-in-out, particlePulse 3s infinite ease-in-out;
         }
-        .poem { min-height: calc(100vh - 160px); display: none; align-items: center; justify-content: center; text-align: left; font-weight: 300; line-height: 1.6; color: #000000; padding: 2rem 2rem 160px 2rem; opacity: 0; transform: translateY(30px); }
-        .poem.active { display: flex; opacity: 1; transform: translateY(0); }
+        .poem { 
+            min-height: calc(100vh - 160px); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: left; 
+            font-weight: 300; 
+            line-height: 1.6; 
+            color: #000000; 
+            padding: 2rem 2rem 160px 2rem; 
+            opacity: 0; 
+        }
+        .poem.active { 
+            display: flex; 
+            opacity: 1; 
+        }
         .navigation { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 1rem; z-index: 100; align-items: center; }
-        .nav-arrow { width: 40px; height: 40px; border: 2px solid #000000; background: transparent; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; font-family: 'Geist', sans-serif; font-size: 16px; color: #000000; }
-        .nav-arrow:hover { background: #000000; color: #ffffff; transform: scale(1.1); }
-        .nav-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
-        .nav-arrow:disabled:hover { background: transparent; color: #000000; transform: none; }
-        .nav-counter { font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; padding: 0 1rem; }
-        .back-button { position: fixed; top: 1rem; left: 1rem; background: transparent; border: 0; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; opacity: 0.4; cursor: pointer; padding: 6px 8px; z-index: 110; }
-        .back-button:hover { opacity: 0.8; }
+        .nav-arrow { 
+            width: 40px; 
+            height: 40px; 
+            border: 2px solid #000000; 
+            background: transparent; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            font-size: 16px; 
+            color: #000000;
+            position: relative;
+            overflow: hidden;
+            border-radius: 50%;
+        }
+        .nav-arrow::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: #000000;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+        .nav-arrow:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        .nav-arrow:hover { 
+            color: #ffffff; 
+            transform: scale(1.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        .nav-arrow:active {
+            transform: scale(0.95);
+        }
+        .nav-arrow:disabled { 
+            opacity: 0.3; 
+            cursor: not-allowed; 
+        }
+        .nav-arrow:disabled:hover { 
+            background: transparent; 
+            color: #000000; 
+            transform: none;
+            box-shadow: none;
+        }
+        .nav-arrow:disabled::before {
+            display: none;
+        }
+        .nav-counter { 
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            font-size: 14px; 
+            color: #000000; 
+            padding: 0 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .nav-counter.updating {
+            transform: scale(1.1);
+            opacity: 0.7;
+        }
+        .nav-counter::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 1rem;
+            right: 1rem;
+            height: 1px;
+            background: #000000;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-counter:hover::after {
+            transform: scaleX(1);
+        }
+        .back-button { 
+            position: fixed; 
+            top: 1rem; 
+            left: 1rem; 
+            background: transparent; 
+            border: 0; 
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            font-size: 14px; 
+            color: #000000; 
+            opacity: 0.4; 
+            cursor: pointer; 
+            padding: 6px 8px; 
+            z-index: 110;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+        }
+        .back-button:hover { 
+            opacity: 0.8; 
+            transform: translateX(-2px);
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .back-button:active {
+            transform: translateX(-4px);
+        }
         .controls { position: fixed; right: 1rem; bottom: 1rem; display: flex; gap: 0.5rem; align-items: center; z-index: 102; }
-        .control-btn { background: transparent; border: 0; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; opacity: 0.8; cursor: pointer; padding: 6px 8px; }
-        .control-btn:hover, .control-btn:focus-visible { opacity: 1; outline: none; text-decoration: underline; }
-        .toast { position: fixed; left: 50%; bottom: calc(3.5rem + env(safe-area-inset-bottom)); transform: translateX(-50%); background: #000000; color: #ffffff; font-family: 'Geist', sans-serif; font-size: 12px; padding: 6px 10px; border-radius: 4px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; z-index: 1500; }
-        .toast.show { opacity: 0.9; }
-        .poem-typing { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); font-family: 'Geist', sans-serif; font-size: 1.2rem; color: rgba(196, 181, 253, 0.7); z-index: 1000; font-weight: 300; letter-spacing: 0.1em; white-space: nowrap; opacity: 0; display: flex; }
+        .control-btn { 
+            background: transparent; 
+            border: 0; 
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            font-size: 14px; 
+            color: #000000; 
+            opacity: 0.8; 
+            cursor: pointer; 
+            padding: 6px 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+            position: relative;
+        }
+        .control-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 8px;
+            right: 8px;
+            height: 1px;
+            background: #000000;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .control-btn:hover, .control-btn:focus-visible { 
+            opacity: 1; 
+            outline: none;
+            transform: translateY(-1px);
+        }
+        .control-btn:hover::after, .control-btn:focus-visible::after {
+            transform: scaleX(1);
+        }
+        .control-btn:active {
+            transform: translateY(0);
+        }
+        .toast { 
+            position: fixed; 
+            left: 50%; 
+            bottom: calc(3.5rem + env(safe-area-inset-bottom)); 
+            transform: translateX(-50%) translateY(20px);
+            background: #000000; 
+            color: #ffffff; 
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            font-size: 12px; 
+            padding: 8px 14px; 
+            border-radius: 6px; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 1500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .toast.show { 
+            opacity: 0.95; 
+            transform: translateX(-50%) translateY(0);
+        }
+        .poem-typing { position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 1.2rem; color: rgba(196, 181, 253, 0.7); z-index: 1000; font-weight: 400; letter-spacing: 0.1em; white-space: nowrap; opacity: 0; display: flex; }
         .poem-typing.show { opacity: 1; }
         .typing-cursor { display: inline-block; width: 3px; height: 1.2rem; background: #1a1a1a; margin-left: 3px; animation: blink 1s infinite; }
         @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
         /* goto popover */
         .goto-popover { position: fixed; left: 50%; bottom: calc(2rem + 56px); transform: translateX(-50%); background: #ffffff; border: 1px solid #000000; border-radius: 4px; padding: 6px 8px; display: none; z-index: 120; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .goto-input { width: 72px; border: 0; outline: none; background: transparent; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; text-align: center; }
-        .goto-hint { margin-top: 4px; font-family: 'Geist', sans-serif; font-size: 11px; color: #555; text-align: center; }
+        .goto-input { width: 72px; border: 0; outline: none; background: transparent; font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; color: #000000; text-align: center; }
+        .goto-hint { margin-top: 4px; font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11px; color: #555; text-align: center; }
         /* search popover */
         .search-popover { position: fixed; left: 50%; top: calc(1rem + env(safe-area-inset-top)); transform: translateX(-50%); width: min(560px, 92vw); background: #ffffff; border: 1px solid #000000; border-radius: 6px; padding: 8px; display: none; z-index: 130; box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
-        .search-input { width: 100%; border: 0; outline: none; background: transparent; font-family: 'Geist', sans-serif; font-size: 16px; color: #000000; padding: 6px 4px; }
+        .search-input { width: 100%; border: 0; outline: none; background: transparent; font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; color: #000000; padding: 6px 4px; }
         .search-results { margin-top: 6px; max-height: 50vh; overflow: auto; }
-        .search-item { display: block; width: 100%; text-align: left; background: transparent; border: 0; cursor: pointer; padding: 8px 6px; font-family: 'Geist', sans-serif; font-size: 14px; color: #000000; border-top: 1px solid #eee; }
-        .search-item:hover, .search-item:focus-visible { background: #f6f6f6; outline: none; }
-        @media (max-width: 640px) {
-            .controls { top: calc(1rem + env(safe-area-inset-top)); right: 1rem; bottom: auto; }
+        .search-item { 
+            display: block; 
+            width: 100%; 
+            text-align: left; 
+            background: transparent; 
+            border: 0; 
+            cursor: pointer; 
+            padding: 8px 6px; 
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            font-size: 14px; 
+            color: #000000; 
+            border-top: 1px solid #eee;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
         }
+        .search-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #000000;
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .search-item:hover, .search-item:focus-visible { 
+            background: #f6f6f6; 
+            outline: none;
+            padding-left: 10px;
+        }
+        .search-item:hover::before, .search-item:focus-visible::before {
+            transform: scaleY(1);
+        }
+        /* Progress indicator z znaczkami - stały pasek na dole */
+        /* Loading skeleton */
+        .poem-skeleton {
+            min-height: calc(100vh - 160px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .skeleton-line {
+            height: 1.6em;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeletonLoading 1.5s ease-in-out infinite;
+            border-radius: 2px;
+            margin-bottom: 0.8em;
+        }
+        @keyframes skeletonLoading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Focus visible improvements */
+        *:focus-visible {
+            outline: 2px solid #000000;
+            outline-offset: 2px;
+        }
+        
+        /* Page transition overlay */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .page-transition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
         @media (max-width: 640px) {
-            #audioToggle { font-size: 10px !important; padding: 4px 6px !important; top: 0.75rem !important; right: 0.75rem !important; }
+            #audioToggle { 
+                font-size: 14px !important; 
+                padding: 4px 6px !important; 
+                top: 0.75rem !important; 
+                right: 0.75rem !important; 
+            }
+            
+            /* Panel kontrolny na mobile - pionowo z boku po prawej */
+            .controls { 
+                position: fixed; 
+                top: 50%;
+                right: 0.5rem;
+                bottom: auto;
+                left: auto;
+                transform: translateY(-50%);
+                flex-direction: column;
+                gap: 0.5rem;
+                z-index: 102;
+            }
+            
+            .control-btn {
+                font-size: 12px;
+                padding: 6px 8px;
+                min-width: 32px;
+                min-height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Nawigacja na dole */
+            .navigation {
+                bottom: calc(1rem + env(safe-area-inset-bottom));
+                gap: 0.75rem;
+            }
+            
+            .nav-arrow {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+            
+            .nav-counter {
+                font-size: 12px;
+                padding: 0 0.75rem;
+            }
+            
+            /* Toast wyżej, żeby nie nachodził na nawigację */
+            .toast {
+                bottom: calc(5rem + env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
     <div class="poems-section" id="poemsSection">
         <div class="poems-background" id="poemsBackground"></div>
-        <button class="back-button" id="backToStart" title="wróć" onclick="window.location.href='index.html'">← start</button>
+        <button class="back-button" id="backToStart" title="wróć" onclick="window.location.href='index.html'">~||-_^+*.</button>
         <div id="poemsMount">
             <div class="poem active" data-index="0">
                 po pełni<br>
@@ -2145,7 +2462,7 @@
                 od.,*zgaś światło<br>
                 od*,.puść pustkę<br><br>
                 owiń mnie<br>
-                oswój<br><br>
+                oswój<br> <br>
                 uznaj<br>
                 kolorem<br><br>
                 i ponoś te„^barwy*_.<br>
@@ -2153,10 +2470,83 @@
                 ….i odnoś!nie prawdy<br>
                 bo ty, to też kolor.
             </div>
+            <div class="poem" data-index="151">
+                gdybyś mogła<br>
+                się tak wzruszać<br>
+                parą, słowa by koiły<br><br>
+                gdybyś mogła<br>
+                więcej zostać<br>
+                mniej bym bał się<br>
+                zmieniał cały<br><br>
+                gdybyś mogła<br>
+                chcieć rozumieć<br>
+                rozumiałbym, <br>
+                że chcesz   
+                <br>
+                
+            </div>
+            <div class="poem" data-index="152">
+                obiecam<br>
+                niewieczność<br>
+                i zamknę to wieczko<br><br>
+                nie czekam<br>
+                jak dziecko<br>
+                na moment!<br><br>
+                i chociaż ziewam<br>
+                "~||-_^+*.<br>
+                nie jestem warunkiem
+            </div>
+            <div class="poem" data-index="153">
+                surowieje<br>
+                tak fałszywie<br>
+                sztucznie tworząc<br>
+                będąc ludzkim<br><br>
+                myślą~.*mówią<br>
+                rozwój!¡. przecież!!<br>
+                w obcym wzroku<br>
+                nie istnieje<br><br>
+                +tym"/ czym jestem<br>
+                dotrę gdzieś<br>
+                gdzie dużo nie wiem
+            </div>
+            <div class="poem" data-index="154">
+                żar jeszcze kłuje<br>
+                więc zaryzykuję<br><br>
+                i mu podziękuję<br>
+                za dar<br>
+                i za czas<br><br>
+                *_++_+_*<br>
+                za to czasami<br>
+                za dar!mo bywam<br>
+                za barwą biegam¡<br>
+                za bardzo!!<br><br>
+                !!…tak mi kazali !<br>
+                mi ! …z moimi myślami<br>
+                zmytymi zmysłami<br>
+                z innymi śladami<br>
+                tak mi aż!.!,,<br><br>
+                !i+_aaahh!!!!<br>
+                słowami snu<br>
+                słoną mam twarz<br><br>
+                i na nowy ów<br>
+                napisze!!<br>
+                =_+*znów！！
+            </div>
+            <div class="poem" data-index="155">
+                nie<br><br>
+                nie łączy nas krew<br>
+                a pożądanie jej braku<br><br>
+                stworzyłeś wampira<br>
+                nie mając jej kropli<br><br>
+                on żywi się sobą<br>
+                by poznać twój smak<br><br>
+                i szuka cię w słońcu<br>
+                którego nie znałeś
+            </div>
 </div>
     </div>
 
-    <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk" style="position: fixed; top: 1rem; right: 1rem; background: none; border: 0; color: #000; font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.8; z-index: 1200; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s ease, transform 0.2s ease;">dźwięk: off</button>
+    <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk" style="position: fixed; top: 1rem; right: 1rem; background: none; border: 0; color: #000; font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; opacity: 0.8; z-index: 1200; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s ease, transform 0.2s ease;">||</button>
     <div class="navigation" id="navigation">
         <button class="nav-arrow" id="prevBtn">‹</button>
         <div class="nav-counter" id="navCounter">1 / 1</div>
@@ -2171,11 +2561,12 @@
     </div>
 
     <div class="controls" id="controls" aria-label="kontrolki">
-        <button class="control-btn" id="fontSmaller" title="mniejszy tekst">a</button>
-        <button class="control-btn" id="fontBigger" title="większy tekst">A</button>
-        <button class="control-btn" id="openSearch" title="szukaj">szukaj</button>
-        <button class="control-btn" id="reshuffleOrder" title="przetasuj">tasuj</button>
-        <button class="control-btn" id="copyLink" title="kopiuj link">link</button>
+        <button class="control-btn" id="fontSmaller" title="mniejszy tekst">-</button>
+        <button class="control-btn" id="fontBigger" title="większy tekst">+</button>
+        <button class="control-btn" id="openSearch" title="szukaj">¿</button>
+        <button class="control-btn" id="reshuffleOrder" title="przetasuj">~</button>
+        <button class="control-btn" id="copyLink" title="kopiuj link">www.</button>
+        <button class="control-btn" id="downloadImage" title="pobierz obraz do galerii">!</button>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite">skopiowano link</div>
 
@@ -2344,13 +2735,58 @@
             }
         }
         
+        // Funkcja zapisująca przeczytane wiersze
+        function markPoemAsRead(poemIndex) {
+            try {
+                if (poemIndex < 0 || poemIndex >= poems.length) return; // Walidacja indeksu
+                
+                const readPoems = JSON.parse(localStorage.getItem('readPoems') || '[]');
+                const originalIndex = getOriginalIndex(poemIndex);
+                
+                // Walidacja: upewnij się, że originalIndex jest prawidłowy
+                if (typeof originalIndex !== 'number' || originalIndex < 0 || originalIndex >= 1000) {
+                    console.warn('Nieprawidłowy originalIndex:', originalIndex, 'dla poemIndex:', poemIndex);
+                    return;
+                }
+                
+                if (!readPoems.includes(originalIndex)) {
+                    readPoems.push(originalIndex);
+                    localStorage.setItem('readPoems', JSON.stringify(readPoems));
+                }
+            } catch(e) {
+                console.warn('Błąd zapisu przeczytanych wierszy:', e);
+            }
+        }
+        
+        // Funkcja pobierająca liczbę przeczytanych wierszy
+        function getReadPoemsCount() {
+            try {
+                const readPoems = JSON.parse(localStorage.getItem('readPoems') || '[]');
+                // Usuń duplikaty i upewnij się, że są to tylko prawidłowe indeksy
+                const uniqueReadPoems = [...new Set(readPoems)].filter(idx => 
+                    typeof idx === 'number' && idx >= 0 && idx < 1000 // Maksymalnie 1000 wierszy
+                );
+                return uniqueReadPoems.length;
+            } catch(e) {
+                return 0;
+            }
+        }
+        
         function updateNavigation() {
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
             const navCounter = document.getElementById('navCounter');
             prevBtn.disabled = currentPoem === 0;
             nextBtn.disabled = currentPoem === poems.length - 1;
+            
+            // Animacja licznika
+            if (navCounter) {
+                navCounter.classList.add('updating');
+                setTimeout(() => {
             navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
+                    navCounter.classList.remove('updating');
+                }, 150);
+            }
         }
         // Funkcja do aktualizacji meta tagów Open Graph
         function updateMetaTags(poemIndex) {
@@ -2384,29 +2820,120 @@
                 meta.setAttribute('content', content);
             };
             
-            const poemNumber = poemIndex + 1;
-            const currentUrl = `${location.origin}${location.pathname}#wiersz-${poemNumber}`;
+            // Użyj oryginalnego indeksu do URL (zakodowany identyfikator, bez widocznego numeru)
+            const originalIndex = getOriginalIndex(poemIndex);
+            const poemNumber = originalIndex + 1;
+            const encodedId = encodePoemId(poemNumber);
+            const currentUrl = `${location.origin}${location.pathname}#wiersz-${encodedId}`;
             
-            updateMeta('og:title', `wiersz ${poemNumber} — ${firstLine.substring(0, 50)}`);
+            // Meta tagi bez numerów wierszy
+            updateMeta('og:title', `${firstLine.substring(0, 50)} — ~||-_^+*.`);
             updateMeta('og:description', preview);
             updateMeta('og:url', currentUrl);
-            updateMetaName('twitter:title', `wiersz ${poemNumber} — ${firstLine.substring(0, 50)}`);
+            updateMetaName('twitter:title', `${firstLine.substring(0, 50)} — ~||-_^+*.`);
             updateMetaName('twitter:description', preview);
             
-            // Aktualizuj tytuł strony
-            document.title = `wiersz ${poemNumber} — ~||-_^+*.`;
+            // Aktualizuj obraz - użyj endpoint do generowania obrazu PNG
+            const imageUrl = `${location.origin}/poem-image.png?poem=${poemNumber}`;
+            updateMeta('og:image', imageUrl);
+            updateMetaName('twitter:image', imageUrl);
+            
+            // Aktualizuj tytuł strony (bez numeru wiersza)
+            document.title = `${firstLine.substring(0, 50)} — ~||-_^+*.`;
         }
 
+        // Funkcje kodowania/dekodowania identyfikatora wiersza (Base64 URL-safe)
+        function encodePoemId(poemNumber) {
+            // Konwertuj numer na string i zakoduj w Base64
+            const encoded = btoa(String(poemNumber))
+                .replace(/\+/g, '-')  // Zastąp + na -
+                .replace(/\//g, '_')  // Zastąp / na _
+                .replace(/=+$/, '');   // Usuń padding =
+            return encoded;
+        }
+        
+        function decodePoemId(encoded) {
+            try {
+                // Przywróć znaki i padding
+                let padded = encoded
+                    .replace(/-/g, '+')  // Przywróć +
+                    .replace(/_/g, '/'); // Przywróć /
+                // Dodaj padding jeśli potrzeba
+                while (padded.length % 4) {
+                    padded += '=';
+                }
+                const decoded = atob(padded);
+                const poemNumber = parseInt(decoded, 10);
+                return isNaN(poemNumber) ? null : poemNumber;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Funkcja pomocnicza: znajdź wiersz po jego oryginalnym indeksie (data-original-index)
+        function findPoemByOriginalIndex(originalIndex) {
+            for (let i = 0; i < poems.length; i++) {
+                const poem = poems[i];
+                const origIdx = poem.getAttribute('data-original-index');
+                if (origIdx !== null && origIdx !== undefined && origIdx !== '' && parseInt(origIdx, 10) === originalIndex) {
+                    return i; // Zwróć pozycję w tablicy
+                }
+            }
+            // Fallback: jeśli nie znaleziono, użyj pozycji w tablicy
+            return originalIndex >= 0 && originalIndex < poems.length ? originalIndex : -1;
+        }
+        
+        // Funkcja pomocnicza: pobierz oryginalny indeks wiersza (data-original-index)
+        function getOriginalIndex(poemIndex) {
+            const poem = poems[poemIndex];
+            if (!poem) return poemIndex;
+            const origIdx = poem.getAttribute('data-original-index');
+            if (origIdx !== null && origIdx !== undefined && origIdx !== '') {
+                return parseInt(origIdx, 10);
+            }
+            // Fallback do data-index
+            const dataIdx = poem.getAttribute('data-index');
+            if (dataIdx !== null && dataIdx !== undefined && dataIdx !== '') {
+                return parseInt(dataIdx, 10);
+            }
+            return poemIndex;
+        }
+        
         function goToPoem(index){
             if (index === currentPoem) return;
+            
+            // Oznacz wiersz jako przeczytany (tylko jeśli jeszcze nie był oznaczony)
+            markPoemAsRead(index);
+            
             const currentPoemEl = poems[currentPoem];
             const newPoemEl = poems[index];
+            
+            // Szybsze przejście między wierszami (bez lagu)
+            if (currentPoemEl) {
             currentPoemEl.classList.remove('active');
+                currentPoemEl.style.opacity = '0';
+                currentPoemEl.style.transform = '';
+            }
+            
+            // Pokaż nowy wiersz natychmiast (bez opóźnień)
+            if (newPoemEl) {
             newPoemEl.classList.add('active');
+                newPoemEl.style.opacity = '1';
+                newPoemEl.style.transform = '';
+            }
+            
             currentPoem = index;
-            try { localStorage.setItem('poemIndex', String(currentPoem + 1)); } catch(e) {}
-            const newHash = `#wiersz-${currentPoem + 1}`;
-            if (location.hash !== newHash) history.replaceState(null, '', location.pathname + newHash);
+            
+            // Zaktualizuj URL - użyj zakodowanego identyfikatora (bez widocznego numeru)
+            const originalIndex = getOriginalIndex(currentPoem);
+            const poemNumber = originalIndex + 1;
+            const encodedId = encodePoemId(poemNumber);
+            const newHash = `#wiersz-${encodedId}`;
+            const currentUrl = location.pathname + location.search + location.hash;
+            const newUrl = location.pathname + newHash;
+            if (currentUrl !== newUrl) {
+                history.replaceState(null, '', newUrl);
+            }
             updateNavigation();
             updateMetaTags(currentPoem);
         }
@@ -2420,7 +2947,22 @@
             try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch(e) {}
             try { const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='-9999px'; document.body.appendChild(ta); ta.focus(); ta.select(); const ok = document.execCommand('copy'); document.body.removeChild(ta); return ok; } catch(e2){ return false; }
         }
-        function showToast(msg){ const t=document.getElementById('toast'); if(!t){ try{ console.log(msg);}catch(e){} return;} t.textContent=msg; t.classList.add('show'); clearTimeout(window.__toastTimer); window.__toastTimer=setTimeout(()=>t.classList.remove('show'),1200); }
+        function showToast(msg){ 
+            const t=document.getElementById('toast'); 
+            if(!t){ 
+                try{ console.log(msg);}catch(e){} 
+                return;
+            } 
+            t.textContent=msg; 
+            t.classList.remove('show');
+            // Force reflow
+            void t.offsetWidth;
+            t.classList.add('show'); 
+            clearTimeout(window.__toastTimer); 
+            window.__toastTimer=setTimeout(()=>{
+                t.classList.remove('show');
+            }, 1500);
+        }
 
         document.getElementById('prevBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem>0) goToPoem(currentPoem-1); });
         document.getElementById('nextBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem<poems.length-1) goToPoem(currentPoem+1); });
@@ -2428,11 +2970,118 @@
         document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(1); });
         document.getElementById('copyLink').addEventListener('click', async (e)=>{ 
             e.preventDefault(); 
-            // Dla crawlerów dodaj ?poem=X do URL
-            const link = location.origin + location.pathname + `?poem=${currentPoem + 1}#wiersz-${currentPoem + 1}`; 
+            // Użyj oryginalnego indeksu (data-original-index) zamiast pozycji w tablicy
+            const originalIndex = getOriginalIndex(currentPoem);
+            const poemNumber = originalIndex + 1;
+            // Link z zakodowanym identyfikatorem (bez widocznego numeru)
+            const encodedId = encodePoemId(poemNumber);
+            const link = location.origin + location.pathname + `#wiersz-${encodedId}`; 
             const ok = await copyToClipboard(link); 
             showToast(ok ? 'skopiowano link' : 'kopiuj: ' + link); 
         });
+        
+        // Przycisk pobierania obrazu do galerii
+        document.getElementById('downloadImage').addEventListener('click', async (e)=>{ 
+            e.preventDefault(); 
+            const originalIndex = getOriginalIndex(currentPoem);
+            const poemNumber = originalIndex + 1;
+            const imageUrl = `${location.origin}/poem-image.png?poem=${poemNumber}`;
+            
+            try {
+                showToast('pobieranie obrazu...');
+                const response = await fetch(imageUrl);
+                if (!response.ok) throw new Error('Nie udało się pobrać obrazu');
+                
+                const blob = await response.blob();
+                const file = new File([blob], `wiersz-${poemNumber}.png`, { type: 'image/png' });
+                
+                const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+                
+                // Na iOS spróbuj Web Share API z plikiem
+                if (isIOS && navigator.share && navigator.canShare) {
+                    try {
+                        // Sprawdź czy można udostępnić plik
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: `wiersz ${poemNumber}`
+                            });
+                            showToast('wybierz "Zapisz do zdjęć"');
+                            return;
+                        }
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            return;
+                        }
+                        console.log('Web Share API error:', err);
+                    }
+                }
+                
+                // Fallback dla iOS: otwórz obraz w tej samej karcie (najlepsze dla iOS Safari)
+                if (isIOS) {
+                    // Na iOS otwórz obraz w tej samej karcie - użytkownik może zapisać długim naciśnięciem
+                    window.location.href = imageUrl;
+                    showToast('naciśnij i przytrzymaj obraz, aby zapisać');
+                } else {
+                    // Na Android/Desktop: użyj Web Share API lub pobierz jako plik
+                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: `wiersz ${poemNumber}`
+                            });
+                            showToast('wybierz "Zapisz zdjęcie"');
+                            return;
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                console.log('Web Share API error:', err);
+                            }
+                        }
+                    }
+                    
+                    // Fallback: pobierz jako plik
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = `wiersz-${poemNumber}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                    showToast('pobrano obraz');
+                }
+            } catch (error) {
+                console.error('Błąd pobierania obrazu:', error);
+                showToast('błąd: ' + error.message);
+            }
+        });
+        
+        // Funkcja resetowania progresu
+        function resetProgress() {
+            try {
+                localStorage.removeItem('readPoems');
+                showToast('postęp zresetowany');
+            } catch(e) {
+                console.warn('Błąd resetowania progresu:', e);
+            }
+        }
+        
+        // Funkcja czyszcząca duplikaty z readPoems
+        function cleanReadPoems() {
+            try {
+                const readPoems = JSON.parse(localStorage.getItem('readPoems') || '[]');
+                const uniqueReadPoems = [...new Set(readPoems)].filter(idx => 
+                    typeof idx === 'number' && idx >= 0 && idx < 1000
+                );
+                if (uniqueReadPoems.length !== readPoems.length) {
+                    localStorage.setItem('readPoems', JSON.stringify(uniqueReadPoems));
+                    console.log('Wyczyszczono duplikaty z readPoems:', readPoems.length, '->', uniqueReadPoems.length);
+                }
+            } catch(e) {
+                console.warn('Błąd czyszczenia readPoems:', e);
+            }
+        }
+        
 
         // Oczekuje, że wkleisz tu wiersze: skopiuj cały <div class="poems-section"> z index i wklej wewnątrz #poemsMount
         window.addEventListener('DOMContentLoaded', () => {
@@ -2507,14 +3156,47 @@
                 } catch(e) { /* ignore */ }
             })();
 
-            // aktywuj pierwszy
+            // Wyczyść duplikaty z readPoems przy starcie
+            cleanReadPoems();
+            
+            // Upewnij się, że poems jest zaktualizowane
+            poems = Array.from(document.querySelectorAll('.poem'));
+            
+            // aktywuj wiersz - sprawdź hash, jeśli nie ma, użyj pierwszego
             poems.forEach(p=>p.classList.remove('active'));
-            const hashMatch = location.hash.match(/^#wiersz-(\d+)$/);
-            const savedIndex = parseInt(localStorage.getItem('poemIndex') || '1');
-            let startIndex = 1;
-            if (hashMatch) startIndex = Math.max(1, Math.min(poems.length, parseInt(hashMatch[1])));
-            else if (!isNaN(savedIndex) && savedIndex >= 1 && savedIndex <= poems.length) startIndex = savedIndex;
-            currentPoem = startIndex - 1;
+            // Obsługuj zarówno stare linki z numerami (#wiersz-16) jak i nowe z kodowaniem (#wiersz-MTY=)
+            const hashMatch = location.hash.match(/^#wiersz-(.+)$/);
+            
+            let currentPoemIndex = 0; // Domyślnie pierwszy wiersz w tasowanej kolejności
+            
+            // Jeśli jest hash, znajdź wiersz po oryginalnym indeksie
+            if (hashMatch) {
+                const hashValue = hashMatch[1];
+                let poemNumber = null;
+                
+                // Spróbuj zdekodować (nowy format z Base64)
+                poemNumber = decodePoemId(hashValue);
+                
+                // Jeśli dekodowanie nie zadziałało, spróbuj jako zwykły numer (stary format)
+                if (poemNumber === null) {
+                    const parsed = parseInt(hashValue, 10);
+                    if (!isNaN(parsed)) {
+                        poemNumber = parsed;
+                    }
+                }
+                
+                if (poemNumber !== null) {
+                    const originalIndex = poemNumber - 1;
+                    const foundIndex = findPoemByOriginalIndex(originalIndex);
+                    if (foundIndex >= 0 && foundIndex < poems.length) {
+                        currentPoemIndex = foundIndex;
+                    } else {
+                        console.warn('Nie znaleziono wiersza o oryginalnym indeksie:', originalIndex, 'znaleziony indeks:', foundIndex);
+                    }
+                }
+            }
+            
+            currentPoem = currentPoemIndex;
             poems[currentPoem]?.classList.add('active');
             updateNavigation();
             updateMetaTags(currentPoem);
@@ -2726,7 +3408,7 @@
                 let lines;
                 const originalLines = (poemText || '').split('\n');
                 do {
-                    ctx.font = `300 ${fontSize}px Geist, IBM Plex Mono, system-ui, sans-serif`;
+                    ctx.font = `300 ${fontSize}px 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
                     lines = [];
                     for (let p = 0; p < originalLines.length; p++) {
                         const rawLine = originalLines[p];
@@ -2740,7 +3422,7 @@
                     const totalHeightTest = lines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : fontSize * 1.4), 0);
                     if (totalHeightTest > contentH) fontSize -= 2; else break;
                 } while (fontSize >= 28);
-                ctx.font = `300 ${fontSize}px Geist, IBM Plex Mono, system-ui, sans-serif`;
+                ctx.font = `300 ${fontSize}px 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
                 const lh = fontSize * 1.4;
                 // wyśrodkuj blok w pionie
                 const totalHeight = lines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : lh), 0);
@@ -2752,7 +3434,7 @@
                     if (y > H - padY) break;
                 }
                 // stopka
-                ctx.font = '400 22px Geist, IBM Plex Mono, system-ui, sans-serif';
+                ctx.font = '700 22px \'ABC Diatype Rounded\', \'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif';
                 ctx.globalAlpha = 0.18;
                 ctx.textAlign = 'right';
                 const footer = '~ staś szpineta · lawenda · szpineta.pl';
@@ -2761,7 +3443,25 @@
                 return await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png', 1.0));
             }
             document.addEventListener('keydown', (e)=>{
-                if (e.key === '/' && hasTransitioned) { e.preventDefault(); openSearchPopover(); }
+                if (e.key === '/' && hasTransitioned) { 
+                    e.preventDefault(); 
+                    openSearchPopover(); 
+                }
+                // Keyboard navigation visual feedback
+                if (e.key === 'ArrowLeft' && currentPoem > 0) {
+                    const prevBtn = document.getElementById('prevBtn');
+                    if (prevBtn && !prevBtn.disabled) {
+                        prevBtn.style.transform = 'scale(0.95)';
+                        setTimeout(() => prevBtn.style.transform = '', 150);
+                    }
+                }
+                if (e.key === 'ArrowRight' && currentPoem < poems.length - 1) {
+                    const nextBtn = document.getElementById('nextBtn');
+                    if (nextBtn && !nextBtn.disabled) {
+                        nextBtn.style.transform = 'scale(0.95)';
+                        setTimeout(() => nextBtn.style.transform = '', 150);
+                    }
+                }
             });
             document.addEventListener('click', (e)=>{
                 if (searchPopover && searchPopover.style.display === 'block') {
@@ -2770,7 +3470,7 @@
             });
             window.addEventListener('resize', ()=>{ if (searchPopover && searchPopover.style.display === 'block') closeSearchPopover(); });
 
-            // reshuffle
+            // reshuffle z animacją
             const reshuffleBtn = document.getElementById('reshuffleOrder');
             if (reshuffleBtn) {
                 reshuffleBtn.addEventListener('click', (e)=>{
@@ -2784,34 +3484,64 @@
                         }
                         localStorage.setItem('poemOrderV1', JSON.stringify(order));
 
-                        // przestaw wiersze bez przeładowania strony, zachowując aktualny wiersz
-                        const mount = document.getElementById('poemsMount');
-                        if (!mount) return;
-                        const oldPoems = poems.slice();
-                        const activeOldIndex = currentPoem;
-                        const newActiveIndex = order.indexOf(activeOldIndex);
-
-                        const frag = document.createDocumentFragment();
-                        order.forEach(i => frag.appendChild(oldPoems[i]));
-                        mount.innerHTML = '';
-                        mount.appendChild(frag);
-
-                        poems = Array.from(document.querySelectorAll('.poem'));
-                        poems.forEach((el, idx) => el.setAttribute('data-index', String(idx)));
-                        poems.forEach(p => p.classList.remove('active'));
-                        if (poems[newActiveIndex]) {
-                            poems[newActiveIndex].classList.add('active');
-                            currentPoem = newActiveIndex;
-                        } else {
-                            currentPoem = 0;
-                            poems[0]?.classList.add('active');
-                        }
-                        updateNavigation();
-                        showToast('przetasowano');
-                    } catch (err) {
-                        showToast('nie udało się przetasować');
+                        // Proste tasowanie bez animacji
+                        shufflePoems(order);
+                    } catch(e) {
+                        console.error('Błąd podczas tasowania:', e);
                     }
                 });
+            }
+            
+            // Funkcja prostego tasowania bez animacji
+            function shufflePoems(newOrder) {
+                const mount = document.getElementById('poemsMount');
+                if (!mount) return;
+                
+                const oldPoems = poems.slice();
+                const activeOldIndex = currentPoem;
+                const activePoemElement = oldPoems[activeOldIndex];
+                
+                // Przestaw wiersze
+                            const frag = document.createDocumentFragment();
+                            newOrder.forEach(i => frag.appendChild(oldPoems[i]));
+                            mount.innerHTML = '';
+                            mount.appendChild(frag);
+                            poems = Array.from(document.querySelectorAll('.poem'));
+                            poems.forEach((el, idx) => el.setAttribute('data-index', String(idx)));
+                            
+                // Znajdź aktywny wiersz w nowej tablicy
+                let targetIndex = -1;
+                if (activePoemElement) {
+                    targetIndex = poems.indexOf(activePoemElement);
+                }
+                
+                // Fallback
+                if (targetIndex < 0 || targetIndex >= poems.length) {
+                    const newActiveIndex = newOrder.indexOf(activeOldIndex);
+                    targetIndex = newActiveIndex >= 0 && newActiveIndex < poems.length ? newActiveIndex : 0;
+                }
+                
+                // Zaktualizuj wyświetlany wiersz
+                                    poems.forEach(p => p.classList.remove('active'));
+                currentPoem = targetIndex;
+                
+                const targetPoem = poems[targetIndex];
+                if (targetPoem) {
+                    targetPoem.classList.add('active');
+                    updateNavigation();
+                    updateMetaTags(targetIndex);
+                    
+                    // Zaktualizuj hash używając oryginalnego indeksu
+                    const originalIndex = getOriginalIndex(targetIndex);
+                    try { localStorage.setItem('poemIndex', String(originalIndex + 1)); } catch(e) {}
+                    const poemNumber = originalIndex + 1;
+                    const encodedId = encodePoemId(poemNumber);
+                    const newHash = `#wiersz-${encodedId}`;
+                    const newUrl = location.pathname + newHash;
+                    if (location.hash !== newHash) {
+                        history.replaceState(null, '', newUrl);
+                    }
+                }
             }
         });
     </script>

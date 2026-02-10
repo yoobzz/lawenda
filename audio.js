@@ -106,11 +106,9 @@
   function updateButton(btn){
     if (!btn) return;
     btn.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-    let text = isOn ? 'dźwięk: on' : 'dźwięk: off';
-    if (AUDIO_FILES.length > 1) {
-      text += ` (${currentAudioIndex + 1}/${AUDIO_FILES.length})`;
-    }
-    btn.textContent = text;
+    // Użyj różnych znaków dla włączonego/wyłączonego
+    // Wyłączony: ||, Włączony: >>
+    btn.textContent = isOn ? '>>' : '||';
   }
 
   function setupButton(){

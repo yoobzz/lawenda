@@ -35,10 +35,11 @@
 
         body {
             font-family: 'Geist', sans-serif;
-            background: #ffffff;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             color: #1a1a1a;
             overflow-x: hidden;
             touch-action: manipulation;
+            min-height: 100vh;
         }
 
         .container {
@@ -50,6 +51,7 @@
             perspective: 1000px;
             z-index: 1;
             pointer-events: none;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
         }
         
         .container > * {
@@ -281,6 +283,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: transparent;
+        }
+        
+        @media (max-width: 640px) {
+            .star-fog {
+                z-index: 0;
+            }
         }
         
         /* Cząsteczki muszą być wyżej niż landingContainer (z-index: 1) */
@@ -775,7 +784,7 @@
             font-size: clamp(0.8rem, 1.5vw, 1.5rem);
             color: #000000;
             opacity: 0;
-            animation: charAppear 0.08s forwards, charFadeOut 0.4s forwards;
+            animation: charAppear 0.1s forwards;
             white-space: nowrap;
             font-weight: 300;
         }
@@ -783,22 +792,9 @@
         @keyframes charAppear {
             0% {
                 opacity: 0;
-                transform: scale(0.8);
             }
             to {
                 opacity: 0.9;
-                transform: scale(1);
-            }
-        }
-        
-        @keyframes charFadeOut {
-            0% {
-                opacity: 0.9;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.9);
             }
         }
     </style>
@@ -2828,7 +2824,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             if (reduced) return; // nie generuj cząsteczek przy reduced motion
-            const count = isIOS ? 0 : (isTouch ? 60 : 200);
+            const count = isTouch ? 80 : 200; // Wyświetlaj cząsteczki również na mobile
             
             for (let i = 0; i < count; i++) {
                 const particle = document.createElement('div');
@@ -3715,82 +3711,125 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
         
         // Apply glitch animation to poems will be called when needed
 
-        // Funkcja animacji przejścia - wypełnienie ekranu znakami z tytułu, imienia i timera
+        // Funkcja animacji przejścia - wypełnienie ekranu znakami, potem wyłonienie wiersza
         function animateTransitionToPoems() {
             const overlay = document.createElement('div');
             overlay.className = 'transition-overlay';
             document.body.appendChild(overlay);
             
-            // Pobierz tekst z tytułu, imienia i timera
-            const title = document.getElementById('title');
-            const firstName = document.getElementById('firstName');
-            const lastName = document.getElementById('lastName');
-            const typedText = document.getElementById('typedText');
-            
-            let sourceText = '';
-            if (title) sourceText += title.textContent;
-            if (firstName) sourceText += firstName.textContent;
-            if (lastName) sourceText += ' ' + lastName.textContent;
-            if (typedText) sourceText += typedText.textContent;
-            
-            // Usuń spacje i przygotuj znaki do rozpisywania
-            const chars = sourceText.split('').filter(c => c.trim() !== '' || c === ' ');
-            
-            if (chars.length === 0) {
-                // Fallback jeśli nie ma tekstu
-                chars.push(...['~', '|', '|', '-', '_', '^', '+', '*', '.']);
+            // Pobierz tekst pierwszego wiersza z poemsSection
+            const poemsSection = document.getElementById('poemsSection');
+            let poemText = '';
+            if (poemsSection) {
+                const firstPoem = poemsSection.querySelector('.poem');
+                if (firstPoem) {
+                    poemText = (firstPoem.innerText || firstPoem.textContent || '').trim();
+                }
             }
             
-            // Powtórz znaki, żeby wypełnić ekran
+            // Jeśli nie ma wiersza, użyj fallback
+            if (!poemText) {
+                poemText = 'po pełni (z)nów na jednego z dwóch';
+            }
+            
+            // Przygotuj znaki wiersza (bez spacji dla łatwiejszego dopasowania)
+            const poemChars = poemText.split('').filter(c => c.trim() !== '');
+            const poemCharsMap = new Map();
+            poemChars.forEach((char, idx) => {
+                if (!poemCharsMap.has(char)) {
+                    poemCharsMap.set(char, []);
+                }
+                poemCharsMap.get(char).push(idx);
+            });
+            
+            // Losowe znaki do wypełnienia ekranu
+            const randomChars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż'];
+            
+            // Wypełnij ekran losowymi znakami + znakami z wiersza
             const charCount = Math.floor((window.innerWidth / 12) * (window.innerHeight / 20));
-            const repeatedChars = [];
+            const allChars = [];
+            const charElements = [];
+            const charPositions = [];
+            
+            // Mieszanka losowych znaków i znaków z wiersza (70% losowe, 30% z wiersza)
             for (let i = 0; i < charCount; i++) {
-                repeatedChars.push(chars[i % chars.length]);
+                let char;
+                let isPoemChar = false;
+                let poemCharIndex = -1;
+                
+                if (Math.random() < 0.3 && poemChars.length > 0) {
+                    // Użyj znaku z wiersza
+                    const randomPoemIndex = Math.floor(Math.random() * poemChars.length);
+                    char = poemChars[randomPoemIndex];
+                    isPoemChar = true;
+                    poemCharIndex = randomPoemIndex;
+                } else {
+                    // Losowy znak
+                    char = randomChars[Math.floor(Math.random() * randomChars.length)];
+                }
+                
+                allChars.push({ char, isPoemChar, poemCharIndex });
             }
             
-            // Twórz znaki jeden po drugim, jakby się pisały
-            let charIndex = 0;
-            const charsPerFrame = 12; // Ile znaków na klatkę (szybkość pisania - zwiększone)
-            const fillDuration = 800; // 0.8 sekundy na wypełnienie (skrócone)
-            const fadeStart = 600; // Kiedy zaczyna się wygaszanie (wcześniej)
-            const frameTime = fillDuration / (charCount / charsPerFrame);
+             // Twórz znaki jeden po drugim
+             let charIndex = 0;
+             const charsPerFrame = 25;
+             const fillDuration = 300;
+             const frameTime = fillDuration / (charCount / charsPerFrame);
             
             function addChars() {
-                if (charIndex >= repeatedChars.length) {
-                    // Wszystkie znaki dodane, przejdź do poems.html
-                    // Overlay pozostanie widoczny i wygaśnie na poems.html
+                if (charIndex >= allChars.length) {
+                    // Wszystkie znaki dodane, teraz wyłonienie wiersza
                     setTimeout(() => {
-                        // Zapisz overlay w sessionStorage, żeby poems.html wiedział, że ma go wygasić
-                        try {
-                            sessionStorage.setItem('hasTransitionOverlay', '1');
-                        } catch(e) {}
-                        window.location.href = 'poems.html';
-                    }, 200);
+                        revealPoem();
+                    }, 300);
                     return;
                 }
                 
                 // Dodaj kilka znaków na raz
-                for (let i = 0; i < charsPerFrame && charIndex < repeatedChars.length; i++) {
+                for (let i = 0; i < charsPerFrame && charIndex < allChars.length; i++) {
+                    const charData = allChars[charIndex];
                     const char = document.createElement('span');
                     char.className = 'transition-char';
-                    char.textContent = repeatedChars[charIndex];
+                    char.textContent = charData.char;
                     char.style.position = 'absolute';
                     char.style.left = Math.random() * 100 + '%';
                     char.style.top = Math.random() * 100 + '%';
-                    
-                    // Losowe opóźnienie animacji pojawienia się (efekt pisania)
-                    const appearDelay = (charIndex / repeatedChars.length) * 0.3 + Math.random() * 0.1;
-                    // Nie wygaszaj znaków - pozostaną widoczne do przejścia
-                    char.style.animationDelay = `${appearDelay}s`;
+                    char.style.animationDelay = `${(charIndex / allChars.length) * 0.2}s`;
                     char.style.animation = 'charAppear 0.08s forwards';
                     
+                    // Zapisz informację o znaku
+                    char.dataset.isPoemChar = charData.isPoemChar ? '1' : '0';
+                    char.dataset.poemCharIndex = charData.poemCharIndex !== -1 ? String(charData.poemCharIndex) : '';
+                    
                     overlay.appendChild(char);
+                    charElements.push(char);
+                    charPositions.push({ left: char.style.left, top: char.style.top });
                     charIndex++;
                 }
                 
                 setTimeout(() => {
                     requestAnimationFrame(addChars);
                 }, frameTime);
+            }
+            
+            function revealPoem() {
+                // Proste zanikanie wszystkich znaków - bez przesuwania
+                const allChars = Array.from(overlay.querySelectorAll('.transition-char'));
+                
+                // Zfadeuj wszystkie znaki jednocześnie
+                allChars.forEach((char) => {
+                    char.style.transition = 'opacity 0.3s ease';
+                    char.style.opacity = '0';
+                });
+                
+                // Przejdź do poems.html po zaniknięciu
+                setTimeout(() => {
+                    try {
+                        sessionStorage.setItem('hasTransitionOverlay', '1');
+                    } catch(e) {}
+                    window.location.href = 'poems.html';
+                }, 400);
             }
             
             // Rozpocznij animację
