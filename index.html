@@ -3169,8 +3169,18 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
             function loadSTLAndStart() {
                 const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
-                fetch('lawendamodel.stl')
-                    .then(function(res) { return res.arrayBuffer(); })
+                // GitHub Pages serwuje LFS jako wskaźnik (~134 B) — na produkcji ładujemy z media CDN
+                const stlMediaUrl = 'https://media.githubusercontent.com/media/yoobzz/lawenda/main/lawendamodel.stl';
+                function fetchSTL() {
+                    return fetch('lawendamodel.stl')
+                        .then(function(res) { return res.arrayBuffer(); })
+                        .then(function(buf) {
+                            if (buf.byteLength < 500) return fetch(stlMediaUrl).then(function(r) { return r.arrayBuffer(); });
+                            return buf;
+                        })
+                        .catch(function() { return fetch(stlMediaUrl).then(function(r) { return r.arrayBuffer(); }); });
+                }
+                fetchSTL()
                     .then(function(stlData) { return Promise.all([Promise.resolve(stlData), colorsPromise]); })
                     .then(function(_) {
                         const stlData = _[0];
