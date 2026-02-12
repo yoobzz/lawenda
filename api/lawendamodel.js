@@ -1,6 +1,6 @@
 // Vercel serverless: proxy lawendamodel.stl z GitHub Releases (omija CORS + LFS)
 // Model musi być w Release: https://github.com/yoobzz/lawenda/releases
-const GITHUB_STL_URL = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
+const GITHUB_STL_URL = 'https://github.com/yoobzz/lawenda/releases/download/v1/lawendamodel.stl';
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {

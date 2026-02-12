@@ -3208,7 +3208,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 }
                 const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
                 // Strona z innej domeny niż GitHub → fetch do Release = CORS (blokada). Model musi być na tej samej domenie co strona.
-                var stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
+                var stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1/lawendamodel.stl';
                 function fetchSTL() {
                     return fetch('lawendamodel.stl')
                         .then(function(res) { return res.arrayBuffer(); })

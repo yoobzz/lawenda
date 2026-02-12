@@ -8,7 +8,7 @@ Plik ma ~497 MB. Vercel pobiera go przez proxy z GitHub Releases.
 
 1. **Utwórz Release w GitHub** (jeśli jeszcze nie istnieje):
    - Repo → Releases → Create new release
-   - Tag: `v1.0`
+   - Tag: `v1` (albo zmień URL w `index.html` i `api/lawendamodel.js` pod swój tag)
    - Załącz plik `lawendamodel.stl` z lokalnego projektu
 
 2. **Deploy na Vercel** – projekt jest gotowy (rewrite w `vercel.json`).
