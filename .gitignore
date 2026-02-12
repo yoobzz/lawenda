@@ -18,7 +18,3 @@ build/
 # logs
 *.log
 
-# large assets (GitHub limit 100 MB)
-lawendamodel.stl
-*.stl
-
