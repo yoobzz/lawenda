@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/lawendamodel.stl", "destination": "/api/lawendamodel" }
+  ],
+  "functions": {
+    "api/lawendamodel.js": {
+      "maxDuration": 300
+    }
+  }
+}

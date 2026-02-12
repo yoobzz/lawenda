@@ -1,8 +1,4 @@
-404: NOT_FOUND
-Code: NOT_FOUND
-ID: arn1::44zds-1770926504634-3d4a7f4e21a4
-
-Read our documentation to learn more about this error.<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -20,12 +16,26 @@ Read our documentation to learn more about this error.<!DOCTYPE html>
         .back:hover { opacity: 1; text-decoration: underline; }
         .pdf-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; padding-top: 48px; }
         .pdf-container embed { width: 100%; height: 100%; border: none; }
+        .mobile-fallback { position: absolute; top: 48px; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .mobile-fallback a { color: #fff; font-size: 16px; text-decoration: underline; text-underline-offset: 4px; }
     </style>
 </head>
 <body>
     <button class="back" onclick="window.location.href='index.html'">← start</button>
     <div class="pdf-container">
-        <embed src="stas_szpineta_esej_posthumanistyczny_pustka.pdf" type="application/pdf" />
+        <embed id="pdf-embed" src="stas_szpineta_esej_posthumanistyczny_pustka.pdf" type="application/pdf" />
+        <div id="mobile-fallback" class="mobile-fallback" style="display:none;">
+            <a href="stas_szpineta_esej_posthumanistyczny_pustka.pdf" target="_blank" rel="noopener">Otwórz PDF w nowej karcie</a>
+        </div>
     </div>
+    <script>
+        (function() {
+            var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                document.getElementById('pdf-embed').style.display = 'none';
+                document.getElementById('mobile-fallback').style.display = 'flex';
+            }
+        })();
+    </script>
 </body>
 </html>

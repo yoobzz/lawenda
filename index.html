@@ -54,6 +54,22 @@
             height: 100%;
         }
 
+        #pointcloud-loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            font-family: 'Geist Mono', monospace;
+            font-size: 13px;
+            color: #333;
+            opacity: 0.9;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        #pointcloud-loading.hidden { opacity: 0; pointer-events: none; }
+        #pointcloud-loading.error { color: #666; font-size: 12px; }
+
         body {
             font-family: 'Geist', sans-serif;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
@@ -972,6 +988,7 @@
 </head>
 <body>
     <div id="pointcloud-bg"></div>
+    <div id="pointcloud-loading">Ładowanie modelu… (~500 MB)</div>
     <div class="star-fog" id="starFog">
         <div class="star-container" id="starContainer"></div>
     </div>
@@ -2985,7 +3002,14 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
         // —— Pointcloud tło (lawendamodel.stl) v2 — zoom 2.2–11, gęsto 19k
         (function() {
             const container = document.getElementById('pointcloud-bg');
+            const loadingEl = document.getElementById('pointcloud-loading');
             if (!container || typeof THREE === 'undefined') return;
+
+            if (location.protocol === 'file:') {
+                if (loadingEl) { loadingEl.textContent = 'Otwórz stronę przez serwer (np. node server.js) — fetch nie działa z file://.'; loadingEl.classList.add('error'); }
+                setTimeout(function() { if (loadingEl) loadingEl.classList.add('hidden'); }, 6000);
+                return;
+            }
 
             const symbols = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
             const textureCache = {};
@@ -3075,7 +3099,15 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0xfafafa);
                 camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
-                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, precision: 'highp', powerPreference: 'high-performance' });
+                var opts = { antialias: true, alpha: false, powerPreference: 'high-performance' };
+                try {
+                    renderer = new THREE.WebGLRenderer(Object.assign({ precision: 'highp' }, opts));
+                } catch (e) {
+                    try { renderer = new THREE.WebGLRenderer(Object.assign({ precision: 'mediump' }, opts)); } catch (e2) {
+                        renderer = new THREE.WebGLRenderer(opts);
+                    }
+                }
+                if (!renderer || !renderer.domElement) throw new Error('WebGL nie jest dostępny');
                 renderer.setSize(w, h);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
                 container.appendChild(renderer.domElement);
@@ -3168,18 +3200,30 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             }
 
             function loadSTLAndStart() {
+                const loadingEl = document.getElementById('pointcloud-loading');
+                function hideLoading() { if (loadingEl) loadingEl.classList.add('hidden'); }
+                function showError(msg) {
+                    if (loadingEl) { loadingEl.textContent = msg; loadingEl.classList.add('error'); }
+                    setTimeout(hideLoading, 8000);
+                }
                 const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
-                // Źródła STL: lokalnie plik, na GitHub Pages LFS = wskaźnik → używamy Release (dodaj plik w Releases)
-                const stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
-                const stlMediaUrl = 'https://media.githubusercontent.com/media/yoobzz/lawenda/main/lawendamodel.stl';
+                // Strona z innej domeny niż GitHub → fetch do Release = CORS (blokada). Model musi być na tej samej domenie co strona.
+                var stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
                 function fetchSTL() {
-                    return fetch('lawendamodel.stl', { mode: 'cors' })
+                    return fetch('lawendamodel.stl')
                         .then(function(res) { return res.arrayBuffer(); })
                         .then(function(buf) {
-                            if (buf.byteLength < 500) return fetch(stlReleaseUrl, { mode: 'cors' }).then(function(r) { if (!r.ok) throw new Error('release'); return r.arrayBuffer(); });
+                            if (buf.byteLength < 500) throw new Error('LFS_POINTER');
                             return buf;
                         })
-                        .catch(function() { return fetch(stlReleaseUrl, { mode: 'cors' }).then(function(r) { if (!r.ok) return fetch(stlMediaUrl, { mode: 'cors' }).then(function(m) { return m.arrayBuffer(); }); return r.arrayBuffer(); }); });
+                        .catch(function(err) {
+                            if (err && err.message === 'LFS_POINTER') throw err;
+                            return fetch(stlReleaseUrl).then(function(r) { if (!r.ok) throw new Error('release'); return r.arrayBuffer(); });
+                        })
+                        .catch(function(err) {
+                            if (err && err.message === 'LFS_POINTER') throw err;
+                            throw new Error('CORS or missing file');
+                        });
                 }
                 fetchSTL()
                     .then(function(stlData) { return Promise.all([Promise.resolve(stlData), colorsPromise]); })
@@ -3187,7 +3231,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         const stlData = _[0];
                         const colorData = _[1];
                         const pointCloud = parseSTL(stlData);
-                        if (pointCloud.length === 0) return;
+                        if (pointCloud.length === 0) { hideLoading(); return; }
+                        hideLoading();
                         const box = new THREE.Box3();
                         pointCloud.forEach(function(v) { box.expandByPoint(v); });
                         const center = box.getCenter(new THREE.Vector3());
@@ -3218,7 +3263,14 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         // Pokaż model gdy jest gotowy (ładowanie 497 MB może trwać długo po animacji paska)
                         setTimeout(function() { if (window.__startPointcloudGrow) window.__startPointcloudGrow(); }, 100);
                     })
-                    .catch(function() { /* brak pliku / błąd sieci */ });
+                    .catch(function(err) {
+                        hideLoading();
+                        if (err && err.message === 'LFS_POINTER') {
+                            showError('Na serwerze jest wskaźnik Git LFS (~134 B), nie pełny plik (~497 MB). Wgraj lawendamodel.stl z lokalnego dysku bezpośrednio na serwer produkcyjny.');
+                        } else {
+                            showError('Model 3D: wgraj lawendamodel.stl na ten sam serwer co stronę (ta sama domena).');
+                        }
+                    });
             }
 
             container.addEventListener('mousedown', function(e) {
@@ -3326,7 +3378,11 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 if (!document.hidden) renderer.render(scene, camera);
             }
 
-            initScene();
+            try { initScene(); } catch (e) {
+                if (loadingEl) { loadingEl.textContent = 'WebGL niedostępny: ' + (e.message || 'nieznany błąd'); loadingEl.classList.add('error'); }
+                setTimeout(function() { if (loadingEl) loadingEl.classList.add('hidden'); }, 6000);
+                return;
+            }
             loadSTLAndStart();
             animate();
         })();
