@@ -3169,16 +3169,17 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
             function loadSTLAndStart() {
                 const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
-                // GitHub Pages serwuje LFS jako wskaźnik (~134 B) — na produkcji ładujemy z media CDN
+                // Źródła STL: lokalnie plik, na GitHub Pages LFS = wskaźnik → używamy Release (dodaj plik w Releases)
+                const stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
                 const stlMediaUrl = 'https://media.githubusercontent.com/media/yoobzz/lawenda/main/lawendamodel.stl';
                 function fetchSTL() {
-                    return fetch('lawendamodel.stl')
+                    return fetch('lawendamodel.stl', { mode: 'cors' })
                         .then(function(res) { return res.arrayBuffer(); })
                         .then(function(buf) {
-                            if (buf.byteLength < 500) return fetch(stlMediaUrl).then(function(r) { return r.arrayBuffer(); });
+                            if (buf.byteLength < 500) return fetch(stlReleaseUrl, { mode: 'cors' }).then(function(r) { if (!r.ok) throw new Error('release'); return r.arrayBuffer(); });
                             return buf;
                         })
-                        .catch(function() { return fetch(stlMediaUrl).then(function(r) { return r.arrayBuffer(); }); });
+                        .catch(function() { return fetch(stlReleaseUrl, { mode: 'cors' }).then(function(r) { if (!r.ok) return fetch(stlMediaUrl, { mode: 'cors' }).then(function(m) { return m.arrayBuffer(); }); return r.arrayBuffer(); }); });
                 }
                 fetchSTL()
                     .then(function(stlData) { return Promise.all([Promise.resolve(stlData), colorsPromise]); })
@@ -3214,8 +3215,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         moveDuration = 20;
                         autoPhase = 'move';
                         autoPhaseTime = 0;
+                        // Pokaż model gdy jest gotowy (ładowanie 497 MB może trwać długo po animacji paska)
+                        setTimeout(function() { if (window.__startPointcloudGrow) window.__startPointcloudGrow(); }, 100);
                     })
-                    .catch(function() { /* brak pliku */ });
+                    .catch(function() { /* brak pliku / błąd sieci */ });
             }
 
             container.addEventListener('mousedown', function(e) {
