@@ -2544,11 +2544,12 @@
                 którego nie znałeś
             </div>
 </div>
+    </div>
 
     <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk" style="position: fixed; top: 1rem; right: 1rem; background: none; border: 0; color: #000; font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; opacity: 0.8; z-index: 1200; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s ease, transform 0.2s ease;">||</button>
     <div class="navigation" id="navigation">
         <button class="nav-arrow" id="prevBtn">‹</button>
-        <div class="nav-counter" id="navCounter">1 / 156</div>
+        <div class="nav-counter" id="navCounter">1 / 1</div>
         <button class="nav-arrow" id="nextBtn">›</button>
     </div>
     <div class="goto-popover" id="gotoPopover" aria-hidden="true">
