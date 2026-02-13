@@ -65,13 +65,13 @@
         </div>
         <div class="row brush">
             <span>Pędzel:</span>
-            <input type="range" id="brushSize" min="1" max="50" value="15">
-            <span id="brushVal">15</span>
+            <input type="range" id="brushSize" min="3" max="80" value="25">
+            <span id="brushVal">25</span>
         </div>
         <div class="row">
             <button class="btn-export" id="btnExport">Zapisz kolory (JSON)</button>
         </div>
-        <p class="hint">Lewy przycisk: maluj. Prawy przycisk + przeciągnij: obracaj model. Zapisz kolory jako lawenda-colors.json.</p>
+        <p class="hint">Lewy przycisk: maluj. Prawy przycisk + przeciągnij: obracaj. Kółko myszy: przybliż/oddal. Zapisz kolory jako lawenda-colors.json.</p>
     </div>
 
     <script>
@@ -81,7 +81,7 @@
             let positions = [];
             let colors = [];
             let currentColor = 0;
-            let brushSize = 15;
+            let brushSize = 25;
             let isDrawing = false;
             let isOrbiting = false;
             let mouse = new THREE.Vector2();
@@ -89,7 +89,9 @@
             let maxSprites = 12000;
             let targetPoints = 28000;
             let camRadius = 8, camTheta = 0.6, camPhi = 0.9;
+            const camRadiusMin = 1.5, camRadiusMax = 22;
             let orbitStartX = 0, orbitStartY = 0, orbitStartTheta = 0, orbitStartPhi = 0;
+            let pinchStartDist = 0, pinchStartRadius = 8;
 
             const lavender = new THREE.Color(0x8a73c8);
             const green = new THREE.Color(0x4b7341);
@@ -145,7 +147,7 @@
                 });
             }
 
-            function loadModel(pointCloud) {
+            function loadModel(pointCloud, colorOverrides) {
                 if (pointCloud.length === 0) return;
                 const box = new THREE.Box3();
                 pointCloud.forEach(function(v) { box.expandByPoint(v); });
@@ -162,6 +164,11 @@
                 }
                 const n = positions.length / 3;
                 colors = new Array(n).fill(0);
+                if (colorOverrides && Array.isArray(colorOverrides.colors)) {
+                    for (let i = 0; i < Math.min(n, colorOverrides.colors.length); i++) {
+                        colors[i] = colorOverrides.colors[i];
+                    }
+                }
 
                 const geometry = new THREE.BufferGeometry();
                 geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -214,7 +221,9 @@
                 const x = posAttr.getX(ndx);
                 const y = posAttr.getY(ndx);
                 const z = posAttr.getZ(ndx);
-                const brush2 = (brushSize * 0.015) * (brushSize * 0.015);
+                // Pędzel skalowany z odległością kamery – ten sam rozmiar na ekranie przy każdym zoomie
+                const brushWorldRadius = (brushSize / 25) * (camRadius / 6);
+                const brush2 = brushWorldRadius * brushWorldRadius;
                 for (let i = 0; i < n; i++) {
                     const dx = posAttr.getX(i) - x;
                     const dy = posAttr.getY(i) - y;
@@ -228,19 +237,23 @@
                 if (!points) return -1;
                 raycaster.setFromCamera(mouse, camera);
                 raycaster.params.Points = raycaster.params.Points || {};
-                raycaster.params.Points.threshold = 0.3;
+                // Threshold zależny od zoomu – przybliżenie = precyzyjniejszy wybór
+                raycaster.params.Points.threshold = 0.08 + (camRadius / 30);
                 const hits = raycaster.intersectObject(points);
                 return hits.length > 0 ? hits[0].index : -1;
             }
 
-            function updateMouse(e) {
-                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            function updateMouse(clientX, clientY) {
+                mouse.x = (clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+            }
+            function updateMouseFromEvent(e) {
+                updateMouse(e.clientX, e.clientY);
             }
 
             container.addEventListener('mousedown', function(e) {
                 if (e.target.closest && e.target.closest('#panel')) return;
-                updateMouse(e);
+                updateMouseFromEvent(e);
                 if (e.button === 0 && pointsGeometry) {
                     const ndx = getClosestPointIndex();
                     if (ndx >= 0) {
@@ -257,7 +270,7 @@
                 }
             });
             container.addEventListener('mousemove', function(e) {
-                updateMouse(e);
+                updateMouseFromEvent(e);
                 if (isDrawing && pointsGeometry) {
                     const ndx = getClosestPointIndex();
                     if (ndx >= 0) paint(ndx);
@@ -273,6 +286,48 @@
             });
             container.addEventListener('mouseleave', function() { isDrawing = false; isOrbiting = false; });
             container.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+            container.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                camRadius *= 1 - e.deltaY * 0.002;
+                camRadius = Math.max(camRadiusMin, Math.min(camRadiusMax, camRadius));
+                updateCameraPosition();
+            }, { passive: false });
+
+            function touchDist(touches) {
+                const a = touches[0], b = touches[1];
+                return Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+            }
+            container.addEventListener('touchstart', function(e) {
+                if (e.target.closest && e.target.closest('#panel')) return;
+                if (e.touches.length === 2) {
+                    pinchStartDist = touchDist(e.touches);
+                    pinchStartRadius = camRadius;
+                } else if (e.touches.length === 1 && pointsGeometry) {
+                    updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+                    const ndx = getClosestPointIndex();
+                    if (ndx >= 0) {
+                        isDrawing = true;
+                        paint(ndx);
+                    }
+                }
+            });
+            container.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    const d = touchDist(e.touches);
+                    camRadius = pinchStartRadius * (pinchStartDist / d);
+                    camRadius = Math.max(camRadiusMin, Math.min(camRadiusMax, camRadius));
+                    updateCameraPosition();
+                } else if (e.touches.length === 1 && isDrawing && pointsGeometry) {
+                    e.preventDefault();
+                    updateMouse(e.touches[0].clientX, e.touches[0].clientY);
+                    const ndx = getClosestPointIndex();
+                    if (ndx >= 0) paint(ndx);
+                }
+            }, { passive: false });
+            container.addEventListener('touchend', function(e) {
+                if (e.touches.length < 2) isDrawing = false;
+            });
 
             document.getElementById('btnLawenda').addEventListener('click', function() { currentColor = 0; });
             document.getElementById('btnStalk').addEventListener('click', function() { currentColor = 1; });
@@ -293,16 +348,26 @@
                 a.click();
             });
 
+            function loadFromBuffer(buffer, colorData) {
+                const pointCloud = parseSTL(buffer);
+                loadModel(pointCloud, colorData);
+            }
             document.getElementById('fileInput').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
                 const r = new FileReader();
-                r.onload = function() {
-                    const pointCloud = parseSTL(r.result);
-                    loadModel(pointCloud);
-                };
+                r.onload = function() { loadFromBuffer(r.result); };
                 r.readAsArrayBuffer(file);
             });
+
+            // Auto-załaduj lavmodel.stl + kolory przy starcie (jeśli na tej samej domenie)
+            Promise.all([
+                fetch('lavmodel.stl').then(function(r) { return r.ok ? r.arrayBuffer() : null; }),
+                fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; })
+            ]).then(function(_) {
+                const buf = _[0], colorData = _[1];
+                if (buf && buf.byteLength > 500) loadFromBuffer(buf, colorData);
+            }).catch(function() {});
 
             function animate() {
                 requestAnimationFrame(animate);
