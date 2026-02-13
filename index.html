@@ -988,7 +988,7 @@
 </head>
 <body>
     <div id="pointcloud-bg"></div>
-    <div id="pointcloud-loading">Ładowanie modelu… (~500 MB)</div>
+    <div id="pointcloud-loading"></div>
     <div class="star-fog" id="starFog">
         <div class="star-container" id="starContainer"></div>
     </div>
@@ -2999,7 +2999,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
     <script src="audio.js"></script>
     <script>
-        // —— Pointcloud tło (lawendamodel.stl) v2 — zoom 2.2–11, gęsto 19k
+        // —— Pointcloud tło (lavmodel.stl) — zoom 2.2–11, gęsto 19k
         (function() {
             const container = document.getElementById('pointcloud-bg');
             const loadingEl = document.getElementById('pointcloud-loading');
@@ -3207,22 +3207,12 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     setTimeout(hideLoading, 8000);
                 }
                 const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
-                // Strona z innej domeny niż GitHub → fetch do Release = CORS (blokada). Model musi być na tej samej domenie co strona.
-                var stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
                 function fetchSTL() {
-                    return fetch('lawendamodel.stl')
-                        .then(function(res) { return res.arrayBuffer(); })
+                    return fetch('lavmodel.stl')
+                        .then(function(res) { if (!res.ok) throw new Error('fetch'); return res.arrayBuffer(); })
                         .then(function(buf) {
                             if (buf.byteLength < 500) throw new Error('LFS_POINTER');
                             return buf;
-                        })
-                        .catch(function(err) {
-                            if (err && err.message === 'LFS_POINTER') throw err;
-                            return fetch(stlReleaseUrl).then(function(r) { if (!r.ok) throw new Error('release'); return r.arrayBuffer(); });
-                        })
-                        .catch(function(err) {
-                            if (err && err.message === 'LFS_POINTER') throw err;
-                            throw new Error('CORS or missing file');
                         });
                 }
                 fetchSTL()
@@ -3260,15 +3250,15 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         moveDuration = 20;
                         autoPhase = 'move';
                         autoPhaseTime = 0;
-                        // Pokaż model gdy jest gotowy (ładowanie 497 MB może trwać długo po animacji paska)
+                        // Pokaż model gdy jest gotowy
                         setTimeout(function() { if (window.__startPointcloudGrow) window.__startPointcloudGrow(); }, 100);
                     })
                     .catch(function(err) {
                         hideLoading();
                         if (err && err.message === 'LFS_POINTER') {
-                            showError('Na serwerze jest wskaźnik Git LFS (~134 B), nie pełny plik (~497 MB). Wgraj lawendamodel.stl z lokalnego dysku bezpośrednio na serwer produkcyjny.');
+                            showError('Na serwerze jest wskaźnik Git LFS, nie pełny plik. Wgraj lavmodel.stl na serwer.');
                         } else {
-                            showError('Model 3D: wgraj lawendamodel.stl na ten sam serwer co stronę (ta sama domena).');
+                            showError('Model 3D: wgraj lavmodel.stl na ten sam serwer co stronę.');
                         }
                     });
             }
