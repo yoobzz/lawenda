@@ -3054,6 +3054,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             let startTheta = 0, startPhi = 0, startRadius = 5.2;
             let userInteracting = false;
             let userIdleTime = 0;
+            let userHasEverInteracted = false;
             let dragStart = null;
             let zoom = 1;
             let growPhase = false;
@@ -3132,7 +3133,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 const positionsArray = geometry.attributes.position.array;
                 const isMobile = window.innerWidth < 640;
                 const spriteSize = isMobile ? 0.07 : 0.085;
-                const maxSprites = isMobile ? 6000 : 12000;
+                const maxSprites = 12000;
                 const step = Math.max(1, Math.floor(positionsArray.length / 3 / maxSprites));
                 pointsGroup = new THREE.Group();
 
@@ -3250,8 +3251,9 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         moveDuration = 20;
                         autoPhase = 'move';
                         autoPhaseTime = 0;
-                        // Pokaż model gdy jest gotowy
-                        setTimeout(function() { if (window.__startPointcloudGrow) window.__startPointcloudGrow(); }, 100);
+                        // Pokaż model dopiero gdy tytuł się wyświetli (koordynacja w startTyping)
+                        window.__pointcloudReady = true;
+                        if (window.__titleShown && window.__startPointcloudGrow) window.__startPointcloudGrow();
                     })
                     .catch(function(err) {
                         hideLoading();
@@ -3266,6 +3268,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             container.addEventListener('mousedown', function(e) {
                 if (e.button !== 0) return;
                 userInteracting = true;
+                userHasEverInteracted = true;
                 userIdleTime = 0;
                 dragStart = { x: e.clientX, y: e.clientY, theta: currentTheta, phi: currentPhi };
             });
@@ -3286,6 +3289,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             container.addEventListener('wheel', function(e) {
                 e.preventDefault();
                 userInteracting = true;
+                userHasEverInteracted = true;
                 userIdleTime = 0;
                 zoom *= 1 - e.deltaY * 0.002;
                 zoom = Math.max(0.4, Math.min(1.8, zoom));
@@ -3293,6 +3297,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             container.addEventListener('touchstart', function(e) {
                 if (e.touches.length === 1) {
                     userInteracting = true;
+                    userHasEverInteracted = true;
                     userIdleTime = 0;
                     dragStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, theta: currentTheta, phi: currentPhi };
                 }
@@ -3344,7 +3349,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     if (userIdleTime > 4) userInteracting = false;
                 }
 
-                if (!userInteracting && pointsGroup) {
+                if (!userInteracting && pointsGroup && !userHasEverInteracted) {
                     autoPhaseTime += dt;
                     const t = Math.min(1, autoPhaseTime / moveDuration);
                     const smooth = t * t * (3 - 2 * t);
@@ -3893,6 +3898,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     document.getElementById('title').style.cursor = 'pointer';
                     document.getElementById('title').style.opacity = '1';
                     startRandomTypedTextAnimation();
+                    window.__titleShown = true;
                     setTimeout(function() {
                         if (window.__startPointcloudGrow) window.__startPointcloudGrow();
                     }, 500);
@@ -4697,6 +4703,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             title.textContent = '~||-_^+*.';
             title.style.color = '#1a1a1a';
             title.style.opacity = '0';
+            document.getElementById('pointcloud-bg').classList.remove('visible');
             authorName.style.opacity = '0';
             authorName.style.position = 'absolute';
             authorName.style.bottom = '3rem';

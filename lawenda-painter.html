@@ -71,7 +71,7 @@
         <div class="row">
             <button class="btn-export" id="btnExport">Zapisz kolory (JSON)</button>
         </div>
-        <p class="hint">Lewy przycisk: maluj. Prawy przycisk + przeciągnij: obracaj. Kółko myszy: przybliż/oddal. Zapisz kolory jako lawenda-colors.json.</p>
+        <p class="hint">Lewy przycisk: maluj. Prawy przycisk + przeciągnij: obracaj. Kółko myszy: przybliż/oddal. Użyj lavmodel.stl (auto-ładowany) – kolory muszą być z tego samego modelu co na stronie.</p>
     </div>
 
     <script>
@@ -154,7 +154,7 @@
                 const center = box.getCenter(new THREE.Vector3());
                 const size = box.getSize(new THREE.Vector3());
                 const maxDim = Math.max(size.x, size.y, size.z);
-                const scale = 5 / maxDim;
+                const scale = 7.8 / maxDim;
 
                 positions = [];
                 const step = Math.max(1, Math.floor(pointCloud.length / maxSprites));
