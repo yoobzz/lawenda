@@ -116,8 +116,8 @@
         .poems-section {
             display: none;
             min-height: 100dvh;
-            height: 100dvh;
             position: relative;
+            perspective: 1200px;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             overflow: hidden;
         }
@@ -148,21 +148,21 @@
         }
 
         .poem {
-            position: absolute;
-            inset: 0;
+            min-height: calc(100vh - 160px);
             display: none;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             text-align: left;
             font-weight: 300;
             line-height: 1.6;
             color: #000000;
-            padding: 2rem 2rem 180px 2rem;
+            padding: 2rem 2rem 160px 2rem;
             opacity: 0;
             transform: translateY(30px);
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            content-visibility: auto;
+            contain-intrinsic-size: 80vh;
         }
+
 
         .poem.active {
             display: flex;
@@ -308,23 +308,43 @@
         /* ukryj przycisk dźwięku na stronie startowej */
         #landingContainer #audioToggle { display: none; }
 
-        /* i.c.u — przycisk menu prezentacji (w bio) */
-        .bio-icu-btn {
-            padding: 0.6rem 1.2rem;
-            background: #000000;
-            border: none;
-            color: #ffffff;
+        /* kup mi kawę — mały przycisk fixed lewy dolny */
+        .coffee-block {
+            position: fixed;
+            left: 1rem;
+            bottom: 1rem;
+            z-index: 1199;
+        }
+        .coffee-btn {
             font-family: 'Geist Mono', monospace;
-            font-size: 13px;
+            font-size: 10px;
+            padding: 3px 6px;
+            color: #000000;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .coffee-btn:hover { opacity: 1; }
+
+        /* i.c.u — mini przycisk menu (prezentacje) */
+        .icu-btn {
+            position: fixed;
+            bottom: 1.25rem;
+            left: 1rem;
+            background: none;
+            border: 0;
+            color: #000000;
+            font-family: 'Geist Mono', monospace;
+            font-size: 11px;
             letter-spacing: 0.05em;
+            opacity: 0.7;
+            z-index: 1200;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
-            transition: background 0.2s ease, transform 0.2s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease;
         }
-        .bio-icu-btn:hover {
-            background: #333333;
-            transform: translateY(-2px);
-        }
+        .icu-btn:hover { opacity: 1; transform: translateY(-1px); }
 
         /* overlay menu i.c.u */
         .icu-menu {
@@ -430,9 +450,18 @@
                 top: calc(1rem + env(safe-area-inset-top, 0));
                 right: calc(1rem + env(safe-area-inset-right, 0));
             }
+            .coffee-block {
+                left: calc(1rem + env(safe-area-inset-left, 0));
+                bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+            }
+            .icu-btn {
+                bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
+                left: calc(1rem + env(safe-area-inset-left, 0));
+            }
             /* sekcja wierszy */
             .poem {
-                padding: 1.25rem 1.25rem calc(180px + env(safe-area-inset-bottom, 0)) 1.25rem;
+                padding: 1.25rem 1.25rem calc(140px + env(safe-area-inset-bottom, 0)) 1.25rem;
+                min-height: calc(100dvh - 140px);
                 font-size: clamp(0.95rem, 2.8vw, 1.15rem);
                 line-height: 1.65;
             }
@@ -458,10 +487,6 @@
             }
             .controls {
                 right: calc(0.75rem + env(safe-area-inset-right, 0));
-                bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
-            }
-            .coffee-block {
-                left: calc(0.75rem + env(safe-area-inset-left, 0));
                 bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
             }
             .control-btn {
@@ -898,45 +923,6 @@
             top: 50px;
             right: 20px;
         }
-        .bio-coffee-dot {
-            color: inherit;
-            text-decoration: none;
-            transition: opacity 0.3s ease;
-        }
-        .bio-coffee-dot:hover {
-            opacity: 0.6;
-        }
-
-        .coffee-block {
-            position: fixed;
-            left: calc(1rem + env(safe-area-inset-left, 0));
-            bottom: calc(1rem + env(safe-area-inset-bottom, 0));
-            display: none;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 2px;
-            z-index: 102;
-        }
-        .coffee-btn {
-            background: transparent;
-            border: 0;
-            font-family: 'Geist Mono', monospace;
-            text-decoration: none;
-            font-size: 14px;
-            color: #000000;
-            opacity: 0.8;
-            cursor: pointer;
-            padding: 6px 8px;
-        }
-        .coffee-btn:hover { opacity: 1; }
-        .coffee-link-small {
-            font-family: 'Geist Mono', monospace;
-            font-size: 10px;
-            color: #666;
-            opacity: 0.7;
-            text-decoration: none;
-        }
-        .coffee-link-small:hover { opacity: 1; color: #000; }
 
         .spotify-widget {
             position: absolute;
@@ -1025,13 +1011,17 @@
 </head>
 <body>
     <div id="pointcloud-bg"></div>
-    <div id="pointcloud-loading"></div>
+    <div id="pointcloud-loading">Ładowanie modelu… (~500 MB)</div>
     <div class="star-fog" id="starFog">
         <div class="star-container" id="starContainer"></div>
     </div>
     
+    <div class="coffee-block">
+        <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener">kup mi kawę</a>
+    </div>
     <div class="container" id="landingContainer">
         <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
+        <button class="icu-btn" id="icuBtn" type="button" title="prezentacje">i.c.u</button>
         <h1 class="title title-emerging" id="title">~||-_^+*.</h1>
         <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
@@ -2988,10 +2978,6 @@
         <button class="nav-arrow" id="nextBtn">›</button>
     </div>
 
-    <div class="coffee-block" id="coffeeBlock">
-        <a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="coffee-btn">kup mi kawę</a>
-        <a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="coffee-link-small">buycoffee.to/szpineta</a>
-    </div>
     <div class="controls" id="controls" aria-label="kontrolki">
         <button class="control-btn" id="fontSmaller" title="mniejszy tekst">a</button>
         <button class="control-btn" id="fontBigger" title="większy tekst">A</button>
@@ -3027,30 +3013,22 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 <a href="https://instagram.com/s.sz.archive" class="bio-link">instagram</a>
                 <a href="https://www.youtube.com/channel/UCD2yGC0UnRYmJ_LkaI-2fNA" class="bio-link">youtube</a>
                 <a href="https://instagram.com/biv.alvia" class="bio-link">biżuteria</a>
-                <button class="bio-icu-btn" id="icuBtn" type="button" title="prezentacje">i.c.u</button>
             </div>
             
             <div class="spotify-widget">
                 <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/7cu88Rw7NzRpScSRjgDfB5?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
             
-            <div class="bio-extra-text-1">~||-_^+*<a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="bio-coffee-dot" title="postaw kawę">.</a></div>
+            <div class="bio-extra-text-1">~||-_^+*.</div>
         </div>
     </div>
 
     <script src="audio.js"></script>
     <script>
-        // —— Pointcloud tło (lavmodel.stl) — zoom 2.2–11, gęsto 19k
+        // —— Pointcloud tło (lawendamodel.stl) v2 — zoom 2.2–11, gęsto 19k
         (function() {
             const container = document.getElementById('pointcloud-bg');
-            const loadingEl = document.getElementById('pointcloud-loading');
             if (!container || typeof THREE === 'undefined') return;
-
-            if (location.protocol === 'file:') {
-                if (loadingEl) { loadingEl.textContent = 'Otwórz stronę przez serwer (np. node server.js) — fetch nie działa z file://.'; loadingEl.classList.add('error'); }
-                setTimeout(function() { if (loadingEl) loadingEl.classList.add('hidden'); }, 6000);
-                return;
-            }
 
             const symbols = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
             const textureCache = {};
@@ -3095,7 +3073,6 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             let startTheta = 0, startPhi = 0, startRadius = 5.2;
             let userInteracting = false;
             let userIdleTime = 0;
-            let userHasEverInteracted = false;
             let dragStart = null;
             let zoom = 1;
             let growPhase = false;
@@ -3141,15 +3118,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color(0xfafafa);
                 camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
-                var opts = { antialias: true, alpha: false, powerPreference: 'high-performance' };
-                try {
-                    renderer = new THREE.WebGLRenderer(Object.assign({ precision: 'highp' }, opts));
-                } catch (e) {
-                    try { renderer = new THREE.WebGLRenderer(Object.assign({ precision: 'mediump' }, opts)); } catch (e2) {
-                        renderer = new THREE.WebGLRenderer(opts);
-                    }
-                }
-                if (!renderer || !renderer.domElement) throw new Error('WebGL nie jest dostępny');
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, precision: 'highp', powerPreference: 'high-performance' });
                 renderer.setSize(w, h);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
                 container.appendChild(renderer.domElement);
@@ -3174,7 +3143,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 const positionsArray = geometry.attributes.position.array;
                 const isMobile = window.innerWidth < 640;
                 const spriteSize = isMobile ? 0.07 : 0.085;
-                const maxSprites = 12000;
+                const maxSprites = isMobile ? 6000 : 12000;
                 const step = Math.max(1, Math.floor(positionsArray.length / 3 / maxSprites));
                 pointsGroup = new THREE.Group();
 
@@ -3248,14 +3217,20 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     if (loadingEl) { loadingEl.textContent = msg; loadingEl.classList.add('error'); }
                     setTimeout(hideLoading, 8000);
                 }
-                const colorsPromise = fetch('lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+                const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+                // Strona z innej domeny niż GitHub → fetch do Release = CORS (blokada). Model musi być na tej samej domenie co strona.
+                var stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
                 function fetchSTL() {
-                    return fetch('lavmodel.stl')
-                        .then(function(res) { if (!res.ok) throw new Error('fetch'); return res.arrayBuffer(); })
+                    return fetch('lawendamodel.stl')
+                        .then(function(res) { return res.arrayBuffer(); })
                         .then(function(buf) {
-                            if (buf.byteLength < 500) throw new Error('LFS_POINTER');
+                            if (buf.byteLength < 500) throw new Error('LFS pointer');
                             return buf;
-                        });
+                        })
+                        .catch(function() {
+                            return fetch(stlReleaseUrl).then(function(r) { if (!r.ok) throw new Error('release'); return r.arrayBuffer(); });
+                        })
+                        .catch(function() { throw new Error('CORS or missing file'); });
                 }
                 fetchSTL()
                     .then(function(stlData) { return Promise.all([Promise.resolve(stlData), colorsPromise]); })
@@ -3292,24 +3267,18 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         moveDuration = 20;
                         autoPhase = 'move';
                         autoPhaseTime = 0;
-                        // Pokaż model dopiero gdy tytuł się wyświetli (koordynacja w startTyping)
-                        window.__pointcloudReady = true;
-                        if (window.__titleShown && window.__startPointcloudGrow) window.__startPointcloudGrow();
+                        // Pokaż model gdy jest gotowy (ładowanie 497 MB może trwać długo po animacji paska)
+                        setTimeout(function() { if (window.__startPointcloudGrow) window.__startPointcloudGrow(); }, 100);
                     })
-                    .catch(function(err) {
+                    .catch(function() {
                         hideLoading();
-                        if (err && err.message === 'LFS_POINTER') {
-                            showError('Na serwerze jest wskaźnik Git LFS, nie pełny plik. Wgraj lavmodel.stl na serwer.');
-                        } else {
-                            showError('Model 3D: wgraj lavmodel.stl na ten sam serwer co stronę.');
-                        }
+                        showError('Model 3D: wgraj lawendamodel.stl na ten sam serwer co stronę (ta sama domena).');
                     });
             }
 
             container.addEventListener('mousedown', function(e) {
                 if (e.button !== 0) return;
                 userInteracting = true;
-                userHasEverInteracted = true;
                 userIdleTime = 0;
                 dragStart = { x: e.clientX, y: e.clientY, theta: currentTheta, phi: currentPhi };
             });
@@ -3330,7 +3299,6 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             container.addEventListener('wheel', function(e) {
                 e.preventDefault();
                 userInteracting = true;
-                userHasEverInteracted = true;
                 userIdleTime = 0;
                 zoom *= 1 - e.deltaY * 0.002;
                 zoom = Math.max(0.4, Math.min(1.8, zoom));
@@ -3338,7 +3306,6 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             container.addEventListener('touchstart', function(e) {
                 if (e.touches.length === 1) {
                     userInteracting = true;
-                    userHasEverInteracted = true;
                     userIdleTime = 0;
                     dragStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, theta: currentTheta, phi: currentPhi };
                 }
@@ -3390,7 +3357,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     if (userIdleTime > 4) userInteracting = false;
                 }
 
-                if (!userInteracting && pointsGroup && !userHasEverInteracted) {
+                if (!userInteracting && pointsGroup) {
                     autoPhaseTime += dt;
                     const t = Math.min(1, autoPhaseTime / moveDuration);
                     const smooth = t * t * (3 - 2 * t);
@@ -3414,11 +3381,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 if (!document.hidden) renderer.render(scene, camera);
             }
 
-            try { initScene(); } catch (e) {
-                if (loadingEl) { loadingEl.textContent = 'WebGL niedostępny: ' + (e.message || 'nieznany błąd'); loadingEl.classList.add('error'); }
-                setTimeout(function() { if (loadingEl) loadingEl.classList.add('hidden'); }, 6000);
-                return;
-            }
+            initScene();
             loadSTLAndStart();
             animate();
         })();
@@ -3606,11 +3569,9 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 }
                 const nav = document.getElementById('navigation');
                 const ctrl = document.getElementById('controls');
-                const coffee = document.getElementById('coffeeBlock');
                 const back = document.getElementById('backToStart');
                 if (nav) nav.style.display = 'flex';
                 if (ctrl) ctrl.style.display = 'flex';
-                if (coffee) coffee.style.display = 'flex';
                 if (back) back.style.display = 'block';
                 
                 // Uruchom animacje dla pierwszego wiersza
@@ -3645,10 +3606,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             prevBtn.disabled = currentPoem === 0;
             nextBtn.disabled = currentPoem === poems.length - 1;
             
-            // Aktualizuj licznik (requestAnimationFrame dla pewności na mobile)
-            const counterText = `${currentPoem + 1} / ${poems.length}`;
-            navCounter.textContent = counterText;
-            requestAnimationFrame(() => { navCounter.textContent = counterText; });
+            // Aktualizuj licznik
+            navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
         }
 
         // Nawigacja między wierszami
@@ -3716,7 +3675,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const particleCount = (reduced || isIOS || isTouch) ? 0 : 15;
+            const particleCount = (reduced || isIOS) ? 0 : (isTouch ? 6 : 15);
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'poem-particle';
@@ -3943,7 +3902,6 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     document.getElementById('title').style.cursor = 'pointer';
                     document.getElementById('title').style.opacity = '1';
                     startRandomTypedTextAnimation();
-                    window.__titleShown = true;
                     setTimeout(function() {
                         if (window.__startPointcloudGrow) window.__startPointcloudGrow();
                     }, 500);
@@ -4718,8 +4676,6 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             document.getElementById('poemsSection').style.display = 'none';
             document.getElementById('navigation').style.display = 'none';
             document.getElementById('controls').style.display = 'none';
-            const coffee = document.getElementById('coffeeBlock');
-            if (coffee) coffee.style.display = 'none';
             document.getElementById('backToStart').style.display = 'none';
             
             // resetuj stan strony tytułowej
@@ -4750,7 +4706,6 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             title.textContent = '~||-_^+*.';
             title.style.color = '#1a1a1a';
             title.style.opacity = '0';
-            document.getElementById('pointcloud-bg').classList.remove('visible');
             authorName.style.opacity = '0';
             authorName.style.position = 'absolute';
             authorName.style.bottom = '3rem';

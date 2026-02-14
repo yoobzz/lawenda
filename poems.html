@@ -54,27 +54,23 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #1a1a1a; }
         .poems-section { 
-            min-height: 100vh;
-            height: 100dvh;
-            height: 100vh;
+            min-height: 100vh; 
             position: relative; 
-            overflow: hidden;
+            perspective: 1200px; 
             background: 
                 radial-gradient(circle at 20% 30%, rgba(196, 181, 253, 0.03) 0%, transparent 50%),
                 radial-gradient(circle at 80% 70%, rgba(144, 128, 207, 0.02) 0%, transparent 50%),
                 linear-gradient(135deg, #fafafa 0%, #f5f5f5 50%, #fafafa 100%); 
+            overflow: hidden; 
         }
         .poems-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        #poemsMount { position: absolute; inset: 0; overflow: hidden; }
         .poem-particle { 
             position: absolute; 
             border-radius: 50%; 
             pointer-events: none; 
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity;
             animation: particleFloat 20s infinite ease-in-out;
-        }
-        @media (max-width: 640px) {
-            .poem-particle { animation: none; }
         }
         
         @keyframes particleFloat {
@@ -93,19 +89,16 @@
             animation: particleFloat 20s infinite ease-in-out, particlePulse 3s infinite ease-in-out;
         }
         .poem { 
-            position: absolute;
-            inset: 0;
+            min-height: calc(100vh - 160px); 
             display: none; 
-            align-items: flex-start; 
+            align-items: center; 
             justify-content: center; 
             text-align: left; 
             font-weight: 300; 
             line-height: 1.6; 
             color: #000000; 
-            padding: 2rem 2rem 180px 2rem; 
-            opacity: 0;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            padding: 2rem 2rem 160px 2rem; 
+            opacity: 0; 
         }
         .poem.active { 
             display: flex; 
@@ -194,6 +187,24 @@
         .nav-counter:hover::after {
             transform: scaleX(1);
         }
+        /* kup mi kawę — mały przycisk fixed lewy dolny */
+        .coffee-block {
+            position: fixed;
+            left: 1rem;
+            bottom: 1rem;
+            z-index: 101;
+        }
+        .coffee-btn {
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 10px;
+            padding: 3px 6px;
+            color: #000000;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .coffee-btn:hover { opacity: 1; }
         .back-button { 
             position: fixed; 
             top: 1rem; 
@@ -255,36 +266,6 @@
         .control-btn:active {
             transform: translateY(0);
         }
-        .coffee-block {
-            position: fixed;
-            left: calc(1rem + env(safe-area-inset-left, 0));
-            bottom: calc(1rem + env(safe-area-inset-bottom, 0));
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 2px;
-            z-index: 102;
-        }
-        .coffee-btn {
-            background: transparent;
-            border: 0;
-            font-family: inherit;
-            text-decoration: none;
-            font-size: 14px;
-            color: inherit;
-            opacity: 0.8;
-            cursor: pointer;
-            padding: 6px 8px;
-        }
-        .coffee-btn:hover { opacity: 1; }
-        .coffee-link-small {
-            font-family: inherit;
-            font-size: 10px;
-            color: #666;
-            opacity: 0.7;
-            text-decoration: none;
-        }
-        .coffee-link-small:hover { opacity: 1; color: inherit; }
         .toast { 
             position: fixed; 
             left: 50%; 
@@ -405,6 +386,10 @@
         }
         
         @media (max-width: 640px) {
+            .coffee-block {
+                left: calc(1rem + env(safe-area-inset-left, 0));
+                bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+            }
             #audioToggle { 
                 font-size: 14px !important; 
                 padding: 4px 6px !important; 
@@ -423,10 +408,6 @@
                 flex-direction: column;
                 gap: 0.5rem;
                 z-index: 102;
-            }
-            .coffee-block {
-                left: calc(0.5rem + env(safe-area-inset-left, 0));
-                bottom: calc(1rem + env(safe-area-inset-bottom, 0));
             }
             
             .control-btn {
@@ -473,6 +454,9 @@
     </style>
 </head>
 <body>
+    <div class="coffee-block">
+        <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener">kup mi kawę</a>
+    </div>
     <div class="poems-section" id="poemsSection">
         <div class="poems-background" id="poemsBackground"></div>
         <button class="back-button" id="backToStart" title="wróć" onclick="window.location.href='index.html'">~||-_^+*.</button>
@@ -2600,10 +2584,6 @@
         <div class="goto-hint">enter ⏎ • esc ✕</div>
     </div>
 
-    <div class="coffee-block">
-        <a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="coffee-btn">kup mi kawę</a>
-        <a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="coffee-link-small">buycoffee.to/szpineta</a>
-    </div>
     <div class="controls" id="controls" aria-label="kontrolki">
         <button class="control-btn" id="fontSmaller" title="mniejszy tekst">-</button>
         <button class="control-btn" id="fontBigger" title="większy tekst">+</button>
@@ -2633,7 +2613,7 @@
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const particleCount = (reduced || isIOS || isTouch) ? 0 : 60;
+            const particleCount = (reduced || isIOS) ? 0 : (isTouch ? 25 : 60);
             
             // Kolory dla cząsteczek - subtelne odcienie
             const colors = [
@@ -2703,28 +2683,25 @@
                 rafId = requestAnimationFrame(updateParticles);
             }
             
-            if (!isTouch) {
-                document.addEventListener('mousemove', (e) => {
-                    mouseX = e.clientX;
-                    mouseY = e.clientY;
-                    if (!rafId) {
-                        updateParticles();
-                    }
-                });
-            }
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                if (!rafId) {
+                    updateParticles();
+                }
+            });
             
-            if (!isTouch) {
-                document.addEventListener('mouseleave', () => {
-                    if (rafId) {
-                        cancelAnimationFrame(rafId);
-                        rafId = null;
-                    }
-                    const particles = background.querySelectorAll('.poem-particle');
-                    particles.forEach((particle) => {
-                        particle.style.transform = 'translate(0, 0) scale(1)';
-                    });
+            // Zatrzymaj animację gdy myszka opuści obszar
+            document.addEventListener('mouseleave', () => {
+                if (rafId) {
+                    cancelAnimationFrame(rafId);
+                    rafId = null;
+                }
+                const particles = background.querySelectorAll('.poem-particle');
+                particles.forEach((particle) => {
+                    particle.style.transform = 'translate(0, 0) scale(1)';
                 });
-            }
+            });
         }
 
         let currentPoem = 0; let poems = [];
@@ -2826,15 +2803,13 @@
             prevBtn.disabled = currentPoem === 0;
             nextBtn.disabled = currentPoem === poems.length - 1;
             
-            // Aktualizacja licznika (requestAnimationFrame dla pewności na mobile)
+            // Animacja licznika
             if (navCounter) {
                 navCounter.classList.add('updating');
-                const text = `${currentPoem + 1} / ${poems.length}`;
-                navCounter.textContent = text;
-                requestAnimationFrame(() => {
-                    navCounter.textContent = text;
+                setTimeout(() => {
+            navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
                     navCounter.classList.remove('updating');
-                });
+                }, 150);
             }
         }
         // Funkcja do aktualizacji meta tagów Open Graph
@@ -3029,134 +3004,79 @@
             showToast(ok ? 'skopiowano link' : 'kopiuj: ' + link); 
         });
         
-        // Generowanie obrazu wiersza po stronie klienta (działa na Vercel i mobile)
-        function generatePoemImageBlob(poemEl, poemNumber) {
-            return new Promise((resolve, reject) => {
-                const rawText = (poemEl.innerText || poemEl.textContent || '').trim();
-                const originalLines = rawText.split('\n').map(l => l.trim());
-                const W = 1080, H = 1920;
-                const padX = 120, padY = 200;
-                const contentW = W - padX * 2, contentH = H - padY * 2;
-                const canvas = document.createElement('canvas');
-                canvas.width = W; canvas.height = H;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) { reject(new Error('Canvas nieobsługiwany')); return; }
-                const bg = ctx.createLinearGradient(0, 0, 0, H);
-                bg.addColorStop(0, '#fffdfa'); bg.addColorStop(1, '#f9f6ef');
-                ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = '#000000'; ctx.textBaseline = 'top'; ctx.textAlign = 'center';
-                const fontFamily = "'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-                function wrapLine(text, maxW, fs) {
-                    const words = text.split(/\s+/);
-                    const lines = []; let line = '';
-                    ctx.font = `300 ${fs}px ${fontFamily}`;
-                    for (const word of words) {
-                        const test = line ? line + ' ' + word : word;
-                        if (ctx.measureText(test).width <= maxW) line = test;
-                        else {
-                            if (line) lines.push(line);
-                            if (ctx.measureText(word).width > maxW) {
-                                let chunk = '';
-                                for (const ch of word) {
-                                    if (ctx.measureText(chunk + ch).width <= maxW) chunk += ch;
-                                    else { if (chunk) lines.push(chunk); chunk = ch; }
-                                }
-                                line = chunk;
-                            } else line = word;
-                        }
-                    }
-                    if (line) lines.push(line);
-                    return lines;
-                }
-                let fontSize = 44, allLines = [];
-                do {
-                    allLines = [];
-                    ctx.font = `300 ${fontSize}px ${fontFamily}`;
-                    for (const rawLine of originalLines) {
-                        if ((rawLine || '').trim().length === 0) allLines.push('');
-                        else allLines.push(...wrapLine(rawLine, contentW, fontSize));
-                    }
-                    const lineHeight = fontSize * 1.4;
-                    const totalH = allLines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : lineHeight), 0);
-                    if (totalH > contentH) fontSize -= 2;
-                    else break;
-                } while (fontSize >= 28);
-                const lineHeight = fontSize * 1.4;
-                const totalH = allLines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : lineHeight), 0);
-                let y = padY + Math.max(0, (contentH - totalH) / 2);
-                ctx.font = `300 ${fontSize}px ${fontFamily}`;
-                for (const ln of allLines) {
-                    if (ln === '') { y += fontSize * 0.9; continue; }
-                    try { ctx.fillText(ln, W / 2, y); } catch (e) {
-                        ctx.fillText(ln.replace(/[^\x20-\x7E\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]/g, '?'), W / 2, y);
-                    }
-                    y += lineHeight;
-                    if (y > H - padY) break;
-                }
-                ctx.font = `700 22px ${fontFamily}`;
-                ctx.fillStyle = '#666666';
-                ctx.fillText('~||-_^+*.', W / 2, H - 100);
-                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Błąd konwersji')), 'image/png');
-            });
-        }
-
         // Przycisk pobierania obrazu do galerii
         document.getElementById('downloadImage').addEventListener('click', async (e)=>{ 
             e.preventDefault(); 
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
-            const poemEl = poems[currentPoem];
-            if (!poemEl) { showToast('błąd: brak wiersza'); return; }
+            const imageUrl = `${location.origin}/poem-image.png?poem=${poemNumber}`;
             
             try {
-                showToast('generowanie obrazu...');
-                await document.fonts.ready;
-                const blob = await generatePoemImageBlob(poemEl, poemNumber);
+                showToast('pobieranie obrazu...');
+                const response = await fetch(imageUrl);
+                if (!response.ok) throw new Error('Nie udało się pobrać obrazu');
+                
+                const blob = await response.blob();
                 const file = new File([blob], `wiersz-${poemNumber}.png`, { type: 'image/png' });
+                
                 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
                 
+                // Na iOS spróbuj Web Share API z plikiem
                 if (isIOS && navigator.share && navigator.canShare) {
                     try {
+                        // Sprawdź czy można udostępnić plik
                         if (navigator.canShare({ files: [file] })) {
-                            await navigator.share({ files: [file], title: `wiersz ${poemNumber}` });
+                            await navigator.share({
+                                files: [file],
+                                title: `wiersz ${poemNumber}`
+                            });
                             showToast('wybierz "Zapisz do zdjęć"');
                             return;
                         }
                     } catch (err) {
-                        if (err.name === 'AbortError') return;
+                        if (err.name === 'AbortError') {
+                            return;
+                        }
                         console.log('Web Share API error:', err);
                     }
                 }
                 
+                // Fallback dla iOS: otwórz obraz w tej samej karcie (najlepsze dla iOS Safari)
                 if (isIOS) {
-                    const blobUrl = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = blobUrl; a.download = `wiersz-${poemNumber}.png`;
-                    document.body.appendChild(a); a.click();
-                    document.body.removeChild(a);
-                    setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                    // Na iOS otwórz obraz w tej samej karcie - użytkownik może zapisać długim naciśnięciem
+                    window.location.href = imageUrl;
                     showToast('naciśnij i przytrzymaj obraz, aby zapisać');
                 } else {
+                    // Na Android/Desktop: użyj Web Share API lub pobierz jako plik
                     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                         try {
-                            await navigator.share({ files: [file], title: `wiersz ${poemNumber}` });
+                            await navigator.share({
+                                files: [file],
+                                title: `wiersz ${poemNumber}`
+                            });
                             showToast('wybierz "Zapisz zdjęcie"');
                             return;
                         } catch (err) {
-                            if (err.name !== 'AbortError') console.log('Web Share API error:', err);
+                            if (err.name !== 'AbortError') {
+                                console.log('Web Share API error:', err);
+                            }
                         }
                     }
+                    
+                    // Fallback: pobierz jako plik
                     const blobUrl = URL.createObjectURL(blob);
                     const a = document.createElement('a');
-                    a.href = blobUrl; a.download = `wiersz-${poemNumber}.png`;
-                    document.body.appendChild(a); a.click();
+                    a.href = blobUrl;
+                    a.download = `wiersz-${poemNumber}.png`;
+                    document.body.appendChild(a);
+                    a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(blobUrl);
                     showToast('pobrano obraz');
                 }
             } catch (error) {
-                console.error('Błąd generowania obrazu:', error);
-                showToast('błąd: ' + (error.message || 'nie udało się'));
+                console.error('Błąd pobierania obrazu:', error);
+                showToast('błąd: ' + error.message);
             }
         });
         
