@@ -116,8 +116,8 @@
         .poems-section {
             display: none;
             min-height: 100dvh;
+            height: 100dvh;
             position: relative;
-            perspective: 1200px;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             overflow: hidden;
         }
@@ -148,21 +148,21 @@
         }
 
         .poem {
-            min-height: calc(100vh - 160px);
+            position: absolute;
+            inset: 0;
             display: none;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             text-align: left;
             font-weight: 300;
             line-height: 1.6;
             color: #000000;
-            padding: 2rem 2rem 160px 2rem;
+            padding: 2rem 2rem 180px 2rem;
             opacity: 0;
             transform: translateY(30px);
-            content-visibility: auto;
-            contain-intrinsic-size: 80vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-
 
         .poem.active {
             display: flex;
@@ -308,24 +308,23 @@
         /* ukryj przycisk dźwięku na stronie startowej */
         #landingContainer #audioToggle { display: none; }
 
-        /* i.c.u — mini przycisk menu (prezentacje) */
-        .icu-btn {
-            position: fixed;
-            bottom: 1.25rem;
-            left: 1rem;
-            background: none;
-            border: 0;
-            color: #000000;
+        /* i.c.u — przycisk menu prezentacji (w bio) */
+        .bio-icu-btn {
+            padding: 0.6rem 1.2rem;
+            background: #000000;
+            border: none;
+            color: #ffffff;
             font-family: 'Geist Mono', monospace;
-            font-size: 11px;
+            font-size: 13px;
             letter-spacing: 0.05em;
-            opacity: 0.7;
-            z-index: 1200;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition: background 0.2s ease, transform 0.2s ease;
         }
-        .icu-btn:hover { opacity: 1; transform: translateY(-1px); }
+        .bio-icu-btn:hover {
+            background: #333333;
+            transform: translateY(-2px);
+        }
 
         /* overlay menu i.c.u */
         .icu-menu {
@@ -431,14 +430,9 @@
                 top: calc(1rem + env(safe-area-inset-top, 0));
                 right: calc(1rem + env(safe-area-inset-right, 0));
             }
-            .icu-btn {
-                bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
-                left: calc(1rem + env(safe-area-inset-left, 0));
-            }
             /* sekcja wierszy */
             .poem {
-                padding: 1.25rem 1.25rem calc(140px + env(safe-area-inset-bottom, 0)) 1.25rem;
-                min-height: calc(100dvh - 140px);
+                padding: 1.25rem 1.25rem calc(180px + env(safe-area-inset-bottom, 0)) 1.25rem;
                 font-size: clamp(0.95rem, 2.8vw, 1.15rem);
                 line-height: 1.65;
             }
@@ -464,6 +458,10 @@
             }
             .controls {
                 right: calc(0.75rem + env(safe-area-inset-right, 0));
+                bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
+            }
+            .coffee-block {
+                left: calc(0.75rem + env(safe-area-inset-left, 0));
                 bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
             }
             .control-btn {
@@ -900,6 +898,45 @@
             top: 50px;
             right: 20px;
         }
+        .bio-coffee-dot {
+            color: inherit;
+            text-decoration: none;
+            transition: opacity 0.3s ease;
+        }
+        .bio-coffee-dot:hover {
+            opacity: 0.6;
+        }
+
+        .coffee-block {
+            position: fixed;
+            left: calc(1rem + env(safe-area-inset-left, 0));
+            bottom: calc(1rem + env(safe-area-inset-bottom, 0));
+            display: none;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+            z-index: 102;
+        }
+        .coffee-btn {
+            background: transparent;
+            border: 0;
+            font-family: 'Geist Mono', monospace;
+            text-decoration: none;
+            font-size: 14px;
+            color: #000000;
+            opacity: 0.8;
+            cursor: pointer;
+            padding: 6px 8px;
+        }
+        .coffee-btn:hover { opacity: 1; }
+        .coffee-link-small {
+            font-family: 'Geist Mono', monospace;
+            font-size: 10px;
+            color: #666;
+            opacity: 0.7;
+            text-decoration: none;
+        }
+        .coffee-link-small:hover { opacity: 1; color: #000; }
 
         .spotify-widget {
             position: absolute;
@@ -995,7 +1032,6 @@
     
     <div class="container" id="landingContainer">
         <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
-        <button class="icu-btn" id="icuBtn" type="button" title="prezentacje">i.c.u</button>
         <h1 class="title title-emerging" id="title">~||-_^+*.</h1>
         <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
@@ -2952,6 +2988,10 @@
         <button class="nav-arrow" id="nextBtn">›</button>
     </div>
 
+    <div class="coffee-block" id="coffeeBlock">
+        <a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="coffee-btn">kup mi kawę</a>
+        <a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="coffee-link-small">buycoffee.to/szpineta</a>
+    </div>
     <div class="controls" id="controls" aria-label="kontrolki">
         <button class="control-btn" id="fontSmaller" title="mniejszy tekst">a</button>
         <button class="control-btn" id="fontBigger" title="większy tekst">A</button>
@@ -2987,13 +3027,14 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 <a href="https://instagram.com/s.sz.archive" class="bio-link">instagram</a>
                 <a href="https://www.youtube.com/channel/UCD2yGC0UnRYmJ_LkaI-2fNA" class="bio-link">youtube</a>
                 <a href="https://instagram.com/biv.alvia" class="bio-link">biżuteria</a>
+                <button class="bio-icu-btn" id="icuBtn" type="button" title="prezentacje">i.c.u</button>
             </div>
             
             <div class="spotify-widget">
                 <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/7cu88Rw7NzRpScSRjgDfB5?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
             </div>
             
-            <div class="bio-extra-text-1">~||-_^+*.</div>
+            <div class="bio-extra-text-1">~||-_^+*<a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener noreferrer" class="bio-coffee-dot" title="postaw kawę">.</a></div>
         </div>
     </div>
 
@@ -3565,9 +3606,11 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 }
                 const nav = document.getElementById('navigation');
                 const ctrl = document.getElementById('controls');
+                const coffee = document.getElementById('coffeeBlock');
                 const back = document.getElementById('backToStart');
                 if (nav) nav.style.display = 'flex';
                 if (ctrl) ctrl.style.display = 'flex';
+                if (coffee) coffee.style.display = 'flex';
                 if (back) back.style.display = 'block';
                 
                 // Uruchom animacje dla pierwszego wiersza
@@ -3602,8 +3645,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             prevBtn.disabled = currentPoem === 0;
             nextBtn.disabled = currentPoem === poems.length - 1;
             
-            // Aktualizuj licznik
-            navCounter.textContent = `${currentPoem + 1} / ${poems.length}`;
+            // Aktualizuj licznik (requestAnimationFrame dla pewności na mobile)
+            const counterText = `${currentPoem + 1} / ${poems.length}`;
+            navCounter.textContent = counterText;
+            requestAnimationFrame(() => { navCounter.textContent = counterText; });
         }
 
         // Nawigacja między wierszami
@@ -3671,7 +3716,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (isTouch && /Macintosh/.test(navigator.userAgent));
             const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const particleCount = (reduced || isIOS) ? 0 : (isTouch ? 6 : 15);
+            const particleCount = (reduced || isIOS || isTouch) ? 0 : 15;
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'poem-particle';
@@ -4673,6 +4718,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             document.getElementById('poemsSection').style.display = 'none';
             document.getElementById('navigation').style.display = 'none';
             document.getElementById('controls').style.display = 'none';
+            const coffee = document.getElementById('coffeeBlock');
+            if (coffee) coffee.style.display = 'none';
             document.getElementById('backToStart').style.display = 'none';
             
             // resetuj stan strony tytułowej
