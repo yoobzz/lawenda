@@ -308,44 +308,6 @@
         /* ukryj przycisk dźwięku na stronie startowej */
         #landingContainer #audioToggle { display: none; }
 
-        /* kup mi kawę — mały przycisk fixed lewy dolny */
-        .coffee-block {
-            position: fixed;
-            left: 1rem;
-            bottom: 1rem;
-            z-index: 1199;
-        }
-        .coffee-btn {
-            font-family: 'Geist Mono', monospace;
-            font-size: 10px;
-            padding: 3px 6px;
-            color: #000000;
-            text-decoration: none;
-            opacity: 0.7;
-            transition: opacity 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .coffee-btn:hover { opacity: 1; }
-
-        /* i.c.u — mini przycisk menu (prezentacje) */
-        .icu-btn {
-            position: fixed;
-            bottom: 1.25rem;
-            left: 1rem;
-            background: none;
-            border: 0;
-            color: #000000;
-            font-family: 'Geist Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 0.05em;
-            opacity: 0.7;
-            z-index: 1200;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        .icu-btn:hover { opacity: 1; transform: translateY(-1px); }
-
         /* overlay menu i.c.u */
         .icu-menu {
             position: fixed;
@@ -449,14 +411,6 @@
             .audio-toggle {
                 top: calc(1rem + env(safe-area-inset-top, 0));
                 right: calc(1rem + env(safe-area-inset-right, 0));
-            }
-            .coffee-block {
-                left: calc(1rem + env(safe-area-inset-left, 0));
-                bottom: calc(1rem + env(safe-area-inset-bottom, 0));
-            }
-            .icu-btn {
-                bottom: calc(1.25rem + env(safe-area-inset-bottom, 0));
-                left: calc(1rem + env(safe-area-inset-left, 0));
             }
             /* sekcja wierszy */
             .poem {
@@ -1011,17 +965,13 @@
 </head>
 <body>
     <div id="pointcloud-bg"></div>
-    <div id="pointcloud-loading">Ładowanie modelu… (~500 MB)</div>
+    <div id="pointcloud-loading">Ładowanie modelu…</div>
     <div class="star-fog" id="starFog">
         <div class="star-container" id="starContainer"></div>
     </div>
     
-    <div class="coffee-block">
-        <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener">kup mi kawę</a>
-    </div>
     <div class="container" id="landingContainer">
         <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
-        <button class="icu-btn" id="icuBtn" type="button" title="prezentacje">i.c.u</button>
         <h1 class="title title-emerging" id="title">~||-_^+*.</h1>
         <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
@@ -3013,6 +2963,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 <a href="https://instagram.com/s.sz.archive" class="bio-link">instagram</a>
                 <a href="https://www.youtube.com/channel/UCD2yGC0UnRYmJ_LkaI-2fNA" class="bio-link">youtube</a>
                 <a href="https://instagram.com/biv.alvia" class="bio-link">biżuteria</a>
+                <a href="#" class="bio-link" id="icuBtn" title="prezentacje">i.c.u</a>
             </div>
             
             <div class="spotify-widget">
@@ -3213,15 +3164,14 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             function loadSTLAndStart() {
                 const loadingEl = document.getElementById('pointcloud-loading');
                 function hideLoading() { if (loadingEl) loadingEl.classList.add('hidden'); }
-                function showError(msg) {
-                    if (loadingEl) { loadingEl.textContent = msg; loadingEl.classList.add('error'); }
-                    setTimeout(hideLoading, 8000);
+                function showError() {
+                    hideLoading();
                 }
-                const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+                const colorsPromise = fetch('lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
                 // Strona z innej domeny niż GitHub → fetch do Release = CORS (blokada). Model musi być na tej samej domenie co strona.
-                var stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lawendamodel.stl';
+                var stlReleaseUrl = 'https://github.com/yoobzz/lawenda/releases/download/v1.0/lavmodel.stl';
                 function fetchSTL() {
-                    return fetch('lawendamodel.stl')
+                    return fetch('lavmodel.stl')
                         .then(function(res) { return res.arrayBuffer(); })
                         .then(function(buf) {
                             if (buf.byteLength < 500) throw new Error('LFS pointer');
@@ -3271,8 +3221,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         setTimeout(function() { if (window.__startPointcloudGrow) window.__startPointcloudGrow(); }, 100);
                     })
                     .catch(function() {
-                        hideLoading();
-                        showError('Model 3D: wgraj lawendamodel.stl na ten sam serwer co stronę (ta sama domena).');
+                        showError();
                     });
             }
 
