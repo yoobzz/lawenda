@@ -3248,7 +3248,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     if (loadingEl) { loadingEl.textContent = msg; loadingEl.classList.add('error'); }
                     setTimeout(hideLoading, 8000);
                 }
-                const colorsPromise = fetch('api/lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
+                const colorsPromise = fetch('lawenda-colors.json').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });
                 function fetchSTL() {
                     return fetch('lavmodel.stl')
                         .then(function(res) { if (!res.ok) throw new Error('fetch'); return res.arrayBuffer(); })
