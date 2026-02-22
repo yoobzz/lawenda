@@ -35,6 +35,13 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TKJ2KBZ8');</script>
+    <!-- End Google Tag Manager -->
     <style>
         @font-face {
             font-family: 'ABC Diatype Rounded';
@@ -454,6 +461,10 @@
     </style>
 </head>
 <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TKJ2KBZ8"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     <div class="coffee-block">
         <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener">wesprzyj wydanie</a>
     </div>
@@ -2948,6 +2959,13 @@
             
             currentPoem = index;
             
+            // Google Analytics – wyświetlenie wiersza
+            if (newPoemEl) {
+                const poemTitle = (newPoemEl.innerText || newPoemEl.textContent || '').trim().split('\n')[0].slice(0, 50);
+                const origIdx = getOriginalIndex(index);
+                (window.dataLayer = window.dataLayer || []).push({ event: 'poem_view', poem_index: origIdx + 1, poem_title: poemTitle });
+            }
+            
             // Zaktualizuj URL - użyj zakodowanego identyfikatora (bez widocznego numeru)
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
@@ -2990,14 +3008,13 @@
 
         document.getElementById('prevBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem>0) goToPoem(currentPoem-1); });
         document.getElementById('nextBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem<poems.length-1) goToPoem(currentPoem+1); });
-        document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(-1); });
-        document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(1); });
+        document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); (window.dataLayer = window.dataLayer || []).push({ event: 'font_adjust', direction: 'smaller' }); adjustFontScale(-1); });
+        document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); (window.dataLayer = window.dataLayer || []).push({ event: 'font_adjust', direction: 'bigger' }); adjustFontScale(1); });
         document.getElementById('copyLink').addEventListener('click', async (e)=>{ 
             e.preventDefault(); 
-            // Użyj oryginalnego indeksu (data-original-index) zamiast pozycji w tablicy
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
-            // Link z zakodowanym identyfikatorem (bez widocznego numeru)
+            (window.dataLayer = window.dataLayer || []).push({ event: 'copy_link', poem_index: poemNumber });
             const encodedId = encodePoemId(poemNumber);
             const link = location.origin + location.pathname + `#wiersz-${encodedId}`; 
             const ok = await copyToClipboard(link); 
@@ -3009,6 +3026,7 @@
             e.preventDefault(); 
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
+            (window.dataLayer = window.dataLayer || []).push({ event: 'download_image', poem_index: poemNumber });
             const imageUrl = `${location.origin}/poem-image.png?poem=${poemNumber}`;
             
             try {
@@ -3222,6 +3240,13 @@
             
             currentPoem = currentPoemIndex;
             poems[currentPoem]?.classList.add('active');
+            // Google Analytics – pierwszy wiersz przy wejściu na poems.html
+            if (poems[currentPoem]) {
+                const firstPoem = poems[currentPoem];
+                const poemTitle = (firstPoem.innerText || firstPoem.textContent || '').trim().split('\n')[0].slice(0, 50);
+                const origIdx = getOriginalIndex(currentPoem);
+                (window.dataLayer = window.dataLayer || []).push({ event: 'poem_view', poem_index: origIdx + 1, poem_title: poemTitle });
+            }
             updateNavigation();
             updateMetaTags(currentPoem);
             createPoemsBackground();
