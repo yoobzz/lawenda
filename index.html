@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>~||-_^+*.</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
     
     <meta name="description" content="staś szpineta archiwum">
     <meta property="og:title" content="~||-_^+*.">
@@ -27,6 +28,14 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
     <style>
+        @font-face {
+            font-family: 'ABC Helveesti';
+            src: url('fonts/ABCHelveestiPlusVariable-Trial.woff2') format('woff2'),
+                 url('fonts/ABCHelveestiPlusVariable-Trial.woff') format('woff');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
         
         * {
             margin: 0;
@@ -96,10 +105,10 @@
         }
 
         .title {
-            font-family: 'Geist Mono', monospace;
-            font-size: clamp(0.9rem, 2.5vw, 1.8rem);
-            font-weight: 400;
-            letter-spacing: 0.15em;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 300;
+            letter-spacing: 0.12em;
             color: #000000;
             user-select: none;
             cursor: pointer;
@@ -109,6 +118,11 @@
             transform-style: flat;
             will-change: transform;
             white-space: nowrap;
+        }
+        .title-char {
+            display: inline-block;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.4s ease;
+            will-change: transform, opacity;
         }
 
         /* hover tytułu bez efektów */
@@ -398,7 +412,7 @@
             }
             /* landing na telefonie */
             .title {
-                font-size: clamp(1rem, 4vw, 1.4rem);
+                font-size: clamp(1.6rem, 6vw, 2.5rem);
                 padding: 0 1rem;
                 margin-bottom: env(safe-area-inset-bottom, 0);
             }
@@ -924,11 +938,11 @@
         /* Animacja przejścia - wypełnienie ekranu znakami */
         .transition-overlay {
             position: fixed;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #ffffff;
             z-index: 10000;
             opacity: 0;
             pointer-events: none;
@@ -954,12 +968,93 @@
         }
         
         @keyframes charAppear {
-            0% {
-                opacity: 0;
-            }
-            to {
-                opacity: 0.9;
-            }
+            0% { opacity: 0; }
+            to { opacity: 0.9; }
+        }
+        @keyframes emergeFromStarText {
+            0% { opacity: 0; transform: scale(0.8); filter: blur(15px); }
+            30% { opacity: 0.3; transform: scale(0.9); filter: blur(8px); }
+            70% { opacity: 0.8; transform: scale(1.02); filter: blur(2px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+        .transition-emerge {
+            animation: emergeFromStarText 2s ease-out forwards;
+        }
+        @keyframes transitionBreathe {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) translateY(-3px) scale(1.003); opacity: 0.98; }
+        }
+        .transition-breathe {
+            animation: transitionBreathe 3.5s ease-in-out infinite;
+        }
+        @keyframes transitionTextPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.92; }
+        }
+        .transition-text-pulse {
+            animation: transitionTextPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes transitionBtnFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+        .transition-btn-float {
+            animation: transitionBtnFloat 2s ease-in-out infinite;
+        }
+        @keyframes transitionSymbolsPulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
+        }
+        .transition-symbols-pulse {
+            animation: transitionSymbolsPulse 3s ease-in-out infinite;
+        }
+        .transition-message-poetic {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 300;
+            color: #1a1a1a;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+        .transition-title-size {
+            font-size: clamp(2rem, 5vw, 4rem);
+            letter-spacing: 0.12em;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+        }
+        .transition-decrypt-char {
+            display: inline-block;
+            min-width: 0.55em;
+            text-align: center;
+        }
+        .transition-line {
+            min-height: 1.4em;
+            white-space: pre;
+        }
+        .transition-btn-mark {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25em 0.5em;
+        }
+        .transition-btn-mark::before,
+        .transition-btn-mark::after {
+            content: '|';
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 300;
+            color: rgba(0,0,0,0.3);
+            font-size: 0.7em;
+            margin: 0 0.4em;
+            letter-spacing: 0.1em;
+        }
+        .transition-btn-sep {
+            color: rgba(0,0,0,0.4);
+            margin: 0 0.6em;
+            font-weight: 300;
+        }
+        .transition-help-link:hover {
+            opacity: 0.7 !important;
+        }
+        .transition-poems-btn:hover {
+            opacity: 0.7 !important;
         }
     </style>
 </head>
@@ -972,7 +1067,7 @@
     
     <div class="container" id="landingContainer">
         <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
-        <h1 class="title title-emerging" id="title">~||-_^+*.</h1>
+        <h1 class="title title-emerging" id="title">"~||-_^+*.</h1>
         <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
         </div>
@@ -3073,6 +3168,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 renderer.setSize(w, h);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
                 container.appendChild(renderer.domElement);
+                container.classList.add('visible');
                 scene.add(new THREE.AmbientLight(0xffffff, 0.7));
 
                 var resizeTimeout;
@@ -3826,6 +3922,40 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             })();
         }
 
+        const DECRYPT_CHARS = '"~||-_^+*.';
+        function decryptText(el, text, settleMs, onDone, spanClass, charDelayMs) {
+            spanClass = spanClass || 'transition-decrypt-char';
+            charDelayMs = charDelayMs != null ? charDelayMs : 75;
+            el.innerHTML = '';
+            const spans = [];
+            for (let i = 0; i < text.length; i++) {
+                const s = document.createElement('span');
+                s.className = spanClass;
+                s.textContent = DECRYPT_CHARS[Math.floor(Math.random() * DECRYPT_CHARS.length)];
+                el.appendChild(s);
+                spans.push(s);
+            }
+            let lastTick = 0;
+            const CYCLE_MS = 95;
+            function cycle(t) {
+                if (t - lastTick >= CYCLE_MS) {
+                    lastTick = t;
+                    for (let i = 0; i < spans.length; i++) {
+                        if (spans[i].dataset.locked !== '1') spans[i].textContent = DECRYPT_CHARS[Math.floor(Math.random() * DECRYPT_CHARS.length)];
+                    }
+                }
+                if (spans.some(s => s.dataset.locked !== '1')) requestAnimationFrame(cycle);
+            }
+            requestAnimationFrame(cycle);
+            for (let i = 0; i < text.length; i++) {
+                setTimeout(() => {
+                    spans[i].textContent = text[i];
+                    spans[i].dataset.locked = '1';
+                    if (i === text.length - 1 && onDone) onDone();
+                }, settleMs + i * charDelayMs);
+            }
+        }
+
         // Typing animation - timer
         function startTyping() {
             const typedText = document.getElementById('typedText');
@@ -4010,26 +4140,35 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             }, 1000);
         }
 
-        // Animacja pisania tytułu po timerze
+        // Animacja pisania tytułu po timerze (tworzy spany od razu)
         function startTitleTyping() {
             const title = document.getElementById('title');
-            const text = '~||-_^+*.';
-            const charDelay = 120; // 120ms między znakami (przyspieszone)
+            const text = '"~||-_^+*.';
+            const charDelay = 120;
             
-            title.textContent = '';
+            title.innerHTML = '';
             title.style.opacity = '0.6';
             
             let index = 0;
             window.__isTitleTyping = true;
             const typingInterval = setInterval(() => {
                 if (index < text.length) {
-                    title.textContent += text[index];
+                    const s = document.createElement('span');
+                    s.className = 'title-char';
+                    s.textContent = text[index];
+                    s.style.opacity = '0';
+                    s.style.transform = 'translateY(3px)';
+                    title.appendChild(s);
+                    requestAnimationFrame(() => {
+                        s.style.transition = 'opacity 0.1s ease, transform 0.1s ease';
+                        s.style.opacity = '';
+                        s.style.transform = '';
+                    });
                     index++;
                 } else {
                     clearInterval(typingInterval);
                     window.__isTitleTyping = false;
                     
-                    // Potem imię - pisanie jak timer
                     setTimeout(() => {
                         startAuthorTyping();
                     }, 600);
@@ -4078,56 +4217,104 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
         // Flagi żeby animacje nie uruchamiały się podczas trwania
         let isAnimatingStas = false;
 
-        // Animacja "lawenda" - zamienia znaczki na "lawenda" i z powrotem
+        // Animacja "lawenda" - zamienia znaczki na "lawenda" i z powrotem (operuje na spanach)
         function animateLawenda() {
-            if (isAnimating || window.__isTitleTyping) return; // Nie uruchamiaj jeśli trwa pisanie tytułu lub animacja
+            if (isAnimating || window.__isTitleTyping) return;
             
             isAnimating = true;
             const title = document.getElementById('title');
-            const originalText = title.textContent;
+            const originalChars = '"~||-_^+*.';
             const lawendaText = 'lawenda';
-            
-            // Zamień na "lawenda" z animacją backspace
-            let currentText = originalText;
-            let index = originalText.length - 1;
-            
-            // Usuwanie znaków (backspace)
-            const removeInterval = setInterval(() => {
-                if (index >= 0) {
-                    currentText = currentText.slice(0, -1);
-                    title.textContent = currentText;
-                    index--;
-                } else {
-                    clearInterval(removeInterval);
-                    
-                    // Pisanie "lawenda"
-                    let lawendaIndex = 0;
-                    const writeInterval = setInterval(() => {
-                        if (lawendaIndex < lawendaText.length) {
-                            currentText += lawendaText[lawendaIndex];
-                            title.textContent = currentText;
-                            lawendaIndex++;
-                        } else {
-                            clearInterval(writeInterval);
-                            
-                            // Czekaj chwilę i wróć do oryginalnego tekstu
-                            setTimeout(() => {
-                                let restoreIndex = 0;
+
+            function ensureSpans() {
+                if (!title.querySelector('.title-char')) {
+                    const text = title.textContent;
+                    title.innerHTML = '';
+                    for (let i = 0; i < text.length; i++) {
+                        const s = document.createElement('span');
+                        s.className = 'title-char';
+                        s.textContent = text[i];
+                        title.appendChild(s);
+                    }
+                }
+            }
+
+            function removeLastSpan() {
+                const spans = title.querySelectorAll('.title-char');
+                if (spans.length > 0) {
+                    const last = spans[spans.length - 1];
+                    last.style.transition = 'opacity 0.08s ease, transform 0.08s ease';
+                    last.style.opacity = '0';
+                    last.style.transform = 'translateY(-4px)';
+                    setTimeout(() => last.remove(), 80);
+                }
+            }
+
+            function addCharSpan(ch) {
+                const s = document.createElement('span');
+                s.className = 'title-char';
+                s.textContent = ch;
+                s.style.opacity = '0';
+                s.style.transform = 'translateY(4px)';
+                title.appendChild(s);
+                requestAnimationFrame(() => {
+                    s.style.transition = 'opacity 0.12s ease, transform 0.12s ease';
+                    s.style.opacity = '';
+                    s.style.transform = '';
+                });
+            }
+
+            ensureSpans();
+            let spans = title.querySelectorAll('.title-char');
+            const initialCount = spans.length;
+
+            const removeCharDelay = 120; // ms między usuwaniem kolejnych znaków
+            function removeSpansSequentially(numToRemove, onComplete) {
+                let removed = 0;
+                function next() {
+                    if (removed >= numToRemove) { onComplete(); return; }
+                    const sp = title.querySelectorAll('.title-char');
+                    if (sp.length > 0) {
+                        const last = sp[sp.length - 1];
+                        last.style.transition = 'opacity 0.08s ease, transform 0.08s ease';
+                        last.style.opacity = '0';
+                        last.style.transform = 'translateY(-4px)';
+                        setTimeout(() => {
+                            last.remove();
+                            removed++;
+                            next();
+                        }, removeCharDelay);
+                    } else { onComplete(); }
+                }
+                next();
+            }
+
+            removeSpansSequentially(initialCount, () => {
+                let lawendaIdx = 0;
+                const writeInterval = setInterval(() => {
+                    if (lawendaIdx < lawendaText.length) {
+                        addCharSpan(lawendaText[lawendaIdx]);
+                        lawendaIdx++;
+                    } else {
+                        clearInterval(writeInterval);
+                        setTimeout(() => {
+                            const curSpans = title.querySelectorAll('.title-char');
+                            removeSpansSequentially(curSpans.length, () => {
+                                let restoreIdx = 0;
                                 const restoreInterval = setInterval(() => {
-                                    if (restoreIndex < originalText.length) {
-                                        currentText = originalText.slice(0, restoreIndex + 1);
-                                        title.textContent = currentText;
-                                        restoreIndex++;
+                                    if (restoreIdx < originalChars.length) {
+                                        addCharSpan(originalChars[restoreIdx]);
+                                        restoreIdx++;
                                     } else {
                                         clearInterval(restoreInterval);
-                                        isAnimating = false; // Zakończ animację
+                                        isAnimating = false;
                                     }
                                 }, 100);
-                            }, 2000);
-                        }
-                    }, 150);
-                }
-            }, 100);
+                            });
+                        }, 2000);
+                    }
+                }, 150);
+            });
         }
 
         // Animacja "staś" - zamienia tylko "stanisław" na "staś", "szpineta" zostaje
@@ -4176,8 +4363,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
         // Start animacji "lawenda" co 5-15 sekund
         function startLawendaAnimation() {
-            const minDelay = 5000; // 5 sekund
-            const maxDelay = 15000; // 15 sekund
+            const minDelay = 15000; // 15 sekund
+            const maxDelay = 25000; // 25 sekund
             
             function scheduleNext() {
                 const delay = Math.random() * (maxDelay - minDelay) + minDelay;
@@ -4210,142 +4397,237 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 if (canTransition) {
                     clearInterval(readyInt);
                     if (cleared) return;
-                    // jednorazowo: tytuł po 1200ms, imię po 2500ms
-                    setTimeout(() => { if (!cleared) animateLawenda(); }, 1200);
-                    setTimeout(() => { if (!cleared) animateStas(); }, 2500);
+                    // jednorazowo: tytuł po ~3.5s (żeby zdążył się napisać i chwilę zostać), imię po 4500ms
+                    setTimeout(() => { if (!cleared) animateLawenda(); }, 3500);
+                    setTimeout(() => { if (!cleared) animateStas(); }, 4500);
                     // cyklicznie naprzemiennie co ~5s (częściej)
                     let toggle = true;
                     const loop = () => {
                         if (cleared || hasTransitioned) return;
                         if (toggle) animateLawenda(); else animateStas();
                         toggle = !toggle;
-                        setTimeout(loop, 5000);
+                        setTimeout(loop, 15000);
                     };
-                    setTimeout(loop, 5000);
+                    setTimeout(loop, 15000);
                 }
             }, 200);
         })();
         
         // Apply glitch animation to poems will be called when needed
 
-        // Funkcja animacji przejścia - wypełnienie ekranu znakami, potem wyłonienie wiersza
+        // Funkcja animacji przejścia - backspace usuwanie strony, potem lawenda + decrypt, animacja chars po kliknięciu "czytaj tutaj"
         function animateTransitionToPoems() {
-            const overlay = document.createElement('div');
-            overlay.className = 'transition-overlay';
-            document.body.appendChild(overlay);
+            const title = document.getElementById('title');
+            const typingText = document.getElementById('typingText');
+            const authorName = document.getElementById('authorName');
+            const starFog = document.getElementById('starFog');
+            const pointcloudBg = document.getElementById('pointcloud-bg');
+            const audioToggle = document.querySelector('.audio-toggle');
             
-            // Pobierz tekst pierwszego wiersza z poemsSection
-            const poemsSection = document.getElementById('poemsSection');
-            let poemText = '';
-            if (poemsSection) {
-                const firstPoem = poemsSection.querySelector('.poem');
-                if (firstPoem) {
-                    poemText = (firstPoem.innerText || firstPoem.textContent || '').trim();
+            typedTextAnimationStopped = true;
+            if (typingText) { typingText.style.transition = 'opacity 0.4s ease'; typingText.style.opacity = '0'; }
+            if (authorName) { authorName.style.transition = 'opacity 0.4s ease'; authorName.style.opacity = '0'; }
+            if (starFog) { starFog.style.transition = 'opacity 0.6s ease'; starFog.style.opacity = '0'; }
+            if (pointcloudBg) { pointcloudBg.style.transition = 'opacity 0.6s ease'; pointcloudBg.style.opacity = '0'; }
+            if (audioToggle) audioToggle.style.opacity = '0';
+            
+            function ensureTitleSpans() {
+                if (!title.querySelector('.title-char')) {
+                    const text = title.textContent;
+                    title.innerHTML = '';
+                    for (let i = 0; i < text.length; i++) {
+                        const s = document.createElement('span');
+                        s.className = 'title-char';
+                        s.textContent = text[i];
+                        title.appendChild(s);
+                    }
                 }
             }
-            
-            // Jeśli nie ma wiersza, użyj fallback
-            if (!poemText) {
-                poemText = 'po pełni (z)nów na jednego z dwóch';
+            function removeTitleSpan(cb) {
+                const spans = title.querySelectorAll('.title-char');
+                if (spans.length === 0) { cb(); return; }
+                const last = spans[spans.length - 1];
+                last.style.transition = 'opacity 0.04s ease, transform 0.04s ease';
+                last.style.opacity = '0';
+                last.style.transform = 'translateY(-3px)';
+                setTimeout(() => { last.remove(); cb(); }, 42);
+            }
+            function backspaceTitleSequence(onDone) {
+                ensureTitleSpans();
+                const total = title.querySelectorAll('.title-char').length;
+                let removed = 0;
+                function next() {
+                    if (removed >= total) { onDone(); return; }
+                    removeTitleSpan(() => { removed++; next(); });
+                }
+                next();
             }
             
-            // Przygotuj znaki wiersza (bez spacji dla łatwiejszego dopasowania)
-            const poemChars = poemText.split('').filter(c => c.trim() !== '');
-            const poemCharsMap = new Map();
-            poemChars.forEach((char, idx) => {
-                if (!poemCharsMap.has(char)) {
-                    poemCharsMap.set(char, []);
-                }
-                poemCharsMap.get(char).push(idx);
-            });
-            
-            // Losowe znaki do wypełnienia ekranu
-            const randomChars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż'];
-            
-            // Wypełnij ekran losowymi znakami + znakami z wiersza (limit żeby animacja się nie blokowała)
-            const rawCount = Math.floor((window.innerWidth / 12) * (window.innerHeight / 20));
-            const charCount = Math.min(rawCount, 450);
-            const allChars = [];
-            const charElements = [];
-            const charPositions = [];
-            
-            // Mieszanka losowych znaków i znaków z wiersza (70% losowe, 30% z wiersza)
-            for (let i = 0; i < charCount; i++) {
-                let char;
-                let isPoemChar = false;
-                let poemCharIndex = -1;
-                
-                if (Math.random() < 0.3 && poemChars.length > 0) {
-                    // Użyj znaku z wiersza
-                    const randomPoemIndex = Math.floor(Math.random() * poemChars.length);
-                    char = poemChars[randomPoemIndex];
-                    isPoemChar = true;
-                    poemCharIndex = randomPoemIndex;
-                } else {
-                    // Losowy znak
-                    char = randomChars[Math.floor(Math.random() * randomChars.length)];
-                }
-                
-                allChars.push({ char, isPoemChar, poemCharIndex });
-            }
-            
-             // Twórz znaki w paczkach – lekko przedłużony czas
-             let charIndex = 0;
-             const charsPerFrame = 32;
-             const totalFillMs = 620;
-             const frameTime = Math.max(10, totalFillMs / Math.ceil(charCount / charsPerFrame));
-            
-            function addChars() {
-                if (charIndex >= allChars.length) {
-                    setTimeout(() => revealPoem(), 320);
-                    return;
-                }
-                for (let i = 0; i < charsPerFrame && charIndex < allChars.length; i++) {
-                    const charData = allChars[charIndex];
-                    const char = document.createElement('span');
-                    char.className = 'transition-char';
-                    char.textContent = charData.char;
-                    char.style.position = 'absolute';
-                    char.style.left = Math.random() * 100 + '%';
-                    char.style.top = Math.random() * 100 + '%';
-                    char.style.animation = 'charAppear 0.08s forwards';
-                    char.dataset.isPoemChar = charData.isPoemChar ? '1' : '0';
-                    char.dataset.poemCharIndex = charData.poemCharIndex !== -1 ? String(charData.poemCharIndex) : '';
-                    overlay.appendChild(char);
-                    charElements.push(char);
-                    charPositions.push({ left: char.style.left, top: char.style.top });
-                    charIndex++;
-                }
-                setTimeout(() => requestAnimationFrame(addChars), frameTime);
-            }
-            
-            // Awaryjnie po 3s zawsze przejdź do wierszy, gdyby animacja się zawiesiła
-            const safetyTimeout = setTimeout(() => {
-                try {
-                    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-                } catch (e) {}
-                if (!hasTransitioned) window.location.href = 'poems.html';
-            }, 3000);
-
-            function revealPoem() {
-                clearTimeout(safetyTimeout);
-                const chars = overlay.querySelectorAll('.transition-char');
-                chars.forEach((el) => {
-                    el.style.transition = 'opacity 0.35s ease';
-                    el.style.opacity = '0';
-                });
-                setTimeout(() => {
-                    try {
-                        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-                    } catch (err) {}
-                    window.location.href = 'poems.html';
-                }, 380);
-            }
+            const safetyTimeout = setTimeout(() => { if (!hasTransitioned) window.location.href = 'poems.html'; }, 15000);
             
             setTimeout(() => {
-                overlay.classList.add('active');
-                addChars();
-            }, 50);
+                if (typingText && typingText.parentNode) typingText.style.display = 'none';
+                const titleIsLawenda = title.textContent === 'lawenda';
+                function showOverlay() {
+                    const overlay = document.createElement('div');
+                    overlay.className = 'transition-overlay';
+                    overlay.style.background = 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)';
+                    document.body.appendChild(overlay);
+                    overlay.classList.add('active');
+                    const symbols = document.createElement('div');
+                    symbols.className = 'transition-symbols transition-symbols-pulse';
+                    symbols.textContent = '"~||-_^+*.';
+                    symbols.style.cssText = "position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 300; letter-spacing: 0.15em; color: rgba(0,0,0,0.35); pointer-events: none; opacity: 0; transition: opacity 0.8s ease;";
+                    overlay.appendChild(symbols);
+                    const container = document.createElement('div');
+                    container.style.cssText = 'position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;';
+                    overlay.appendChild(container);
+                    const titleBlock = document.createElement('div');
+                    titleBlock.style.cssText = 'position: absolute; left: 50%; top: 50%; transform: translate(-50%, calc(-50% - 2rem)); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.2rem;';
+                    const line1 = document.createElement('div');
+                    line1.className = 'transition-line transition-text-pulse';
+                    line1.style.cssText = 'max-width: 92%; padding: 0 1rem; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; position: relative; align-items: baseline;';
+                    const line1Part1 = document.createElement('span');
+                    line1Part1.className = 'transition-title-size';
+                    line1Part1.style.cssText = 'display: inline-flex; white-space: nowrap; color: #1a1a1a; font-weight: 300;';
+                    line1.appendChild(line1Part1);
+                    titleBlock.appendChild(line1);
+                    const line2 = document.createElement('div');
+                    line2.className = 'transition-message-poetic transition-line transition-text-pulse';
+                    line2.style.cssText = 'max-width: 92%; padding: 0 1rem; visibility: hidden; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0;';
+                    const helpLinkWrap = document.createElement('span');
+                    helpLinkWrap.className = 'transition-btn-mark';
+                    const helpLink = document.createElement('a');
+                    helpLink.href = 'https://buycoffee.to/szpineta';
+                    helpLink.target = '_blank';
+                    helpLink.rel = 'noopener';
+                    helpLink.className = 'transition-help-link transition-message-poetic transition-btn-float';
+                    helpLink.style.cssText = "font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2.2vw, 1.6rem); font-weight: 300; color: #333; text-decoration: none; cursor: pointer; transition: opacity 0.6s ease 0.2s; white-space: nowrap;";
+                    helpLinkWrap.appendChild(helpLink);
+                    const sep = document.createElement('span');
+                    sep.className = 'transition-btn-sep transition-message-poetic';
+                    sep.textContent = '/';
+                    sep.style.cssText = 'visibility: hidden; font-size: clamp(1rem, 2.2vw, 1.6rem);';
+                    const poemsBtnWrap = document.createElement('span');
+                    poemsBtnWrap.className = 'transition-btn-mark';
+                    poemsBtnWrap.style.cssText = 'visibility: hidden;';
+                    const poemsBtn = document.createElement('button');
+                    poemsBtn.type = 'button';
+                    poemsBtn.className = 'transition-poems-btn transition-btn-float';
+                    poemsBtn.style.cssText = "font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2.2vw, 1.6rem); font-weight: 300; color: #1a1a1a; background: none; border: none; cursor: pointer; padding: 0; transition: opacity 0.4s ease;";
+                    const poemsBtnText = document.createElement('span');
+                    poemsBtnWrap.appendChild(poemsBtn);
+                    poemsBtn.appendChild(poemsBtnText);
+                    line2.appendChild(helpLinkWrap);
+                    line2.appendChild(sep);
+                    line2.appendChild(poemsBtnWrap);
+                    titleBlock.appendChild(line2);
+                    container.appendChild(titleBlock);
+                    requestAnimationFrame(() => { symbols.style.opacity = '1'; });
+                    function continueAfterLawenda() {
+                        setTimeout(() => {
+                            const line1Part2 = document.createElement('span');
+                            line1Part2.className = 'transition-message-poetic';
+                            line1Part2.style.cssText = 'position: absolute; left: 100%; margin-left: 0.25em; white-space: nowrap; opacity: 0; pointer-events: none;';
+                            line1Part2.textContent = ' chce kwitnąć w tomiku';
+                            line1.appendChild(line1Part2);
+                            requestAnimationFrame(() => {
+                                const slideAmount = line1Part2.offsetWidth / 2;
+                                const slideDuration = 1100;
+                                line1.style.transition = 'transform ' + (slideDuration/1000) + 's cubic-bezier(0.22, 0.61, 0.36, 1)';
+                                requestAnimationFrame(() => {
+                                    line1.style.transform = 'translateX(-' + slideAmount + 'px)';
+                                });
+                                setTimeout(() => {
+                                    line1Part2.style.position = 'static';
+                                    line1Part2.style.marginLeft = '0.25em';
+                                    line1Part2.style.opacity = '1';
+                                    line1Part2.style.pointerEvents = '';
+                                    line1.style.transform = '';
+                                    line1.style.transition = '';
+                                    line1Part2.textContent = '';
+                                    decryptText(line1Part2, ' chce kwitnąć w tomiku', 50, () => {
+                                        setTimeout(() => {
+                                            line2.style.visibility = 'visible';
+                                            decryptText(helpLink, 'wesprzyj wydanie', 0, () => {
+                                                sep.style.visibility = 'visible';
+                                                setTimeout(() => {
+                                                    poemsBtnWrap.style.visibility = 'visible';
+                                                    decryptText(poemsBtnText, 'czytaj tutaj', 60, null, 'transition-decrypt-char', 35);
+                                                }, 280);
+                                            });
+                                        }, 600);
+                                    }, 'transition-decrypt-char', 35);
+                                }, slideDuration + 50);
+                            });
+                        }, 550);
+                    }
+                    if (titleIsLawenda) {
+                        line1Part1.textContent = 'lawenda';
+                        continueAfterLawenda();
+                    } else {
+                        decryptText(line1Part1, 'lawenda', 100, continueAfterLawenda, 'transition-decrypt-char', 85);
+                    }
+                    container.classList.add('transition-breathe');
+                    overlay.style.pointerEvents = 'all';
+                    
+                    const fullSymbols = '"~||-_^+*.';
+                    function runCharsThenNavigate() {
+                        clearTimeout(safetyTimeout);
+                        overlay.style.pointerEvents = 'none';
+                        const poemsSection = document.getElementById('poemsSection');
+                        let poemText = poemsSection && poemsSection.querySelector('.poem') ? (poemsSection.querySelector('.poem').innerText || '').trim() : 'po pełni (z)nów na jednego z dwóch';
+                        const poemChars = poemText.split('').filter(c => c.trim() !== '');
+                        const randomChars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż'];
+                        const titleSymbols = '"~||-_^+*.';
+                        const rawCount = Math.floor((window.innerWidth / 12) * (window.innerHeight / 20));
+                        const charCount = Math.min(rawCount, 450);
+                        const allChars = [];
+                        for (let i = 0; i < charCount; i++) {
+                            if (Math.random() < 0.35) allChars.push({ char: titleSymbols[Math.floor(Math.random() * titleSymbols.length)] });
+                            else if (Math.random() < 0.46 && poemChars.length) allChars.push({ char: poemChars[Math.floor(Math.random() * poemChars.length)] });
+                            else allChars.push({ char: randomChars[Math.floor(Math.random() * randomChars.length)] });
+                        }
+                        const charsOverlay = document.createElement('div');
+                        charsOverlay.className = 'transition-overlay';
+                        charsOverlay.style.cssText = 'background: transparent; z-index: 10001;';
+                        document.body.appendChild(charsOverlay);
+                        charsOverlay.classList.add('active');
+                        let charIndex = 0;
+                        const charsPerFrame = 32;
+                        const frameTime = Math.max(8, 380 / Math.ceil(charCount / charsPerFrame));
+                        function addChars() {
+                            if (charIndex >= allChars.length) {
+                                const chars = charsOverlay.querySelectorAll('.transition-char');
+                                const fadeDuration = 0.55;
+                                chars.forEach((el) => { el.style.transition = `opacity ${fadeDuration}s ease-out`; el.style.opacity = '0'; });
+                                setTimeout(() => {
+                                    try { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); } catch (e) {}
+                                    try { if (charsOverlay.parentNode) charsOverlay.parentNode.removeChild(charsOverlay); } catch (e) {}
+                                    window.location.href = 'poems.html';
+                                }, Math.round(fadeDuration * 1000) + 100);
+                                return;
+                            }
+                            for (let i = 0; i < charsPerFrame && charIndex < allChars.length; i++) {
+                                const c = document.createElement('span');
+                                c.className = 'transition-char';
+                                c.textContent = allChars[charIndex].char;
+                                c.style.cssText = 'position: absolute; left: ' + (Math.random() * 100) + '%; top: ' + (Math.random() * 100) + '%; animation: charAppear 0.08s forwards;';
+                                charsOverlay.appendChild(c);
+                                charIndex++;
+                            }
+                            setTimeout(() => requestAnimationFrame(addChars), frameTime);
+                        }
+                        addChars();
+                    }
+                    poemsBtn.addEventListener('click', runCharsThenNavigate);
+                }
+                if (titleIsLawenda) {
+                    showOverlay();
+                } else {
+                    backspaceTitleSequence(showOverlay);
+                }
+            }, 250);
         }
 
         document.getElementById('title').addEventListener('click', () => {
@@ -4365,13 +4647,22 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             }
         });
 
-
-        // Animacja "lawenda" przy najezdzaniu na tytuł
-        document.getElementById('title').addEventListener('mouseenter', () => {
-            if (canTransition) {
-                animateLawenda();
+        // Decrypt na tytule przy najechaniu kursorem (tylko gdy tytuł w stanie stabilnym – pełne znaczki lub "lawenda")
+        (function initTitleDecryptOnHover() {
+            const titleEl = document.getElementById('title');
+            if (!titleEl) return;
+            const fullSymbols = '"~||-_^+*.';
+            let decrypting = false;
+            function onHover() {
+                if (decrypting || window.__isTitleTyping) return;
+                const text = titleEl.textContent;
+                if (text !== fullSymbols) return; // tylko gdy tytuł = znaczki, nie gdy "lawenda"
+                decrypting = true;
+                decryptText(titleEl, text, 80, () => { decrypting = false; }, 'title-char');
             }
-        });
+            titleEl.addEventListener('mouseenter', onHover);
+            titleEl.addEventListener('touchstart', () => { onHover(); }, { passive: true });
+        })();
 
         // Animacja "staś" przy najezdzaniu na imię
         document.getElementById('authorName').addEventListener('mouseenter', () => {
@@ -4652,7 +4943,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             typingText.style.display = 'block';
             
             // resetuj tytuł i imię do stanu początkowego
-            title.textContent = '~||-_^+*.';
+            title.textContent = '"~||-_^+*.';
             title.style.color = '#1a1a1a';
             title.style.opacity = '0';
             authorName.style.opacity = '0';
@@ -4692,18 +4983,18 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 const readyInt = setInterval(() => {
                     if (canTransition) {
                         clearInterval(readyInt);
-                        // jednorazowo: tytuł po 1200ms, imię po 2500ms
-                        setTimeout(() => { if (!hasTransitioned) animateLawenda(); }, 1200);
-                        setTimeout(() => { if (!hasTransitioned) animateStas(); }, 2500);
+                        // jednorazowo: tytuł po ~3.5s (żeby zdążył się napisać i chwilę zostać), imię po 4500ms
+                        setTimeout(() => { if (!hasTransitioned) animateLawenda(); }, 3500);
+                        setTimeout(() => { if (!hasTransitioned) animateStas(); }, 4500);
                         // cyklicznie naprzemiennie co ~5s (częściej)
                         let toggle = true;
                         const loop = () => {
                             if (hasTransitioned) return;
                             if (toggle) animateLawenda(); else animateStas();
                             toggle = !toggle;
-                            setTimeout(loop, 5000);
+                            setTimeout(loop, 15000);
                         };
-                        setTimeout(loop, 5000);
+                        setTimeout(loop, 15000);
                     }
                 }, 200);
             }, 100);
