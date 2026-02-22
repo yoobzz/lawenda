@@ -27,6 +27,15 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XVMT9MTCGE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XVMT9MTCGE');
+    </script>
     <style>
         @font-face {
             font-family: 'ABC Helveesti';
@@ -49,6 +58,8 @@
             left: 0;
             width: 100%;
             height: 100%;
+            max-width: 100vw;
+            overflow: hidden;
             z-index: 0;
             pointer-events: auto;
             opacity: 0;
@@ -79,11 +90,16 @@
         #pointcloud-loading.hidden { opacity: 0; pointer-events: none; }
         #pointcloud-loading.error { color: #666; font-size: 12px; }
 
+        html {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
         body {
             font-family: 'Geist', sans-serif;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             color: #1a1a1a;
             overflow-x: hidden;
+            max-width: 100vw;
             touch-action: manipulation;
             min-height: 100vh;
         }
@@ -98,6 +114,8 @@
             z-index: 1;
             pointer-events: none;
             background: transparent;
+            overflow-x: hidden;
+            max-width: 100vw;
         }
         
         .container > * {
@@ -131,6 +149,8 @@
             display: none;
             min-height: 100dvh;
             position: relative;
+            overflow-x: hidden;
+            max-width: 100vw;
             perspective: 1200px;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             overflow: hidden;
@@ -467,6 +487,29 @@
             /* overlay przejścia – mniej znaków, czytelniej */
             .transition-char {
                 font-size: clamp(0.7rem, 2vw, 1rem);
+            }
+            /* strona przejściowa – mobilka */
+            .transition-title-size {
+                font-size: clamp(1.5rem, 8vw, 2.5rem);
+                letter-spacing: 0.08em;
+            }
+            .transition-message-poetic {
+                font-size: clamp(1rem, 4vw, 1.4rem);
+            }
+            .transition-line {
+                white-space: normal;
+                text-align: center;
+            }
+            .transition-line1 {
+                flex-wrap: wrap !important;
+                justify-content: center;
+            }
+            .transition-btn-mark {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .transition-title-size {
+                white-space: normal;
             }
         }
         
@@ -941,6 +984,8 @@
             inset: 0;
             width: 100%;
             height: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             z-index: 10000;
             opacity: 0;
@@ -3632,6 +3677,13 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 if (startIndex > 1) {
                     currentPoem = 0;
                     goToPoem(startIndex - 1);
+                } else {
+                    // Google Analytics – pierwszy wiersz przy wejściu
+                    if (typeof gtag === 'function' && poems.length) {
+                        const firstPoem = poems[0];
+                        const poemTitle = (firstPoem.innerText || firstPoem.textContent || '').trim().split('\n')[0].slice(0, 50);
+                        gtag('event', 'poem_view', { poem_index: 1, poem_title: poemTitle });
+                    }
                 }
 
                 startPoemBreathing();
@@ -3687,6 +3739,12 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             }, 300);
             
             currentPoem = index;
+            
+            // Google Analytics – wyświetlenie wiersza
+            if (typeof gtag === 'function') {
+                const poemTitle = (newPoemEl.innerText || newPoemEl.textContent || '').trim().split('\n')[0].slice(0, 50);
+                gtag('event', 'poem_view', { poem_index: index + 1, poem_title: poemTitle });
+            }
             
             // zapamiętaj pozycję
             try { localStorage.setItem('poemIndex', String(currentPoem + 1)); } catch(e) {}
@@ -4479,11 +4537,11 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     symbols.style.cssText = "position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 300; letter-spacing: 0.15em; color: rgba(0,0,0,0.35); pointer-events: none; opacity: 0; transition: opacity 0.8s ease;";
                     overlay.appendChild(symbols);
                     const container = document.createElement('div');
-                    container.style.cssText = 'position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.8rem; padding: 0 1rem 5rem;';
+                    container.style.cssText = 'position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.8rem; padding: 0 1rem 5rem; max-width: 100%; box-sizing: border-box;';
                     overlay.appendChild(container);
                     const line1 = document.createElement('div');
-                    line1.className = 'transition-line transition-text-pulse';
-                    line1.style.cssText = 'max-width: 92%; padding: 0 1rem; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; position: relative; align-items: baseline;';
+                    line1.className = 'transition-line transition-line1 transition-text-pulse';
+                    line1.style.cssText = 'max-width: 92%; padding: 0 1rem; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; position: relative; align-items: baseline;';
                     const line1Part1 = document.createElement('span');
                     line1Part1.className = 'transition-title-size';
                     line1Part1.style.cssText = 'display: inline-flex; white-space: nowrap; color: #1a1a1a; font-weight: 300;';
