@@ -27,13 +27,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TKJ2KBZ8');</script>
-    <!-- End Google Tag Manager -->
+    <script defer data-domain="szpineta.pl" src="https://plausible.io/js/script.tagged-events.js"></script>
+    <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
     <style>
         @font-face {
             font-family: 'ABC Helveesti';
@@ -1117,10 +1112,6 @@
     </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TKJ2KBZ8"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     <div id="pointcloud-bg"></div>
     <div id="pointcloud-loading" class="hidden" aria-hidden="true"></div>
     <div class="star-fog" id="starFog">
@@ -2559,7 +2550,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     helpLink.rel = 'noopener';
                     helpLink.className = 'transition-help-link transition-message-poetic transition-btn-float';
                     helpLink.style.cssText = "font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2.2vw, 1.6rem); font-weight: 300; color: #333; text-decoration: none; cursor: pointer; transition: opacity 0.6s ease 0.2s; white-space: nowrap;";
-                    helpLink.addEventListener('click', function() { (window.dataLayer = window.dataLayer || []).push({ event: 'support_click', link_url: 'buycoffee.to/szpineta' }); });
+                    helpLink.addEventListener('click', function() { plausible('wesprzyj_klik'); });
                     helpLinkWrap.appendChild(helpLink);
                     const sep = document.createElement('span');
                     sep.className = 'transition-btn-sep transition-message-poetic';

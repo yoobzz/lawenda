@@ -15,7 +15,8 @@
     <meta name="twitter:title" content="~||-_^+*.">
     <meta name="twitter:description" content="staś szpineta archiwum">
     <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
-    <script defer data-domain="szpineta.pl" src="https://plausible.io/js/script.js"></script>
+    <script defer data-domain="szpineta.pl" src="https://plausible.io/js/script.tagged-events.js"></script>
+    <script>window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wiersze — ~||-_^+*.</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -35,13 +36,6 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-TKJ2KBZ8');</script>
-    <!-- End Google Tag Manager -->
     <style>
         @font-face {
             font-family: 'ABC Diatype Rounded';
@@ -461,12 +455,8 @@
     </style>
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TKJ2KBZ8"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     <div class="coffee-block">
-        <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener">wesprzyj wydanie</a>
+        <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener" id="wsprzyjBtn">wesprzyj wydanie</a>
     </div>
     <div class="poems-section" id="poemsSection">
         <div class="poems-background" id="poemsBackground"></div>
@@ -3078,7 +3068,7 @@
             if (newEl) {
                 const poemTitle = (newEl.innerText || newEl.textContent || '').trim().split('\n')[0].slice(0, 50);
                 const origIdx = getOriginalIndex(index);
-                (window.dataLayer = window.dataLayer || []).push({ event: 'poem_view', poem_index: origIdx + 1, poem_title: poemTitle });
+                plausible('poem_view', { props: { nr: origIdx + 1, tytul: poemTitle } });
             }
             // URL + nav
             const originalIndex = getOriginalIndex(currentPoem);
@@ -3157,13 +3147,13 @@
             });
         });
         // ──────────────────────────────────────────────────────────────────────
-        document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); (window.dataLayer = window.dataLayer || []).push({ event: 'font_adjust', direction: 'smaller' }); adjustFontScale(-1); });
-        document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); (window.dataLayer = window.dataLayer || []).push({ event: 'font_adjust', direction: 'bigger' }); adjustFontScale(1); });
-        document.getElementById('copyLink').addEventListener('click', async (e)=>{ 
-            e.preventDefault(); 
+        document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(-1); });
+        document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(1); });
+        document.getElementById('copyLink').addEventListener('click', async (e)=>{
+            e.preventDefault();
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
-            (window.dataLayer = window.dataLayer || []).push({ event: 'copy_link', poem_index: poemNumber });
+            plausible('copy_link', { props: { nr: poemNumber } });
             const encodedId = encodePoemId(poemNumber);
             const link = location.origin + location.pathname + `#wiersz-${encodedId}`; 
             const ok = await copyToClipboard(link); 
@@ -3175,7 +3165,7 @@
             e.preventDefault(); 
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
-            (window.dataLayer = window.dataLayer || []).push({ event: 'download_image', poem_index: poemNumber });
+            plausible('download_image', { props: { nr: poemNumber } });
             const imageUrl = `${location.origin}/poem-image.png?poem=${poemNumber}`;
             
             try {
@@ -3393,12 +3383,12 @@
             document.fonts.ready.then(() => {
                 if (poems[currentPoem]) poemDecryptReveal(poems[currentPoem]);
             });
-            // Google Analytics – pierwszy wiersz przy wejściu na poems.html
+            // Plausible – pierwszy wiersz przy wejściu na poems.html
             if (poems[currentPoem]) {
                 const firstPoem = poems[currentPoem];
                 const poemTitle = (firstPoem.innerText || firstPoem.textContent || '').trim().split('\n')[0].slice(0, 50);
                 const origIdx = getOriginalIndex(currentPoem);
-                (window.dataLayer = window.dataLayer || []).push({ event: 'poem_view', poem_index: origIdx + 1, poem_title: poemTitle });
+                plausible('poem_view', { props: { nr: origIdx + 1, tytul: poemTitle } });
             }
             updateNavigation();
             updateMetaTags(currentPoem);
@@ -3735,6 +3725,11 @@
                     }
                 }
             }
+        });
+
+        // Plausible – wesprzyj wydanie
+        document.getElementById('wsprzyjBtn')?.addEventListener('click', () => {
+            plausible('wesprzyj_klik');
         });
     </script>
 </body>
