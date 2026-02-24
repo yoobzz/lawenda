@@ -3056,12 +3056,24 @@
             })(el);
             if (!targets.length) return;
 
+            // Shuffled queue — cycle through all chars before repeating any
+            let queue = [...targets];
+            let qi = queue.length; // force reshuffle on first pick
+            function nextTarget() {
+                if (qi >= queue.length) {
+                    for (let i = queue.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [queue[i], queue[j]] = [queue[j], queue[i]];
+                    }
+                    qi = 0;
+                }
+                return queue[qi++];
+            }
+
             function glitch() {
-                const count = Math.random() < 0.75 ? 1 : 2;
-                for (let n = 0; n < count; n++) {
-                    const tgt = targets[Math.floor(Math.random() * targets.length)];
-                    const origChar = tgt.node.textContent[tgt.offset];
-                    if (!origChar || /\s/.test(origChar)) continue;
+                const tgt = nextTarget();
+                const origChar = tgt.node.textContent[tgt.offset];
+                if (origChar && !/\s/.test(origChar)) {
                     const sym = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
                     const txt = tgt.node.textContent;
                     tgt.node.textContent = txt.slice(0, tgt.offset) + sym + txt.slice(tgt.offset + 1);
@@ -3070,9 +3082,9 @@
                         tgt.node.textContent = cur.slice(0, tgt.offset) + origChar + cur.slice(tgt.offset + 1);
                     }, 85 + Math.random() * 65);
                 }
-                _glitchTimer = setTimeout(glitch, 2800 + Math.random() * 3200);
+                _glitchTimer = setTimeout(glitch, 800 + Math.random() * 1000);
             }
-            _glitchTimer = setTimeout(glitch, 2800 + Math.random() * 3200);
+            _glitchTimer = setTimeout(glitch, 800 + Math.random() * 1000);
         }
         // ──────────────────────────────────────────────────────────────────────
 
