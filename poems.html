@@ -3022,11 +3022,12 @@
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
                 el.innerHTML = origHTML; _activeDecrypt = null;
+                startAmbientGlitch(el);
             }, totalTime + 80);
 
             _activeDecrypt = {
                 cancel() {
-                    cancelled = true; clearInterval(iv);
+                    cancelled = true;
                     timeouts.forEach(clearTimeout); clearTimeout(cleanup);
                     el.innerHTML = origHTML;
                 }
@@ -3034,8 +3035,50 @@
         }
         // ──────────────────────────────────────────────────────────────────────
 
+        // ── Ambient glitch ────────────────────────────────────────────────────
+        let _glitchTimer = null;
+
+        function stopAmbientGlitch() {
+            if (_glitchTimer) { clearTimeout(_glitchTimer); _glitchTimer = null; }
+        }
+
+        function startAmbientGlitch(el) {
+            stopAmbientGlitch();
+            // Collect all non-whitespace char positions from text nodes
+            const targets = [];
+            (function walk(node) {
+                if (node.nodeType === 3) {
+                    const text = node.textContent;
+                    for (let i = 0; i < text.length; i++) {
+                        if (!/\s/.test(text[i])) targets.push({ node, offset: i });
+                    }
+                } else { node.childNodes.forEach(walk); }
+            })(el);
+            if (!targets.length) return;
+
+            function glitch() {
+                const count = Math.random() < 0.75 ? 1 : 2;
+                for (let n = 0; n < count; n++) {
+                    const tgt = targets[Math.floor(Math.random() * targets.length)];
+                    const origChar = tgt.node.textContent[tgt.offset];
+                    if (!origChar || /\s/.test(origChar)) continue;
+                    const sym = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                    const txt = tgt.node.textContent;
+                    tgt.node.textContent = txt.slice(0, tgt.offset) + sym + txt.slice(tgt.offset + 1);
+                    setTimeout(() => {
+                        const cur = tgt.node.textContent;
+                        tgt.node.textContent = cur.slice(0, tgt.offset) + origChar + cur.slice(tgt.offset + 1);
+                    }, 85 + Math.random() * 65);
+                }
+                _glitchTimer = setTimeout(glitch, 2800 + Math.random() * 3200);
+            }
+            _glitchTimer = setTimeout(glitch, 2800 + Math.random() * 3200);
+        }
+        // ──────────────────────────────────────────────────────────────────────
+
         function goToPoem(index){
             if (index === currentPoem) return;
+            stopAmbientGlitch();
 
             const direction = index > currentPoem ? 1 : -1;
             const oldEl = poems[currentPoem];
