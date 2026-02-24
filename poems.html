@@ -2994,25 +2994,25 @@
                 for (let j = 0; j < spans.length; j++) {
                     if (!spans[j]._s) spans[j].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
                 }
-            }, 90);
+            }, 55);
 
-            // Biased-random timing: earlier lines settle sooner on average,
-            // but random jitter makes it look organic, not mechanical
-            const LINE_BIAS = 38;  // ms per line baseline
-            const SPREAD    = 60;  // random spread within a line
+            // Pure random order, fast — Fisher-Yates shuffle, ~5ms per char
+            const order = spans.map((_, i) => i);
+            for (let k = order.length - 1; k > 0; k--) {
+                const j = Math.floor(Math.random() * (k + 1));
+                [order[k], order[j]] = [order[j], order[k]];
+            }
             const timeouts = [];
-            const schedule = spans.map((_, idx) => ({
-                idx,
-                t: charLine[idx] * LINE_BIAS + Math.random() * SPREAD
-            }));
-            schedule.forEach(({ idx, t }) => {
+            let t = 0;
+            order.forEach(spanIdx => {
+                t += 3 + Math.random() * 6; // 3–9ms per char, avg ~6ms
                 timeouts.push(setTimeout(() => {
                     if (cancelled) return;
-                    spans[idx]._s = true;
-                    spans[idx].textContent = chars[idx];
+                    spans[spanIdx]._s = true;
+                    spans[spanIdx].textContent = chars[spanIdx];
                 }, t));
             });
-            const totalTime = schedule.reduce((m, x) => Math.max(m, x.t), 0);
+            const totalTime = t;
 
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
