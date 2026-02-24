@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>_ _ _ _ _ _ _ _ _</title>
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Geist Mono', monospace;
+            background: #fafafa;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .meta {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .meta-title {
+            font-size: 11px;
+            letter-spacing: 0.45em;
+            color: #bbb;
+            font-weight: 300;
+            text-transform: lowercase;
+        }
+
+        .meta-timer {
+            font-size: 11px;
+            letter-spacing: 0.25em;
+            color: #ccc;
+            margin-top: 6px;
+            font-weight: 300;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── grid ── */
+        .grid-wrap {
+            position: relative;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            border: 2px solid #888;
+            width: min(450px, calc(100vw - 32px));
+            height: min(450px, calc(100vw - 32px));
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            font-size: clamp(13px, 3.8vw, 22px);
+            font-weight: 400;
+            color: #1a1a1a;
+            transition: background 0.08s;
+        }
+
+        .cell.br { border-right: 2px solid #888; }
+        .cell.bb { border-bottom: 2px solid #888; }
+
+        .cell.given       { font-weight: 500; }
+        .cell.user        { color: rgba(138, 108, 202, 0.92); }
+        .cell.selected    { background: rgba(138, 108, 202, 0.13) !important; }
+        .cell.highlight   { background: rgba(138, 108, 202, 0.045); }
+        .cell.same-num    { background: rgba(138, 108, 202, 0.10); }
+        .cell.error       { color: rgba(196, 55, 55, 0.88) !important; }
+
+        /* ── numpad (mobile) ── */
+        .numpad {
+            display: none;
+            margin-top: 16px;
+            gap: 7px;
+            grid-template-columns: repeat(5, 1fr);
+            width: min(450px, calc(100vw - 32px));
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            .numpad { display: grid; }
+        }
+
+        .nb {
+            font-family: 'Geist Mono', monospace;
+            font-size: 17px;
+            font-weight: 400;
+            background: none;
+            border: 1px solid #e0e0e0;
+            padding: 13px 0;
+            cursor: pointer;
+            color: #333;
+            transition: background 0.08s, color 0.08s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .nb:active, .nb.pressed {
+            background: rgba(138, 108, 202, 0.13);
+            color: rgba(138, 108, 202, 0.9);
+        }
+
+        .nb.del {
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            color: #aaa;
+        }
+
+        /* ── status ── */
+        .status {
+            margin-top: 16px;
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            color: transparent;
+            text-align: center;
+            min-height: 18px;
+            font-weight: 300;
+            transition: color 0.4s;
+        }
+
+        .status.show { color: rgba(138, 108, 202, 0.75); }
+
+        .controls {
+            margin-top: 10px;
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            color: #d0d0d0;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+
+<div class="meta">
+    <div class="meta-title">_ _ _ _ _ _ _ _ _</div>
+    <div class="meta-timer" id="timer">0:00</div>
+</div>
+
+<div class="grid-wrap">
+    <div class="grid" id="grid"></div>
+</div>
+
+<div class="numpad" id="numpad">
+    <button class="nb" data-n="1">1</button>
+    <button class="nb" data-n="2">2</button>
+    <button class="nb" data-n="3">3</button>
+    <button class="nb" data-n="4">4</button>
+    <button class="nb" data-n="5">5</button>
+    <button class="nb" data-n="6">6</button>
+    <button class="nb" data-n="7">7</button>
+    <button class="nb" data-n="8">8</button>
+    <button class="nb" data-n="9">9</button>
+    <button class="nb del" data-n="0">del</button>
+</div>
+
+<div class="status" id="status"></div>
+<div class="controls" id="ctrl">n · nowa gra</div>
+
+<script>
+const PUZZLES = [
+    {
+        puzzle: [
+            [5,3,0,0,7,0,0,0,0],
+            [6,0,0,1,9,5,0,0,0],
+            [0,9,8,0,0,0,0,6,0],
+            [8,0,0,0,6,0,0,0,3],
+            [4,0,0,8,0,3,0,0,1],
+            [7,0,0,0,2,0,0,0,6],
+            [0,6,0,0,0,0,2,8,0],
+            [0,0,0,4,1,9,0,0,5],
+            [0,0,0,0,8,0,0,7,9]
+        ],
+        solution: [
+            [5,3,4,6,7,8,9,1,2],
+            [6,7,2,1,9,5,3,4,8],
+            [1,9,8,3,4,2,5,6,7],
+            [8,5,9,7,6,1,4,2,3],
+            [4,2,6,8,5,3,7,9,1],
+            [7,1,3,9,2,4,8,5,6],
+            [9,6,1,5,3,7,2,8,4],
+            [2,8,7,4,1,9,6,3,5],
+            [3,4,5,2,8,6,1,7,9]
+        ]
+    },
+    {
+        puzzle: [
+            [0,0,0,2,6,0,7,0,1],
+            [6,8,0,0,7,0,0,9,0],
+            [1,9,0,0,0,4,5,0,0],
+            [8,2,0,1,0,0,0,4,0],
+            [0,0,4,6,0,2,9,0,0],
+            [0,5,0,0,0,3,0,2,8],
+            [0,0,9,3,0,0,0,7,4],
+            [0,4,0,0,5,0,0,3,6],
+            [7,0,3,0,1,8,0,0,0]
+        ],
+        solution: [
+            [4,3,5,2,6,9,7,8,1],
+            [6,8,2,5,7,1,4,9,3],
+            [1,9,7,8,3,4,5,6,2],
+            [8,2,6,1,9,5,3,4,7],
+            [3,7,4,6,8,2,9,1,5],
+            [9,5,1,7,4,3,6,2,8],
+            [5,1,9,3,2,6,8,7,4],
+            [2,4,8,9,5,7,1,3,6],
+            [7,6,3,4,1,8,2,5,9]
+        ]
+    },
+    {
+        puzzle: [
+            [0,2,0,0,0,0,0,0,0],
+            [0,0,0,6,0,0,0,0,3],
+            [0,7,4,0,8,0,0,0,0],
+            [0,0,0,0,0,3,0,0,2],
+            [0,8,0,0,4,0,0,1,0],
+            [6,0,0,5,0,0,0,0,0],
+            [0,0,0,0,1,0,7,8,0],
+            [5,0,0,0,0,9,0,0,0],
+            [0,0,0,0,0,0,0,4,0]
+        ],
+        solution: [
+            [1,2,6,4,3,7,9,5,8],
+            [8,9,5,6,2,1,4,7,3],
+            [3,7,4,9,8,5,1,2,6],
+            [4,5,7,1,9,3,8,6,2],
+            [9,8,3,2,4,6,5,1,7],
+            [6,1,2,5,7,8,3,9,4],
+            [2,6,9,3,1,4,7,8,5],
+            [5,4,8,7,6,9,2,3,1],
+            [7,3,1,8,5,2,6,4,9]
+        ]
+    }
+];
+
+let pidx = 0;
+let board, given, solution;
+let selected = null;
+let solved = false;
+let timerSec = 0;
+let timerRef = null;
+let started = false;
+
+function loadPuzzle(i) {
+    pidx = i % PUZZLES.length;
+    const p = PUZZLES[pidx];
+    board   = p.puzzle.map(r => [...r]);
+    given   = p.puzzle.map(r => r.map(v => v !== 0));
+    solution = p.solution;
+    selected = null;
+    solved   = false;
+    started  = false;
+    timerSec = 0;
+    clearInterval(timerRef);
+    timerRef = null;
+    document.getElementById('timer').textContent = '0:00';
+    document.getElementById('status').className = 'status';
+    document.getElementById('status').textContent = '';
+    buildGrid();
+}
+
+function tick() {
+    timerSec++;
+    const m = Math.floor(timerSec / 60);
+    const s = timerSec % 60;
+    document.getElementById('timer').textContent = m + ':' + String(s).padStart(2, '0');
+}
+
+function ensureTimer() {
+    if (!started && !solved) {
+        started = true;
+        timerRef = setInterval(tick, 1000);
+    }
+}
+
+/* ── Build grid ── */
+function buildGrid() {
+    const g = document.getElementById('grid');
+    g.innerHTML = '';
+    for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+            const el = document.createElement('div');
+            el.className = 'cell';
+            el.dataset.r = r; el.dataset.c = c;
+            if (c === 2 || c === 5) el.classList.add('br');
+            if (r === 2 || r === 5) el.classList.add('bb');
+            if (given[r][c]) {
+                el.classList.add('given');
+                el.textContent = board[r][c];
+            } else if (board[r][c]) {
+                el.classList.add('user');
+                el.textContent = board[r][c];
+            }
+            el.addEventListener('pointerdown', e => { e.preventDefault(); pick(r, c); });
+            g.appendChild(el);
+        }
+    }
+}
+
+function cell(r, c) {
+    return document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+}
+
+function pick(r, c) {
+    ensureTimer();
+    selected = { r, c };
+    paint();
+}
+
+function paint() {
+    document.querySelectorAll('.cell').forEach(el => {
+        el.classList.remove('selected', 'highlight', 'same-num');
+    });
+    if (!selected) return;
+    const { r, c } = selected;
+    const num = board[r][c];
+    const br = Math.floor(r / 3) * 3;
+    const bc = Math.floor(c / 3) * 3;
+
+    for (let i = 0; i < 9; i++) {
+        cell(r, i).classList.add('highlight');
+        cell(i, c).classList.add('highlight');
+    }
+    for (let dr = 0; dr < 3; dr++)
+        for (let dc = 0; dc < 3; dc++)
+            cell(br + dr, bc + dc).classList.add('highlight');
+
+    if (num) {
+        for (let rr = 0; rr < 9; rr++)
+            for (let cc = 0; cc < 9; cc++)
+                if (board[rr][cc] === num) cell(rr, cc).classList.add('same-num');
+    }
+    cell(r, c).classList.add('selected');
+}
+
+function input(n) {
+    if (!selected || solved) return;
+    const { r, c } = selected;
+    if (given[r][c]) return;
+    ensureTimer();
+
+    board[r][c] = n;
+    const el = cell(r, c);
+
+    if (n === 0) {
+        el.textContent = '';
+        el.classList.remove('user', 'error');
+    } else {
+        el.textContent = n;
+        el.classList.add('user');
+        el.classList.toggle('error', solution[r][c] !== n);
+    }
+    paint();
+    checkWin();
+}
+
+function checkWin() {
+    for (let r = 0; r < 9; r++)
+        for (let c = 0; c < 9; c++)
+            if (board[r][c] !== solution[r][c]) return;
+
+    solved = true;
+    clearInterval(timerRef);
+    const m = Math.floor(timerSec / 60);
+    const s = timerSec % 60;
+    const t = m > 0 ? m + ':' + String(s).padStart(2, '0') : s + 's';
+    setTimeout(() => {
+        const el = document.getElementById('status');
+        el.textContent = '~ rozwiązane · ' + t + ' ~';
+        el.classList.add('show');
+    }, 150);
+}
+
+function move(dr, dc) {
+    if (!selected) { selected = { r: 0, c: 0 }; }
+    else {
+        selected.r = Math.max(0, Math.min(8, selected.r + dr));
+        selected.c = Math.max(0, Math.min(8, selected.c + dc));
+    }
+    paint();
+}
+
+/* ── keyboard ── */
+document.addEventListener('keydown', e => {
+    if (e.key >= '1' && e.key <= '9')          { input(+e.key); return; }
+    if (e.key === '0' || e.key === 'Backspace' || e.key === 'Delete') { input(0); return; }
+    if (e.key === 'ArrowUp')    { e.preventDefault(); move(-1, 0); return; }
+    if (e.key === 'ArrowDown')  { e.preventDefault(); move(1,  0); return; }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); move(0, -1); return; }
+    if (e.key === 'ArrowRight') { e.preventDefault(); move(0,  1); return; }
+    if (e.key === 'n' || e.key === 'N') { loadPuzzle(pidx + 1); return; }
+    if (e.key === 'r' || e.key === 'R') { loadPuzzle(pidx); return; }
+    if (e.key === 'Escape') { selected = null; paint(); return; }
+});
+
+/* ── numpad buttons ── */
+document.querySelectorAll('.nb').forEach(btn => {
+    btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        btn.classList.add('pressed');
+        input(+btn.dataset.n);
+        setTimeout(() => btn.classList.remove('pressed'), 120);
+    });
+});
+
+/* ── deselect on outside click ── */
+document.addEventListener('pointerdown', e => {
+    if (!e.target.closest('#grid') && !e.target.closest('#numpad')) {
+        selected = null;
+        paint();
+    }
+});
+
+loadPuzzle(0);
+</script>
+</body>
+</html>
