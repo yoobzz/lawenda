@@ -3068,11 +3068,12 @@
                 });
             }, 50);
 
-            // Google Analytics
+            // Plausible – wirtualny pageview per wiersz
             if (newEl) {
-                const poemTitle = (newEl.innerText || newEl.textContent || '').trim().split('\n')[0].slice(0, 50);
+                const poemTitle = (newEl.innerText || newEl.textContent || '').trim().split('\n')[0].slice(0, 40);
                 const origIdx = getOriginalIndex(index);
-                plausible('poem_view', { props: { nr: origIdx + 1, tytul: poemTitle } });
+                const slug = poemTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-ąćęłńóśźż]/g, '').slice(0, 35) || String(origIdx + 1);
+                plausible('pageview', { u: location.origin + '/wiersz/' + (origIdx + 1) + '/' + slug });
             }
             // URL + nav
             const originalIndex = getOriginalIndex(currentPoem);
@@ -3390,9 +3391,10 @@
             // Plausible – pierwszy wiersz przy wejściu na poems.html
             if (poems[currentPoem]) {
                 const firstPoem = poems[currentPoem];
-                const poemTitle = (firstPoem.innerText || firstPoem.textContent || '').trim().split('\n')[0].slice(0, 50);
+                const poemTitle = (firstPoem.innerText || firstPoem.textContent || '').trim().split('\n')[0].slice(0, 40);
                 const origIdx = getOriginalIndex(currentPoem);
-                plausible('poem_view', { props: { nr: origIdx + 1, tytul: poemTitle } });
+                const slug = poemTitle.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-ąćęłńóśźż]/g, '').slice(0, 35) || String(origIdx + 1);
+                plausible('pageview', { u: location.origin + '/wiersz/' + (origIdx + 1) + '/' + slug });
             }
             updateNavigation();
             updateMetaTags(currentPoem);
