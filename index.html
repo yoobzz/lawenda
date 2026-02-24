@@ -1255,6 +1255,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             let growTime = 0;
             let growDuration = 2.0;
             let pointcloudGrowDone = false;
+            let sortedSprites = [];
+            let revealIdx = 0;
             let cameraTime = 0;
 
 
@@ -1329,6 +1331,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     sprite.scale.set(0, 0, 1);
                     sprite.userData.revealT = Math.random();
                     sprite.userData.fullSize = spriteSize;
+                    sprite.matrixAutoUpdate = false;
+                    sprite.updateMatrix();
                     pointsGroup.add(sprite);
                     sprites.push(sprite);
                 }
@@ -1383,6 +1387,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     });
                     return;
                 }
+                sortedSprites = sprites.slice().sort((a, b) => a.userData.revealT - b.userData.revealT);
+                revealIdx = 0;
                 growPhase = true;
                 growTime = 0;
             };
@@ -1439,24 +1445,21 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
                 if (growPhase) {
                     growTime = Math.min(1, growTime + dt / growDuration);
-                    for (let i = 0; i < sprites.length; i++) {
-                        const s = sprites[i];
-                        if (growTime < s.userData.revealT) continue;
-                        if (s.material.opacity < 1) {
-                            s.material.opacity = 1;
-                            const full = s.userData.fullSize;
-                            s.scale.set(full, full, 1);
-                        }
+                    // sortedSprites posortowane po revealT — wystarczy przesuwać wskaźnik
+                    while (revealIdx < sortedSprites.length && sortedSprites[revealIdx].userData.revealT <= growTime) {
+                        const s = sortedSprites[revealIdx];
+                        s.material.opacity = 1;
+                        const full = s.userData.fullSize;
+                        s.scale.set(full, full, 1);
+                        s.updateMatrix();
+                        revealIdx++;
                     }
                     if (growTime >= 1) {
                         growPhase = false;
                         pointcloudGrowDone = true;
                     }
                 }
-
-                if (pointsGroup && sprites.length && frameCount % 4 === 0) {
-                    sprites.forEach(function(s) { s.lookAt(camera.position); });
-                }
+                // lookAt() usunięte — THREE.Sprite to billboard, sam obraca się do kamery
 
                 if (userInteracting) {
                     userIdleTime += dt;
