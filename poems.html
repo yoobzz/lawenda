@@ -2988,10 +2988,9 @@
 
             let cancelled = false;
 
-            // Each char gets its own mini-sequence: 3 random symbols then settle.
-            // No global interval — each char "thinks" on its own schedule.
-            const CYCLES  = 3;   // how many random symbols per char before settling
-            const STEP_MS = 65;  // ms between each symbol swap within a char
+            // Each char gets its own random rhythm — some snap fast, some linger.
+            // cycles: 1-5 random symbols before settling
+            // stepMs: 35-110ms between each symbol (per-char random)
 
             const order = spans.map((_, i) => i);
             for (let k = order.length - 1; k > 0; k--) {
@@ -3000,24 +2999,27 @@
             }
             const timeouts = [];
             let t = 0;
+            let maxEnd = 0;
             order.forEach(spanIdx => {
-                t += 2 + Math.random() * 5; // stagger start times
+                t += 1 + Math.random() * 7; // stagger start times
                 const start = t;
-                // Show CYCLES random symbols in sequence
-                for (let c = 0; c < CYCLES; c++) {
+                const cycles = 1 + Math.floor(Math.random() * 5); // 1–5 per char
+                const stepMs = 35 + Math.random() * 75;            // 35–110ms per step
+                for (let c = 0; c < cycles; c++) {
                     timeouts.push(setTimeout(() => {
                         if (cancelled) return;
                         spans[spanIdx].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
-                    }, start + c * STEP_MS));
+                    }, start + c * stepMs));
                 }
-                // Then settle to real char
+                const endTime = start + cycles * stepMs;
+                if (endTime > maxEnd) maxEnd = endTime;
                 timeouts.push(setTimeout(() => {
                     if (cancelled) return;
                     spans[spanIdx]._s = true;
                     spans[spanIdx].textContent = chars[spanIdx];
-                }, start + CYCLES * STEP_MS));
+                }, endTime));
             });
-            const totalTime = t + CYCLES * STEP_MS;
+            const totalTime = maxEnd;
 
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
@@ -3071,20 +3073,32 @@
             }
 
             function glitch() {
-                const tgt = nextTarget();
-                const origChar = tgt.node.textContent[tgt.offset];
-                if (origChar && !/\s/.test(origChar)) {
-                    const sym = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
-                    const txt = tgt.node.textContent;
-                    tgt.node.textContent = txt.slice(0, tgt.offset) + sym + txt.slice(tgt.offset + 1);
-                    setTimeout(() => {
-                        const cur = tgt.node.textContent;
-                        tgt.node.textContent = cur.slice(0, tgt.offset) + origChar + cur.slice(tgt.offset + 1);
-                    }, 85 + Math.random() * 65);
+                // 28% chance: burst of 2-3 simultaneous chars
+                const burst = Math.random() < 0.28;
+                const count = burst ? 2 + Math.floor(Math.random() * 2) : 1;
+
+                for (let i = 0; i < count; i++) {
+                    const tgt = nextTarget();
+                    const origChar = tgt.node.textContent[tgt.offset];
+                    if (origChar && !/\s/.test(origChar)) {
+                        const sym = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                        const txt = tgt.node.textContent;
+                        tgt.node.textContent = txt.slice(0, tgt.offset) + sym + txt.slice(tgt.offset + 1);
+                        const dur = 160 + Math.random() * 220; // 160–380ms — dłużej widoczny
+                        setTimeout(() => {
+                            const cur = tgt.node.textContent;
+                            tgt.node.textContent = cur.slice(0, tgt.offset) + origChar + cur.slice(tgt.offset + 1);
+                        }, dur);
+                    }
                 }
-                _glitchTimer = setTimeout(glitch, 800 + Math.random() * 1000);
+
+                // Burst → krótka przerwa, single → dłuższa przerwa
+                const next = burst
+                    ? 350 + Math.random() * 650   // 0.35–1.0s po burst
+                    : 1200 + Math.random() * 2300; // 1.2–3.5s normalnie
+                _glitchTimer = setTimeout(glitch, next);
             }
-            _glitchTimer = setTimeout(glitch, 800 + Math.random() * 1000);
+            _glitchTimer = setTimeout(glitch, 1000 + Math.random() * 1500);
         }
         // ──────────────────────────────────────────────────────────────────────
 
