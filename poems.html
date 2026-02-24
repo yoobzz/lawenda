@@ -2953,20 +2953,22 @@
                 } else { toks.push({ t: 'c', v: origHTML[i] }); i++; }
             }
 
-            // Build HTML
+            // Build HTML + track line index per char for biased timing
             let newHTML = '';
             const chars = [];
-            let ci = 0;
+            const charLine = []; // which line each char is on
+            let lineIdx = 0;
             for (const tok of toks) {
                 if (tok.t === 'g') {
                     newHTML += tok.v;
+                    if (/^<br/i.test(tok.v)) lineIdx++;
                 } else if (/\s/.test(tok.v)) {
                     newHTML += tok.v;
                 } else {
                     const s = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
                     newHTML += `<span class="dc">${s}</span>`;
                     chars.push(tok.v);
-                    ci++;
+                    charLine.push(lineIdx);
                 }
             }
 
@@ -2974,7 +2976,6 @@
             const spans = Array.from(el.querySelectorAll('.dc'));
 
             // Lock each span's width to the final character's width
-            // so cycling symbols don't shift surrounding text
             spans.forEach((s, idx) => { s.textContent = chars[idx]; });
             void el.offsetWidth;
             spans.forEach((s, idx) => {
@@ -2987,7 +2988,7 @@
 
             let cancelled = false;
 
-            // Cycle random symbols on all unsettled spans
+            // Cycle random symbols on unsettled spans
             const iv = setInterval(() => {
                 if (cancelled) return;
                 for (let j = 0; j < spans.length; j++) {
@@ -2995,27 +2996,28 @@
                 }
             }, 90);
 
-            // Settle in random order, one by one, with small jitter between each
-            const order = spans.map((_, i) => i);
-            for (let k = order.length - 1; k > 0; k--) {
-                const j = Math.floor(Math.random() * (k + 1));
-                [order[k], order[j]] = [order[j], order[k]];
-            }
+            // Biased-random timing: earlier lines settle sooner on average,
+            // but random jitter makes it look organic, not mechanical
+            const LINE_BIAS = 38;  // ms per line baseline
+            const SPREAD    = 60;  // random spread within a line
             const timeouts = [];
-            let t = 0;
-            order.forEach(spanIdx => {
-                t += 9 + Math.random() * 10; // 9–19ms between each settle
+            const schedule = spans.map((_, idx) => ({
+                idx,
+                t: charLine[idx] * LINE_BIAS + Math.random() * SPREAD
+            }));
+            schedule.forEach(({ idx, t }) => {
                 timeouts.push(setTimeout(() => {
                     if (cancelled) return;
-                    spans[spanIdx]._s = true;
-                    spans[spanIdx].textContent = chars[spanIdx];
+                    spans[idx]._s = true;
+                    spans[idx].textContent = chars[idx];
                 }, t));
             });
+            const totalTime = schedule.reduce((m, x) => Math.max(m, x.t), 0);
 
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
                 clearInterval(iv); el.innerHTML = origHTML; _activeDecrypt = null;
-            }, t + 80);
+            }, totalTime + 80);
 
             _activeDecrypt = {
                 cancel() {
