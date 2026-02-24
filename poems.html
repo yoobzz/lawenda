@@ -2988,15 +2988,11 @@
 
             let cancelled = false;
 
-            // Cycle random symbols on unsettled spans
-            const iv = setInterval(() => {
-                if (cancelled) return;
-                for (let j = 0; j < spans.length; j++) {
-                    if (!spans[j]._s) spans[j].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
-                }
-            }, 55);
+            // Each char gets its own mini-sequence: 3 random symbols then settle.
+            // No global interval — each char "thinks" on its own schedule.
+            const CYCLES  = 3;   // how many random symbols per char before settling
+            const STEP_MS = 65;  // ms between each symbol swap within a char
 
-            // Pure random order, fast — Fisher-Yates shuffle, ~5ms per char
             const order = spans.map((_, i) => i);
             for (let k = order.length - 1; k > 0; k--) {
                 const j = Math.floor(Math.random() * (k + 1));
@@ -3005,18 +3001,27 @@
             const timeouts = [];
             let t = 0;
             order.forEach(spanIdx => {
-                t += 3 + Math.random() * 6; // 3–9ms per char, avg ~6ms
+                t += 2 + Math.random() * 5; // stagger start times
+                const start = t;
+                // Show CYCLES random symbols in sequence
+                for (let c = 0; c < CYCLES; c++) {
+                    timeouts.push(setTimeout(() => {
+                        if (cancelled) return;
+                        spans[spanIdx].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                    }, start + c * STEP_MS));
+                }
+                // Then settle to real char
                 timeouts.push(setTimeout(() => {
                     if (cancelled) return;
                     spans[spanIdx]._s = true;
                     spans[spanIdx].textContent = chars[spanIdx];
-                }, t));
+                }, start + CYCLES * STEP_MS));
             });
-            const totalTime = t;
+            const totalTime = t + CYCLES * STEP_MS;
 
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
-                clearInterval(iv); el.innerHTML = origHTML; _activeDecrypt = null;
+                el.innerHTML = origHTML; _activeDecrypt = null;
             }, totalTime + 80);
 
             _activeDecrypt = {
