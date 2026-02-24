@@ -3375,6 +3375,10 @@
             
             currentPoem = currentPoemIndex;
             poems[currentPoem]?.classList.add('active');
+            // Decrypt reveal na starcie (po załadowaniu fontów, żeby pomiar szerokości był dokładny)
+            document.fonts.ready.then(() => {
+                if (poems[currentPoem]) poemDecryptReveal(poems[currentPoem]);
+            });
             // Google Analytics – pierwszy wiersz przy wejściu na poems.html
             if (poems[currentPoem]) {
                 const firstPoem = poems[currentPoem];
