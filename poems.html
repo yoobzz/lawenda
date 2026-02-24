@@ -2962,7 +2962,8 @@
                     chars.push(tok.v);
                 }
             }
-            el.innerHTML = newHTML;
+            // Wrap in a block container so spans don't become individual flex items
+            el.innerHTML = '<div class="dc-wrap">' + newHTML + '</div>';
             const spans = Array.from(el.querySelectorAll('.dc'));
             let cancelled = false;
             const TOTAL = 280;
