@@ -2975,6 +2975,18 @@
             el.innerHTML = '<div class="dc-wrap">' + newHTML + '</div>';
             const spans = Array.from(el.querySelectorAll('.dc'));
 
+            // Lock each span's width to the final character's width
+            // so cycling symbols don't shift surrounding text
+            spans.forEach((s, idx) => { s.textContent = chars[idx]; });
+            void el.offsetWidth; // force reflow to measure
+            spans.forEach((s, idx) => {
+                const w = s.getBoundingClientRect().width;
+                s.style.display = 'inline-block';
+                s.style.width = w + 'px';
+                s.style.textAlign = 'center';
+                s.textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+            });
+
             let cancelled = false;
             const CHAR_MS = 18;  // ms between chars within a line
             const LINE_MS = 42;  // extra gap before next line starts
