@@ -2934,48 +2934,113 @@
             return poemIndex;
         }
         
+        // ── Decrypt reveal animation ──────────────────────────────────────────
+        const SYMS_DECRYPT = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+        let _activeDecrypt = null;
+
+        function poemDecryptReveal(el) {
+            if (_activeDecrypt) { _activeDecrypt.cancel(); _activeDecrypt = null; }
+            const origHTML = el.innerHTML;
+            // Tokenize HTML: tags pass through, whitespace passes through, other chars get wrapped
+            const toks = [];
+            let i = 0;
+            while (i < origHTML.length) {
+                if (origHTML[i] === '<') {
+                    const end = origHTML.indexOf('>', i);
+                    if (end === -1) { toks.push({ t: 'c', v: origHTML[i] }); i++; }
+                    else { toks.push({ t: 'g', v: origHTML.slice(i, end + 1) }); i = end + 1; }
+                } else { toks.push({ t: 'c', v: origHTML[i] }); i++; }
+            }
+            let newHTML = '';
+            const chars = [];
+            for (const tok of toks) {
+                if (tok.t === 'g') { newHTML += tok.v; }
+                else if (/\s/.test(tok.v)) { newHTML += tok.v; }
+                else {
+                    const s = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                    newHTML += `<span class="dc">${s}</span>`;
+                    chars.push(tok.v);
+                }
+            }
+            el.innerHTML = newHTML;
+            const spans = Array.from(el.querySelectorAll('.dc'));
+            let cancelled = false;
+            const TOTAL = 280;
+            const iv = setInterval(() => {
+                if (cancelled) return;
+                for (let j = 0; j < spans.length; j++) {
+                    if (!spans[j]._s) spans[j].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                }
+            }, 22);
+            const timeouts = [];
+            spans.forEach((s, idx) => {
+                const d = Math.random() * TOTAL;
+                timeouts.push(setTimeout(() => {
+                    if (cancelled) return;
+                    s._s = true; s.textContent = chars[idx];
+                }, d));
+            });
+            const cleanup = setTimeout(() => {
+                if (cancelled) return;
+                clearInterval(iv); el.innerHTML = origHTML; _activeDecrypt = null;
+            }, TOTAL + 80);
+            _activeDecrypt = {
+                cancel() {
+                    cancelled = true; clearInterval(iv);
+                    timeouts.forEach(clearTimeout); clearTimeout(cleanup);
+                    el.innerHTML = origHTML;
+                }
+            };
+        }
+        // ──────────────────────────────────────────────────────────────────────
+
         function goToPoem(index){
             if (index === currentPoem) return;
-            
-            // Oznacz wiersz jako przeczytany (tylko jeśli jeszcze nie był oznaczony)
+
+            const direction = index > currentPoem ? 1 : -1;
+            const oldEl = poems[currentPoem];
+            const newEl = poems[index];
+
             markPoemAsRead(index);
-            
-            const currentPoemEl = poems[currentPoem];
-            const newPoemEl = poems[index];
-            
-            // Szybsze przejście między wierszami (bez lagu)
-            if (currentPoemEl) {
-            currentPoemEl.classList.remove('active');
-                currentPoemEl.style.opacity = '0';
-                currentPoemEl.style.transform = '';
-            }
-            
-            // Pokaż nowy wiersz natychmiast (bez opóźnień)
-            if (newPoemEl) {
-            newPoemEl.classList.add('active');
-                newPoemEl.style.opacity = '1';
-                newPoemEl.style.transform = '';
-            }
-            
             currentPoem = index;
-            
-            // Google Analytics – wyświetlenie wiersza
-            if (newPoemEl) {
-                const poemTitle = (newPoemEl.innerText || newPoemEl.textContent || '').trim().split('\n')[0].slice(0, 50);
+
+            // Exit old poem: slide + fade out
+            if (oldEl) {
+                oldEl.style.transition = 'opacity 90ms ease, transform 90ms ease';
+                oldEl.style.opacity = '0';
+                oldEl.style.transform = direction === 1 ? 'translateX(-28px)' : 'translateX(28px)';
+                setTimeout(() => { oldEl.classList.remove('active'); oldEl.style.cssText = ''; }, 100);
+            }
+
+            // Enter new poem: slide in + decrypt reveal
+            setTimeout(() => {
+                if (!newEl) return;
+                newEl.classList.add('active');
+                newEl.style.opacity = '1';
+                newEl.style.transition = 'none';
+                newEl.style.transform = direction === 1 ? 'translateX(28px)' : 'translateX(-28px)';
+                requestAnimationFrame(() => {
+                    newEl.style.transition = 'transform 180ms ease';
+                    newEl.style.transform = 'translateX(0)';
+                    poemDecryptReveal(newEl);
+                    setTimeout(() => { newEl.style.cssText = ''; }, 300);
+                });
+            }, 50);
+
+            // Google Analytics
+            if (newEl) {
+                const poemTitle = (newEl.innerText || newEl.textContent || '').trim().split('\n')[0].slice(0, 50);
                 const origIdx = getOriginalIndex(index);
                 (window.dataLayer = window.dataLayer || []).push({ event: 'poem_view', poem_index: origIdx + 1, poem_title: poemTitle });
             }
-            
-            // Zaktualizuj URL - użyj zakodowanego identyfikatora (bez widocznego numeru)
+            // URL + nav
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
             const encodedId = encodePoemId(poemNumber);
             const newHash = `#wiersz-${encodedId}`;
             const currentUrl = location.pathname + location.search + location.hash;
             const newUrl = location.pathname + newHash;
-            if (currentUrl !== newUrl) {
-                history.replaceState(null, '', newUrl);
-            }
+            if (currentUrl !== newUrl) history.replaceState(null, '', newUrl);
             updateNavigation();
             updateMetaTags(currentPoem);
         }
@@ -3008,6 +3073,43 @@
 
         document.getElementById('prevBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem>0) goToPoem(currentPoem-1); });
         document.getElementById('nextBtn').addEventListener('click', (e)=>{ e.preventDefault(); if(currentPoem<poems.length-1) goToPoem(currentPoem+1); });
+
+        // ── Swipe na mobile ────────────────────────────────────────────────────
+        (function(){
+            let tx0 = 0, ty0 = 0;
+            document.addEventListener('touchstart', e => {
+                tx0 = e.touches[0].clientX; ty0 = e.touches[0].clientY;
+            }, { passive: true });
+            document.addEventListener('touchend', e => {
+                const dx = e.changedTouches[0].clientX - tx0;
+                const dy = e.changedTouches[0].clientY - ty0;
+                if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) {
+                    if (dx < 0 && currentPoem < poems.length - 1) goToPoem(currentPoem + 1);
+                    else if (dx > 0 && currentPoem > 0) goToPoem(currentPoem - 1);
+                }
+            }, { passive: true });
+        })();
+
+        // ── Magnetic nav arrows (desktop) ─────────────────────────────────────
+        ['prevBtn', 'nextBtn'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            let hovering = false;
+            btn.addEventListener('mouseenter', () => { hovering = true; btn.style.transition = 'background 0.2s, color 0.2s'; });
+            btn.addEventListener('mouseleave', () => {
+                hovering = false;
+                btn.style.transition = 'transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94), background 0.2s, color 0.2s';
+                btn.style.transform = '';
+            });
+            btn.addEventListener('mousemove', e => {
+                if (!hovering) return;
+                const r = btn.getBoundingClientRect();
+                const dx = (e.clientX - (r.left + r.width / 2)) * 0.42;
+                const dy = (e.clientY - (r.top + r.height / 2)) * 0.42;
+                btn.style.transform = `translate(${dx}px,${dy}px)`;
+            });
+        });
+        // ──────────────────────────────────────────────────────────────────────
         document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); (window.dataLayer = window.dataLayer || []).push({ event: 'font_adjust', direction: 'smaller' }); adjustFontScale(-1); });
         document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); (window.dataLayer = window.dataLayer || []).push({ event: 'font_adjust', direction: 'bigger' }); adjustFontScale(1); });
         document.getElementById('copyLink').addEventListener('click', async (e)=>{ 
@@ -3492,24 +3594,14 @@
                 return await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png', 1.0));
             }
             document.addEventListener('keydown', (e)=>{
-                if (e.key === '/' && hasTransitioned) { 
-                    e.preventDefault(); 
-                    openSearchPopover(); 
+                if (e.key === '/' && hasTransitioned) {
+                    e.preventDefault(); openSearchPopover();
                 }
-                // Keyboard navigation visual feedback
                 if (e.key === 'ArrowLeft' && currentPoem > 0) {
-                    const prevBtn = document.getElementById('prevBtn');
-                    if (prevBtn && !prevBtn.disabled) {
-                        prevBtn.style.transform = 'scale(0.95)';
-                        setTimeout(() => prevBtn.style.transform = '', 150);
-                    }
+                    e.preventDefault(); goToPoem(currentPoem - 1);
                 }
                 if (e.key === 'ArrowRight' && currentPoem < poems.length - 1) {
-                    const nextBtn = document.getElementById('nextBtn');
-                    if (nextBtn && !nextBtn.disabled) {
-                        nextBtn.style.transform = 'scale(0.95)';
-                        setTimeout(() => nextBtn.style.transform = '', 150);
-                    }
+                    e.preventDefault(); goToPoem(currentPoem + 1);
                 }
             });
             document.addEventListener('click', (e)=>{
