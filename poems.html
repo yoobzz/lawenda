@@ -192,24 +192,46 @@
         .nav-counter:hover::after {
             transform: scaleX(1);
         }
-        /* wesprzyj wydanie — mały przycisk fixed lewy dolny */
+        /* wesprzyj wydanie */
         .coffee-block {
             position: fixed;
-            left: 1rem;
-            bottom: 1rem;
+            left: 1.2rem;
+            bottom: 1.4rem;
             z-index: 101;
         }
         .coffee-btn {
             font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 10px;
-            padding: 3px 6px;
-            color: #000000;
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 0.04em;
+            color: #000;
             text-decoration: none;
-            opacity: 0.7;
-            transition: opacity 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35em;
+            position: relative;
+            padding: 3px 0;
+            cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-        .coffee-btn:hover { opacity: 1; }
+        .coffee-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 1px;
+            background: #000;
+            transition: width 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        .coffee-btn:hover::after { width: 100%; }
+        .coffee-sym {
+            display: inline-block;
+            color: rgba(0,0,0,0.3);
+            transition: opacity 0.18s, color 0.25s;
+            min-width: 0.65em;
+            text-align: center;
+        }
+        .coffee-btn:hover .coffee-sym { color: rgba(0,0,0,0.65); }
         .back-button { 
             position: fixed; 
             top: 1rem; 
@@ -460,7 +482,7 @@
 </head>
 <body>
     <div class="coffee-block">
-        <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener" id="wsprzyjBtn">wesprzyj wydanie</a>
+        <a href="https://buycoffee.to/szpineta" class="coffee-btn" target="_blank" rel="noopener" id="wsprzyjBtn"><span class="coffee-sym" aria-hidden="true">~</span><span class="coffee-text">wesprzyj wydanie</span></a>
     </div>
     <div class="poems-section" id="poemsSection">
         <div class="poems-background" id="poemsBackground"></div>
@@ -3733,10 +3755,57 @@
             }
         });
 
-        // Plausible – wesprzyj wydanie
-        document.getElementById('wsprzyjBtn')?.addEventListener('click', () => {
-            plausible('wesprzyj_klik');
-        });
+        // wesprzyj wydanie — symbol rotation, hover decrypt, magnetic
+        (function() {
+            const btn = document.getElementById('wsprzyjBtn');
+            if (!btn) return;
+            const symEl = btn.querySelector('.coffee-sym');
+            const textEl = btn.querySelector('.coffee-text');
+            const origText = 'wesprzyj wydanie';
+
+            // Symbol prefix rotuje co ~2.8s
+            setInterval(() => {
+                symEl.style.opacity = '0';
+                setTimeout(() => {
+                    symEl.textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                    symEl.style.opacity = '1';
+                }, 180);
+            }, 2800);
+
+            // Hover: wszystkie litery naraz błyskają symbolami, 3× po 55ms
+            let decryptActive = false;
+            btn.addEventListener('mouseenter', () => {
+                if (decryptActive) return;
+                decryptActive = true;
+                let step = 0;
+                function flash() {
+                    if (step >= 3) { textEl.textContent = origText; decryptActive = false; return; }
+                    textEl.textContent = origText.split('').map(c =>
+                        c === ' ' ? ' ' : SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)]
+                    ).join('');
+                    step++;
+                    setTimeout(flash, 55);
+                }
+                flash();
+            });
+
+            // Magnetic
+            let hovering = false;
+            btn.addEventListener('mouseenter', () => { hovering = true; });
+            btn.addEventListener('mouseleave', () => {
+                hovering = false;
+                btn.style.transform = '';
+            });
+            btn.addEventListener('mousemove', e => {
+                if (!hovering) return;
+                const r = btn.getBoundingClientRect();
+                const dx = (e.clientX - (r.left + r.width / 2)) * 0.3;
+                const dy = (e.clientY - (r.top + r.height / 2)) * 0.3;
+                btn.style.transform = `translate(${dx}px,${dy}px)`;
+            });
+
+            btn.addEventListener('click', () => { plausible('wesprzyj_klik'); });
+        })();
     </script>
 </body>
 </html>
