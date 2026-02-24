@@ -2953,22 +2953,20 @@
                 } else { toks.push({ t: 'c', v: origHTML[i] }); i++; }
             }
 
-            // Build HTML + group char indices by line (split at <br>)
+            // Build HTML
             let newHTML = '';
-            const chars = [];        // final char for each span
-            const lines = [[]];      // lines[lineIdx] = [spanIdx, ...]
+            const chars = [];
             let ci = 0;
             for (const tok of toks) {
                 if (tok.t === 'g') {
                     newHTML += tok.v;
-                    if (/^<br/i.test(tok.v)) lines.push([]); // new visual line
                 } else if (/\s/.test(tok.v)) {
                     newHTML += tok.v;
                 } else {
                     const s = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
                     newHTML += `<span class="dc">${s}</span>`;
                     chars.push(tok.v);
-                    lines[lines.length - 1].push(ci++);
+                    ci++;
                 }
             }
 
@@ -2978,7 +2976,7 @@
             // Lock each span's width to the final character's width
             // so cycling symbols don't shift surrounding text
             spans.forEach((s, idx) => { s.textContent = chars[idx]; });
-            void el.offsetWidth; // force reflow to measure
+            void el.offsetWidth;
             spans.forEach((s, idx) => {
                 const w = s.getBoundingClientRect().width;
                 s.style.display = 'inline-block';
@@ -2988,8 +2986,6 @@
             });
 
             let cancelled = false;
-            const CHAR_MS = 18;  // ms between chars within a line
-            const LINE_MS = 42;  // extra gap before next line starts
 
             // Cycle random symbols on all unsettled spans
             const iv = setInterval(() => {
@@ -2999,24 +2995,27 @@
                 }
             }, 90);
 
-            // Schedule: line by line top→bottom, char by char left→right
+            // Settle in random order, one by one, with small jitter between each
+            const order = spans.map((_, i) => i);
+            for (let k = order.length - 1; k > 0; k--) {
+                const j = Math.floor(Math.random() * (k + 1));
+                [order[k], order[j]] = [order[j], order[k]];
+            }
             const timeouts = [];
-            let lineStart = 0;
-            lines.forEach(lineChars => {
-                lineChars.forEach((spanIdx, pos) => {
-                    timeouts.push(setTimeout(() => {
-                        if (cancelled) return;
-                        spans[spanIdx]._s = true;
-                        spans[spanIdx].textContent = chars[spanIdx];
-                    }, lineStart + pos * CHAR_MS));
-                });
-                lineStart += LINE_MS + lineChars.length * CHAR_MS;
+            let t = 0;
+            order.forEach(spanIdx => {
+                t += 9 + Math.random() * 10; // 9–19ms between each settle
+                timeouts.push(setTimeout(() => {
+                    if (cancelled) return;
+                    spans[spanIdx]._s = true;
+                    spans[spanIdx].textContent = chars[spanIdx];
+                }, t));
             });
 
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
                 clearInterval(iv); el.innerHTML = origHTML; _activeDecrypt = null;
-            }, lineStart + 80);
+            }, t + 80);
 
             _activeDecrypt = {
                 cancel() {
