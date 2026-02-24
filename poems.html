@@ -2941,7 +2941,8 @@
         function poemDecryptReveal(el) {
             if (_activeDecrypt) { _activeDecrypt.cancel(); _activeDecrypt = null; }
             const origHTML = el.innerHTML;
-            // Tokenize HTML: tags pass through, whitespace passes through, other chars get wrapped
+
+            // Tokenize: split into tags and single chars
             const toks = [];
             let i = 0;
             while (i < origHTML.length) {
@@ -2951,40 +2952,60 @@
                     else { toks.push({ t: 'g', v: origHTML.slice(i, end + 1) }); i = end + 1; }
                 } else { toks.push({ t: 'c', v: origHTML[i] }); i++; }
             }
+
+            // Build HTML + group char indices by line (split at <br>)
             let newHTML = '';
-            const chars = [];
+            const chars = [];        // final char for each span
+            const lines = [[]];      // lines[lineIdx] = [spanIdx, ...]
+            let ci = 0;
             for (const tok of toks) {
-                if (tok.t === 'g') { newHTML += tok.v; }
-                else if (/\s/.test(tok.v)) { newHTML += tok.v; }
-                else {
+                if (tok.t === 'g') {
+                    newHTML += tok.v;
+                    if (/^<br/i.test(tok.v)) lines.push([]); // new visual line
+                } else if (/\s/.test(tok.v)) {
+                    newHTML += tok.v;
+                } else {
                     const s = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
                     newHTML += `<span class="dc">${s}</span>`;
                     chars.push(tok.v);
+                    lines[lines.length - 1].push(ci++);
                 }
             }
-            // Wrap in a block container so spans don't become individual flex items
+
             el.innerHTML = '<div class="dc-wrap">' + newHTML + '</div>';
             const spans = Array.from(el.querySelectorAll('.dc'));
+
             let cancelled = false;
-            const TOTAL = 280;
+            const CHAR_MS = 18;  // ms between chars within a line
+            const LINE_MS = 42;  // extra gap before next line starts
+
+            // Cycle random symbols on all unsettled spans
             const iv = setInterval(() => {
                 if (cancelled) return;
                 for (let j = 0; j < spans.length; j++) {
                     if (!spans[j]._s) spans[j].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
                 }
             }, 22);
+
+            // Schedule: line by line top→bottom, char by char left→right
             const timeouts = [];
-            spans.forEach((s, idx) => {
-                const d = Math.random() * TOTAL;
-                timeouts.push(setTimeout(() => {
-                    if (cancelled) return;
-                    s._s = true; s.textContent = chars[idx];
-                }, d));
+            let lineStart = 0;
+            lines.forEach(lineChars => {
+                lineChars.forEach((spanIdx, pos) => {
+                    timeouts.push(setTimeout(() => {
+                        if (cancelled) return;
+                        spans[spanIdx]._s = true;
+                        spans[spanIdx].textContent = chars[spanIdx];
+                    }, lineStart + pos * CHAR_MS));
+                });
+                lineStart += LINE_MS + lineChars.length * CHAR_MS;
             });
+
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
                 clearInterval(iv); el.innerHTML = origHTML; _activeDecrypt = null;
-            }, TOTAL + 80);
+            }, lineStart + 80);
+
             _activeDecrypt = {
                 cancel() {
                     cancelled = true; clearInterval(iv);
