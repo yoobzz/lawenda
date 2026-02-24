@@ -3037,70 +3037,8 @@
         }
         // ──────────────────────────────────────────────────────────────────────
 
-        // ── Ambient glitch ────────────────────────────────────────────────────
-        let _glitchTimer = null;
-
-        function stopAmbientGlitch() {
-            if (_glitchTimer) { clearTimeout(_glitchTimer); _glitchTimer = null; }
-        }
-
-        function startAmbientGlitch(el) {
-            stopAmbientGlitch();
-            // Collect all non-whitespace char positions from text nodes
-            const targets = [];
-            (function walk(node) {
-                if (node.nodeType === 3) {
-                    const text = node.textContent;
-                    for (let i = 0; i < text.length; i++) {
-                        if (!/\s/.test(text[i])) targets.push({ node, offset: i });
-                    }
-                } else { node.childNodes.forEach(walk); }
-            })(el);
-            if (!targets.length) return;
-
-            // Shuffled queue — cycle through all chars before repeating any
-            let queue = [...targets];
-            let qi = queue.length; // force reshuffle on first pick
-            function nextTarget() {
-                if (qi >= queue.length) {
-                    for (let i = queue.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [queue[i], queue[j]] = [queue[j], queue[i]];
-                    }
-                    qi = 0;
-                }
-                return queue[qi++];
-            }
-
-            function glitch() {
-                // 28% chance: burst of 2-3 simultaneous chars
-                const burst = Math.random() < 0.28;
-                const count = burst ? 2 + Math.floor(Math.random() * 2) : 1;
-
-                for (let i = 0; i < count; i++) {
-                    const tgt = nextTarget();
-                    const origChar = tgt.node.textContent[tgt.offset];
-                    if (origChar && !/\s/.test(origChar)) {
-                        const sym = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
-                        const txt = tgt.node.textContent;
-                        tgt.node.textContent = txt.slice(0, tgt.offset) + sym + txt.slice(tgt.offset + 1);
-                        const dur = 160 + Math.random() * 220; // 160–380ms — dłużej widoczny
-                        setTimeout(() => {
-                            const cur = tgt.node.textContent;
-                            tgt.node.textContent = cur.slice(0, tgt.offset) + origChar + cur.slice(tgt.offset + 1);
-                        }, dur);
-                    }
-                }
-
-                // Burst → krótka przerwa, single → dłuższa przerwa
-                const next = burst
-                    ? 350 + Math.random() * 650   // 0.35–1.0s po burst
-                    : 1200 + Math.random() * 2300; // 1.2–3.5s normalnie
-                _glitchTimer = setTimeout(glitch, next);
-            }
-            _glitchTimer = setTimeout(glitch, 1000 + Math.random() * 1500);
-        }
-        // ──────────────────────────────────────────────────────────────────────
+        function stopAmbientGlitch() {}
+        function startAmbientGlitch() {}
 
         function goToPoem(index){
             if (index === currentPoem) return;
