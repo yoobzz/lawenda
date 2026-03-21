@@ -10,5 +10,7 @@
 			"path": "../../Downloads/DINAMO Trial Fonts/ABC Helveesti"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"claudeCode.initialPermissionMode": "acceptEdits"
+	}
 }

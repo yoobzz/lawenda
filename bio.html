@@ -2,13 +2,12 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>bio — ~||-_^+*.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+
     <meta name="description" content="staś szpineta archiwum">
     <meta property="og:title" content="~||-_^+*.">
     <meta property="og:description" content="staś szpineta archiwum">
@@ -16,7 +15,7 @@
     <meta property="og:locale" content="pl_PL">
     <meta property="og:url" content="https://szpineta.pl/bio.html">
     <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
-    
+
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="~||-_^+*.">
     <meta name="twitter:description" content="staś szpineta archiwum">
@@ -26,69 +25,1325 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
     <script defer data-domain="szpineta.pl" src="https://plausible.io/js/script.js"></script>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TKJ2KBZ8');</script>
+    <!-- End Google Tag Manager -->
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Geist', sans-serif; background: #ffffff; color: #1a1a1a; }
-        .bio-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: flex; align-items: flex-start; justify-content: flex-start; z-index: 2000; opacity: 1; padding: 50px; }
-        .bio-content { max-width: 100%; padding: 0; text-align: left; color: #000000; font-family: 'Geist', sans-serif; background: transparent; position: relative; width: 100%; height: 100%; }
-        .bio-photo { width: 500px; height: 400px; object-fit: cover; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .bio-photo video { width: 100%; height: 100%; object-fit: cover; }
-        .bio-title { font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 400; margin-bottom: 1.5rem; color: #000000; font-family: 'Geist Mono', monospace; letter-spacing: 0.15em; position: absolute; top: 50px; left: 80px; }
-        .bio-first-name, .bio-last-name { display: inline; white-space: nowrap; }
-        .bio-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; color: #000000; font-family: 'Geist', sans-serif; position: absolute; top: 150px; left: 50px; width: 350px; }
-        .bio-links { display: flex; justify-content: flex-start; gap: 0.8rem; flex-wrap: wrap; position: absolute; bottom: 50px; left: 50px; }
-        .bio-link { padding: 0.6rem 1.2rem; background: #000000; border: none; color: #ffffff; text-decoration: none; font-family: 'Geist Mono', monospace; font-size: 0.8rem; transition: all 0.3s ease; border-radius: 4px; cursor: pointer; }
-        .bio-link:hover { background: #333333; transform: translateY(-2px); }
-        .bio-close { position: absolute; top: 2rem; right: 2rem; background: none; border: none; color: #000000; font-size: 2rem; cursor: pointer; font-family: 'Geist Mono', monospace; transition: all 0.3s ease; }
-        .bio-close:hover { color: #666666; transform: scale(1.1); }
-        .bio-extra-text-1 { position: absolute; font-family: 'Geist Mono', monospace; color: #000000; font-size: 1.2rem; font-weight: 300; top: 50px; right: 20px; }
-        .spotify-widget { position: absolute; top: 40%; left: 65%; transform: translate(150px, -50%); width: 300px; }
-        @media (max-width: 640px) {
-            .bio-overlay { padding: 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; align-items: flex-start; justify-content: flex-start; }
-            .bio-content { position: relative; width: 100%; height: auto; display: flex; flex-direction: column; gap: 16px; }
-            .bio-photo { position: relative; top: auto; left: auto; transform: none; width: 100%; height: auto; max-height: 40vh; }
-            .bio-photo video { width: 100%; height: 100%; object-fit: cover; }
-            .bio-title { position: static; margin-top: 4px; }
-            .bio-text { position: static; width: auto; font-size: 1rem; }
-            .bio-links { position: static; gap: 0.6rem; }
-            .spotify-widget { position: static; transform: none; width: 100%; }
-            .bio-extra-text-1 { display: none; }
-            .bio-close { top: 0.5rem; right: 0.5rem; }
+        @font-face {
+            font-family: 'ABC Diatype Rounded';
+            src: url('fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
         }
-        .back { position: fixed; top: 1rem; left: 1rem; background: transparent; border: 0; font-family: 'Geist Mono', monospace; font-size: 14px; color: #000000; opacity: 0.6; cursor: pointer; padding: 6px 8px; }
-        .back:hover { opacity: 1; text-decoration: underline; }
-        @media (max-width: 640px) {
-            #audioToggle { font-size: 10px !important; padding: 4px 6px !important; top: 0.75rem !important; right: 0.75rem !important; }
+        @font-face {
+            font-family: 'ABC Helveesti';
+            src: url('fonts/ABCHelveestiPlusVariable-Trial.woff2') format('woff2'),
+                 url('fonts/ABCHelveestiPlusVariable-Trial.woff') format('woff');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html {
+            height: 100%;
+        }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, sans-serif;
+            color: #fff;
+            background: #111;
+        }
+
+        /* ── GRAIN ───────────────────────────────────────────────────── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.025;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 256px;
+        }
+
+        /* ── FIXED UI ─────────────────────────────────────────────────── */
+        .back-button {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: transparent;
+            border: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #fff;
+            opacity: 0.4;
+            cursor: pointer;
+            padding: 6px 8px;
+            z-index: 110;
+            text-decoration: none;
+            transition: opacity 0.3s;
+            mix-blend-mode: difference;
+        }
+        .back-button:hover { opacity: 0.9; }
+
+        .audio-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: 0;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            opacity: 0.5;
+            cursor: pointer;
+            z-index: 1200;
+            -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.2s;
+            mix-blend-mode: difference;
+        }
+        .audio-toggle:hover { opacity: 1; }
+
+        /* ── SECTION BASE ────────────────────────────────────────────── */
+        .section {
+            position: relative;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* ── SCATTERED WORDS (per-section decoration) ────────────────── */
+        .scatter-words {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .scatter-words span {
+            position: absolute;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            user-select: none;
+            opacity: 0;
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+        .scatter-words span.visible {
+            opacity: 1;
+        }
+
+        /* ── SECTION 1: HERO (dark) ──────────────────────────────────── */
+        .section-hero {
+            background: #111;
+            flex-direction: column;
+            gap: 0;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding-left: clamp(2rem, 6vw, 8rem);
+            padding-bottom: clamp(4rem, 12vh, 10rem);
+            min-height: 110vh;
+            min-height: 110dvh;
+        }
+        .section-hero .scatter-words span {
+            color: #fff;
+            opacity: 0;
+        }
+        .section-hero .scatter-words span.visible {
+            opacity: 0.06;
+        }
+        .hero-name {
+            font-size: clamp(36px, 5.5vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+            color: #fff;
+            z-index: 2;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+        .hero-name.visible {
+            opacity: 1;
+        }
+        .hero-hej {
+            font-size: clamp(100px, 22vw, 300px);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            color: #fff;
+            z-index: 2;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            margin-bottom: clamp(0.5rem, 1.5vh, 1.5rem);
+        }
+        .hero-hej.visible { opacity: 1; }
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+        .hero-video.visible {
+            opacity: 0.45;
+        }
+
+        /* ── SECTION 2: PISZĘ (off-white) ───────────────────────────── */
+        .section-pisze {
+            background: #f0ede8;
+            color: #111;
+            display: block;
+            position: relative;
+            min-height: 70vh;
+            min-height: 70dvh;
+        }
+        .section-pisze .scatter-words span {
+            color: #111;
+        }
+        .section-pisze .scatter-words span.visible {
+            opacity: 0.04;
+        }
+        .pisze-line {
+            position: absolute;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            z-index: 1;
+            color: #111;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            white-space: nowrap;
+        }
+        .pisze-line.visible {
+            opacity: 1;
+            transform: none;
+        }
+        .pisze-line-1 {
+            top: 12vh;
+            left: clamp(2rem, 6vw, 8rem);
+            font-size: clamp(32px, 5vw, 64px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .pisze-line-2 {
+            top: 35vh;
+            right: clamp(2rem, 8vw, 10rem);
+            font-size: clamp(20px, 2.8vw, 36px);
+            font-weight: 600;
+            text-align: right;
+        }
+        .pisze-line-3 {
+            bottom: 18vh;
+            left: 50%;
+            transform: translateX(-50%) translateY(12px);
+            font-size: clamp(18px, 2.2vw, 28px);
+            font-weight: 600;
+        }
+        .pisze-line-3.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .pisze-dot {
+            bottom: 15vh;
+            right: clamp(3rem, 12vw, 14rem);
+            font-size: clamp(60px, 10vw, 120px);
+            font-weight: 900;
+            opacity: 0.15;
+        }
+        .pisze-dot.visible {
+            opacity: 0.15;
+            transform: none;
+        }
+        .pisze-star {
+            display: inline;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .pisze-star:hover {
+            color: #b8a0d6;
+        }
+        .pisze-footnote {
+            position: absolute;
+            bottom: clamp(2rem, 5vh, 4rem);
+            left: clamp(2rem, 6vw, 8rem);
+            font-size: clamp(13px, 1.4vw, 18px);
+            font-weight: 600;
+            color: rgba(0,0,0,0.3);
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            white-space: nowrap;
+        }
+        .pisze-footnote.visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* ── SECTION 3: LAWENDA (lavender) ───────────────────────────── */
+        .section-lawenda {
+            background: #f0ede8;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            min-height: 70dvh;
+        }
+        .section-lawenda .scatter-words span {
+            color: #b8a0d6;
+        }
+        .section-lawenda .scatter-words span.visible {
+            opacity: 0.08;
+        }
+        .lawenda-kicker {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: clamp(14px, 1.8vw, 22px);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            line-height: 1.3;
+            color: #111;
+            z-index: 1;
+            margin-bottom: clamp(0.5rem, 1.5vh, 1rem);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            text-align: center;
+        }
+        .lawenda-kicker.visible {
+            opacity: 1;
+            transform: none;
+        }
+        .lawenda-huge {
+            font-size: clamp(60px, 14vw, 180px);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 0.85;
+            color: #b8a0d6;
+            z-index: 1;
+            text-align: center;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .lawenda-huge:hover {
+            color: #7B5EA7;
+        }
+        .lawenda-desc {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: clamp(20px, 2.8vw, 36px);
+            font-weight: 600;
+            line-height: 1.6;
+            white-space: pre-line;
+            max-width: 32ch;
+            text-align: center;
+            color: #000;
+            margin-top: clamp(1.5rem, 4vh, 4rem);
+            z-index: 1;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 1s ease 0.3s, transform 1s ease 0.3s;
+        }
+        .lawenda-desc.visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* ── SECTION 4: KSIĄŻKA (white) ──────────────────────────────── */
+        .section-ksiazka {
+            background: #f0ede8;
+            color: #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            min-height: 70dvh;
+        }
+        .section-ksiazka .scatter-words span {
+            color: #111;
+        }
+        .section-ksiazka .scatter-words span.visible {
+            opacity: 0.035;
+        }
+        .ksiazka-line {
+            font-size: clamp(24px, 3.5vw, 44px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #111;
+            z-index: 1;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            text-align: center;
+        }
+        .ksiazka-sym {
+            opacity: 0.35;
+            display: inline-block;
+            min-width: 2ch;
+        }
+        .ksiazka-line.visible {
+            opacity: 1;
+            transform: none;
+        }
+        .ksiazka-dot {
+            display: inline-block;
+            font-weight: 900;
+            opacity: 0.15;
+        }
+
+        /* ── SECTION 5: SUPPORT (off-white) ─────────────────────────── */
+        .section-support {
+            background: #f0ede8;
+            display: block;
+            position: relative;
+            min-height: 70vh;
+            min-height: 70dvh;
+        }
+        .support-cta-read {
+            position: absolute;
+            top: 28vh;
+            left: clamp(2rem, 6vw, 8rem);
+            font-size: clamp(42px, 7vw, 90px);
+            font-weight: 700;
+            color: #b8a0d6;
+            text-decoration: none;
+            letter-spacing: -0.03em;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s, color 0.3s;
+        }
+        .support-cta-read:hover { color: #9b80c0; }
+        .support-cta-help {
+            position: absolute;
+            bottom: 22vh;
+            right: clamp(2rem, 8vw, 10rem);
+            font-size: clamp(24px, 3.5vw, 44px);
+            font-weight: 600;
+            color: rgba(184,160,214,0.5);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.3s, color 0.3s;
+        }
+        .support-cta-help:hover { color: #b8a0d6; opacity: 1 !important; }
+        .support-scatter-sym {
+            position: absolute;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            color: rgba(184,160,214,0.08);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        .support-scatter-sym.visible { opacity: 1; }
+
+        /* ── SECTION 6: NAV (near-black) ─────────────────────────────── */
+        .section-nav {
+            background: #0a0a0a;
+            flex-direction: column;
+            gap: 0;
+            padding: clamp(3rem, 6vh, 6rem) clamp(2rem, 6vw, 8rem);
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .nav-row {
+            display: block;
+            text-decoration: none;
+            color: #fff;
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.35;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.6s ease, transform 0.6s ease, color 0.3s;
+        }
+        .nav-row.visible {
+            opacity: 0.25;
+            transform: none;
+        }
+        .nav-row:hover {
+            opacity: 1 !important;
+            color: #7B5EA7;
+        }
+        .nav-row-main {
+            font-size: clamp(48px, 9vw, 110px) !important;
+            margin-bottom: clamp(1rem, 2vh, 2rem);
+        }
+        .nav-row.visible:nth-child(2) { transition-delay: 0.08s; }
+        .nav-row.visible:nth-child(3) { transition-delay: 0.16s; }
+        .nav-row.visible:nth-child(4) { transition-delay: 0.24s; }
+        .nav-row.visible:nth-child(5) { transition-delay: 0.32s; }
+        .nav-row.visible:nth-child(6) { transition-delay: 0.40s; }
+
+        .nav-collab {
+            display: block;
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.35;
+            color: #fff;
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.6s ease, transform 0.6s ease, color 0.3s;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: inherit;
+            text-align: left;
+            margin-top: clamp(1.5rem, 3vh, 3rem);
+        }
+        .nav-collab.visible {
+            opacity: 0.25;
+            transform: none;
+        }
+        .nav-collab:hover {
+            opacity: 1 !important;
+            color: #7B5EA7;
+        }
+        .nav-email {
+            display: block;
+            font-size: clamp(18px, 3vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #7B5EA7;
+            text-decoration: none;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s ease, opacity 0.4s ease, color 0.3s;
+            margin-top: 0.3rem;
+        }
+        .nav-email.open {
+            max-height: 4rem;
+            opacity: 1;
+        }
+        .nav-email:hover { color: #b8a0d6; }
+
+        /* ── CURSOR ──────────────────────────────────────────────────── */
+        .stas-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 0.85em;
+            background: #fff;
+            margin-left: 3px;
+            vertical-align: baseline;
+            animation: blink-caret 0.6s step-end infinite;
+        }
+        @keyframes blink-caret {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ── DECRYPT ─────────────────────────────────────────────────── */
+        .dc {
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* ── MOBILE ───────────────────────────────────────────────────── */
+        @media (max-width: 768px) {
+            .section-nav {
+                padding: 3rem 1.5rem;
+            }
+            .nav-row {
+                font-size: clamp(28px, 9vw, 48px);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-snap-type: none; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk" style="position: fixed; top: 1rem; right: 1rem; background: none; border: 0; color: #000; font-family: 'Geist Mono', monospace; font-size: 12px; opacity: 0.8; z-index: 1200; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s ease, transform 0.2s ease;">dźwięk: off</button>
-    <button class="back" onclick="window.location.href='index.html'">← start</button>
-    <div class="bio-overlay show" id="bioOverlay">
-        <button class="bio-close" id="bioClose" onclick="window.location.href='index.html'">×</button>
-        <div class="bio-content">
-            <video class="bio-photo" autoplay muted loop playsinline>
-                <source src="08AE25F8-768F-4E1D-8721-A1E8599935AFMVI_0843.mov" type="video/mp4">
-                twoja przeglądarka nie obsługuje wideo.
-            </video>
-            <h2 class="bio-title"><span class="bio-first-name">staś</span> <span class="bio-last-name">szpineta</span></h2>
-            <p class="bio-text">
-nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszystko musi mieć sens. piszę, bo wiersze są dla mnie naturalnym i jedynym sposobem, żeby nie zgubić siebie w sobie i w świecie. to moja codzienność, pamięć, myśli, emocje, wspomnienia, a czasem rozmowa z kimś, kogo już nie ma albo kto jest bardzo blisko. w tekstach dodaję znaki, traktując je jako coś, czego nie da się zapisać słowami. to mój własny język. mój tworzony od kilku lat zbiór „lawenda" to pierwszy krok do pokazania ludziom mojego świata. oprócz pisania tworzę muzykę, biżuterię, maluję, projektuję. kocham naturę, wschody słońca, ciszę i dźwięk analogowych kaset audio.
-            </p>
-            <div class="bio-links">
-                <a href="mailto:stas.mono123@gmail.com" class="bio-link">email</a>
-                <a href="https://instagram.com/s.sz.archive" class="bio-link">instagram</a>
-                <a href="https://www.youtube.com/channel/UCD2yGC0UnRYmJ_LkaI-2fNA" class="bio-link">youtube</a>
-                <a href="https://instagram.com/biv.alvia" class="bio-link">biżuteria</a>
-            </div>
-            <div class="spotify-widget">
-                <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/artist/7cu88Rw7NzRpScSRjgDfB5?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-            </div>
-            <div class="bio-extra-text-1">~||-_^+*.</div>
-        </div>
-    </div>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TKJ2KBZ8"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <a href="index.html" class="back-button">~||-_^+*.</a>
+    <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">||</button>
+
+    <div id="camera">
+    <!-- ══ SECTION 1: HERO ══════════════════════════════════════════ -->
+    <section class="section section-hero" data-section="hero">
+        <div class="scatter-words" aria-hidden="true"></div>
+        <div class="hero-hej" id="heroHej"></div>
+        <div class="hero-name" id="heroName"></div>
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="08AE25F8-768F-4E1D-8721-A1E8599935AFMVI_0843.mov" type="video/mp4">
+        </video>
+    </section>
+
+    <!-- ══ SECTION 2: PISZĘ ═════════════════════════════════════════ -->
+    <section class="section section-pisze" data-section="pisze">
+        <div class="scatter-words" aria-hidden="true"></div>
+        <div class="pisze-line pisze-line-1" id="piszeLine1"></div>
+        <div class="pisze-line pisze-line-2" id="piszeLine2"></div>
+        <div class="pisze-line pisze-line-3" id="piszeLine3"></div>
+        <div class="pisze-line pisze-dot" id="piszeDot"></div>
+        <div class="pisze-footnote" id="piszeFootnote"></div>
+    </section>
+
+    <!-- ══ SECTION 3: LAWENDA ═══════════════════════════════════════ -->
+    <section class="section section-lawenda" data-section="lawenda">
+        <div class="scatter-words" aria-hidden="true"></div>
+        <p class="lawenda-kicker">ich archiwum,</p>
+        <div class="lawenda-huge">lawenda</div>
+        <div class="lawenda-desc">to wszystko czym jestem.
+chcę się tym dzielić.</div>
+    </section>
+
+    <!-- ══ SECTION 4: KSIĄŻKA ═══════════════════════════════════════ -->
+    <section class="section section-ksiazka" data-section="ksiazka">
+        <div class="scatter-words" aria-hidden="true"></div>
+        <div class="ksiazka-line ksiazka-line-1"><span class="ksiazka-sym" data-side="left" data-count="3"></span>chciałbym ją wydać<span class="ksiazka-sym" data-side="right" data-count="3"></span></div>
+        <div class="ksiazka-line ksiazka-line-2"><span class="ksiazka-sym" data-side="left" data-count="2"></span>fizycznie<span class="ksiazka-sym" data-side="right" data-count="2"></span></div>
+        <div class="ksiazka-line ksiazka-line-3"><span class="ksiazka-sym" data-side="left" data-count="3"></span>jako książkę<span class="ksiazka-sym" data-side="right" data-count="3"></span></div>
+    </section>
+
+    <!-- ══ SECTION 5: SUPPORT ═══════════════════════════════════════ -->
+    <section class="section section-support" data-section="support">
+        <a href="index.html" class="support-cta-read" id="supportRead">czytaj lawendę</a>
+        <a href="https://buycoffee.to/szpineta" target="_blank" rel="noopener" class="support-cta-help" id="supportHelp">wesprzyj wydanie</a>
+    </section>
+
+    <!-- ══ SECTION 6: NAV ═══════════════════════════════════════════ -->
+    <section class="section section-nav" data-section="nav">
+        <a href="https://instagram.com/s.sz.archive" class="nav-row" target="_blank" rel="noopener">instagram</a>
+        <a href="https://www.youtube.com/channel/UCD2yGC0UnRYmJ_LkaI-2fNA" class="nav-row" target="_blank" rel="noopener">youtube</a>
+        <a href="https://open.spotify.com/artist/7cu88Rw7NzRpScSRjgDfB5" class="nav-row" target="_blank" rel="noopener">spotify</a>
+        <a href="https://instagram.com/biv.alvia" class="nav-row" target="_blank" rel="noopener">biżuteria</a>
+        <button class="nav-collab" id="navCollab">współpraca</button>
+        <a href="mailto:stanislaw@szpineta.com" class="nav-email" id="navEmail">stanislaw@szpineta.com</a>
+    </section>
+    </div><!-- /camera -->
+
     <script src="audio.js"></script>
+    <script>
+    (function() {
+        const SYMS = ['~', '|', '|', '-', '_', '^', '+', '*', '.'];
+
+        // ── Scatter symbols per section ────────────────────────────────
+        const scatterConfig = {
+            hero:    { count: 20, opacity: 0.05, color: '#fff' },
+            pisze:   { count: 14, opacity: 0.04, color: '#111' },
+            lawenda: { count: 16, opacity: 0.07, color: '#fff' },
+            ksiazka: { count: 14, opacity: 0.03, color: '#111' },
+        };
+
+        document.querySelectorAll('.scatter-words').forEach(container => {
+            const sectionName = container.parentElement.dataset.section;
+            const cfg = scatterConfig[sectionName];
+            if (!cfg) return;
+
+            for (let i = 0; i < cfg.count; i++) {
+                const s = document.createElement('span');
+                s.textContent = SYMS[Math.floor(Math.random() * SYMS.length)];
+                s.style.left = (5 + Math.random() * 85) + '%';
+                s.style.top = (5 + Math.random() * 85) + '%';
+                const size = 14 + Math.random() * 36;
+                s.style.fontSize = size + 'px';
+                s.style.color = cfg.color;
+                const rotate = (Math.random() - 0.5) * 40;
+                s.style.transform = 'rotate(' + rotate + 'deg) translateY(20px)';
+                s._rotate = rotate;
+                container.appendChild(s);
+            }
+        });
+
+        // ── Intersection Observer for scroll-triggered reveals ───────
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const section = entry.target;
+                const sectionName = section.dataset.section;
+
+                // reveal scatter words
+                section.querySelectorAll('.scatter-words span').forEach((s, i) => {
+                    setTimeout(() => {
+                        s.classList.add('visible');
+                        s.style.transform = 'rotate(' + s._rotate + 'deg) translateY(0)';
+                    }, i * 80);
+                });
+
+                // reveal main content
+                if (sectionName === 'hero') {
+                    const name = document.getElementById('heroName');
+                    if (!name.dataset.animated) {
+                        name.dataset.animated = '1';
+                        typewriteHero();
+                    }
+                }
+                else if (sectionName === 'pisze') {
+                    if (!section.dataset.animated) {
+                        section.dataset.animated = '1';
+                        animatePisze();
+                    }
+                }
+                else if (sectionName === 'lawenda') {
+                    const kickerEl = section.querySelector('.lawenda-kicker');
+                    const hugeEl = section.querySelector('.lawenda-huge');
+                    const descEl = section.querySelector('.lawenda-desc');
+                    if (!hugeEl.dataset.looping) {
+                        hugeEl.dataset.looping = '1';
+                        if (!descEl.dataset.fullText) {
+                            descEl.dataset.fullText = descEl.textContent.trim();
+                        }
+                        descEl.textContent = '';
+                        if (kickerEl && !kickerEl.dataset.animated) {
+                            kickerEl.dataset.animated = '1';
+                            typewriteKicker(kickerEl, kickerEl.textContent.trim(), () => {
+                                setTimeout(() => {
+                                    lawendaDecryptLoop(hugeEl, () => {
+                                        typewriteLawendaDesc(descEl);
+                                    });
+                                }, 300);
+                            });
+                        }
+                    }
+                }
+                else if (sectionName === 'ksiazka') {
+                    section.querySelectorAll('.ksiazka-line').forEach((el, i) => {
+                        setTimeout(() => el.classList.add('visible'), i * 400);
+                    });
+                    if (!section.dataset.symLoop) {
+                        section.dataset.symLoop = '1';
+                        updateKsiazkaSymbols();
+                        setInterval(updateKsiazkaSymbols, 180);
+                    }
+                }
+                else if (sectionName === 'support') {
+                    if (!section.dataset.animated) {
+                        section.dataset.animated = '1';
+                        animateSupport();
+                    }
+                }
+                else if (sectionName === 'nav') {
+                    section.querySelectorAll('.nav-row').forEach(el => el.classList.add('visible'));
+                    const collabBtn = document.getElementById('navCollab');
+                    if (collabBtn) collabBtn.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.section').forEach(s => observer.observe(s));
+
+        // ── Decrypt reveal (from poems) ──────────────────────────────
+        const SYMS_DECRYPT = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+        const LIVE_KSIAZKA_SYMS = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+
+        function randomSymChunk(len) {
+            let out = '';
+            for (let i = 0; i < len; i++) {
+                out += LIVE_KSIAZKA_SYMS[Math.floor(Math.random() * LIVE_KSIAZKA_SYMS.length)];
+            }
+            return out;
+        }
+
+        function updateKsiazkaSymbols() {
+            document.querySelectorAll('.section-ksiazka .ksiazka-sym').forEach(el => {
+                const n = Number(el.dataset.count) || 3;
+                const side = el.dataset.side || 'left';
+                const chunk = randomSymChunk(n);
+                el.textContent = chunk;
+            });
+        }
+
+        function decryptReveal(el) {
+            const text = el.textContent;
+            const chars = [];
+            let html = '';
+            for (let i = 0; i < text.length; i++) {
+                if (/\s/.test(text[i])) {
+                    html += text[i];
+                } else {
+                    html += '<span class="dc">' + SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)] + '</span>';
+                    chars.push({ idx: i, ch: text[i] });
+                }
+            }
+            el.innerHTML = html;
+            const spans = Array.from(el.querySelectorAll('.dc'));
+
+            // lock widths to final chars
+            spans.forEach((s, i) => { s.textContent = chars[i].ch; });
+            void el.offsetWidth;
+            spans.forEach((s, i) => {
+                const w = s.getBoundingClientRect().width;
+                s.style.width = w + 'px';
+                s.textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+            });
+
+            // shuffle order
+            const order = spans.map((_, i) => i);
+            for (let k = order.length - 1; k > 0; k--) {
+                const j = Math.floor(Math.random() * (k + 1));
+                [order[k], order[j]] = [order[j], order[k]];
+            }
+
+            const timeouts = [];
+            let t = 0;
+            order.forEach(si => {
+                t += 1 + Math.random() * 7;
+                const start = t;
+                const cycles = 1 + Math.floor(Math.random() * 5);
+                const stepMs = 35 + Math.random() * 75;
+                for (let c = 0; c < cycles; c++) {
+                    timeouts.push(setTimeout(() => {
+                        spans[si].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                    }, start + c * stepMs));
+                }
+                timeouts.push(setTimeout(() => {
+                    spans[si].textContent = chars[si].ch;
+                }, start + cycles * stepMs));
+            });
+        }
+
+        // ── Typewrite hero ───────────────────────────────────────────
+        function humanDelay(char) {
+            let d = 30 + Math.random() * 40;
+            if ('.!?'.includes(char)) d += 120 + Math.random() * 150;
+            else if (',;:'.includes(char)) d += 60 + Math.random() * 60;
+            else if (char === ' ') d += 15 + Math.random() * 50;
+            // random micro-pauses — hesitation
+            if (Math.random() < 0.1) d += 80 + Math.random() * 150;
+            // rare long pause — like thinking
+            if (Math.random() < 0.04) d += 200 + Math.random() * 250;
+            return d;
+        }
+
+        function decryptRevealSlow(el, onDone) {
+            const text = el.textContent;
+            const chars = [];
+            let html = '';
+            for (let i = 0; i < text.length; i++) {
+                if (/\s/.test(text[i])) {
+                    html += text[i];
+                } else {
+                    html += '<span class="dc">' + SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)] + '</span>';
+                    chars.push({ idx: i, ch: text[i] });
+                }
+            }
+            el.innerHTML = html;
+            const spans = Array.from(el.querySelectorAll('.dc'));
+
+            spans.forEach((s, i) => { s.textContent = chars[i].ch; });
+            void el.offsetWidth;
+            spans.forEach((s, i) => {
+                const w = s.getBoundingClientRect().width;
+                s.style.width = w + 'px';
+                s.textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+            });
+
+            // find the exclamation mark index (last char "!")
+            const exclIndex = chars.findIndex(c => c.ch === '!');
+
+            // shuffle order but exclude "!" — it goes last
+            const order = spans.map((_, i) => i).filter(i => i !== exclIndex);
+            for (let k = order.length - 1; k > 0; k--) {
+                const j = Math.floor(Math.random() * (k + 1));
+                [order[k], order[j]] = [order[j], order[k]];
+            }
+
+            let t = 0;
+            let maxEnd = 0;
+            // decrypt all chars except "!" — fast timing
+            order.forEach(si => {
+                t += 8 + Math.random() * 25;
+                const start = t;
+                const cycles = 3 + Math.floor(Math.random() * 5);
+                const stepMs = 35 + Math.random() * 55;
+                for (let c = 0; c < cycles; c++) {
+                    setTimeout(() => {
+                        spans[si].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                    }, start + c * stepMs);
+                }
+                const endTime = start + cycles * stepMs;
+                if (endTime > maxEnd) maxEnd = endTime;
+                setTimeout(() => {
+                    spans[si].textContent = chars[si].ch;
+                }, endTime);
+            });
+
+            // "!" decrypts last — starts when others finish, decelerates
+            if (exclIndex !== -1) {
+                const exclStart = maxEnd + 80;
+                const exclCycles = 4 + Math.floor(Math.random() * 3);
+                let exclT = exclStart;
+                for (let c = 0; c < exclCycles; c++) {
+                    const progress = c / exclCycles;
+                    const stepMs = 70 + progress * progress * 250;
+                    setTimeout(() => {
+                        spans[exclIndex].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                    }, exclT);
+                    exclT += stepMs;
+                }
+                // final reveal
+                setTimeout(() => {
+                    spans[exclIndex].textContent = chars[exclIndex].ch;
+                }, exclT);
+                maxEnd = exclT;
+            }
+
+            setTimeout(() => {
+                el.textContent = text;
+                if (onDone) onDone();
+            }, maxEnd + 100);
+        }
+
+        function typewriteHero() {
+            const hejEl = document.getElementById('heroHej');
+            const nameEl = document.getElementById('heroName');
+
+            // Phase 1: decrypt "cześć!" (slow, no typewrite)
+            hejEl.classList.add('visible');
+            hejEl.textContent = 'cześć!';
+            decryptRevealSlow(hejEl, () => {
+                document.querySelector('.hero-video').classList.add('visible');
+                // Phase 2: brief pause + start tracking cursor
+                setTimeout(() => {
+                    // Phase 3: typewrite "jestem sta" then hesitation animation
+                    nameEl.classList.add('visible');
+                    const preText = 'jestem sta';
+                    let ni = 0;
+                    function typePre() {
+                        ni++;
+                        nameEl.innerHTML = preText.slice(0, ni) + '<span class="stas-cursor"></span>';
+                        if (ni >= preText.length) {
+                            // Phase 4: staś/stanisław hesitation, then auto-scroll
+                            setTimeout(() => animateStasHesitation(nameEl, () => {}), 150);
+                            return;
+                        }
+                        setTimeout(typePre, humanDelay(preText[ni]));
+                    }
+                    typePre();
+                }, 400);
+            });
+        }
+
+        // ── Staś/Stanisław hesitation ────────────────────────────────
+        // staś → stanisław → staś → staś? —— stanisław -(pauza) -dopisanie "?" -dopisanie "????" —— staś — staś.
+        function animateStasHesitation(el, onDone) {
+            const base = 'jestem sta';
+            const steps = [];
+            function last() { return steps[steps.length - 1].text; }
+            function typeStr(str, speed) {
+                str.split('').forEach(ch => {
+                    steps.push({ text: last() + ch, cursor: true, delay: speed || (50 + Math.random() * 55) });
+                });
+            }
+            function deleteBack(to, speed) {
+                let cur = last();
+                while (cur.length > to.length) {
+                    cur = cur.slice(0, -1);
+                    steps.push({ text: cur, cursor: true, delay: speed || 30 });
+                }
+            }
+            function pause(ms) {
+                steps.push({ text: last(), cursor: true, delay: ms });
+            }
+
+            // 1. staś
+            steps.push({ text: base + 'ś', cursor: true, delay: 50 });
+            pause(300);
+
+            // 2. → stanisław
+            deleteBack(base, 20);
+            pause(120);
+            typeStr('nisław', 35);
+            pause(250);
+
+            // 3. → staś
+            deleteBack(base, 18);
+            pause(100);
+            typeStr('ś', 35);
+            pause(180);
+
+            // 4. → staś?
+            deleteBack(base, 18);
+            pause(80);
+            typeStr('ś?', 35);
+            pause(600);
+
+            // 5. —— stanisław
+            deleteBack(base, 18);
+            pause(150);
+            typeStr('nisław', 30);
+            pause(500);
+
+            // 6. (pauza) dopisanie "?" potem "????"
+            typeStr('?', 40);
+            pause(250);
+            typeStr('????', 55);
+            pause(400);
+
+            // 7. —— staś
+            deleteBack(base, 18);
+            pause(100);
+            typeStr('ś', 35);
+            pause(300);
+
+            // 8. — staś.
+            deleteBack(base, 18);
+            pause(100);
+            typeStr('ś.', 35);
+            pause(600);
+
+            // cursor off
+            steps.push({ text: last(), cursor: false });
+
+            let step = 0;
+            function run() {
+                if (step >= steps.length) { if (onDone) onDone(); return; }
+                const s = steps[step];
+                el.innerHTML = s.text + (s.cursor ? '<span class="stas-cursor"></span>' : '');
+                step++;
+                setTimeout(run, s.delay || 60);
+            }
+            run();
+        }
+
+        // ── Piszę wiersze... animation ────────────────────────────
+        function animatePisze() {
+            const cursor = '<span class="stas-cursor" style="background:#111"></span>';
+
+            function typeInto(el, text, speed) {
+                return new Promise(resolve => {
+                    let i = 0;
+                    el.classList.add('visible');
+                    function step() {
+                        if (i >= text.length) {
+                            el.textContent = text;
+                            resolve();
+                            return;
+                        }
+                        i++;
+                        el.innerHTML = text.slice(0, i) + cursor;
+                        let d = speed || (18 + Math.random() * 22);
+                        if (text[i - 1] === ' ') d += 8 + Math.random() * 15;
+                        if (Math.random() < 0.04) d += 40 + Math.random() * 60;
+                        setTimeout(step, d);
+                    }
+                    step();
+                });
+            }
+
+            function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+            function typeFootnote(el, text, speed) {
+                return new Promise(resolve => {
+                    let i = 0;
+                    el.classList.add('visible');
+                    function step() {
+                        if (i >= text.length) { el.textContent = text; resolve(); return; }
+                        i++;
+                        el.textContent = text.slice(0, i);
+                        setTimeout(step, speed || (25 + Math.random() * 20));
+                    }
+                    step();
+                });
+            }
+
+            async function run() {
+                const l1 = document.getElementById('piszeLine1');
+                const l2 = document.getElementById('piszeLine2');
+                const l3 = document.getElementById('piszeLine3');
+                const dot = document.getElementById('piszeDot');
+                const foot = document.getElementById('piszeFootnote');
+
+                // line 1: "piszę wiersze,"
+                await typeInto(l1, 'piszę wiersze,', 25);
+
+                // line 2: longer — slight pause before, slower
+                await wait(500);
+                await typeInto(l2, 'żeby nie zgubić siebie w sobie', 30);
+
+                // line 3: short — quick
+                await wait(300);
+                await typeInto(l3, 'i w świecie', 22);
+
+                // dot
+                await wait(600);
+                dot.classList.add('visible');
+                dot.textContent = '.';
+
+                // comma → asterisk on "piszę wiersze,"
+                await wait(400);
+                l1.innerHTML = 'piszę wiersze<span class="pisze-star">*</span>';
+
+                // footnote typewrite
+                await wait(300);
+                await typeFootnote(foot, '*i nie tylko', 35);
+            }
+
+            run();
+        }
+
+        function typewriteKicker(el, text, onDone) {
+            const cursor = '<span class="stas-cursor" style="background:#111"></span>';
+            el.textContent = '';
+            el.classList.add('visible');
+            let i = 0;
+            function step() {
+                if (i >= text.length) {
+                    el.textContent = text;
+                    setTimeout(() => { if (onDone) onDone(); }, 400);
+                    return;
+                }
+                i++;
+                el.innerHTML = text.slice(0, i) + cursor;
+                let d = 30 + Math.random() * 40;
+                if (text[i - 1] === ' ') d += 15 + Math.random() * 25;
+                if (text[i - 1] === ',') d += 80 + Math.random() * 60;
+                setTimeout(step, d);
+            }
+            step();
+        }
+
+        function typewriteLawendaDesc(el) {
+            const cursor = () => '<span class="stas-cursor" style="background:#111"></span>';
+            function sliceToHtml(s) {
+                return s
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/\n/g, '<br>');
+            }
+            const fullText = el.dataset.fullText || '';
+            let i = 0;
+
+            el.classList.add('visible');
+            el.innerHTML = cursor();
+
+            function step() {
+                if (i >= fullText.length) {
+                    el.textContent = fullText;
+                    return;
+                }
+                i++;
+                el.innerHTML = sliceToHtml(fullText.slice(0, i)) + cursor();
+
+                let d = 25 + Math.random() * 30;
+                if (fullText[i - 1] === ' ') d += 15 + Math.random() * 25;
+                if (fullText[i - 1] === '\n') d += 80 + Math.random() * 60;
+                if (fullText[i - 1] === ',') d += 100 + Math.random() * 80;
+                else if ('.;:!?'.includes(fullText[i - 1])) d += 120 + Math.random() * 120;
+                if (Math.random() < 0.05) d += 50 + Math.random() * 80;
+                setTimeout(step, d);
+            }
+
+            setTimeout(step, 180);
+        }
+
+        // ── Support section animation ──────────────────────────────
+        function animateSupport() {
+            const section = document.querySelector('.section-support');
+            const readEl = document.getElementById('supportRead');
+            const helpEl = document.getElementById('supportHelp');
+
+            // scatter big symbols across the section
+            const SYMS_BG = ['"', '~', '|', '-', '_', '^', '+', '*', '.'];
+            for (let s = 0; s < 25; s++) {
+                const sym = document.createElement('span');
+                sym.className = 'support-scatter-sym';
+                sym.textContent = SYMS_BG[Math.floor(Math.random() * SYMS_BG.length)];
+                sym.style.left = (5 + Math.random() * 85) + '%';
+                sym.style.top = (5 + Math.random() * 85) + '%';
+                sym.style.fontSize = (20 + Math.random() * 60) + 'px';
+                sym.style.transform = 'rotate(' + ((Math.random() - 0.5) * 50) + 'deg)';
+                section.appendChild(sym);
+                setTimeout(() => sym.classList.add('visible'), 200 + s * 60);
+            }
+
+            // rotating symbols in background
+            setInterval(() => {
+                const syms = section.querySelectorAll('.support-scatter-sym');
+                const pick = syms[Math.floor(Math.random() * syms.length)];
+                if (pick) pick.textContent = SYMS_BG[Math.floor(Math.random() * SYMS_BG.length)];
+            }, 200);
+
+            function decryptLink(el, onDone) {
+                const text = el.textContent;
+                const chars = [];
+                let html = '';
+                for (let j = 0; j < text.length; j++) {
+                    if (/\s/.test(text[j])) { html += text[j]; }
+                    else {
+                        html += '<span class="dc">' + SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)] + '</span>';
+                        chars.push({ ch: text[j] });
+                    }
+                }
+                el.innerHTML = html;
+                el.style.opacity = '1';
+                const spans = Array.from(el.querySelectorAll('.dc'));
+                spans.forEach((s, k) => { s.textContent = chars[k].ch; });
+                void el.offsetWidth;
+                spans.forEach((s, k) => {
+                    const w = s.getBoundingClientRect().width;
+                    s.style.width = w + 'px';
+                    s.textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                });
+                const order = spans.map((_, k) => k);
+                for (let k = order.length - 1; k > 0; k--) {
+                    const j = Math.floor(Math.random() * (k + 1));
+                    [order[k], order[j]] = [order[j], order[k]];
+                }
+                let t = 0, maxEnd = 0;
+                order.forEach(si => {
+                    t += 8 + Math.random() * 25;
+                    const start = t;
+                    const cycles = 3 + Math.floor(Math.random() * 5);
+                    const stepMs = 40 + Math.random() * 60;
+                    for (let c = 0; c < cycles; c++) {
+                        setTimeout(() => {
+                            spans[si].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                        }, start + c * stepMs);
+                    }
+                    const endTime = start + cycles * stepMs;
+                    if (endTime > maxEnd) maxEnd = endTime;
+                    setTimeout(() => { spans[si].textContent = chars[si].ch; }, endTime);
+                });
+                setTimeout(() => { el.textContent = text; if (onDone) onDone(); }, maxEnd + 80);
+            }
+
+            setTimeout(() => {
+                decryptLink(readEl, () => {
+                    setTimeout(() => {
+                        decryptLink(helpEl, () => {});
+                    }, 400);
+                });
+            }, 200);
+        }
+
+        // ── Lawenda ↔ ~||-_^+*. decrypt loop ───────────────────────
+        function lawendaDecryptLoop(el, onFirstDecryptDone) {
+            const words = ['lawenda', '"~||-_^+*.'];
+            let idx = 0;
+
+            function fastDecrypt(target, onDone, speedProfile) {
+                const chars = [];
+                let html = '';
+                for (let i = 0; i < target.length; i++) {
+                    if (/\s/.test(target[i])) {
+                        html += target[i];
+                    } else {
+                        html += '<span class="dc">' + SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)] + '</span>';
+                        chars.push({ i: i, ch: target[i] });
+                    }
+                }
+                el.innerHTML = html;
+                const spans = Array.from(el.querySelectorAll('.dc'));
+
+                // lock widths
+                spans.forEach((s, i) => { s.textContent = chars[i].ch; });
+                void el.offsetWidth;
+                spans.forEach((s, i) => {
+                    const w = s.getBoundingClientRect().width;
+                    s.style.width = w + 'px';
+                    s.textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                });
+
+                const order = spans.map((_, i) => i);
+                for (let k = order.length - 1; k > 0; k--) {
+                    const j = Math.floor(Math.random() * (k + 1));
+                    [order[k], order[j]] = [order[j], order[k]];
+                }
+
+                let t = 0;
+                let maxEnd = 0;
+                const isSlow = speedProfile === 'slow';
+                order.forEach(si => {
+                    t += isSlow ? (26 + Math.random() * 54) : (5 + Math.random() * 20);
+                    const start = t;
+                    const cycles = isSlow ? (7 + Math.floor(Math.random() * 7)) : (3 + Math.floor(Math.random() * 5));
+                    const stepMs = isSlow ? (95 + Math.random() * 120) : (50 + Math.random() * 70);
+                    for (let c = 0; c < cycles; c++) {
+                        setTimeout(() => {
+                            spans[si].textContent = SYMS_DECRYPT[Math.floor(Math.random() * SYMS_DECRYPT.length)];
+                        }, start + c * stepMs);
+                    }
+                    const endTime = start + cycles * stepMs;
+                    if (endTime > maxEnd) maxEnd = endTime;
+                    setTimeout(() => { spans[si].textContent = chars[si].ch; }, endTime);
+                });
+
+                setTimeout(() => {
+                    el.textContent = target;
+                    if (onDone) onDone();
+                }, maxEnd + (isSlow ? 150 : 80));
+            }
+
+            function loop() {
+                idx = (idx + 1) % words.length;
+                fastDecrypt(words[idx], () => {
+                    const pause = 1800 + Math.random() * 2000;
+                    setTimeout(loop, pause);
+                });
+            }
+
+            // start with slower decrypt on "lawenda"
+            fastDecrypt(words[idx], () => {
+                if (onFirstDecryptDone) onFirstDecryptDone();
+                const initialPause = 900 + Math.random() * 700;
+                setTimeout(loop, initialPause);
+            }, 'slow');
+        }
+
+        // ── Parallax on scroll ───────────────────────────────────────
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                document.querySelectorAll('.scatter-words').forEach(container => {
+                    const rect = container.parentElement.getBoundingClientRect();
+                    const progress = -rect.top * 0.03;
+                    container.querySelectorAll('span').forEach((s, i) => {
+                        const rate = 0.3 + (i % 4) * 0.15;
+                        const y = progress * rate;
+                        s.style.transform = 'rotate(' + (s._rotate || 0) + 'deg) translateY(' + y + 'px)';
+                    });
+                });
+                ticking = false;
+            });
+        }, { passive: true });
+
+        // ── "lawenda" click scrolls to support section ───────────
+        document.querySelector('.lawenda-huge').addEventListener('click', function() {
+            const supportSection = document.querySelector('[data-section="support"]');
+            if (supportSection) {
+                supportSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // ── Współpraca toggle ──────────────────────────────────────
+        document.getElementById('navCollab').addEventListener('click', function() {
+            document.getElementById('navEmail').classList.toggle('open');
+        });
+
+    })();
+    </script>
 </body>
 </html>
-

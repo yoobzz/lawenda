@@ -27,6 +27,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
+    <link rel="prefetch" href="bio.html">
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-snZHOA1gRdrEnCR8bWAzN.js"></script>
     <script>
@@ -264,6 +265,24 @@
 
         .back-button:hover { opacity: 0.8; }
 
+        .bio-button {
+            position: fixed;
+            top: 1rem;
+            left: 5.5rem;
+            background: transparent;
+            border: 0;
+            font-family: 'Geist Mono', monospace;
+            font-size: 14px;
+            color: #000000;
+            opacity: 0.4;
+            cursor: pointer;
+            padding: 6px 8px;
+            display: none;
+            z-index: 110;
+            text-decoration: none;
+        }
+        .bio-button:hover { opacity: 0.8; }
+
         .nav-counter {
             font-family: 'Geist Mono', monospace;
             font-size: 14px;
@@ -466,6 +485,10 @@
             .back-button {
                 top: calc(0.75rem + env(safe-area-inset-top, 0));
                 left: calc(0.75rem + env(safe-area-inset-left, 0));
+            }
+            .bio-button {
+                top: calc(0.75rem + env(safe-area-inset-top, 0));
+                left: calc(5.5rem + env(safe-area-inset-left, 0));
                 padding: 10px 12px;
                 min-height: 44px;
                 font-size: 14px;
@@ -1125,7 +1148,7 @@
     <div class="container" id="landingContainer">
         <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
         <h1 class="title title-emerging" id="title">"~||-_^+*.</h1>
-        <div id="authorName" style="position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
+        <div id="authorName" style="display: none; position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
         </div>
     </div>
@@ -1145,6 +1168,7 @@
     <div class="poems-section" id="poemsSection">
         <div class="poems-background" id="poemsBackground"></div>
         <button class="back-button" id="backToStart" title="wróć">← start</button>
+        <button type="button" class="bio-button" id="bioLink" title="bio">bio</button>
 </div>
 
     <div class="navigation" id="navigation">
@@ -1437,7 +1461,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
             let lastTime = performance.now();
             let frameCount = 0;
+            let threeAnimStopped = false;
+            window.__stopThreeAnimate = function(){ threeAnimStopped = true; };
             function animate() {
+                if (threeAnimStopped) return;
                 requestAnimationFrame(animate);
                 const now = performance.now();
                 const dt = (now - lastTime) / 1000;
@@ -1555,69 +1582,48 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 starFog.style.zIndex = '2';
             }
             
-            // Stopniowe pojawianie się cząsteczek z animacją
+            // Stopniowe pojawianie się cząsteczek
             const particles = container.querySelectorAll('.star-particle');
             particles.forEach((particle, index) => {
-                // Losowy delay dla bardziej naturalnego pojawiania się
-                // Pierwsze cząsteczki pojawiają się szybciej, późniejsze wolniej
                 const baseDelay = index * 12;
-                const randomOffset = Math.random() * 200; // losowe opóźnienie 0-200ms
-                const delay = Math.min(baseDelay + randomOffset, 2500); // max 2.5 sekundy
-                
-                // Losowy kierunek pojawiania się (lekkie przesunięcie)
+                const randomOffset = Math.random() * 200;
+                const delay = Math.min(baseDelay + randomOffset, 2500);
                 const randomX = (Math.random() - 0.5) * 30;
                 const randomY = (Math.random() - 0.5) * 30;
                 particle.style.setProperty('--appear-x', randomX + 'px');
                 particle.style.setProperty('--appear-y', randomY + 'px');
-                
-                setTimeout(() => {
-                    particle.classList.add('typing-in');
-                }, delay);
-                
-                // Dodaj interaktywność - zmiana symbolu przy kliknięciu/najechaniu
+                setTimeout(() => { particle.classList.add('typing-in'); }, delay);
                 particle.style.cursor = 'pointer';
-                particle.style.transition = 'all 0.3s ease';
+                particle.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                 particle.style.pointerEvents = 'auto';
-                
-                const originalChar = particle.textContent;
-                let currentChar = originalChar;
-                let hoverChar = null;
-                
-                // Zmiana przy najechaniu
-                particle.addEventListener('mouseenter', () => {
-                    hoverChar = generateRandomString(chars, 2, 4);
-                    particle.textContent = hoverChar;
-                    particle.style.opacity = '0.4';
-                    particle.style.transform = 'scale(1.5)';
-                });
+                particle.dataset.orig = particle.textContent;
+            });
 
-                particle.addEventListener('mouseleave', () => {
-                    particle.textContent = currentChar;
-                    particle.style.opacity = '0.18';
-                    particle.style.transform = 'scale(1)';
-                    hoverChar = null;
-                });
-
-                // Zmiana przy kliknięciu/touch
-                const handleClick = (e) => {
-                    e.stopPropagation();
-                    const newChar = generateRandomString(chars, 2, 4);
-                    currentChar = newChar;
-                    particle.textContent = newChar;
-                    particle.style.opacity = '0.6';
-                    particle.style.transform = 'scale(1.8)';
-                    setTimeout(() => {
-                        particle.style.opacity = '0.18';
-                        particle.style.transform = 'scale(1)';
-                    }, 200);
-                };
-                
-                particle.addEventListener('click', handleClick);
-                particle.addEventListener('touchstart', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleClick(e);
-                }, { passive: false });
+            // Event delegation zamiast 200 indywidualnych listenerów
+            container.addEventListener('mouseenter', (e) => {
+                const p = e.target.closest('.star-particle');
+                if (!p) return;
+                p.textContent = generateRandomString(chars, 2, 4);
+                p.style.opacity = '0.4';
+                p.style.transform = 'scale(1.5)';
+            }, true);
+            container.addEventListener('mouseleave', (e) => {
+                const p = e.target.closest('.star-particle');
+                if (!p) return;
+                p.textContent = p.dataset.orig;
+                p.style.opacity = '0.18';
+                p.style.transform = 'scale(1)';
+            }, true);
+            container.addEventListener('click', (e) => {
+                const p = e.target.closest('.star-particle');
+                if (!p) return;
+                e.stopPropagation();
+                const newChar = generateRandomString(chars, 2, 4);
+                p.dataset.orig = newChar;
+                p.textContent = newChar;
+                p.style.opacity = '0.6';
+                p.style.transform = 'scale(1.8)';
+                setTimeout(() => { p.style.opacity = '0.18'; p.style.transform = 'scale(1)'; }, 200);
             });
         }
 
@@ -1635,6 +1641,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             
             typedTextAnimationStopped = true;
             if (typingText) typingText.style.display = 'none';
+            // zatrzymaj Three.js render loop — nie potrzebny po przejściu
+            if (window.__stopThreeAnimate) window.__stopThreeAnimate();
             
             document.body.style.background = '#ffffff';
             if (landingContainer) {
@@ -1662,6 +1670,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 if (nav) nav.style.display = 'flex';
                 if (ctrl) ctrl.style.display = 'flex';
                 if (back) back.style.display = 'block';
+                const bioLink = document.getElementById('bioLink');
+                if (bioLink) bioLink.style.display = 'block';
                 
                 // Uruchom animacje dla pierwszego wiersza
                 // Jeśli hash lub zapis w localStorage, ustaw odpowiedni wiersz
@@ -1795,7 +1805,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 background.appendChild(particle);
             }
             
-            // Interakcja z myszką – throttled RAF, żeby się nie zacinało
+            // Interakcja z myszką — cache particles
+            const poemParticles = Array.from(background.querySelectorAll('.poem-particle'));
             let mouseX = 0, mouseY = 0;
             let rafScheduled = false;
             document.addEventListener('mousemove', (e) => {
@@ -1806,9 +1817,9 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 rafScheduled = true;
                 requestAnimationFrame(() => {
                     rafScheduled = false;
-                    const particles = background.querySelectorAll('.poem-particle');
                     const mx = mouseX, my = mouseY;
-                    particles.forEach((particle) => {
+                    for (let i = 0; i < poemParticles.length; i++) {
+                        const particle = poemParticles[i];
                         const rect = particle.getBoundingClientRect();
                         const px = rect.left + rect.width / 2;
                         const py = rect.top + rect.height / 2;
@@ -1820,11 +1831,11 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                             const moveY = Math.sin(angle) * force * 10;
                             particle.style.transform = `translate(${moveX}px, ${moveY}px) scale(${1 + force * 0.5})`;
                             particle.style.opacity = 0.3 + force * 0.2;
-                        } else {
-                            particle.style.transform = 'translate(0, 0) scale(1)';
+                        } else if (particle.style.transform) {
+                            particle.style.transform = '';
                             particle.style.opacity = 0.15;
                         }
-                    });
+                    }
                 });
             });
         }
@@ -1850,13 +1861,6 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             const pushMouse = isTouch ? 40 : 30;
             const pushTimer = isTouch ? 80 : 50;
             let animId = null;
-
-            document.addEventListener('mousemove', (e) => {
-                if (isTouch || isIOS || reduced) return;
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                updateParticles();
-            });
 
             // żyroskop na telefonach: reaguj na przechylenie
             if (isTouch) {
@@ -1918,63 +1922,60 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 }
             }
 
+            // cache particles array raz (zamiast querySelectorAll co frame)
+            const cachedParticles = Array.from(container.querySelectorAll('.star-particle'));
+            if (isTouch || isIOS || reduced) return;
+
             function updateParticles() {
-                const particles = container.querySelectorAll('.star-particle');
-                if (isTouch || isIOS || reduced) return; // pomiń na mobile/reduced motion
-                particles.forEach(particle => {
+                const mx = mouseX, my = mouseY, tx = timerX, ty = timerY;
+                for (let i = 0; i < cachedParticles.length; i++) {
+                    const particle = cachedParticles[i];
                     const rect = particle.getBoundingClientRect();
                     const particleX = rect.left + rect.width / 2;
                     const particleY = rect.top + rect.height / 2;
 
-                    // Odległość od myszy
-                    const dx = mouseX - particleX;
-                    const dy = mouseY - particleY;
+                    const dx = mx - particleX;
+                    const dy = my - particleY;
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
-                    // Odległość od timera (tylko gdy jest widoczny)
-                    const timerDx = timerX - particleX;
-                    const timerDy = timerY - particleY;
+                    const timerDx = tx - particleX;
+                    const timerDy = ty - particleY;
                     const timerDistance = Math.sqrt(timerDx * timerDx + timerDy * timerDy);
 
                     let totalPushX = 0;
                     let totalPushY = 0;
 
-                    // Siła odpychania od myszy/żyroskopu
-                    const maxDistance = maxDistMouse;
-                    if (distance < maxDistance) {
-                        const force = (maxDistance - distance) / maxDistance;
+                    if (distance < maxDistMouse) {
+                        const force = (maxDistMouse - distance) / maxDistMouse;
                         const angle = Math.atan2(dy, dx);
                         totalPushX += Math.cos(angle) * force * pushMouse;
                         totalPushY += Math.sin(angle) * force * pushMouse;
                     }
 
-                    // Siła odpychania od timera (większa)
-                    const timerMaxDistance = maxDistTimer;
-                    if (timerDistance < timerMaxDistance) {
-                        const timerForce = (timerMaxDistance - timerDistance) / timerMaxDistance;
+                    if (timerDistance < maxDistTimer) {
+                        const timerForce = (maxDistTimer - timerDistance) / maxDistTimer;
                         const timerAngle = Math.atan2(timerDy, timerDx);
                         totalPushX += Math.cos(timerAngle) * timerForce * pushTimer;
                         totalPushY += Math.sin(timerAngle) * timerForce * pushTimer;
                     }
 
-                    // Aktualizuj pozycję
                     if (totalPushX !== 0 || totalPushY !== 0) {
                         const currentX = parseFloat(particle.style.left) || 0;
                         const currentY = parseFloat(particle.style.top) || 0;
-                        const newX = currentX - totalPushX;
-                        const newY = currentY - totalPushY;
-
-                        particle.style.left = newX + 'px';
-                        particle.style.top = newY + 'px';
+                        particle.style.left = (currentX - totalPushX) + 'px';
+                        particle.style.top = (currentY - totalPushY) + 'px';
                     }
-                });
+                }
             }
 
-            // płynna pętla animacji
-            (function loop(){
-                updateParticles();
-                animId = requestAnimationFrame(loop);
-            })();
+            // rAF tylko na żądanie (mousemove) zamiast ciągłego loop
+            let bgRafId = null;
+            document.addEventListener('mousemove', (e) => {
+                if (isTouch || isIOS || reduced) return;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                if (!bgRafId) bgRafId = requestAnimationFrame(() => { bgRafId = null; updateParticles(); });
+            });
         }
 
         const DECRYPT_CHARS = '"~||-_^+*.';
@@ -2529,153 +2530,64 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     overlay.style.background = 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)';
                     document.body.appendChild(overlay);
                     overlay.classList.add('active');
-                    const symbols = document.createElement('div');
-                    symbols.className = 'transition-symbols transition-symbols-pulse';
-                    symbols.textContent = '"~||-_^+*.';
-                    symbols.style.cssText = "position: absolute; bottom: 1.5rem; left: 50%; transform: translateX(-50%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 300; letter-spacing: 0.15em; color: rgba(0,0,0,0.35); pointer-events: none; opacity: 0; transition: opacity 0.8s ease;";
-                    overlay.appendChild(symbols);
-                    const container = document.createElement('div');
-                    container.className = 'transition-container';
-                    container.style.cssText = 'text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1.8rem; padding: 0 1rem; max-width: 100%; width: 100%; box-sizing: border-box;';
-                    overlay.appendChild(container);
-                    const line1 = document.createElement('div');
-                    line1.className = 'transition-line transition-line1 transition-text-pulse';
-                    line1.style.cssText = 'max-width: 92%; padding: 0 1rem; display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; position: relative; align-items: baseline;';
-                    const line1Part1 = document.createElement('span');
-                    line1Part1.className = 'transition-title-size';
-                    line1Part1.style.cssText = 'display: inline-flex; white-space: nowrap; color: #1a1a1a; font-weight: 300;';
-                    line1.appendChild(line1Part1);
-                    container.appendChild(line1);
-                    const line2 = document.createElement('div');
-                    line2.className = 'transition-message-poetic transition-line transition-line2 transition-text-pulse';
-                    line2.style.cssText = 'max-width: 92%; padding: 0 1rem; visibility: hidden; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0;';
-                    const helpLinkWrap = document.createElement('span');
-                    helpLinkWrap.className = 'transition-btn-mark';
-                    const helpLink = document.createElement('a');
-                    helpLink.href = 'https://buycoffee.to/szpineta';
-                    helpLink.target = '_blank';
-                    helpLink.rel = 'noopener';
-                    helpLink.className = 'transition-help-link transition-message-poetic transition-btn-float';
-                    helpLink.style.cssText = "font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2.2vw, 1.6rem); font-weight: 300; color: #333; text-decoration: none; cursor: pointer; transition: opacity 0.6s ease 0.2s; white-space: nowrap;";
-                    helpLink.addEventListener('click', function() { plausible('wesprzyj_klik'); });
-                    helpLinkWrap.appendChild(helpLink);
-                    const sep = document.createElement('span');
-                    sep.className = 'transition-btn-sep transition-message-poetic';
-                    sep.textContent = '/';
-                    sep.style.cssText = 'visibility: hidden; font-size: clamp(1rem, 2.2vw, 1.6rem);';
-                    const poemsBtnWrap = document.createElement('span');
-                    poemsBtnWrap.className = 'transition-btn-mark';
-                    poemsBtnWrap.style.cssText = 'visibility: hidden;';
-                    const poemsBtn = document.createElement('button');
-                    poemsBtn.type = 'button';
-                    poemsBtn.className = 'transition-poems-btn transition-btn-float';
-                    poemsBtn.style.cssText = "font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: clamp(1rem, 2.2vw, 1.6rem); font-weight: 300; color: #1a1a1a; background: none; border: none; cursor: pointer; padding: 0; transition: opacity 0.4s ease;";
-                    const poemsBtnText = document.createElement('span');
-                    poemsBtnWrap.appendChild(poemsBtn);
-                    poemsBtn.appendChild(poemsBtnText);
-                    line2.appendChild(helpLinkWrap);
-                    line2.appendChild(sep);
-                    line2.appendChild(poemsBtnWrap);
-                    container.appendChild(line2);
-                    requestAnimationFrame(() => { symbols.style.opacity = '1'; });
-                    function continueAfterLawenda() {
-                        setTimeout(() => {
-                            const line1Part2 = document.createElement('span');
-                            line1Part2.className = 'transition-message-poetic';
-                            line1Part2.style.cssText = 'position: absolute; left: 100%; margin-left: 0.25em; white-space: nowrap; opacity: 0; pointer-events: none;';
-                            line1Part2.textContent = ' chce kwitnąć w tomiku';
-                            line1.appendChild(line1Part2);
-                            requestAnimationFrame(() => {
-                                const slideAmount = line1Part2.offsetWidth / 2;
-                                const slideDuration = 1100;
-                                line1.style.transition = 'transform ' + (slideDuration/1000) + 's cubic-bezier(0.22, 0.61, 0.36, 1)';
-                                requestAnimationFrame(() => {
-                                    line1.style.transform = 'translateX(-' + slideAmount + 'px)';
-                                });
-                                setTimeout(() => {
-                                    line1Part2.style.position = 'static';
-                                    line1Part2.style.marginLeft = '0.25em';
-                                    line1Part2.style.opacity = '1';
-                                    line1Part2.style.pointerEvents = '';
-                                    line1.style.transform = '';
-                                    line1.style.transition = '';
-                                    line1Part2.textContent = '';
-                                    decryptText(line1Part2, ' chce kwitnąć w tomiku', 50, () => {
-                                        setTimeout(() => {
-                                            line2.style.visibility = 'visible';
-                                            decryptText(helpLink, 'wesprzyj wydanie', 0, () => {
-                                                sep.style.visibility = 'visible';
-                                                setTimeout(() => {
-                                                    poemsBtnWrap.style.visibility = 'visible';
-                                                    decryptText(poemsBtnText, 'czytaj tutaj', 60, null, 'transition-decrypt-char', 35);
-                                                }, 280);
-                                            });
-                                        }, 600);
-                                    }, 'transition-decrypt-char', 35);
-                                }, slideDuration + 50);
-                            });
-                        }, 550);
-                    }
-                    if (titleIsLawenda) {
-                        line1Part1.textContent = 'lawenda';
-                        continueAfterLawenda();
-                    } else {
-                        decryptText(line1Part1, 'lawenda', 100, continueAfterLawenda, 'transition-decrypt-char', 85);
-                    }
-                    container.classList.add('transition-breathe');
-                    overlay.style.pointerEvents = 'all';
-                    
-                    const fullSymbols = '"~||-_^+*.';
-                    function runCharsThenNavigate() {
+
+                    // od razu animacja znaków → poems.html
+                    setTimeout(() => {
                         (window.dataLayer = window.dataLayer || []).push({ event: 'read_poems_click' });
                         clearTimeout(safetyTimeout);
-                        overlay.style.pointerEvents = 'none';
                         const poemsSection = document.getElementById('poemsSection');
                         let poemText = poemsSection && poemsSection.querySelector('.poem') ? (poemsSection.querySelector('.poem').innerText || '').trim() : 'po pełni (z)nów na jednego z dwóch';
                         const poemChars = poemText.split('').filter(c => c.trim() !== '');
                         const randomChars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż'];
                         const titleSymbols = '"~||-_^+*.';
-                        const rawCount = Math.floor((window.innerWidth / 12) * (window.innerHeight / 20));
+                        const W = window.innerWidth, H = window.innerHeight;
+                        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                        const rawCount = Math.floor((W / 12) * (H / 20));
                         const charCount = Math.min(rawCount, 450);
                         const allChars = [];
                         for (let i = 0; i < charCount; i++) {
-                            if (Math.random() < 0.35) allChars.push({ char: titleSymbols[Math.floor(Math.random() * titleSymbols.length)] });
-                            else if (Math.random() < 0.46 && poemChars.length) allChars.push({ char: poemChars[Math.floor(Math.random() * poemChars.length)] });
-                            else allChars.push({ char: randomChars[Math.floor(Math.random() * randomChars.length)] });
+                            let ch;
+                            if (Math.random() < 0.35) ch = titleSymbols[Math.floor(Math.random() * titleSymbols.length)];
+                            else if (Math.random() < 0.46 && poemChars.length) ch = poemChars[Math.floor(Math.random() * poemChars.length)];
+                            else ch = randomChars[Math.floor(Math.random() * randomChars.length)];
+                            allChars.push({ char: ch, x: Math.random() * W, y: Math.random() * H });
                         }
-                        const charsOverlay = document.createElement('div');
-                        charsOverlay.className = 'transition-overlay';
-                        charsOverlay.style.cssText = 'background: transparent; z-index: 10001;';
-                        document.body.appendChild(charsOverlay);
-                        charsOverlay.classList.add('active');
-                        let charIndex = 0;
-                        const charsPerFrame = 32;
-                        const frameTime = Math.max(8, 380 / Math.ceil(charCount / charsPerFrame));
-                        function addChars() {
-                            if (charIndex >= allChars.length) {
-                                const chars = charsOverlay.querySelectorAll('.transition-char');
-                                const fadeDuration = 0.55;
-                                chars.forEach((el) => { el.style.transition = `opacity ${fadeDuration}s ease-out`; el.style.opacity = '0'; });
+                        const cvs = document.createElement('canvas');
+                        cvs.width = W * dpr; cvs.height = H * dpr;
+                        cvs.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:10001;pointer-events:none;';
+                        document.body.appendChild(cvs);
+                        const ctx = cvs.getContext('2d');
+                        ctx.scale(dpr, dpr);
+                        const fontSize = Math.max(12, Math.min(W * 0.015, 22));
+                        ctx.font = '300 ' + fontSize + "px 'Geist Mono', monospace";
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        let drawn = 0;
+                        const charsPerFrame = 40;
+                        const totalFrames = Math.ceil(charCount / charsPerFrame);
+                        const targetMs = 400;
+                        const frameDelay = Math.max(6, targetMs / totalFrames);
+                        function drawBatch() {
+                            if (drawn >= allChars.length) {
+                                cvs.style.transition = 'opacity 0.5s ease-out';
+                                cvs.style.opacity = '0';
                                 setTimeout(() => {
-                                    try { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); } catch (e) {}
-                                    try { if (charsOverlay.parentNode) charsOverlay.parentNode.removeChild(charsOverlay); } catch (e) {}
+                                    try { overlay.remove(); } catch(e) {}
+                                    try { cvs.remove(); } catch(e) {}
                                     window.location.href = 'poems.html';
-                                }, Math.round(fadeDuration * 1000) + 100);
+                                }, 600);
                                 return;
                             }
-                            for (let i = 0; i < charsPerFrame && charIndex < allChars.length; i++) {
-                                const c = document.createElement('span');
-                                c.className = 'transition-char';
-                                c.textContent = allChars[charIndex].char;
-                                c.style.cssText = 'position: absolute; left: ' + (Math.random() * 100) + '%; top: ' + (Math.random() * 100) + '%; animation: charAppear 0.08s forwards;';
-                                charsOverlay.appendChild(c);
-                                charIndex++;
+                            ctx.fillStyle = 'rgba(0,0,0,0.9)';
+                            const end = Math.min(drawn + charsPerFrame, allChars.length);
+                            for (let i = drawn; i < end; i++) {
+                                ctx.fillText(allChars[i].char, allChars[i].x, allChars[i].y);
                             }
-                            setTimeout(() => requestAnimationFrame(addChars), frameTime);
+                            drawn = end;
+                            setTimeout(() => requestAnimationFrame(drawBatch), frameDelay);
                         }
-                        addChars();
-                    }
-                    poemsBtn.addEventListener('click', runCharsThenNavigate);
+                        drawBatch();
+                    }, 300);
                 }
                 if (titleIsLawenda) {
                     showOverlay();
@@ -2951,7 +2863,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             
             // Sprawdź czy kliknięcie nie jest w przycisku nawigacji
             if (e.target.id === 'prevBtn' || e.target.id === 'nextBtn' || 
-                e.target.closest('#prevBtn') || e.target.closest('#nextBtn') || e.target.closest('#backToStart')) {
+                e.target.closest('#prevBtn') || e.target.closest('#nextBtn') || e.target.closest('#backToStart') || e.target.closest('#bioLink')) {
                 return;
             }
             
@@ -2976,6 +2888,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             document.getElementById('navigation').style.display = 'none';
             document.getElementById('controls').style.display = 'none';
             document.getElementById('backToStart').style.display = 'none';
+            const bioLink = document.getElementById('bioLink');
+            if (bioLink) bioLink.style.display = 'none';
             
             // resetuj stan strony tytułowej
             const starFog = document.getElementById('starFog');
@@ -3078,12 +2992,73 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
         // Animacja imienia - pojawia się później
         // Animacja imienia przeniesiona do startTyping
 
-        // Interaktywność imienia - bio overlay
+        // Animacja przejścia do bio – znaki "stanislaw" jak przy czytaj tutaj
+        function animateCharsToBio() {
+            function runChars() {
+                const bioChars = 'stanislaw'.split('');
+                const rawCount = Math.floor((window.innerWidth / 12) * (window.innerHeight / 20));
+                const charCount = Math.min(rawCount, 450);
+                const allChars = [];
+                for (let i = 0; i < charCount; i++) {
+                    allChars.push({ char: bioChars[Math.floor(Math.random() * bioChars.length)] });
+                }
+                const charsOverlay = document.createElement('div');
+                charsOverlay.className = 'transition-overlay';
+                charsOverlay.style.cssText = 'background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%); z-index: 10001;';
+                document.body.appendChild(charsOverlay);
+                charsOverlay.classList.add('active');
+                let charIndex = 0;
+                const charsPerFrame = 32;
+                const frameTime = Math.max(8, 380 / Math.ceil(charCount / charsPerFrame));
+                function addChars() {
+                    if (charIndex >= allChars.length) {
+                        const chars = charsOverlay.querySelectorAll('.transition-char');
+                        const fadeDuration = 0.55;
+                        chars.forEach((el) => { el.style.transition = `opacity ${fadeDuration}s ease-out`; el.style.opacity = '0'; });
+                        setTimeout(() => {
+                            window.location.href = 'bio.html';
+                        }, Math.round(fadeDuration * 1000) + 100);
+                        return;
+                    }
+                    for (let i = 0; i < charsPerFrame && charIndex < allChars.length; i++) {
+                        const c = document.createElement('span');
+                        c.className = 'transition-char';
+                        c.textContent = allChars[charIndex].char;
+                        c.style.cssText = 'position: absolute; left: ' + (Math.random() * 100) + '%; top: ' + (Math.random() * 100) + '%; animation: charAppear 0.08s forwards;';
+                        charsOverlay.appendChild(c);
+                        charIndex++;
+                    }
+                    setTimeout(() => requestAnimationFrame(addChars), frameTime);
+                }
+                addChars();
+            }
+            if (!hasTransitioned) {
+                const title = document.getElementById('title');
+                const authorName = document.getElementById('authorName');
+                const typingText = document.getElementById('typingText');
+                const starFog = document.getElementById('starFog');
+                const pointcloudBg = document.getElementById('pointcloud-bg');
+                const audioToggle = document.querySelector('.audio-toggle');
+                if (title) { title.style.transition = 'opacity 0.2s ease'; title.style.opacity = '0'; }
+                if (authorName) { authorName.style.transition = 'opacity 0.2s ease'; authorName.style.opacity = '0'; }
+                if (typingText) { typingText.style.transition = 'opacity 0.2s ease'; typingText.style.opacity = '0'; }
+                if (starFog) { starFog.style.transition = 'opacity 0.25s ease'; starFog.style.opacity = '0'; }
+                if (pointcloudBg) { pointcloudBg.style.transition = 'opacity 0.25s ease'; pointcloudBg.style.opacity = '0'; }
+                if (audioToggle) audioToggle.style.opacity = '0';
+                setTimeout(runChars, 120);
+            } else {
+                runChars();
+            }
+        }
+
+        // Interaktywność imienia – animacja chars do bio
         const authorEl = document.getElementById('authorName');
-        authorEl.addEventListener('click', () => {
-            window.location.href = 'bio.html';
-        });
+        authorEl.addEventListener('click', () => { animateCharsToBio(); });
         authorEl.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); authorEl.click(); }, { passive: false });
+
+        // Przycisk bio w sekcji wierszy – ta sama animacja
+        const bioLinkEl = document.getElementById('bioLink');
+        if (bioLinkEl) bioLinkEl.addEventListener('click', (e) => { e.preventDefault(); animateCharsToBio(); });
 
         // klik poza bio-content zamyka bio
         document.getElementById('bioOverlay').addEventListener('click', (e) => {

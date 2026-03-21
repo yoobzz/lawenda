@@ -449,14 +449,15 @@
             
             /* Nawigacja na dole */
             .navigation {
-                bottom: calc(1rem + env(safe-area-inset-bottom));
-                gap: 0.75rem;
+                bottom: calc(1.2rem + env(safe-area-inset-bottom));
+                gap: 1rem;
+                z-index: 200;
             }
-            
+
             .nav-arrow {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
             }
             
             .nav-counter {
@@ -2595,12 +2596,26 @@
                 i szuka cię w słońcu<br>
                 którego nie znałeś
             </div>
+            <div class="poem" data-index="156">
+                [zło]<br>
+                ~tym tonem<br>
+                dzielisz *.ja^<br><br>
+                *.ja^<br>
+                \i ja, jak on\<br><br>
+                szkło i twarz<br>
+                słona w łzach<br>
+                jednym słowem<br>
+                widzi!.• dwa<br><br>
+                (od|bicia)<br>
+                w takich jak ona<br>
+                pustych lustrach
+            </div>
 </div>
 
     <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk" style="position: fixed; top: 1rem; right: 1rem; background: none; border: 0; color: #000; font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; opacity: 0.8; z-index: 1200; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity 0.2s ease, transform 0.2s ease;">||</button>
     <div class="navigation" id="navigation">
         <button class="nav-arrow" id="prevBtn">‹</button>
-        <div class="nav-counter" id="navCounter">1 / 156</div>
+        <div class="nav-counter" id="navCounter">1 / 157</div>
         <button class="nav-arrow" id="nextBtn">›</button>
     </div>
     <div class="goto-popover" id="gotoPopover" aria-hidden="true">
@@ -2618,6 +2633,7 @@
         <button class="control-btn" id="reshuffleOrder" title="przetasuj">~</button>
         <button class="control-btn" id="copyLink" title="kopiuj link">www.</button>
         <button class="control-btn" id="downloadImage" title="pobierz obraz do galerii">!</button>
+        <a href="bio.html" class="control-btn" id="openBio" title="bio" style="text-decoration:none;">bio</a>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite">skopiowano link</div>
 
@@ -2679,55 +2695,56 @@
                 background.appendChild(particle);
             }
             
-            // Ulepszona interaktywność z myszką
+            // Interaktywność z myszką — cache'owane referencje, rAF tylko na żądanie
             let mouseX = 0, mouseY = 0;
             let rafId = null;
-            
+            const particleEls = Array.from(background.querySelectorAll('.poem-particle'));
+            // Pre-cache pozycji particles (aktualizowane raz na resize/poem change)
+            let particlePositions = [];
+            function cachePositions() {
+                particlePositions = particleEls.map(p => {
+                    const r = p.getBoundingClientRect();
+                    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+                });
+            }
+            if (particleEls.length) cachePositions();
+
             function updateParticles() {
-                const particles = background.querySelectorAll('.poem-particle');
-                particles.forEach((particle) => {
-                    const rect = particle.getBoundingClientRect();
-                    const particleX = rect.left + rect.width / 2;
-                    const particleY = rect.top + rect.height / 2;
-                    const distance = Math.hypot(mouseX - particleX, mouseY - particleY);
-                    
+                for (let i = 0; i < particleEls.length; i++) {
+                    const p = particleEls[i];
+                    const pos = particlePositions[i];
+                    if (!pos) continue;
+                    const distance = Math.hypot(mouseX - pos.x, mouseY - pos.y);
                     if (distance < 150) {
                         const force = (150 - distance) / 150;
-                        const angle = Math.atan2(particleY - mouseY, particleX - mouseX);
+                        const angle = Math.atan2(pos.y - mouseY, pos.x - mouseX);
                         const moveX = Math.cos(angle) * force * 15;
                         const moveY = Math.sin(angle) * force * 15;
                         const scale = 1 + force * 0.8;
-                        particle.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
-                        particle.style.opacity = Math.min(0.6, parseFloat(particle.style.opacity || '0.2') + force * 0.3);
-                    } else {
-                        // Płynny powrót do normalnego stanu
-                        const currentTransform = particle.style.transform || 'translate(0, 0) scale(1)';
-                        if (currentTransform !== 'translate(0, 0) scale(1)') {
-                            particle.style.transform = 'translate(0, 0) scale(1)';
-                        }
+                        p.style.transform = `translate(${moveX}px, ${moveY}px) scale(${scale})`;
+                    } else if (p.style.transform) {
+                        p.style.transform = '';
                     }
-                });
-                rafId = requestAnimationFrame(updateParticles);
+                }
+                rafId = null;
             }
-            
+
             document.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
-                if (!rafId) {
-                    updateParticles();
-                }
+                if (!rafId) rafId = requestAnimationFrame(updateParticles);
             });
-            
-            // Zatrzymaj animację gdy myszka opuści obszar
+
             document.addEventListener('mouseleave', () => {
-                if (rafId) {
-                    cancelAnimationFrame(rafId);
-                    rafId = null;
-                }
-                const particles = background.querySelectorAll('.poem-particle');
-                particles.forEach((particle) => {
-                    particle.style.transform = 'translate(0, 0) scale(1)';
-                });
+                if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+                for (const p of particleEls) p.style.transform = '';
+            });
+
+            // Przebuduj cache pozycji przy resize
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(cachePositions, 200);
             });
         }
 
@@ -3106,6 +3123,8 @@
             const newUrl = location.pathname + newHash;
             if (currentUrl !== newUrl) history.replaceState(null, '', newUrl);
             updateNavigation();
+            // odśwież cache pozycji particles po animacji
+            if (typeof cachePositions === 'function') setTimeout(cachePositions, 350);
             updateMetaTags(currentPoem);
         }
         function adjustFontScale(delta) {
@@ -3187,79 +3206,178 @@
             showToast(ok ? 'skopiowano link' : 'kopiuj: ' + link); 
         });
         
-        // Przycisk pobierania obrazu do galerii
-        document.getElementById('downloadImage').addEventListener('click', async (e)=>{ 
-            e.preventDefault(); 
+        function getActivePoemText(){
+            const el = document.querySelector('.poem.active');
+            if (!el) return '';
+            return (el.innerText || '').trim();
+        }
+        function wrapLines(ctx, text, maxWidth, lineHeight){
+            const words = text.split(/\s+/);
+            const lines = [];
+            let line = '';
+            for (let i = 0; i < words.length; i++) {
+                const test = line ? line + ' ' + words[i] : words[i];
+                if (ctx.measureText(test).width <= maxWidth) {
+                    line = test;
+                } else {
+                    if (line) lines.push(line);
+                    if (ctx.measureText(words[i]).width > maxWidth) {
+                        let chunk = '';
+                        for (const ch of words[i]) {
+                            const test2 = chunk + ch;
+                            if (ctx.measureText(test2).width <= maxWidth) chunk = test2; else { lines.push(chunk); chunk = ch; }
+                        }
+                        line = chunk;
+                    } else {
+                        line = words[i];
+                    }
+                }
+            }
+            if (line) lines.push(line);
+            return lines;
+        }
+        async function renderPoemToCanvasBlob(){
+            const poemText = getActivePoemText();
+            const W = 1080, H = 1920;
+            const dpr = 2;                       // retina-quality
+            const canvas = document.createElement('canvas');
+            canvas.width = W * dpr; canvas.height = H * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            // ── białe tło ──
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, W, H);
+
+            // ── ramka z losowych znaków wzdłuż krawędzi (1 rząd) ──
+            const SYMS = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+            let seed = 0;
+            for (let i = 0; i < poemText.length; i++) seed = ((seed << 5) - seed + poemText.charCodeAt(i)) | 0;
+            function seededRand(){ seed = (seed * 16807 + 0) % 2147483647; return (seed & 0x7fffffff) / 2147483647; }
+
+            const fontStack = "'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
+            const symFont = "bold 28px 'Helvetica Neue', 'ABC Helveesti', Helvetica, Arial, sans-serif";
+            const symStep = 32;
+            const borderSize = 32;       // grubość ramki (1 rząd)
+
+            ctx.fillStyle = '#000000';
+            ctx.font = symFont;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            const yMidTop = borderSize / 2;
+            const yMidBot = H - borderSize / 2;
+            const xMidLeft = borderSize / 2;
+            const xMidRight = W - borderSize / 2;
+
+            // góra — znaki poziomo
+            for (let x = symStep / 2; x < W; x += symStep) {
+                ctx.fillText(SYMS[Math.floor(seededRand() * SYMS.length)], x, yMidTop);
+            }
+
+            // dół — znaki + "szpineta.pl" wkomponowane w środek
+            const watermark = 'szpineta.pl';
+            ctx.font = symFont;
+            const wmWidth = ctx.measureText(watermark).width + 40; // z marginesem
+            const wmStart = (W - wmWidth) / 2;
+            const wmEnd = (W + wmWidth) / 2;
+            for (let x = symStep / 2; x < W; x += symStep) {
+                if (x > wmStart && x < wmEnd) continue; // zostaw miejsce na watermark
+                ctx.fillText(SYMS[Math.floor(seededRand() * SYMS.length)], x, yMidBot);
+            }
+            // watermark w ramce dolnej — ta sama czcionka i rozmiar
+            ctx.fillText(watermark, W / 2, yMidBot);
+
+            // lewo — znaki pionowo
+            for (let y = borderSize + symStep / 2; y < H - borderSize; y += symStep) {
+                ctx.fillText(SYMS[Math.floor(seededRand() * SYMS.length)], xMidLeft, y);
+            }
+
+            // prawo — znaki pionowo
+            for (let y = borderSize + symStep / 2; y < H - borderSize; y += symStep) {
+                ctx.fillText(SYMS[Math.floor(seededRand() * SYMS.length)], xMidRight, y);
+            }
+
+            // ── marginesy treści ──
+            const padX = 80, padTop = 80, padBot = 80;
+            const contentW = W - padX * 2;
+            const contentH = H - padTop - padBot;
+
+            ctx.fillStyle = '#000000';
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';
+
+            // ── auto-skalowanie tekstu ──
+            let fontSize = 42;
+            let lines;
+            const originalLines = (poemText || '').split('\n');
+            do {
+                ctx.font = `300 ${fontSize}px ${fontStack}`;
+                lines = [];
+                for (const rawLine of originalLines) {
+                    if ((rawLine || '').trim().length === 0) {
+                        lines.push('');
+                    } else {
+                        lines.push(...wrapLines(ctx, rawLine, contentW, fontSize * 1.5));
+                    }
+                }
+                const totalH = lines.reduce((a, ln) => a + (ln === '' ? fontSize * 0.8 : fontSize * 1.5), 0);
+                if (totalH <= contentH) break;
+                fontSize -= 2;
+            } while (fontSize >= 24);
+
+            ctx.font = `300 ${fontSize}px ${fontStack}`;
+            const lh = fontSize * 1.5;
+            const emptyLh = fontSize * 0.8;
+            const totalHeight = lines.reduce((a, ln) => a + (ln === '' ? emptyLh : lh), 0);
+            let y = padTop + Math.max(0, (contentH - totalHeight) / 2);
+
+            for (const ln of lines) {
+                if (ln === '') { y += emptyLh; continue; }
+                ctx.fillText(ln, padX, y);
+                y += lh;
+                if (y > H - padBot) break;
+            }
+
+            return await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png', 1.0));
+        }
+
+        // Przycisk pobierania obrazu — generowany client-side na canvas
+        document.getElementById('downloadImage').addEventListener('click', async (e)=>{
+            e.preventDefault();
             const originalIndex = getOriginalIndex(currentPoem);
             const poemNumber = originalIndex + 1;
             plausible('download_image', { props: { nr: poemNumber } });
-            const imageUrl = `${location.origin}/poem-image.png?poem=${poemNumber}`;
-            
+
             try {
-                showToast('pobieranie obrazu...');
-                const response = await fetch(imageUrl);
-                if (!response.ok) throw new Error('Nie udało się pobrać obrazu');
-                
-                const blob = await response.blob();
+                showToast('generuję obraz…');
+                const blob = await renderPoemToCanvasBlob();
+                if (!blob) throw new Error('nie udało się wygenerować obrazu');
                 const file = new File([blob], `wiersz-${poemNumber}.png`, { type: 'image/png' });
-                
-                const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
-                
-                // Na iOS spróbuj Web Share API z plikiem
-                if (isIOS && navigator.share && navigator.canShare) {
+
+                // Web Share API (iOS + Android) — udostępnij plik
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                     try {
-                        // Sprawdź czy można udostępnić plik
-                        if (navigator.canShare({ files: [file] })) {
-                            await navigator.share({
-                                files: [file],
-                                title: `wiersz ${poemNumber}`
-                            });
-                            showToast('wybierz "Zapisz do zdjęć"');
-                            return;
-                        }
+                        await navigator.share({ files: [file], title: `wiersz ${poemNumber}` });
+                        showToast('udostępniono');
+                        return;
                     } catch (err) {
-                        if (err.name === 'AbortError') {
-                            return;
-                        }
-                        console.log('Web Share API error:', err);
+                        if (err.name === 'AbortError') return;
                     }
                 }
-                
-                // Fallback dla iOS: otwórz obraz w tej samej karcie (najlepsze dla iOS Safari)
-                if (isIOS) {
-                    // Na iOS otwórz obraz w tej samej karcie - użytkownik może zapisać długim naciśnięciem
-                    window.location.href = imageUrl;
-                    showToast('naciśnij i przytrzymaj obraz, aby zapisać');
-                } else {
-                    // Na Android/Desktop: użyj Web Share API lub pobierz jako plik
-                    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: `wiersz ${poemNumber}`
-                            });
-                            showToast('wybierz "Zapisz zdjęcie"');
-                            return;
-                        } catch (err) {
-                            if (err.name !== 'AbortError') {
-                                console.log('Web Share API error:', err);
-                            }
-                        }
-                    }
-                    
-                    // Fallback: pobierz jako plik
-                    const blobUrl = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = blobUrl;
-                    a.download = `wiersz-${poemNumber}.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(blobUrl);
-                    showToast('pobrano obraz');
-                }
+
+                // Fallback: pobierz jako plik
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = `wiersz-${poemNumber}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+                showToast('pobrano obraz');
             } catch (error) {
-                console.error('Błąd pobierania obrazu:', error);
+                console.error('Błąd generowania obrazu:', error);
                 showToast('błąd: ' + error.message);
             }
         });
@@ -3573,95 +3691,7 @@
                 });
             }
 
-            function getActivePoemText(){
-                const el = document.querySelector('.poem.active');
-                if (!el) return '';
-                // zachowaj podziały wierszy
-                return (el.innerText || '').trim();
-            }
-            function wrapLines(ctx, text, maxWidth, lineHeight){
-                const words = text.split(/\s+/);
-                const lines = [];
-                let line = '';
-                for (let i = 0; i < words.length; i++) {
-                    const test = line ? line + ' ' + words[i] : words[i];
-                    if (ctx.measureText(test).width <= maxWidth) {
-                        line = test;
-                    } else {
-                        if (line) lines.push(line);
-                        // jeśli bardzo długie słowo, dziel po znakach
-                        if (ctx.measureText(words[i]).width > maxWidth) {
-                            let chunk = '';
-                            for (const ch of words[i]) {
-                                const test2 = chunk + ch;
-                                if (ctx.measureText(test2).width <= maxWidth) chunk = test2; else { lines.push(chunk); chunk = ch; }
-                            }
-                            line = chunk;
-                        } else {
-                            line = words[i];
-                        }
-                    }
-                }
-                if (line) lines.push(line);
-                return lines;
-            }
-            async function renderPoemToCanvasBlob(){
-                const poemText = getActivePoemText();
-                const W = 1080, H = 1920; // IG stories
-                const canvas = document.createElement('canvas');
-                canvas.width = W; canvas.height = H;
-                const ctx = canvas.getContext('2d');
-                // tło (lekko kremowe)
-                const bg = ctx.createLinearGradient(0, 0, 0, H);
-                bg.addColorStop(0, '#fffdfa');
-                bg.addColorStop(1, '#f9f6ef');
-                ctx.fillStyle = bg;
-                ctx.fillRect(0, 0, W, H);
-                // marginesy
-                const padX = 120; const padY = 200; const contentW = W - padX * 2; const contentH = H - padY * 2;
-                // ustawienia tekstu
-                ctx.fillStyle = '#000000';
-                ctx.textBaseline = 'top';
-                ctx.textAlign = 'center';
-                // tekst
-                let fontSize = 44; // mniejszy start
-                let lines;
-                const originalLines = (poemText || '').split('\n');
-                do {
-                    ctx.font = `300 ${fontSize}px 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
-                    lines = [];
-                    for (let p = 0; p < originalLines.length; p++) {
-                        const rawLine = originalLines[p];
-                        if ((rawLine || '').trim().length === 0) {
-                            lines.push(''); // zachowaj pustą linię jako odstęp
-                        } else {
-                            const wrapped = wrapLines(ctx, rawLine, contentW, fontSize * 1.4);
-                            lines.push(...wrapped);
-                        }
-                    }
-                    const totalHeightTest = lines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : fontSize * 1.4), 0);
-                    if (totalHeightTest > contentH) fontSize -= 2; else break;
-                } while (fontSize >= 28);
-                ctx.font = `300 ${fontSize}px 'ABC Diatype Rounded', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
-                const lh = fontSize * 1.4;
-                // wyśrodkuj blok w pionie
-                const totalHeight = lines.reduce((acc, ln) => acc + (ln === '' ? fontSize * 0.9 : lh), 0);
-                let y = padY + Math.max(0, (contentH - totalHeight) / 2);
-                for (const ln of lines) {
-                    if (ln === '') { y += fontSize * 0.9; continue; }
-                    ctx.fillText(ln, W / 2, y);
-                    y += lh;
-                    if (y > H - padY) break;
-                }
-                // stopka
-                ctx.font = '700 22px \'ABC Diatype Rounded\', \'Inter\', -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif';
-                ctx.globalAlpha = 0.18;
-                ctx.textAlign = 'right';
-                const footer = '~ staś szpineta · lawenda · szpineta.pl';
-                ctx.fillText(footer, W - padX, H - padY + 8);
-                ctx.globalAlpha = 1;
-                return await new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/png', 1.0));
-            }
+            // funkcje canvas przeniesione do scope globalnego (powyżej)
             document.addEventListener('keydown', (e)=>{
                 if (e.key === '/' && hasTransitioned) {
                     e.preventDefault(); openSearchPopover();
