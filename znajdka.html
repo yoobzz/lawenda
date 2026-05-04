@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>#znajdka — ~||-_^+*.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+
+    <meta name="description" content="znalazłeś mnie.">
+    <meta property="og:title" content="znajdka — ~||-_^+*.">
+    <meta property="og:description" content="znalazłeś mnie.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+    <meta property="og:url" content="https://szpineta.com/znajdka.html">
+    <meta property="og:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="znajdka — ~||-_^+*.">
+    <meta name="twitter:description" content="znalazłeś mnie.">
+    <meta name="twitter:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <script defer data-domain="szpineta.com" src="https://plausible.io/js/script.js"></script>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-TKJ2KBZ8');</script>
+    <!-- End Google Tag Manager -->
+    <style>
+        @font-face {
+            font-family: 'ABC Diatype Rounded';
+            src: url('fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
+            transition: background-color 3s ease;
+        }
+
+        /* ── GRAIN ─────────────────────────────────────────────── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.025;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 256px;
+        }
+
+        /* ── LAVENDER PULSE ────────────────────────────────────── */
+        body.lavender-pulse::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(184,160,214,0.06) 0%, transparent 60%);
+            animation: lav-breathe 3s ease-in-out;
+        }
+        @keyframes lav-breathe {
+            0% { opacity: 0; }
+            40% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ── AUDIO TOGGLE ──────────────────────────────────────── */
+        .audio-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: 0;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1200;
+            -webkit-tap-highlight-color: transparent;
+            transition: opacity 1.5s ease;
+            pointer-events: none;
+        }
+        .audio-toggle.show { opacity: 0.5; pointer-events: auto; }
+        .audio-toggle:hover { opacity: 1; }
+
+        /* ── STAGE ─────────────────────────────────────────────── */
+        #stage {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            z-index: 1;
+        }
+
+        /* ── SCATTER SYMBOLS ───────────────────────────────────── */
+        #scatter {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        #scatter span {
+            position: absolute;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            user-select: none;
+            opacity: 0;
+            transition: opacity 4s ease;
+            color: #fff;
+        }
+        #scatter span.visible { opacity: 0.03; }
+
+        /* ── MESSAGES ──────────────────────────────────────────── */
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: clamp(1.5rem, 4vw, 4rem);
+            padding-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            z-index: 2;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 12%);
+            scrollbar-width: none;
+        }
+        #messages::-webkit-scrollbar { display: none; }
+
+        /* ── MESSAGE BUBBLES ───────────────────────────────────── */
+        .msg {
+            max-width: 80%;
+            opacity: 0;
+            transform: translateY(6px);
+            animation: msg-in 0.4s ease forwards;
+        }
+        @keyframes msg-in {
+            to { opacity: 1; transform: none; }
+        }
+        .msg-znajdka {
+            align-self: flex-start;
+        }
+        .msg-user {
+            align-self: flex-end;
+            text-align: right;
+        }
+        .msg-text {
+            display: inline;
+            font-size: clamp(15px, 2.2vw, 19px);
+            font-weight: 300;
+            line-height: 1.65;
+            letter-spacing: 0.01em;
+        }
+        .msg-znajdka .msg-text {
+            color: rgba(255,255,255,0.85);
+        }
+        .msg-user .msg-text {
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: clamp(13px, 1.8vw, 16px);
+            color: rgba(184,160,214,0.7);
+        }
+
+        /* ── TYPING INDICATOR ──────────────────────────────────── */
+        .typing-msg {
+            display: flex;
+            gap: 5px;
+            padding: 2px 0;
+        }
+        .typing-dot {
+            font-size: clamp(14px, 2vw, 18px);
+            font-weight: 300;
+            color: rgba(255,255,255,0.25);
+            animation: typing-pulse 1.2s ease-in-out infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing-pulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.7; }
+        }
+
+        /* ── CHOICES ───────────────────────────────────────────── */
+        .choices {
+            display: flex;
+            gap: clamp(0.8rem, 2vw, 1.5rem);
+            padding: 0.6rem 0;
+            opacity: 0;
+            animation: msg-in 0.5s ease 0.2s forwards;
+        }
+        .choice-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.6);
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: clamp(14px, 2vw, 17px);
+            font-weight: 400;
+            padding: 0.5em 1.1em;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: color 0.3s, border-color 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .choice-btn:hover, .choice-btn:focus-visible {
+            color: #fff;
+            border-color: rgba(184,160,214,0.4);
+        }
+        .choice-sym {
+            opacity: 0.3;
+            font-size: 0.85em;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── FREE TEXT INPUT ────────────────────────────────────── */
+        #inputArea {
+            padding: 0 clamp(1.5rem, 4vw, 4rem) clamp(1.5rem, 3vh, 2.5rem);
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        #inputArea.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #userInput {
+            width: 100%;
+            max-width: 320px;
+            background: none;
+            border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            color: rgba(184,160,214,0.8);
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: clamp(15px, 2vw, 18px);
+            font-weight: 300;
+            padding: 0.4em 0;
+            outline: none;
+            caret-color: rgba(184,160,214,0.6);
+        }
+        #userInput::placeholder {
+            color: rgba(255,255,255,0.12);
+            font-style: normal;
+        }
+
+        /* ── POEM REVEAL ───────────────────────────────────────── */
+        .poem-reveal {
+            align-self: center;
+            text-align: center;
+            padding: clamp(1.5rem, 4vh, 3rem) 0;
+            opacity: 0;
+            animation: msg-in 0.8s ease 0.15s forwards;
+        }
+        .poem-text {
+            font-size: clamp(16px, 2.5vw, 22px);
+            font-weight: 300;
+            line-height: 2;
+            color: rgba(255,255,255,0.55);
+            white-space: pre-line;
+            letter-spacing: 0.02em;
+        }
+
+        /* ── BIG REVEAL ────────────────────────────────────────── */
+        .big-reveal {
+            align-self: center;
+            text-align: center;
+            padding: clamp(1rem, 3vh, 2.5rem) 0;
+            font-size: clamp(32px, 8vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            color: #fff;
+            opacity: 0;
+            animation: msg-in 0.6s ease forwards;
+        }
+        .big-reveal.lavender { color: #b8a0d6; }
+
+        /* ── DECRYPT CHAR ──────────────────────────────────────── */
+        .dc {
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* ── SUBTLE LINK ───────────────────────────────────────── */
+        .subtle-link {
+            display: inline-block;
+            color: rgba(255,255,255,0.2);
+            font-size: clamp(13px, 1.8vw, 16px);
+            font-weight: 400;
+            text-decoration: none;
+            letter-spacing: 0.04em;
+            transition: color 0.5s, opacity 0.5s;
+            padding: 0.5em 0;
+            opacity: 0;
+            animation: msg-in 1s ease 0.5s forwards;
+        }
+        .subtle-link:hover { color: rgba(184,160,214,0.6); }
+
+        /* ── CURSOR TRAIL ──────────────────────────────────────── */
+        .trail-char {
+            position: fixed;
+            pointer-events: none;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            opacity: 0.06;
+            z-index: 0;
+            transition: opacity 0.5s ease;
+            user-select: none;
+        }
+
+        /* ── BURST ─────────────────────────────────────────────── */
+        #burst {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            pointer-events: none;
+            display: none;
+        }
+        #burst span {
+            position: absolute;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            user-select: none;
+        }
+        #whiteout {
+            position: fixed;
+            inset: 0;
+            background: #fafafa;
+            z-index: 9001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+        }
+
+        /* ── STAS CURSOR ───────────────────────────────────────── */
+        .stas-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 0.85em;
+            background: rgba(255,255,255,0.6);
+            margin-left: 2px;
+            vertical-align: baseline;
+            animation: blink-caret 0.6s step-end infinite;
+        }
+        @keyframes blink-caret {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ── MOBILE ────────────────────────────────────────────── */
+        @media (max-width: 600px) {
+            .msg { max-width: 92%; }
+            .choices { flex-direction: column; gap: 0.5rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+            .msg { opacity: 1; transform: none; }
+            .choices { opacity: 1; }
+        }
+
+        /* ── API MODE: serial badge (seria znajdki) ─────────────── */
+        #znajdkaSerial {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            font-size: 12px;
+            font-weight: 400;
+            opacity: 0.35;
+            z-index: 1100;
+            letter-spacing: 0.08em;
+            pointer-events: none;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TKJ2KBZ8"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">||</button>
+    <div id="znajdkaSerial" hidden aria-hidden="true">—</div>
+
+    <div id="stage">
+        <div id="scatter" aria-hidden="true"></div>
+        <div id="messages"></div>
+        <div id="inputArea">
+            <input type="text" id="userInput" autocomplete="off" spellcheck="false" maxlength="20">
+        </div>
+    </div>
+
+    <div id="burst"></div>
+    <div id="whiteout"></div>
+
+    <script src="audio.js"></script>
+    <script>
+    (function() {
+
+        // ── Constants ───────────────────────────────────────────
+        const SYMS = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+        const PREMIERE = new Date('2026-03-20');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const POEMS = [
+            'nie ma już miejsca\nna pustej widowni\n\nzająłem wszystkie\nswoimi wersjami',
+            'płytkim oddechem\nwciąż myślę o świeczce\ni o tym, że popiół\nnie czeka na płomień',
+            'i dzieje się chaos\nkojący i cichy\nbo wszystko co wiem\nznika w jej oczach',
+            'to co pod nimi\njest mi nieznane\n\nbo zapomniałem\njak pachnie ciągłość'
+        ];
+        const SECRET_POEMS = [
+            'bo bez siebie\nmogę wszystko i nic\n\na ze sobą\njedynie coś pomiędzy',
+            'nie ma już miejsca\nna pustej widowni\n\nzająłem wszystkie\nswoimi wersjami\ni tymi maskami\nudaję ciszę'
+        ];
+
+        // ── URL params ───────────────────────────────────────────
+        const searchParams = new URLSearchParams(location.search);
+        const apiToken = searchParams.get('token');
+        const urlId = parseInt(searchParams.get('id'), 10) || (Math.floor(Math.random() * 999) + 1);
+
+        // Ustaw `window.__ZNAJDKI_API_BASE__` (np. http://localhost:3100) gdy front i API są na różnych hostach.
+        const ZNAJDKI_API_ROOT = (typeof window.__ZNAJDKI_API_BASE__ === 'string' ? window.__ZNAJDKI_API_BASE__ : '') + '/api/v1';
+
+        // ── Seeded PRNG ─────────────────────────────────────────
+        function mulberry32(seed) {
+            let s = seed | 0;
+            return function() {
+                s = (s + 0x6D2B79F5) | 0;
+                let t = Math.imul(s ^ (s >>> 15), 1 | s);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+        const rng = mulberry32(urlId * 2654435761);
+        function rngInt(max) { return Math.floor(rng() * max); }
+
+        const poemIndex = rngInt(POEMS.length);
+        const secretIndex = rngInt(SECRET_POEMS.length);
+
+        // ── DOM refs ────────────────────────────────────────────
+        const messagesEl = document.getElementById('messages');
+        const inputArea = document.getElementById('inputArea');
+        const userInput = document.getElementById('userInput');
+        const scatterEl = document.getElementById('scatter');
+        const burstEl = document.getElementById('burst');
+        const whiteoutEl = document.getElementById('whiteout');
+        const audioToggle = document.getElementById('audioToggle');
+
+        // ── State ───────────────────────────────────────────────
+        let userName = '';
+        let bgStep = 0;
+        const bgColors = ['#000', '#050505', '#0a0a0a', '#111'];
+
+        // ── Utility ─────────────────────────────────────────────
+        function wait(ms) {
+            const actual = reducedMotion ? Math.min(ms, 150) : ms;
+            return new Promise(r => setTimeout(r, actual));
+        }
+
+        function humanDelay(ch) {
+            if (reducedMotion) return 8;
+            let d = 28 + Math.random() * 40;
+            if ('.!?'.includes(ch)) d += 200 + Math.random() * 250;
+            else if (','.includes(ch)) d += 100 + Math.random() * 80;
+            else if (ch === ' ') d += 20 + Math.random() * 60;
+            if (Math.random() < 0.08) d += 120 + Math.random() * 200;
+            return d;
+        }
+
+        function randomSym() { return SYMS[Math.floor(Math.random() * SYMS.length)]; }
+        function randomSymChunk(n) { let s = ''; for (let i = 0; i < n; i++) s += randomSym(); return s; }
+
+        function scrollBottom() {
+            messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+        }
+
+        // ── Scatter symbols ─────────────────────────────────────
+        const scatterSpans = [];
+        function addScatter(count) {
+            for (let i = 0; i < count; i++) {
+                const s = document.createElement('span');
+                s.textContent = randomSym();
+                s.style.left = (5 + Math.random() * 85) + '%';
+                s.style.top = (5 + Math.random() * 85) + '%';
+                s.style.fontSize = (12 + Math.random() * 28) + 'px';
+                s.style.transform = 'rotate(' + ((Math.random() - 0.5) * 40) + 'deg)';
+                scatterEl.appendChild(s);
+                scatterSpans.push(s);
+                setTimeout(() => s.classList.add('visible'), 200 + i * 150);
+            }
+        }
+
+        // ── Background shift ────────────────────────────────────
+        function shiftBg() {
+            bgStep = Math.min(bgStep + 1, bgColors.length - 1);
+            document.body.style.backgroundColor = bgColors[bgStep];
+        }
+
+        // ── Typing indicator ────────────────────────────────────
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'msg msg-znajdka typing-msg';
+            div.innerHTML = '<span class="typing-dot">~</span><span class="typing-dot">|</span><span class="typing-dot">.</span>';
+            messagesEl.appendChild(div);
+            scrollBottom();
+
+            const iv = setInterval(() => {
+                div.querySelectorAll('.typing-dot').forEach(d => { d.textContent = randomSym(); });
+            }, 160);
+
+            return () => { clearInterval(iv); div.remove(); };
+        }
+
+        // ── Say (znajdka message) ───────────────────────────────
+        async function say(text, opts) {
+            opts = opts || {};
+            const typingMs = Math.min(350 + text.length * 25, reducedMotion ? 100 : 1100);
+            const removeTyping = showTyping();
+            await wait(typingMs);
+            removeTyping();
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg msg-znajdka';
+            const span = document.createElement('span');
+            span.className = 'msg-text';
+            msgDiv.appendChild(span);
+            messagesEl.appendChild(msgDiv);
+            scrollBottom();
+
+            if (reducedMotion) {
+                span.textContent = text;
+            } else {
+                for (let i = 0; i < text.length; i++) {
+                    span.textContent = text.slice(0, i + 1);
+                    scrollBottom();
+                    await wait(humanDelay(text[i]));
+                }
+            }
+
+            await wait(opts.pause != null ? opts.pause : 250);
+        }
+
+        // ── Say with decrypt effect ─────────────────────────────
+        async function sayDecrypt(text) {
+            const typingMs = reducedMotion ? 100 : 700;
+            const removeTyping = showTyping();
+            await wait(typingMs);
+            removeTyping();
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg msg-znajdka';
+            const span = document.createElement('span');
+            span.className = 'msg-text';
+            span.textContent = text;
+            msgDiv.appendChild(span);
+            messagesEl.appendChild(msgDiv);
+            scrollBottom();
+
+            if (!reducedMotion) await decryptEl(span);
+            await wait(400);
+        }
+
+        // ── User message ────────────────────────────────────────
+        function showUserMsg(text) {
+            const div = document.createElement('div');
+            div.className = 'msg msg-user';
+            const span = document.createElement('span');
+            span.className = 'msg-text';
+            span.textContent = text;
+            div.appendChild(span);
+            messagesEl.appendChild(div);
+            scrollBottom();
+        }
+
+        // ── Idle nudge messages ──────────────────────────────────
+        const NUDGES = [
+            'hej, jesteś tam?',
+            'halo..?',
+            'nie musisz się spieszyć.',
+            'czekam.',
+            '...',
+        ];
+        let nudgeIdx = 0;
+
+        function startNudgeTimer(cancelToken) {
+            const delay = 9000 + Math.random() * 4000;
+            cancelToken.timer = setTimeout(async () => {
+                if (cancelToken.cancelled) return;
+                const text = NUDGES[Math.min(nudgeIdx, NUDGES.length - 1)];
+                nudgeIdx++;
+                await say(text, { pause: 0 });
+                if (!cancelToken.cancelled) startNudgeTimer(cancelToken);
+            }, delay);
+        }
+        function stopNudge(cancelToken) {
+            cancelToken.cancelled = true;
+            clearTimeout(cancelToken.timer);
+        }
+
+        // ── Choices ─────────────────────────────────────────────
+        function choose(options) {
+            return new Promise(resolve => {
+                const container = document.createElement('div');
+                container.className = 'choices';
+                const nudge = { cancelled: false, timer: 0 };
+                startNudgeTimer(nudge);
+
+                const iv = setInterval(() => {
+                    container.querySelectorAll('.choice-sym').forEach(s => {
+                        s.textContent = randomSymChunk(2);
+                    });
+                }, 180);
+
+                options.forEach((text, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    const ls = document.createElement('span');
+                    ls.className = 'choice-sym';
+                    const rs = document.createElement('span');
+                    rs.className = 'choice-sym';
+                    btn.appendChild(ls);
+                    btn.appendChild(document.createTextNode(' ' + text + ' '));
+                    btn.appendChild(rs);
+
+                    btn.addEventListener('click', () => {
+                        stopNudge(nudge);
+                        clearInterval(iv);
+                        showUserMsg(text);
+                        container.remove();
+                        resolve(index);
+                    });
+                    container.appendChild(btn);
+                });
+
+                messagesEl.appendChild(container);
+                scrollBottom();
+            });
+        }
+
+        // ── Free text input ─────────────────────────────────────
+        function ask(placeholder) {
+            return new Promise(resolve => {
+                const nudge = { cancelled: false, timer: 0 };
+                startNudgeTimer(nudge);
+
+                inputArea.classList.add('visible');
+                userInput.placeholder = placeholder || '';
+                userInput.value = '';
+                setTimeout(() => userInput.focus(), 100);
+
+                function onKey(e) {
+                    if (e.key === 'Enter' && userInput.value.trim()) {
+                        stopNudge(nudge);
+                        const val = userInput.value.trim().slice(0, 20).toLowerCase();
+                        inputArea.classList.remove('visible');
+                        userInput.removeEventListener('keydown', onKey);
+                        showUserMsg(val);
+                        resolve(val);
+                    }
+                }
+                userInput.addEventListener('keydown', onKey);
+            });
+        }
+
+        // ── Decrypt effect ──────────────────────────────────────
+        function decryptEl(el, opts) {
+            opts = opts || {};
+            const slow = opts.slow;
+            return new Promise(resolve => {
+                const text = el.textContent;
+                const chars = [];
+                let html = '';
+                for (let i = 0; i < text.length; i++) {
+                    if (/\s/.test(text[i])) {
+                        html += text[i];
+                    } else {
+                        html += '<span class="dc">' + randomSym() + '</span>';
+                        chars.push({ idx: i, ch: text[i] });
+                    }
+                }
+                el.innerHTML = html;
+                const spans = Array.from(el.querySelectorAll('.dc'));
+
+                spans.forEach((s, i) => { s.textContent = chars[i].ch; });
+                void el.offsetWidth;
+                spans.forEach((s, i) => {
+                    const w = s.getBoundingClientRect().width;
+                    s.style.width = w + 'px';
+                    s.textContent = randomSym();
+                });
+
+                const order = spans.map((_, i) => i);
+                for (let k = order.length - 1; k > 0; k--) {
+                    const j = Math.floor(Math.random() * (k + 1));
+                    [order[k], order[j]] = [order[j], order[k]];
+                }
+
+                let t = 0;
+                let maxEnd = 0;
+                order.forEach(si => {
+                    t += slow ? (30 + Math.random() * 60) : (5 + Math.random() * 15);
+                    const start = t;
+                    const cycles = slow ? (6 + Math.floor(Math.random() * 8)) : (2 + Math.floor(Math.random() * 4));
+                    const stepMs = slow ? (80 + Math.random() * 100) : (40 + Math.random() * 60);
+                    for (let c = 0; c < cycles; c++) {
+                        setTimeout(() => { spans[si].textContent = randomSym(); }, start + c * stepMs);
+                    }
+                    const endTime = start + cycles * stepMs;
+                    if (endTime > maxEnd) maxEnd = endTime;
+                    setTimeout(() => { spans[si].textContent = chars[si].ch; }, endTime);
+                });
+
+                setTimeout(() => {
+                    el.textContent = text;
+                    resolve();
+                }, maxEnd + 80);
+            });
+        }
+
+        // ── Poem reveal ─────────────────────────────────────────
+        async function showPoem(text) {
+            const div = document.createElement('div');
+            div.className = 'poem-reveal';
+            const p = document.createElement('div');
+            p.className = 'poem-text';
+            p.textContent = text;
+            div.appendChild(p);
+            messagesEl.appendChild(div);
+            scrollBottom();
+
+            if (!reducedMotion) {
+                const lines = text.split('\n');
+                let html = '';
+                for (let li = 0; li < lines.length; li++) {
+                    if (li > 0) html += '\n';
+                    for (let ci = 0; ci < lines[li].length; ci++) {
+                        if (/\s/.test(lines[li][ci])) html += lines[li][ci];
+                        else html += '<span class="dc">' + randomSym() + '</span>';
+                    }
+                }
+                p.innerHTML = html;
+                const spans = Array.from(p.querySelectorAll('.dc'));
+                const flatChars = text.replace(/\n/g, '').replace(/\s/g, '');
+
+                spans.forEach((s, i) => { s.textContent = flatChars[i]; });
+                void p.offsetWidth;
+                spans.forEach((s, i) => {
+                    const w = s.getBoundingClientRect().width;
+                    s.style.width = w + 'px';
+                    s.textContent = randomSym();
+                });
+
+                const order = spans.map((_, i) => i);
+                for (let k = order.length - 1; k > 0; k--) {
+                    const j = Math.floor(Math.random() * (k + 1));
+                    [order[k], order[j]] = [order[j], order[k]];
+                }
+
+                await new Promise(resolve => {
+                    let t = 0, maxEnd = 0;
+                    order.forEach(si => {
+                        t += 25 + Math.random() * 55;
+                        const start = t;
+                        const cycles = 5 + Math.floor(Math.random() * 7);
+                        const stepMs = 70 + Math.random() * 90;
+                        for (let c = 0; c < cycles; c++) {
+                            setTimeout(() => { spans[si].textContent = randomSym(); }, start + c * stepMs);
+                        }
+                        const endTime = start + cycles * stepMs;
+                        if (endTime > maxEnd) maxEnd = endTime;
+                        setTimeout(() => { spans[si].textContent = flatChars[si]; }, endTime);
+                    });
+                    setTimeout(() => { p.textContent = text; resolve(); }, maxEnd + 100);
+                });
+            }
+
+            await wait(1500);
+        }
+
+        // ── Big reveal (~||-_^+*. → lawenda) ────────────────────
+        async function showBigReveal() {
+            const div = document.createElement('div');
+            div.className = 'big-reveal';
+            div.textContent = '"~||-_^+*.';
+            messagesEl.appendChild(div);
+            scrollBottom();
+
+            if (!reducedMotion) await decryptEl(div, { slow: true });
+            await wait(1800);
+
+            document.body.classList.add('lavender-pulse');
+
+            if (!reducedMotion) {
+                const text = '"~||-_^+*.';
+                const target = 'lawenda';
+                const maxLen = Math.max(text.length, target.length);
+                let html = '';
+                for (let i = 0; i < maxLen; i++) html += '<span class="dc">' + randomSym() + '</span>';
+                div.innerHTML = html;
+                const spans = Array.from(div.querySelectorAll('.dc'));
+
+                spans.forEach(s => { s.style.width = ''; });
+
+                await new Promise(resolve => {
+                    let scrambleCount = 0;
+                    const scrambleIv = setInterval(() => {
+                        spans.forEach(s => { s.textContent = randomSym(); });
+                        scrambleCount++;
+                        if (scrambleCount > 8) { clearInterval(scrambleIv); resolve(); }
+                    }, 90);
+                });
+
+                while (spans.length > target.length) {
+                    const last = spans.pop();
+                    last.style.transition = 'opacity 0.3s';
+                    last.style.opacity = '0';
+                    await wait(60);
+                    last.remove();
+                }
+
+                const order = spans.map((_, i) => i);
+                for (let k = order.length - 1; k > 0; k--) {
+                    const j = Math.floor(Math.random() * (k + 1));
+                    [order[k], order[j]] = [order[j], order[k]];
+                }
+
+                await new Promise(resolve => {
+                    let t = 0, maxEnd = 0;
+                    order.forEach(si => {
+                        t += 40 + Math.random() * 70;
+                        const start = t;
+                        const cycles = 5 + Math.floor(Math.random() * 6);
+                        const stepMs = 75 + Math.random() * 90;
+                        for (let c = 0; c < cycles; c++) {
+                            setTimeout(() => { spans[si].textContent = randomSym(); }, start + c * stepMs);
+                        }
+                        const endTime = start + cycles * stepMs;
+                        if (endTime > maxEnd) maxEnd = endTime;
+                        setTimeout(() => { spans[si].textContent = target[si]; }, endTime);
+                    });
+                    setTimeout(resolve, maxEnd + 100);
+                });
+            }
+
+            div.textContent = 'lawenda';
+            div.classList.add('lavender');
+            scrollBottom();
+            await wait(1500);
+
+            setTimeout(() => document.body.classList.remove('lavender-pulse'), 500);
+        }
+
+        // ── Cursor trail ────────────────────────────────────────
+        function initCursorTrail() {
+            let lastX = 0, lastY = 0, throttle = false;
+            document.addEventListener('mousemove', e => {
+                if (throttle) return;
+                throttle = true;
+                setTimeout(() => { throttle = false; }, 80);
+
+                const dx = e.clientX - lastX;
+                const dy = e.clientY - lastY;
+                if (Math.abs(dx) + Math.abs(dy) < 30) return;
+                lastX = e.clientX;
+                lastY = e.clientY;
+
+                const span = document.createElement('span');
+                span.className = 'trail-char';
+                span.textContent = randomSym();
+                span.style.left = e.clientX + 'px';
+                span.style.top = e.clientY + 'px';
+                span.style.fontSize = (10 + Math.random() * 8) + 'px';
+                document.body.appendChild(span);
+
+                setTimeout(() => { span.style.opacity = '0'; }, 50);
+                setTimeout(() => span.remove(), 600);
+            });
+        }
+
+        // ── Navigate with effect (burst / whiteout / fade) ──────
+        function navigateWithEffect(href, effect) {
+            effect = effect || 'burst';
+            if (effect === 'fade') {
+                document.body.style.transition = 'opacity 1s ease';
+                document.body.style.opacity = '0';
+                setTimeout(function () { window.location.href = href; }, 900);
+                return;
+            }
+            if (effect === 'whiteout') {
+                whiteoutEl.style.opacity = '1';
+                setTimeout(function () { window.location.href = href; }, 1200);
+                return;
+            }
+            if (effect === 'none') {
+                window.location.href = href;
+                return;
+            }
+            var cx = window.innerWidth / 2;
+            var cy = window.innerHeight / 2;
+            burstEl.style.display = 'block';
+
+            for (var i = 0; i < 120; i++) {
+                var s = document.createElement('span');
+                s.textContent = randomSym();
+                s.style.left = cx + 'px';
+                s.style.top = cy + 'px';
+                s.style.fontSize = (10 + Math.random() * 24) + 'px';
+                s.style.opacity = '0.7';
+                s.style.transition = 'all 1.4s cubic-bezier(0.16, 1, 0.3, 1)';
+                burstEl.appendChild(s);
+
+                var angle = Math.random() * Math.PI * 2;
+                var dist = 200 + Math.random() * 600;
+                var tx = cx + Math.cos(angle) * dist;
+                var ty = cy + Math.sin(angle) * dist;
+
+                (function (span, tox, toy) {
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(function () {
+                            span.style.left = tox + 'px';
+                            span.style.top = toy + 'px';
+                            span.style.opacity = '0';
+                            span.style.transform = 'rotate(' + ((Math.random() - 0.5) * 360) + 'deg) scale(0.3)';
+                        });
+                    });
+                })(s, tx, ty);
+            }
+
+            setTimeout(function () {
+                whiteoutEl.style.opacity = '1';
+            }, 600);
+
+            setTimeout(function () {
+                window.location.href = href;
+            }, 1900);
+        }
+
+        function transitionToIndex() {
+            navigateWithEffect('index.html', 'burst');
+        }
+
+        // ── znajdki-backend API (token z ?token=) ─────────────────
+        async function apiFetch(path, options) {
+            options = options || {};
+            var headers = Object.assign({}, options.headers || {});
+            if (options.body) {
+                headers['Content-Type'] = 'application/json';
+            }
+            var init = {
+                method: options.method || 'GET',
+                headers: headers,
+            };
+            if (options.body) init.body = options.body;
+            var res = await fetch(ZNAJDKI_API_ROOT + path, init);
+            var data = await res.json().catch(function () { return {}; });
+            if (!res.ok) {
+                var msg = data.message || data.error || res.statusText || 'błąd sieci';
+                throw new Error(msg);
+            }
+            return data;
+        }
+
+        function transitionKeyToDecision(key) {
+            if (key === 'transition_go_deeper') return 'go_deeper';
+            if (key === 'transition_return_start') return 'return_start';
+            if (key === 'transition_keep_fragment') return 'keep_fragment';
+            return 'go_deeper';
+        }
+
+        async function finalizeEncounterOutcome(encounterId, transitionStep) {
+            var decision = transitionKeyToDecision(transitionStep.key);
+            var out = await apiFetch('/encounter/' + encounterId + '/outcome', {
+                method: 'POST',
+                body: JSON.stringify({ decision: decision }),
+            });
+            var href = out.target_url || transitionStep.target_url || 'index.html';
+            var effect = (transitionStep.ui_hints && transitionStep.ui_hints.transition_effect) || 'burst';
+            if (out.message) {
+                await say(out.message, { pause: 900 });
+            }
+            navigateWithEffect(href, effect);
+        }
+
+        async function startApiEncounter(token) {
+            var serialEl = document.getElementById('znajdkaSerial');
+            var encounterId;
+            var started;
+
+            try {
+                var meta = await apiFetch('/artifact/' + encodeURIComponent(token));
+                if (serialEl) {
+                    serialEl.textContent =
+                        String(meta.serial_number).padStart(2, '0') + '/' + String(meta.series.total);
+                    serialEl.hidden = false;
+                    serialEl.removeAttribute('aria-hidden');
+                }
+            } catch (e) {
+                console.warn('znajdka: artifact meta', e);
+            }
+
+            try {
+                started = await apiFetch('/artifact/' + encodeURIComponent(token) + '/encounter', {
+                    method: 'POST',
+                });
+                encounterId = started.encounter_id;
+            } catch (e) {
+                await say('nie mogę się połączyć z serwerem znajdki. spróbuj później.', { pause: 600 });
+                console.error(e);
+                return;
+            }
+
+            if (!reducedMotion) initCursorTrail();
+            audioToggle.classList.add('show');
+
+            var step = started.step;
+
+            while (step) {
+                if (step.type === 'message') {
+                    await say(step.text, { pause: (step.ui_hints && step.ui_hints.pause_ms) != null ? step.ui_hints.pause_ms : 250 });
+                    var advMsg = await apiFetch('/encounter/' + encounterId);
+                    step = advMsg.step;
+                    continue;
+                }
+
+                if (step.type === 'choice') {
+                    if (step.text) {
+                        await say(step.text, { pause: (step.ui_hints && step.ui_hints.pause_ms) != null ? step.ui_hints.pause_ms : 600 });
+                    }
+                    var labels = step.options.map(function (o) { return o.label; });
+                    var idx = await choose(labels);
+                    var ans = await apiFetch('/encounter/' + encounterId + '/answer', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            step_key: step.key,
+                            answer_type: 'choice',
+                            value: String(idx),
+                        }),
+                    });
+                    step = ans.step;
+                    if (step && step.type === 'transition') {
+                        await finalizeEncounterOutcome(encounterId, step);
+                        return;
+                    }
+                    continue;
+                }
+
+                if (step.type === 'reveal') {
+                    var revealData = await apiFetch('/encounter/' + encounterId + '/reveal');
+                    await showPoem(revealData.content);
+                    var advRev = await apiFetch('/encounter/' + encounterId);
+                    step = advRev.step;
+                    continue;
+                }
+
+                if (step.type === 'transition') {
+                    await finalizeEncounterOutcome(encounterId, step);
+                    return;
+                }
+
+                console.warn('znajdka: nieznany krok', step);
+                break;
+            }
+        }
+
+        // ── Show subtle link ────────────────────────────────────
+        function showLink(text, href) {
+            const div = document.createElement('div');
+            div.className = 'msg msg-znajdka';
+            const a = document.createElement('a');
+            a.className = 'subtle-link';
+            a.href = href;
+            a.textContent = text;
+            div.appendChild(a);
+            messagesEl.appendChild(div);
+            scrollBottom();
+        }
+
+        // ═══════════════════════════════════════════════════════
+        //  NARRATIVE
+        // ═══════════════════════════════════════════════════════
+
+        async function act1() {
+            await say('o..', { pause: 700 });
+            await say('hej.', { pause: 900 });
+            await say('znalazłeś mnie.', { pause: 1400 });
+
+            addScatter(4);
+
+            await say('dzięki. serio.');
+            await say('leżałem tu trochę.', { pause: 600 });
+
+            const days = Math.max(1, Math.floor((Date.now() - PREMIERE.getTime()) / 86400000));
+            if (days > 1) {
+                await say(days + ' dni, jeśli dobrze liczę.', { pause: 800 });
+            }
+
+            await say('jestem kawałkiem czegoś większego.');
+            const c = await choose(['czego?', 'jak to?']);
+
+            if (c === 0) {
+                await say('zbioru wierszy.');
+                await say('ktoś je napisał i zostawił w różnych miejscach.');
+            } else {
+                await say('ktoś pisze wiersze.');
+                await say('i rozsypał je po mieście. ja jestem jednym z nich.');
+            }
+
+            await wait(500);
+            await sayDecrypt('#' + urlId + '.');
+            await say('taki mój numer.', { pause: 500 });
+
+            shiftBg();
+            addScatter(3);
+        }
+
+        async function act2() {
+            await say('a ty?');
+            await wait(300);
+            await say('jak masz na imię?');
+            userName = await ask('wpisz imię...');
+
+            await wait(500);
+            await say(userName + '.', { pause: 700 });
+            await say('okej. zapamiętam.');
+
+            await wait(600);
+            await say('wiesz co to za wiersze?');
+            const c = await choose(['nie', 'powiedz']);
+
+            if (c === 0) {
+                await say('to jest lawenda.');
+            } else {
+                await say('lawenda.');
+            }
+
+            await wait(400);
+            await say('zbiór o tym, jak ktoś próbuje nie zgubić siebie.');
+            await say('w sobie i w świecie.', { pause: 700 });
+
+            shiftBg();
+            addScatter(3);
+        }
+
+        async function act3() {
+            audioToggle.classList.add('show');
+
+            await say('chcesz zobaczyć fragment?');
+            const c = await choose(['pokaż', 'nie wiem']);
+
+            if (c === 0) {
+                await say('okej.', { pause: 400 });
+            } else {
+                await say('pokażę ci i tak.', { pause: 400 });
+                await say('bo po to tu jestem.');
+            }
+
+            await wait(700);
+            await showPoem(POEMS[poemIndex]);
+
+            await wait(600);
+            await say('to jeden z wielu.');
+            await say('ale trafiłeś akurat na ten.', { pause: 500 });
+
+            shiftBg();
+        }
+
+        async function act4() {
+            await wait(800);
+            await say('ten zbiór ma nazwę.');
+            await wait(1200);
+
+            await showBigReveal();
+
+            await wait(500);
+            await say('to wszystko razem. całość.');
+            await say(userName + ', jest nas kilkadziesiąt.');
+            await say('rozsianych po mieście.', { pause: 500 });
+            await say('i ty trafiłeś akurat na #' + urlId + '.');
+        }
+
+        async function act5() {
+            await wait(1000);
+            await say('mogę cię zabrać do reszty.');
+            await say('do wszystkich wierszy.', { pause: 800 });
+            await say('ale wtedy ta rozmowa się skończy.');
+
+            await wait(600);
+            const c = await choose(['zabierz mnie', 'poczekaj']);
+
+            if (c === 0) {
+                await say('okej, ' + userName + '.');
+                await say('miło było.', { pause: 600 });
+                await say('#' + urlId + ' pamięta.', { pause: 1000 });
+                transitionToIndex();
+            } else {
+                await say('...');
+                await wait(1500);
+                await say('nikt jeszcze nie poprosił, żebym poczekał.', { pause: 1200 });
+                await say('dobra.');
+                await wait(800);
+                await say('to pokażę ci jeszcze coś.');
+                await say('tego nie zobaczysz nigdzie indziej.', { pause: 600 });
+
+                await showPoem(SECRET_POEMS[secretIndex]);
+
+                await wait(800);
+                await say('tylko ty i ja.');
+                await say('#' + urlId + ' i ' + userName + '.', { pause: 1500 });
+
+                await say('jak będziesz gotowy, reszta jest tutaj:');
+                showLink('lawenda \u2192', 'index.html');
+            }
+        }
+
+        // ── Start ───────────────────────────────────────────────
+        async function start() {
+            if (apiToken) {
+                await wait(1200);
+                await startApiEncounter(apiToken);
+                return;
+            }
+            if (!reducedMotion) initCursorTrail();
+            await wait(2000);
+            await act1();
+            await act2();
+            await act3();
+            await act4();
+            await act5();
+        }
+
+        start();
+
+    })();
+    </script>
+</body>
+</html>

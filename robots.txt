@@ -1,6 +1,9 @@
 User-agent: *
-Disallow:
-Sitemap: https://szpineta.pl/sitemap.xml
 Disallow: /admin
+Disallow: /poems.html
+Disallow: /poems_143_backup.html
+Disallow: /poems_from_live.html
+Disallow: /poems_updated.html
+Disallow: /poems.html.bak
 
-
+Sitemap: https://szpineta.com/sitemap.xml

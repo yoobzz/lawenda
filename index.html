@@ -17,12 +17,12 @@
     <meta property="og:description" content="staś szpineta archiwum">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pl_PL">
-    <meta property="og:url" content="https://szpineta.pl/">
-    <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta property="og:url" content="https://szpineta.com/">
+    <meta property="og:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="~||-_^+*.">
     <meta name="twitter:description" content="staś szpineta archiwum">
-    <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta name="twitter:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -35,6 +35,13 @@
       plausible.init()
     </script>
     <style>
+        @font-face {
+            font-family: 'ABC Diatype Rounded';
+            src: url('fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
         @font-face {
             font-family: 'ABC Helveesti';
             src: url('fonts/ABCHelveestiPlusVariable-Trial.woff2') format('woff2'),
@@ -78,7 +85,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 2;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 13px;
             color: #333;
             opacity: 0.9;
@@ -93,7 +100,7 @@
             max-width: 100vw;
         }
         body {
-            font-family: 'Geist', sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
             color: #1a1a1a;
             overflow-x: hidden;
@@ -121,7 +128,7 @@
         }
 
         .title {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
             font-size: clamp(2rem, 5vw, 4rem);
             font-weight: 300;
             letter-spacing: 0.12em;
@@ -224,7 +231,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 16px;
             color: #000000;
         }
@@ -253,7 +260,7 @@
             left: 1rem;
             background: transparent;
             border: 0;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 14px;
             color: #000000;
             opacity: 0.4;
@@ -271,7 +278,7 @@
             left: 5.5rem;
             background: transparent;
             border: 0;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 14px;
             color: #000000;
             opacity: 0.4;
@@ -284,7 +291,7 @@
         .bio-button:hover { opacity: 0.8; }
 
         .nav-counter {
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 14px;
             color: #000000;
             padding: 0 1rem;
@@ -304,7 +311,7 @@
         .control-btn {
             background: transparent;
             border: 0;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 14px;
             color: #000000;
             opacity: 0.8;
@@ -321,7 +328,7 @@
             transform: translateX(-50%);
             background: #000000;
             color: #ffffff;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 12px;
             padding: 6px 10px;
             border-radius: 4px;
@@ -345,7 +352,7 @@
             background: none;
             border: 0;
             color: #000000;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 12px;
             opacity: 0.8;
             z-index: 1200;
@@ -384,7 +391,7 @@
             position: relative;
             background: #fff;
             color: #000;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             padding: 1.5rem 1.75rem;
             border-radius: 4px;
             max-width: 90vw;
@@ -418,7 +425,7 @@
             right: 0.75rem;
             background: none;
             border: 0;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 12px;
             color: #000;
             opacity: 0.7;
@@ -564,7 +571,7 @@
 
         .star-particle {
             position: absolute;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             color: rgb(150, 130, 220);
             font-size: 0.85rem;
             font-weight: 300;
@@ -751,7 +758,7 @@
             top: 2rem;
             left: 50%;
             transform: translateX(-50%);
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 2.2rem;
             color: #1a1a1a;
             opacity: 0;
@@ -806,7 +813,7 @@
             top: 2rem;
             left: 50%;
             transform: translateX(-50%);
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 1.2rem;
             color: rgba(196, 181, 253, 0.7);
             z-index: 1000;
@@ -824,7 +831,7 @@
 
         /* Wiersz w trybie symboli */
         .poem.symbols {
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             letter-spacing: 0.1em;
             color: #c4b5fd;
             filter: blur(0.5px);
@@ -862,7 +869,7 @@
             padding: 0;
             text-align: left;
             color: #000000;
-            font-family: 'Geist', sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             background: transparent;
             position: relative;
             width: 100%;
@@ -891,7 +898,7 @@
             font-weight: 400;
             margin-bottom: 1.5rem;
             color: #000000;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             letter-spacing: 0.15em;
             position: absolute;
             top: 50px;
@@ -908,7 +915,7 @@
             line-height: 1.6;
             margin-bottom: 2rem;
             color: #000000;
-            font-family: 'Geist', sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             position: absolute;
             top: 150px;
             left: 50px;
@@ -931,7 +938,7 @@
             border: none;
             color: #ffffff;
             text-decoration: none;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 0.8rem;
             transition: all 0.3s ease;
             border-radius: 4px;
@@ -952,7 +959,7 @@
             color: #000000;
             font-size: 2rem;
             cursor: pointer;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             transition: all 0.3s ease;
         }
 
@@ -963,7 +970,7 @@
 
         .bio-extra-text-1 {
             position: absolute;
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             color: #000000;
             font-size: 1.2rem;
             font-weight: 300;
@@ -1038,7 +1045,7 @@
         }
         
         .transition-char {
-            font-family: 'Geist Mono', monospace;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: clamp(0.8rem, 1.5vw, 1.5rem);
             color: #000000;
             opacity: 0;
@@ -1089,7 +1096,7 @@
             animation: transitionSymbolsPulse 3s ease-in-out infinite;
         }
         .transition-message-poetic {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
             font-size: clamp(1.2rem, 3vw, 2rem);
             font-weight: 300;
             color: #1a1a1a;
@@ -1099,7 +1106,7 @@
         .transition-title-size {
             font-size: clamp(2rem, 5vw, 4rem);
             letter-spacing: 0.12em;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
         }
         .transition-decrypt-char {
             display: inline-block;
@@ -1118,7 +1125,7 @@
         .transition-btn-mark::before,
         .transition-btn-mark::after {
             content: '|';
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
             font-weight: 300;
             color: rgba(0,0,0,0.3);
             font-size: 0.7em;
@@ -1148,7 +1155,7 @@
     <div class="container" id="landingContainer">
         <button class="audio-toggle" id="audioToggle" aria-pressed="false" title="dźwięk">dźwięk: off</button>
         <h1 class="title title-emerging" id="title">"~||-_^+*.</h1>
-        <div id="authorName" style="display: none; position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'Geist', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
+        <div id="authorName" style="display: none; position: absolute; bottom: 3rem; font-size: 1.2rem; color: #000000; opacity: 0; font-weight: 300; letter-spacing: 0.1em; font-family: 'ABC Diatype Rounded', 'Inter', sans-serif; cursor: pointer; transition: all 0.3s ease; padding: 12px 16px; -webkit-tap-highlight-color: transparent; touch-action: manipulation;">
             <span id="firstName">stanisław</span> <span id="lastName">szpineta</span>
         </div>
     </div>
@@ -2536,7 +2543,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         (window.dataLayer = window.dataLayer || []).push({ event: 'read_poems_click' });
                         clearTimeout(safetyTimeout);
                         const poemsSection = document.getElementById('poemsSection');
-                        let poemText = poemsSection && poemsSection.querySelector('.poem') ? (poemsSection.querySelector('.poem').innerText || '').trim() : 'po pełni (z)nów na jednego z dwóch';
+                        let poemText = poemsSection && poemsSection.querySelector('.poem') ? (poemsSection.querySelector('.poem').innerText || '').trim() : '~||-_^+*.';
                         const poemChars = poemText.split('').filter(c => c.trim() !== '');
                         const randomChars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż'];
                         const titleSymbols = '"~||-_^+*.';
@@ -2559,7 +2566,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                         const ctx = cvs.getContext('2d');
                         ctx.scale(dpr, dpr);
                         const fontSize = Math.max(12, Math.min(W * 0.015, 22));
-                        ctx.font = '300 ' + fontSize + "px 'Geist Mono', monospace";
+                        ctx.font = '300 ' + fontSize + "px 'ABC Diatype Rounded', 'Inter', sans-serif";
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         let drawn = 0;

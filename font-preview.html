@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>font preview — poems.html</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Playfair+Display:ital,wght@0,400;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Geist+Mono:wght@300;400&family=Libre+Baskerville:ital,wght@0,400;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'ABC Diatype Rounded';
+            src: url('fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #080808;
+            --fg: #f0ede8;
+            --fg-dim: rgba(240,237,232,0.35);
+            --fg-faint: rgba(240,237,232,0.08);
+            --grain-opacity: 0.03;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+            padding: 2rem;
+            transition: background 0.25s ease, color 0.25s ease;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: var(--grain-opacity);
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 256px;
+        }
+
+        /* ── TOP BAR ─────────────────────────────────────────── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .topbar-title {
+            font-family: 'Geist Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            color: var(--fg-dim);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .bg-swatches {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .bg-label {
+            font-family: 'Geist Mono', monospace;
+            font-size: 10px;
+            color: var(--fg-dim);
+            letter-spacing: 0.08em;
+            margin-right: 0.25rem;
+        }
+
+        .swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            transition: border-color 0.15s ease, transform 0.15s ease;
+        }
+        .swatch:hover { transform: scale(1.1); }
+        .swatch.active { border-color: var(--fg); }
+
+        /* ── GRID ────────────────────────────────────────────── */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .card {
+            border-top: 1px solid var(--fg-faint);
+            padding-top: 1.25rem;
+        }
+
+        .label {
+            font-family: 'Geist Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            color: var(--fg-dim);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .sublabel {
+            font-family: 'Geist Mono', monospace;
+            font-size: 10px;
+            color: rgba(240,237,232,0.18);
+            margin-bottom: 1.75rem;
+            line-height: 1.5;
+        }
+
+        .poem-sample {
+            line-height: 1.8;
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: var(--fg);
+            margin-bottom: 1rem;
+        }
+
+        .chars-sample {
+            font-size: 1.1rem;
+            color: rgba(240,237,232,0.45);
+            margin-bottom: 2rem;
+            letter-spacing: 0.04em;
+        }
+
+        .ui-sample {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            color: var(--fg-dim);
+            font-size: 13px;
+            border-top: 1px solid var(--fg-faint);
+            padding-top: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        /* ── FONT VARIANTS ──────────────────────────────────── */
+
+        /* A — ABC Diatype Rounded */
+        .a .poem-sample { font-family: 'ABC Diatype Rounded', sans-serif; }
+        .a .chars-sample { font-family: 'ABC Diatype Rounded', sans-serif; }
+        .a .ui-sample   { font-family: 'ABC Diatype Rounded', sans-serif; }
+
+        /* B — EB Garamond italic + Geist Mono UI */
+        .b .poem-sample { font-family: 'EB Garamond', serif; font-size: 1.1rem; }
+        .b .chars-sample { font-family: 'EB Garamond', serif; font-size: 1.15rem; }
+        .b .ui-sample   { font-family: 'Geist Mono', monospace; font-size: 12px; }
+
+        /* C — Cormorant italic + Geist Mono UI */
+        .c .poem-sample { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 300; }
+        .c .chars-sample { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 300; }
+        .c .ui-sample   { font-family: 'Geist Mono', monospace; font-size: 12px; }
+
+        /* D — Geist Mono all */
+        .d .poem-sample { font-family: 'Geist Mono', monospace; font-size: 0.88rem; font-weight: 300; line-height: 1.95; }
+        .d .chars-sample { font-family: 'Geist Mono', monospace; font-size: 0.88rem; font-weight: 300; }
+        .d .ui-sample   { font-family: 'Geist Mono', monospace; font-size: 12px; }
+
+        /* E — Playfair Display italic + Geist Mono UI */
+        .e .poem-sample { font-family: 'Playfair Display', serif; font-size: 1.05rem; }
+        .e .chars-sample { font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+        .e .ui-sample   { font-family: 'Geist Mono', monospace; font-size: 12px; }
+
+        /* F — Crimson Pro italic + Geist Mono UI */
+        .f .poem-sample { font-family: 'Crimson Pro', serif; font-size: 1.1rem; font-weight: 300; line-height: 1.85; }
+        .f .chars-sample { font-family: 'Crimson Pro', serif; font-size: 1.15rem; font-weight: 300; }
+        .f .ui-sample   { font-family: 'Geist Mono', monospace; font-size: 12px; }
+
+        /* G — Libre Baskerville + Geist Mono UI */
+        .g .poem-sample { font-family: 'Libre Baskerville', serif; font-size: 0.97rem; line-height: 1.85; }
+        .g .chars-sample { font-family: 'Libre Baskerville', serif; }
+        .g .ui-sample   { font-family: 'Geist Mono', monospace; font-size: 12px; }
+
+        /* H — Courier Prime (monospace serif) */
+        .h .poem-sample { font-family: 'Courier Prime', 'Courier New', monospace; font-size: 0.95rem; line-height: 1.9; }
+        .h .chars-sample { font-family: 'Courier Prime', 'Courier New', monospace; }
+        .h .ui-sample   { font-family: 'Courier Prime', 'Courier New', monospace; font-size: 12px; }
+
+        /* ── LIGHT THEME SUBLABEL FIX ─────────────────────── */
+        body.light .sublabel { color: rgba(0,0,0,0.25); }
+        body.light .bg-label { color: rgba(0,0,0,0.4); }
+        body.light .topbar-title { color: rgba(0,0,0,0.4); }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <span class="topbar-title">font preview — poems.html</span>
+
+        <div class="bg-swatches">
+            <span class="bg-label">tło →</span>
+            <div class="swatch active" style="background:#080808" title="#080808 — near black"
+                 onclick="setBg('#080808','#f0ede8',0.03,this)"></div>
+            <div class="swatch" style="background:#0d0a07" title="#0d0a07 — warm dark"
+                 onclick="setBg('#0d0a07','#f0ede8',0.03,this)"></div>
+            <div class="swatch" style="background:#111" title="#111"
+                 onclick="setBg('#111','#f0ede8',0.03,this)"></div>
+            <div class="swatch" style="background:#1c1c1c;border:1px solid #333" title="#1c1c1c — dark gray"
+                 onclick="setBg('#1c1c1c','#f0ede8',0.025,this)"></div>
+            <div class="swatch" style="background:#2a2520" title="#2a2520 — dark warm"
+                 onclick="setBg('#2a2520','#f0ede8',0.025,this)"></div>
+            <div class="swatch" style="background:#f0ede8;border:1px solid #ddd" title="#f0ede8 — cream"
+                 onclick="setBg('#f0ede8','#1a1a1a',0.012,this)"></div>
+            <div class="swatch" style="background:#fafafa;border:1px solid #ddd" title="#fafafa — white"
+                 onclick="setBg('#fafafa','#1a1a1a',0.012,this)"></div>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <div class="card a">
+            <div class="label">A — obecny</div>
+            <div class="sublabel">ABC Diatype Rounded wszędzie</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+        <div class="card b">
+            <div class="label">B — faworyt</div>
+            <div class="sublabel">EB Garamond italic · Geist Mono UI<br>najbliżej Goudy Old Style (Way of Code)</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+        <div class="card c">
+            <div class="label">C</div>
+            <div class="sublabel">Cormorant Garamond italic · Geist Mono UI<br>wyrafinowana, wąska</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+        <div class="card d">
+            <div class="label">D</div>
+            <div class="sublabel">Geist Mono wszędzie<br>terminal / maszynopis</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+        <div class="card e">
+            <div class="label">E — Way of Code</div>
+            <div class="sublabel">Playfair Display italic · Geist Mono UI<br>wysoki kontrast kreski, editorial</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+        <div class="card f">
+            <div class="label">F</div>
+            <div class="sublabel">Crimson Pro italic · Geist Mono UI<br>lekka, czytelna, klasyczna</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+        <div class="card g">
+            <div class="label">G</div>
+            <div class="sublabel">Libre Baskerville italic · Geist Mono UI<br>solidna, mocna szeryfowa</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+        <div class="card h">
+            <div class="label">H — Way of Code #2</div>
+            <div class="sublabel">Courier Prime · monospace serif<br>most między szeryfową a mono</div>
+            <div class="poem-sample">
+                miało być inaczej<br><br>
+                miało nie być<br>
+                mało mnie<br><br>
+                miałem być<br><br>
+                chociaż srebrny
+            </div>
+            <div class="chars-sample">~||-_^+*. +_:"~~?&gt;&lt;</div>
+            <div class="ui-sample">
+                <span>← wiersze</span><span>47 / 157</span><span>a</span><span>A</span><span>~</span><span>¿</span><span>*</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function setBg(bg, fg, grain, el) {
+            document.documentElement.style.setProperty('--bg', bg);
+            document.documentElement.style.setProperty('--fg', fg);
+            document.documentElement.style.setProperty('--grain-opacity', grain);
+
+            const isDark = bg.startsWith('#0') || bg.startsWith('#1') || bg.startsWith('#2');
+            const dimAlpha = isDark ? 0.35 : 0.45;
+            const faintAlpha = isDark ? 0.08 : 0.1;
+            document.documentElement.style.setProperty('--fg-dim', isDark
+                ? `rgba(240,237,232,${dimAlpha})`
+                : `rgba(0,0,0,${dimAlpha})`);
+            document.documentElement.style.setProperty('--fg-faint', isDark
+                ? `rgba(240,237,232,${faintAlpha})`
+                : `rgba(0,0,0,${faintAlpha})`);
+
+            document.body.classList.toggle('light', !isDark);
+
+            document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+
+            // fix chars-sample color for light
+            document.querySelectorAll('.chars-sample').forEach(el => {
+                el.style.color = isDark ? 'rgba(240,237,232,0.45)' : 'rgba(0,0,0,0.35)';
+            });
+            document.querySelectorAll('.ui-sample').forEach(el => {
+                el.style.color = isDark ? 'rgba(240,237,232,0.35)' : 'rgba(0,0,0,0.4)';
+            });
+        }
+    </script>
+</body>
+</html>

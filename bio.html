@@ -13,18 +13,18 @@
     <meta property="og:description" content="staś szpineta archiwum">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pl_PL">
-    <meta property="og:url" content="https://szpineta.pl/bio.html">
-    <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta property="og:url" content="https://szpineta.com/bio.html">
+    <meta property="og:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="~||-_^+*.">
     <meta name="twitter:description" content="staś szpineta archiwum">
-    <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta name="twitter:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <link rel="manifest" href="/site.webmanifest">
-    <script defer data-domain="szpineta.pl" src="https://plausible.io/js/script.js"></script>
+    <script defer data-domain="szpineta.com" src="https://plausible.io/js/script.js"></script>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -33,6 +33,13 @@
     })(window,document,'script','dataLayer','GTM-TKJ2KBZ8');</script>
     <!-- End Google Tag Manager -->
     <style>
+        :root {
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+            --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         @font-face {
             font-family: 'ABC Diatype Rounded';
             src: url('fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
@@ -53,7 +60,7 @@
             height: 100%;
         }
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
             color: #fff;
             background: #111;
         }
@@ -77,7 +84,7 @@
             left: 1.5rem;
             background: transparent;
             border: 0;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 700;
             letter-spacing: 0.05em;
@@ -87,10 +94,10 @@
             padding: 6px 8px;
             z-index: 110;
             text-decoration: none;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s var(--ease-smooth), letter-spacing 0.4s var(--ease-smooth);
             mix-blend-mode: difference;
         }
-        .back-button:hover { opacity: 0.9; }
+        .back-button:hover { opacity: 0.9; letter-spacing: 0.09em; }
 
         .audio-toggle {
             position: fixed;
@@ -98,7 +105,7 @@
             right: 1.5rem;
             background: none;
             border: 0;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: 13px;
             font-weight: 700;
             color: #fff;
@@ -106,7 +113,7 @@
             cursor: pointer;
             z-index: 1200;
             -webkit-tap-highlight-color: transparent;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s var(--ease-smooth);
             mix-blend-mode: difference;
         }
         .audio-toggle:hover { opacity: 1; }
@@ -132,15 +139,23 @@
         }
         .scatter-words span {
             position: absolute;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-weight: 700;
             letter-spacing: 0.08em;
             user-select: none;
             opacity: 0;
-            transition: opacity 1.5s ease, transform 1.5s ease;
+            filter: blur(4px);
+            transition: opacity 1.8s var(--ease-out-quart), transform 1.8s var(--ease-out-quart), filter 1.4s var(--ease-out-quart);
         }
         .scatter-words span.visible {
             opacity: 1;
+            filter: blur(0);
+        }
+        .scatter-words span.floating {
+            animation: scatter-float var(--float-dur, 8s) ease-in-out infinite alternate;
+        }
+        @keyframes scatter-float {
+            to { translate: 0 var(--float-y, -6px); }
         }
 
         /* ── SECTION 1: HERO (dark) ──────────────────────────────────── */
@@ -171,10 +186,14 @@
             z-index: 2;
             text-align: left;
             opacity: 0;
-            transition: opacity 0.8s ease;
+            filter: blur(4px);
+            transform: translateY(10px);
+            transition: opacity 1s var(--ease-out-quart) 0.1s, filter 0.8s var(--ease-out-quart) 0.1s, transform 0.8s var(--ease-out-quart) 0.1s;
         }
         .hero-name.visible {
             opacity: 1;
+            filter: blur(0);
+            transform: none;
         }
         .hero-hej {
             font-size: clamp(100px, 22vw, 300px);
@@ -185,10 +204,16 @@
             z-index: 2;
             text-align: left;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transform: scale(1.06);
+            filter: blur(12px);
+            transition: opacity 0.8s var(--ease-out-expo), transform 1s var(--ease-out-back), filter 0.9s var(--ease-out-expo);
             margin-bottom: clamp(0.5rem, 1.5vh, 1.5rem);
         }
-        .hero-hej.visible { opacity: 1; }
+        .hero-hej.visible {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+        }
         .hero-video {
             position: absolute;
             inset: 0;
@@ -197,7 +222,7 @@
             object-fit: cover;
             z-index: 0;
             opacity: 0;
-            transition: opacity 1.2s ease;
+            transition: opacity 2s var(--ease-out-quart);
         }
         .hero-video.visible {
             opacity: 0.45;
@@ -209,8 +234,8 @@
             color: #111;
             display: block;
             position: relative;
-            min-height: 70vh;
-            min-height: 70dvh;
+            min-height: 85vh;
+            min-height: 85dvh;
         }
         .section-pisze .scatter-words span {
             color: #111;
@@ -220,17 +245,19 @@
         }
         .pisze-line {
             position: absolute;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             z-index: 1;
             color: #111;
             opacity: 0;
             transform: translateY(12px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            filter: blur(4px);
+            transition: opacity 0.7s var(--ease-out-quart), transform 0.7s var(--ease-out-quart), filter 0.6s var(--ease-out-quart);
             white-space: nowrap;
         }
         .pisze-line.visible {
             opacity: 1;
             transform: none;
+            filter: blur(0);
         }
         .pisze-line-1 {
             top: 12vh;
@@ -245,6 +272,9 @@
             font-size: clamp(20px, 2.8vw, 36px);
             font-weight: 600;
             text-align: right;
+            transform: translateX(20px);
+            filter: blur(6px);
+            transition: opacity 0.9s var(--ease-out-expo), transform 0.9s var(--ease-out-expo), filter 0.8s var(--ease-out-expo);
         }
         .pisze-line-3 {
             bottom: 18vh;
@@ -252,21 +282,26 @@
             transform: translateX(-50%) translateY(12px);
             font-size: clamp(18px, 2.2vw, 28px);
             font-weight: 600;
+            filter: blur(4px);
         }
         .pisze-line-3.visible {
             opacity: 1;
             transform: translateX(-50%) translateY(0);
+            filter: blur(0);
         }
         .pisze-dot {
             bottom: 15vh;
             right: clamp(3rem, 12vw, 14rem);
             font-size: clamp(60px, 10vw, 120px);
             font-weight: 900;
-            opacity: 0.15;
+            transform: translateY(12px) scale(0.7);
+            filter: blur(8px);
+            transition: opacity 0.4s var(--ease-out-back), transform 0.5s var(--ease-out-back), filter 0.4s var(--ease-out-expo);
         }
         .pisze-dot.visible {
             opacity: 0.15;
             transform: none;
+            filter: blur(0);
         }
         .pisze-star {
             display: inline;
@@ -286,12 +321,14 @@
             z-index: 1;
             opacity: 0;
             transform: translateY(6px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            filter: blur(3px);
+            transition: opacity 0.8s var(--ease-out-quart), transform 0.7s var(--ease-out-quart), filter 0.6s var(--ease-out-quart);
             white-space: nowrap;
         }
         .pisze-footnote.visible {
             opacity: 1;
             transform: none;
+            filter: blur(0);
         }
 
         /* ── SECTION 3: LAWENDA (lavender) ───────────────────────────── */
@@ -300,8 +337,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 70vh;
-            min-height: 70dvh;
+            min-height: 90vh;
+            min-height: 90dvh;
         }
         .section-lawenda .scatter-words span {
             color: #b8a0d6;
@@ -310,7 +347,7 @@
             opacity: 0.08;
         }
         .lawenda-kicker {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: clamp(14px, 1.8vw, 22px);
             font-weight: 600;
             letter-spacing: 0.05em;
@@ -320,12 +357,14 @@
             margin-bottom: clamp(0.5rem, 1.5vh, 1rem);
             opacity: 0;
             transform: translateY(8px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            filter: blur(3px);
+            transition: opacity 0.8s var(--ease-out-quart), transform 0.8s var(--ease-out-quart), filter 0.7s var(--ease-out-quart);
             text-align: center;
         }
         .lawenda-kicker.visible {
             opacity: 1;
             transform: none;
+            filter: blur(0);
         }
         .lawenda-huge {
             font-size: clamp(60px, 14vw, 180px);
@@ -336,13 +375,21 @@
             z-index: 1;
             text-align: center;
             cursor: pointer;
-            transition: color 0.3s;
+            opacity: 0;
+            filter: blur(10px);
+            transform: scale(0.94);
+            transition: color 0.3s, opacity 0.6s var(--ease-out-expo), filter 1.2s var(--ease-out-quart), transform 1.2s var(--ease-out-back);
+        }
+        .lawenda-huge.visible {
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1);
         }
         .lawenda-huge:hover {
             color: #7B5EA7;
         }
         .lawenda-desc {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-size: clamp(20px, 2.8vw, 36px);
             font-weight: 600;
             line-height: 1.6;
@@ -354,11 +401,13 @@
             z-index: 1;
             opacity: 0;
             transform: translateY(15px);
-            transition: opacity 1s ease 0.3s, transform 1s ease 0.3s;
+            filter: blur(6px);
+            transition: opacity 1.2s var(--ease-out-quart) 0.3s, transform 1.2s var(--ease-out-quart) 0.3s, filter 1s var(--ease-out-quart) 0.4s;
         }
         .lawenda-desc.visible {
             opacity: 1;
             transform: none;
+            filter: blur(0);
         }
 
         /* ── SECTION 4: KSIĄŻKA (white) ──────────────────────────────── */
@@ -369,8 +418,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 70vh;
-            min-height: 70dvh;
+            min-height: 80vh;
+            min-height: 80dvh;
         }
         .section-ksiazka .scatter-words span {
             color: #111;
@@ -386,9 +435,18 @@
             z-index: 1;
             line-height: 1.6;
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            filter: blur(5px);
+            transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo), filter 0.7s var(--ease-out-expo);
             text-align: center;
+        }
+        .ksiazka-line-1 { transform: translateY(30px); }
+        .ksiazka-line-2 {
+            transform: translateY(25px);
+            transition-timing-function: var(--ease-out-quart);
+        }
+        .ksiazka-line-3 {
+            transform: translateY(20px);
+            transition-timing-function: var(--ease-out-quart);
         }
         .ksiazka-sym {
             opacity: 0.35;
@@ -398,6 +456,7 @@
         .ksiazka-line.visible {
             opacity: 1;
             transform: none;
+            filter: blur(0);
         }
         .ksiazka-dot {
             display: inline-block;
@@ -410,8 +469,8 @@
             background: #f0ede8;
             display: block;
             position: relative;
-            min-height: 70vh;
-            min-height: 70dvh;
+            min-height: 80vh;
+            min-height: 80dvh;
         }
         .support-cta-read {
             position: absolute;
@@ -424,9 +483,13 @@
             letter-spacing: -0.03em;
             z-index: 2;
             opacity: 0;
-            transition: opacity 0.3s, color 0.3s;
+            transition: opacity 0.3s, color 0.4s var(--ease-smooth), transform 0.3s var(--ease-smooth), letter-spacing 0.4s var(--ease-smooth);
         }
-        .support-cta-read:hover { color: #9b80c0; }
+        .support-cta-read:hover {
+            color: #9b80c0;
+            transform: translateX(4px);
+            letter-spacing: -0.02em;
+        }
         .support-cta-help {
             position: absolute;
             bottom: 22vh;
@@ -438,18 +501,23 @@
             letter-spacing: -0.02em;
             z-index: 2;
             opacity: 0;
-            transition: opacity 0.3s, color 0.3s;
+            transition: opacity 0.3s, color 0.4s var(--ease-smooth), transform 0.3s var(--ease-smooth), letter-spacing 0.4s var(--ease-smooth);
         }
-        .support-cta-help:hover { color: #b8a0d6; opacity: 1 !important; }
+        .support-cta-help:hover {
+            color: #b8a0d6;
+            opacity: 1 !important;
+            transform: translateX(-3px);
+            letter-spacing: -0.01em;
+        }
         .support-scatter-sym {
             position: absolute;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
             font-weight: 700;
             color: rgba(184,160,214,0.08);
             z-index: 0;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 1.5s ease;
+            transition: opacity 1.5s var(--ease-out-quart);
         }
         .support-scatter-sym.visible { opacity: 1; }
 
@@ -472,25 +540,27 @@
             line-height: 1.35;
             opacity: 0;
             transform: translateX(-30px);
-            transition: opacity 0.6s ease, transform 0.6s ease, color 0.3s;
+            filter: blur(5px);
+            transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo), filter 0.5s var(--ease-out-expo), color 0.3s, letter-spacing 0.3s var(--ease-smooth);
         }
         .nav-row.visible {
             opacity: 0.25;
             transform: none;
+            filter: blur(0);
         }
         .nav-row:hover {
             opacity: 1 !important;
             color: #7B5EA7;
+            letter-spacing: 0em;
         }
         .nav-row-main {
             font-size: clamp(48px, 9vw, 110px) !important;
             margin-bottom: clamp(1rem, 2vh, 2rem);
         }
-        .nav-row.visible:nth-child(2) { transition-delay: 0.08s; }
-        .nav-row.visible:nth-child(3) { transition-delay: 0.16s; }
-        .nav-row.visible:nth-child(4) { transition-delay: 0.24s; }
-        .nav-row.visible:nth-child(5) { transition-delay: 0.32s; }
-        .nav-row.visible:nth-child(6) { transition-delay: 0.40s; }
+        .nav-row.visible:nth-child(1) { transition-delay: 0s; }
+        .nav-row.visible:nth-child(2) { transition-delay: 0.12s; }
+        .nav-row.visible:nth-child(3) { transition-delay: 0.24s; }
+        .nav-row.visible:nth-child(4) { transition-delay: 0.36s; }
 
         .nav-collab {
             display: block;
@@ -501,7 +571,8 @@
             color: #fff;
             opacity: 0;
             transform: translateX(-30px);
-            transition: opacity 0.6s ease, transform 0.6s ease, color 0.3s;
+            filter: blur(5px);
+            transition: opacity 0.6s var(--ease-out-expo) 0.48s, transform 0.6s var(--ease-out-expo) 0.48s, filter 0.5s var(--ease-out-expo) 0.48s, color 0.3s, letter-spacing 0.3s var(--ease-smooth);
             cursor: pointer;
             background: none;
             border: none;
@@ -513,10 +584,12 @@
         .nav-collab.visible {
             opacity: 0.25;
             transform: none;
+            filter: blur(0);
         }
         .nav-collab:hover {
             opacity: 1 !important;
             color: #7B5EA7;
+            letter-spacing: 0em;
         }
         .nav-email {
             display: block;
@@ -528,7 +601,7 @@
             overflow: hidden;
             max-height: 0;
             opacity: 0;
-            transition: max-height 0.5s ease, opacity 0.4s ease, color 0.3s;
+            transition: max-height 0.6s var(--ease-out-expo), opacity 0.5s var(--ease-out-quart), color 0.3s;
             margin-top: 0.3rem;
         }
         .nav-email.open {
@@ -560,11 +633,28 @@
 
         /* ── MOBILE ───────────────────────────────────────────────────── */
         @media (max-width: 768px) {
+            .section-pisze {
+                min-height: 80vh;
+                min-height: 80dvh;
+            }
+            .section-lawenda {
+                min-height: 80vh;
+                min-height: 80dvh;
+            }
             .section-nav {
                 padding: 3rem 1.5rem;
             }
             .nav-row {
                 font-size: clamp(28px, 9vw, 48px);
+            }
+            .nav-collab {
+                font-size: clamp(28px, 9vw, 48px);
+            }
+            .support-cta-read {
+                top: 22vh;
+            }
+            .support-cta-help {
+                bottom: 18vh;
             }
         }
 
@@ -573,6 +663,7 @@
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
                 transition-duration: 0.01ms !important;
+                filter: none !important;
             }
         }
     </style>
@@ -645,6 +736,7 @@ chcę się tym dzielić.</div>
     <script>
     (function() {
         const SYMS = ['~', '|', '|', '-', '_', '^', '+', '*', '.'];
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // ── Scatter symbols per section ────────────────────────────────
         const scatterConfig = {
@@ -670,6 +762,9 @@ chcę się tym dzielić.</div>
                 const rotate = (Math.random() - 0.5) * 40;
                 s.style.transform = 'rotate(' + rotate + 'deg) translateY(20px)';
                 s._rotate = rotate;
+                // ambient drift properties
+                s.style.setProperty('--float-y', (-3 - Math.random() * 9) + 'px');
+                s.style.setProperty('--float-dur', (6 + Math.random() * 10) + 's');
                 container.appendChild(s);
             }
         });
@@ -681,12 +776,17 @@ chcę się tym dzielić.</div>
                 const section = entry.target;
                 const sectionName = section.dataset.section;
 
-                // reveal scatter words
+                // reveal scatter words with staggered timing
                 section.querySelectorAll('.scatter-words span').forEach((s, i) => {
+                    const delay = i * 90 + Math.random() * 40;
                     setTimeout(() => {
                         s.classList.add('visible');
                         s.style.transform = 'rotate(' + s._rotate + 'deg) translateY(0)';
-                    }, i * 80);
+                        // start ambient float after reveal transition completes
+                        if (!prefersReducedMotion) {
+                            setTimeout(() => s.classList.add('floating'), 2000);
+                        }
+                    }, delay);
                 });
 
                 // reveal main content
@@ -696,12 +796,14 @@ chcę się tym dzielić.</div>
                         name.dataset.animated = '1';
                         typewriteHero();
                     }
+                    observer.unobserve(section);
                 }
                 else if (sectionName === 'pisze') {
                     if (!section.dataset.animated) {
                         section.dataset.animated = '1';
                         animatePisze();
                     }
+                    observer.unobserve(section);
                 }
                 else if (sectionName === 'lawenda') {
                     const kickerEl = section.querySelector('.lawenda-kicker');
@@ -717,6 +819,7 @@ chcę się tym dzielić.</div>
                             kickerEl.dataset.animated = '1';
                             typewriteKicker(kickerEl, kickerEl.textContent.trim(), () => {
                                 setTimeout(() => {
+                                    hugeEl.classList.add('visible');
                                     lawendaDecryptLoop(hugeEl, () => {
                                         typewriteLawendaDesc(descEl);
                                     });
@@ -724,30 +827,34 @@ chcę się tym dzielić.</div>
                             });
                         }
                     }
+                    observer.unobserve(section);
                 }
                 else if (sectionName === 'ksiazka') {
                     section.querySelectorAll('.ksiazka-line').forEach((el, i) => {
-                        setTimeout(() => el.classList.add('visible'), i * 400);
+                        setTimeout(() => el.classList.add('visible'), i * 500);
                     });
                     if (!section.dataset.symLoop) {
                         section.dataset.symLoop = '1';
                         updateKsiazkaSymbols();
-                        setInterval(updateKsiazkaSymbols, 180);
+                        section._symInterval = setInterval(updateKsiazkaSymbols, 180);
                     }
+                    observer.unobserve(section);
                 }
                 else if (sectionName === 'support') {
                     if (!section.dataset.animated) {
                         section.dataset.animated = '1';
                         animateSupport();
                     }
+                    observer.unobserve(section);
                 }
                 else if (sectionName === 'nav') {
                     section.querySelectorAll('.nav-row').forEach(el => el.classList.add('visible'));
                     const collabBtn = document.getElementById('navCollab');
                     if (collabBtn) collabBtn.classList.add('visible');
+                    observer.unobserve(section);
                 }
             });
-        }, { threshold: 0.3 });
+        }, { threshold: 0.25 });
 
         document.querySelectorAll('.section').forEach(s => observer.observe(s));
 
@@ -917,7 +1024,7 @@ chcę się tym dzielić.</div>
             const hejEl = document.getElementById('heroHej');
             const nameEl = document.getElementById('heroName');
 
-            // Phase 1: decrypt "cześć!" (slow, no typewrite)
+            // Phase 1: decrypt "cześć!" with scale+blur reveal
             hejEl.classList.add('visible');
             hejEl.textContent = 'cześć!';
             decryptRevealSlow(hejEl, () => {
@@ -932,14 +1039,14 @@ chcę się tym dzielić.</div>
                         ni++;
                         nameEl.innerHTML = preText.slice(0, ni) + '<span class="stas-cursor"></span>';
                         if (ni >= preText.length) {
-                            // Phase 4: staś/stanisław hesitation, then auto-scroll
+                            // Phase 4: staś/stanisław hesitation
                             setTimeout(() => animateStasHesitation(nameEl, () => {}), 150);
                             return;
                         }
                         setTimeout(typePre, humanDelay(preText[ni]));
                     }
                     typePre();
-                }, 400);
+                }, 500);
             });
         }
 
@@ -1077,24 +1184,24 @@ chcę się tym dzielić.</div>
                 await typeInto(l1, 'piszę wiersze,', 25);
 
                 // line 2: longer — slight pause before, slower
-                await wait(500);
+                await wait(600);
                 await typeInto(l2, 'żeby nie zgubić siebie w sobie', 30);
 
                 // line 3: short — quick
-                await wait(300);
+                await wait(400);
                 await typeInto(l3, 'i w świecie', 22);
 
-                // dot
-                await wait(600);
+                // dot — pop in
+                await wait(700);
                 dot.classList.add('visible');
                 dot.textContent = '.';
 
                 // comma → asterisk on "piszę wiersze,"
-                await wait(400);
+                await wait(500);
                 l1.innerHTML = 'piszę wiersze<span class="pisze-star">*</span>';
 
                 // footnote typewrite
-                await wait(300);
+                await wait(400);
                 await typeFootnote(foot, '*i nie tylko', 35);
             }
 
@@ -1145,16 +1252,16 @@ chcę się tym dzielić.</div>
                 i++;
                 el.innerHTML = sliceToHtml(fullText.slice(0, i)) + cursor();
 
-                let d = 25 + Math.random() * 30;
+                let d = 28 + Math.random() * 35;
                 if (fullText[i - 1] === ' ') d += 15 + Math.random() * 25;
-                if (fullText[i - 1] === '\n') d += 80 + Math.random() * 60;
-                if (fullText[i - 1] === ',') d += 100 + Math.random() * 80;
-                else if ('.;:!?'.includes(fullText[i - 1])) d += 120 + Math.random() * 120;
-                if (Math.random() < 0.05) d += 50 + Math.random() * 80;
+                if (fullText[i - 1] === '\n') d += 250 + Math.random() * 200;
+                if (fullText[i - 1] === ',') d += 120 + Math.random() * 100;
+                else if ('.;:!?'.includes(fullText[i - 1])) d += 200 + Math.random() * 200;
+                if (Math.random() < 0.06) d += 60 + Math.random() * 100;
                 setTimeout(step, d);
             }
 
-            setTimeout(step, 180);
+            setTimeout(step, 250);
         }
 
         // ── Support section animation ──────────────────────────────
@@ -1174,7 +1281,7 @@ chcę się tym dzielić.</div>
                 sym.style.fontSize = (20 + Math.random() * 60) + 'px';
                 sym.style.transform = 'rotate(' + ((Math.random() - 0.5) * 50) + 'deg)';
                 section.appendChild(sym);
-                setTimeout(() => sym.classList.add('visible'), 200 + s * 60);
+                setTimeout(() => sym.classList.add('visible'), 200 + s * 70);
             }
 
             // rotating symbols in background
@@ -1232,9 +1339,9 @@ chcę się tym dzielić.</div>
                 decryptLink(readEl, () => {
                     setTimeout(() => {
                         decryptLink(helpEl, () => {});
-                    }, 400);
+                    }, 500);
                 });
-            }, 200);
+            }, 250);
         }
 
         // ── Lawenda ↔ ~||-_^+*. decrypt loop ───────────────────────
@@ -1321,7 +1428,9 @@ chcę się tym dzielić.</div>
                     const rect = container.parentElement.getBoundingClientRect();
                     const progress = -rect.top * 0.03;
                     container.querySelectorAll('span').forEach((s, i) => {
-                        const rate = 0.3 + (i % 4) * 0.15;
+                        // multi-depth parallax based on element size
+                        const sizeRate = parseFloat(s.style.fontSize) / 50;
+                        const rate = (0.2 + (i % 5) * 0.12) * sizeRate;
                         const y = progress * rate;
                         s.style.transform = 'rotate(' + (s._rotate || 0) + 'deg) translateY(' + y + 'px)';
                     });

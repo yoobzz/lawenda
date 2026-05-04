@@ -8,13 +8,13 @@
     <meta property="og:description" content="staś szpineta archiwum">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pl_PL">
-    <meta property="og:url" content="https://szpineta.pl/poems.html">
-    <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta property="og:url" content="https://szpineta.com/poems.html">
+    <meta property="og:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
     
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="~||-_^+*.">
     <meta name="twitter:description" content="staś szpineta archiwum">
-    <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta name="twitter:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-snZHOA1gRdrEnCR8bWAzN.js"></script>
     <script>
@@ -23,6 +23,7 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>wiersze — ~||-_^+*.</title>
+    <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode')})();</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     
     <meta name="description" content="staś szpineta archiwum">
@@ -30,12 +31,12 @@
     <meta property="og:description" content="staś szpineta archiwum">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pl_PL">
-    <meta property="og:url" content="https://szpineta.pl/poems.html">
-    <meta property="og:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta property="og:url" content="https://szpineta.com/poems.html">
+    <meta property="og:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="~||-_^+*.">
     <meta name="twitter:description" content="staś szpineta archiwum">
-    <meta name="twitter:image" content="https://szpineta.pl/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <meta name="twitter:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -105,9 +106,24 @@
             padding: 2rem 2rem 160px 2rem; 
             opacity: 0; 
         }
-        .poem.active { 
-            display: flex; 
-            opacity: 1; 
+        .poem.active {
+            display: flex;
+            opacity: 1;
+        }
+        /* per-poem block placement (seeded) — pozycja, alignment, max-width, lekka rotacja */
+        .poem.align-start { align-items: flex-start; }
+        .poem.align-center { align-items: center; }
+        .poem.align-end { align-items: flex-end; }
+        .poem.just-start { justify-content: flex-start; }
+        .poem.just-center { justify-content: center; }
+        .poem.just-end { justify-content: flex-end; }
+        .poem-body {
+            transform-origin: center;
+            will-change: transform;
+            max-width: min(58ch, 84vw);
+        }
+        @media (max-width: 640px) {
+            .poem-body { max-width: 88vw; }
         }
         .navigation { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: row; gap: 1rem; z-index: 100; align-items: center; }
         .nav-arrow { 
@@ -479,6 +495,68 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* ── THEME TRANSITION ─────────────────────────────────────── */
+        body,
+        .poem,
+        .poems-section,
+        .nav-arrow,
+        .nav-counter,
+        .back-button,
+        .control-btn,
+        .coffee-btn,
+        .goto-popover,
+        .search-popover,
+        .search-item,
+        #audioToggle {
+            transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+        }
+
+        /* ── DARK MODE ────────────────────────────────────────────── */
+        html.dark-mode body { background: #080808; color: #f0ede8; }
+        html.dark-mode .poems-section { background: #080808; }
+        html.dark-mode .poem { color: #f0ede8; }
+        html.dark-mode .nav-arrow { color: rgba(240,237,232,0.4); }
+        html.dark-mode .nav-arrow::after { background: rgba(240,237,232,0.3); }
+        html.dark-mode .nav-arrow:hover { color: rgba(240,237,232,0.85); }
+        html.dark-mode .nav-counter { color: rgba(240,237,232,0.35); }
+        html.dark-mode .nav-counter::after { background: rgba(240,237,232,0.25); }
+        html.dark-mode .back-button { color: rgba(240,237,232,0.35); }
+        html.dark-mode .back-button:hover { color: rgba(240,237,232,0.75); background: rgba(255,255,255,0.04); }
+        html.dark-mode .control-btn { color: rgba(240,237,232,0.4); }
+        html.dark-mode .control-btn:hover, html.dark-mode .control-btn:focus-visible { color: rgba(240,237,232,0.85); }
+        html.dark-mode .control-btn::after { background: rgba(240,237,232,0.3); }
+        html.dark-mode .coffee-btn { color: rgba(240,237,232,0.4); }
+        html.dark-mode .coffee-btn:hover { color: rgba(240,237,232,0.75); }
+        html.dark-mode .coffee-btn::after { background: rgba(240,237,232,0.35); }
+        html.dark-mode .coffee-sym { color: rgba(240,237,232,0.18); }
+        html.dark-mode .coffee-btn:hover .coffee-sym { color: rgba(240,237,232,0.45); }
+        html.dark-mode .goto-popover {
+            background: #111;
+            border-color: rgba(240,237,232,0.12);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+        html.dark-mode .goto-input { color: #f0ede8; }
+        html.dark-mode .goto-hint { color: rgba(240,237,232,0.35); }
+        html.dark-mode .search-popover {
+            background: #111;
+            border-color: rgba(240,237,232,0.12);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        html.dark-mode .search-input { color: #f0ede8; }
+        html.dark-mode .search-input::placeholder { color: rgba(240,237,232,0.25); }
+        html.dark-mode .search-item { color: rgba(240,237,232,0.7); border-top-color: rgba(240,237,232,0.07); }
+        html.dark-mode .search-item:hover,
+        html.dark-mode .search-item:focus-visible { background: rgba(255,255,255,0.05); color: #f0ede8; }
+        html.dark-mode .search-item::before { background: rgba(240,237,232,0.4); }
+        html.dark-mode .skeleton-line {
+            background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+            background-size: 200% 100%;
+        }
+        html.dark-mode .page-transition { background: #080808; }
+        html.dark-mode .typing-cursor { background: rgba(240,237,232,0.5); }
+        html.dark-mode #audioToggle { color: rgba(240,237,232,0.4) !important; }
+        html.dark-mode *:focus-visible { outline-color: rgba(240,237,232,0.4); }
     </style>
 </head>
 <body>
@@ -2627,6 +2705,7 @@
     </div>
 
     <div class="controls" id="controls" aria-label="kontrolki">
+        <button class="control-btn" id="themeToggle" title="tryb jasny / ciemny">*</button>
         <button class="control-btn" id="fontSmaller" title="mniejszy tekst">-</button>
         <button class="control-btn" id="fontBigger" title="większy tekst">+</button>
         <button class="control-btn" id="openSearch" title="szukaj">¿</button>
@@ -2747,6 +2826,92 @@
                 resizeTimer = setTimeout(cachePositions, 200);
             });
         }
+
+        // ── messy block placement: seeded per-poem position ───────────────────
+        function makeSeededRng(seed) {
+            let s = ((seed | 0) * 16807) % 2147483647;
+            if (s <= 0) s = 1;
+            return function () {
+                s = (s * 16807) % 2147483647;
+                return (s & 0x7fffffff) / 2147483647;
+            };
+        }
+
+        function applyMessyLayout(el) {
+            if (!el || el.dataset.messyApplied === '1') return;
+            const seedAttr = el.getAttribute('data-original-index') || el.getAttribute('data-index') || '0';
+            const seed = (parseInt(seedAttr, 10) || 0) + 1;
+            const rnd = makeSeededRng(seed * 7919);
+
+            const innerOriginal = el.innerHTML;
+            // metryki tekstu: ile linii, najdłuższa linia
+            const linesText = innerOriginal
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<[^>]+>/g, '')
+                .replace(/&nbsp;/g, ' ')
+                .split('\n');
+            const totalLineCount = linesText.length;
+            const longestLine = linesText.reduce((m, l) => Math.max(m, l.trim().length), 0);
+
+            // viewport
+            const vw = Math.max(window.innerWidth || 360, 320);
+            const vh = Math.max(window.innerHeight || 600, 480);
+            const isSmall = vw < 540;
+
+            // budżet pozycji (mniej na mobile)
+            const baseMaxX = isSmall ? 2.5 : 5;
+            const baseMaxY = isSmall ? 1.8 : 2.8;
+
+            // alignment najpierw — bo wpływa na bezpieczny offset i max-width
+            const aiCls = ['align-start', 'align-center', 'align-center', 'align-end'];
+            const jiCls = ['just-start', 'just-center', 'just-center', 'just-end'];
+            const ai = aiCls[Math.floor(rnd() * aiCls.length)];
+            const ji = jiCls[Math.floor(rnd() * jiCls.length)];
+            el.classList.add(ai);
+            el.classList.add(ji);
+
+            // offsety + tłumienie kierunku do krawędzi gdy alignment już tam stoi
+            let mxVal = (rnd() - 0.5) * baseMaxX * 2;
+            let myVal = (rnd() - 0.5) * baseMaxY * 2;
+            if (ji === 'just-start' && mxVal < 0) mxVal *= 0.25;
+            if (ji === 'just-end'   && mxVal > 0) mxVal *= 0.25;
+            if (ai === 'align-start' && myVal < 0) myVal *= 0.25;
+            if (ai === 'align-end'   && myVal > 0) myVal *= 0.25;
+            const mr = ((rnd() - 0.5) * 1.0).toFixed(2);
+
+            // bezpieczna szerokość — uwzględnia że alignment przy krawędzi i przesunięcie zjadają budżet
+            const edgeReserve = (ji === 'just-start' || ji === 'just-end') ? 12 : 6;
+            const safeWidthVw = Math.max(56, 92 - edgeReserve - Math.abs(mxVal) * 2);
+
+            // auto font-size: dopasuj do najdłuższej linii i całkowitej wysokości
+            const usablePx = vw * (safeWidthVw / 100) - 16;
+            const usableHpx = vh * 0.66 - 32;
+            const charWidthCoef = 0.56; // sans-serif średnia
+            const lineHeight = 1.6;
+            const padFactor = 1 + Math.min(totalLineCount * 0.04, 0.2);
+            const fitWidthFs = longestLine > 0 ? (usablePx / (longestLine * charWidthCoef)) : 9999;
+            const fitHeightFs = totalLineCount > 0 ? (usableHpx / (totalLineCount * lineHeight * padFactor)) : 9999;
+            let fontPx = Math.floor(Math.min(fitWidthFs, fitHeightFs));
+            const minFs = isSmall ? 14 : 16;
+            const maxFs = isSmall ? 30 : 42;
+            if (!isFinite(fontPx) || fontPx <= 0) fontPx = isSmall ? 18 : 22;
+            fontPx = Math.max(minFs, Math.min(maxFs, fontPx));
+
+            // max-width w ch — rośnie z viewportem ale ograniczone safeWidthVw
+            const mwCh = 32 + Math.floor(rnd() * 22);
+
+            const enter = Math.floor(rnd() * 4);
+            el.dataset.enter = String(enter);
+
+            const mx = mxVal.toFixed(1);
+            const my = myVal.toFixed(1);
+            const styles = 'font-size:' + fontPx + 'px;'
+                         + 'max-width:min(' + mwCh + 'ch,' + safeWidthVw + 'vw);'
+                         + 'transform:translate(' + mx + 'vw,' + my + 'vh) rotate(' + mr + 'deg);';
+            el.innerHTML = '<div class="poem-body" style="' + styles + '">' + innerOriginal + '</div>';
+            el.dataset.messyApplied = '1';
+        }
+        // ───────────────────────────────────────────────────────────────────────
 
         let currentPoem = 0; let poems = [];
         
@@ -2973,7 +3138,10 @@
 
         function poemDecryptReveal(el) {
             if (_activeDecrypt) { _activeDecrypt.cancel(); _activeDecrypt = null; }
-            const origHTML = el.innerHTML;
+            // jeśli wiersz ma wrapper .poem-body (messy layout), działaj wewnątrz niego —
+            // żeby wrapper i jego inline style (font-size/max-width/transform) przeżyły decrypt
+            const target = el.querySelector('.poem-body') || el;
+            const origHTML = target.innerHTML;
 
             // Tokenize: split into tags and single chars
             const toks = [];
@@ -3005,12 +3173,12 @@
                 }
             }
 
-            el.innerHTML = '<div class="dc-wrap">' + newHTML + '</div>';
-            const spans = Array.from(el.querySelectorAll('.dc'));
+            target.innerHTML = '<div class="dc-wrap">' + newHTML + '</div>';
+            const spans = Array.from(target.querySelectorAll('.dc'));
 
             // Lock each span's width to the final character's width
             spans.forEach((s, idx) => { s.textContent = chars[idx]; });
-            void el.offsetWidth;
+            void target.offsetWidth;
             spans.forEach((s, idx) => {
                 const w = s.getBoundingClientRect().width;
                 s.style.display = 'inline-block';
@@ -3056,7 +3224,7 @@
 
             const cleanup = setTimeout(() => {
                 if (cancelled) return;
-                el.innerHTML = origHTML; _activeDecrypt = null;
+                target.innerHTML = origHTML; _activeDecrypt = null;
                 startAmbientGlitch(el);
             }, totalTime + 80);
 
@@ -3064,7 +3232,7 @@
                 cancel() {
                     cancelled = true;
                     timeouts.forEach(clearTimeout); clearTimeout(cleanup);
-                    el.innerHTML = origHTML;
+                    target.innerHTML = origHTML;
                 }
             };
         }
@@ -3084,26 +3252,44 @@
             markPoemAsRead(index);
             currentPoem = index;
 
-            // Exit old poem: slide + fade out
+            // Exit old poem
             if (oldEl) {
+                const exitDir = direction === 1 ? -1 : 1;
                 oldEl.style.transition = 'opacity 90ms ease, transform 90ms ease';
                 oldEl.style.opacity = '0';
-                oldEl.style.transform = direction === 1 ? 'translateX(-28px)' : 'translateX(28px)';
-                setTimeout(() => { oldEl.classList.remove('active'); oldEl.style.cssText = ''; }, 100);
+                oldEl.style.transform = 'translateX(' + (exitDir * 24) + 'px)';
+                setTimeout(() => {
+                    oldEl.classList.remove('active');
+                    oldEl.style.transition = '';
+                    oldEl.style.transform = '';
+                    oldEl.style.opacity = '';
+                }, 100);
             }
 
-            // Enter new poem: slide in + decrypt reveal
+            // Enter new poem — wariant wejścia per wiersz (data-enter)
             setTimeout(() => {
                 if (!newEl) return;
                 newEl.classList.add('active');
                 newEl.style.opacity = '1';
                 newEl.style.transition = 'none';
-                newEl.style.transform = direction === 1 ? 'translateX(28px)' : 'translateX(-28px)';
+                const enterIdx = parseInt(newEl.dataset.enter || '0', 10) % 4;
+                const enters = [
+                    { from: 'translateX(' + (direction * 24) + 'px)', to: 'translateX(0)' },
+                    { from: 'translateY(' + (direction === 1 ? 24 : -24) + 'px)', to: 'translateY(0)' },
+                    { from: 'translateY(14px)',                          to: 'translateY(0)' },
+                    { from: 'translate(' + (direction * 18) + 'px,-8px)', to: 'translate(0,0)' }
+                ];
+                const e = enters[enterIdx];
+                newEl.style.transform = e.from;
                 requestAnimationFrame(() => {
-                    newEl.style.transition = 'transform 180ms ease';
-                    newEl.style.transform = 'translateX(0)';
+                    newEl.style.transition = 'transform 220ms cubic-bezier(0.22, 0.61, 0.36, 1), opacity 220ms ease';
+                    newEl.style.transform = e.to;
                     poemDecryptReveal(newEl);
-                    setTimeout(() => { newEl.style.cssText = ''; }, 300);
+                    setTimeout(() => {
+                        newEl.style.transition = '';
+                        newEl.style.transform = '';
+                        newEl.style.opacity = '';
+                    }, 280);
                 });
             }, 50);
 
@@ -3193,6 +3379,13 @@
             });
         });
         // ──────────────────────────────────────────────────────────────────────
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark-mode');
+            try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch(e) {}
+        });
+
         document.getElementById('fontSmaller').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(-1); });
         document.getElementById('fontBigger').addEventListener('click', (e)=>{ e.preventDefault(); adjustFontScale(1); });
         document.getElementById('copyLink').addEventListener('click', async (e)=>{
@@ -3275,8 +3468,9 @@
                 ctx.fillText(SYMS[Math.floor(seededRand() * SYMS.length)], x, yMidTop);
             }
 
-            // dół — znaki + "szpineta.pl" wkomponowane w środek
-            const watermark = 'szpineta.pl';
+            // dół — znaki + "szpineta.com" wkomponowane w środek
+            // TODO: rozważyć usunięcie domeny z watermarku — kłóci się z modelem dostępu przez fizyczny kod (decyzja po Kroku F)
+            const watermark = 'szpineta.com';
             ctx.font = symFont;
             const wmWidth = ctx.measureText(watermark).width + 40; // z marginesem
             const wmStart = (W - wmWidth) / 2;
@@ -3484,6 +3678,9 @@
 
             // Wyczyść duplikaty z readPoems przy starcie
             cleanReadPoems();
+
+            // Messy layout per wiersz (seedowany od oryginalnego indeksu)
+            Array.from(document.querySelectorAll('.poem')).forEach(p => applyMessyLayout(p));
             
             // Upewnij się, że poems jest zaktualizowane
             poems = Array.from(document.querySelectorAll('.poem'));
