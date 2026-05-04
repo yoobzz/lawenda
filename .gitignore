@@ -18,3 +18,11 @@ build/
 # logs
 *.log
 
+# env vars (sekrety: KV_REST_API_*, GATE_JWT_SECRET, ADMIN_TOKEN)
+.env
+.env.local
+.env.*.local
+
+# generowane lokalnie — zawiera całą poezję i sekretne kody, NIE commitujemy
+scripts/output/
+

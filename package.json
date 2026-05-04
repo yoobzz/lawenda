@@ -2,12 +2,19 @@
   "name": "szpineta-strona",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "extract:poems": "node scripts/extract-poems.js",
+    "mint:codes": "node scripts/mint-codes.js",
+    "seed:poems": "node scripts/seed-poems-to-kv.js",
+    "seed:codes": "node scripts/seed-codes-to-kv.js"
   },
   "dependencies": {
     "@grapesjs/studio-sdk": "^1.0.56",
     "canvas": "^3.2.1",
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1"
+  },
+  "devDependencies": {
+    "qrcode": "^1.5.4"
   }
 }
