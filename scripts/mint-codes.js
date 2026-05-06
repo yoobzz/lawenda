@@ -75,21 +75,21 @@ async function main() {
     serial: i + 1,
     url: BASE_URL + code,
     issuedAt,
-    physicalObject: null, // wypełnij ręcznie w codes-mapping.md gdy przypiszesz do obiektu
+    physicalObject: null, // wypełnij ręcznie w codes-mapping.md gdy przypiszesz do znajdki
   }));
 
   fs.writeFileSync(CODES_JSON, JSON.stringify(records, null, 2), 'utf8');
 
   // Mapping markdown
   const md = [
-    '# kody — mapowanie do obiektów fizycznych',
+    '# kody — mapowanie do znajdek fizycznych',
     '',
     `wygenerowane: ${issuedAt}`,
     `łącznie: ${N}`,
     '',
     '**ten plik jest prywatny — nie commituj.**',
     '',
-    '| serial | kod | url | obiekt fizyczny | data sparowania |',
+    '| serial | kod | url | znajdka fizyczna | data sparowania |',
     '|---|---|---|---|---|',
     ...records.map(r => `| ${r.serial} | \`${r.code}\` | ${r.url} | _(uzupełnij)_ | _(po pierwszym skanie)_ |`),
     '',

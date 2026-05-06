@@ -1,53 +1,66 @@
 var GATE_CONFIG = {
-  chat: {
-    preScan: [
-      { text: 'hej.', delay: 700 },
-      { text: 'znalazłeś jeden z moich obiektów.', delay: 1100 },
-      { text: 'naciśnij żeby zobaczyć co jest w środku.', delay: 1300 },
-    ],
-    noCode: [
-      { text: 'hej.', delay: 700 },
-      { text: 'żeby wejść, musisz zeskanować fizyczny kod.', delay: 1000 },
-    ],
-    scanning: [
-      { text: 'szukam kodu...', delay: 400 },
-    ],
-    cameraError: [
-      { text: 'brak dostępu do kamery.', delay: 600 },
-      { text: 'zezwól na dostęp w ustawieniach przeglądarki.', delay: 900 },
-    ],
-    verifying: [
-      { text: 'sprawdzam...', delay: 700 },
-    ],
-    notFound: [
-      { text: 'nie znam tego kodu.', delay: 600 },
-    ],
-    successFirst: [
-      { text: 'aktywowano.', delay: 500 },
-      { text: 'ten obiekt jest teraz twój.', delay: 900 },
-      { text: 'dopóki nie zeskanujesz go z innego urządzenia.', delay: 1200 },
-    ],
-    successKnown: [
-      { text: 'witaj z powrotem.', delay: 700 },
-    ],
-    transfer: [
-      { text: 'ten obiekt był już aktywowany.', delay: 700 },
-      { text: 'jeśli go przejmiesz, poprzedni właściciel straci dostęp.', delay: 1100 },
-    ],
-    transferDone: [
-      { text: 'obiekt jest teraz twój.', delay: 600 },
-    ],
-    error: [
-      { text: 'coś poszło nie tak.', delay: 500 },
-      { text: 'spróbuj ponownie.', delay: 700 },
-    ],
+  intro: 'hej.',
+  activateLabel: 'czytaj',
+  welcomeFirst: [
+    { text: 'znajdka otwarta.', delay: 700 },
+    { text: 'to pierwsze wejście z tego urządzenia.', delay: 900 },
+    { text: 'jeśli kiedyś nie chcesz jej zatrzymywać, puść ją dalej.', delay: 1100 },
+    { text: 'zostaw ją tam, gdzie ktoś trafi na nią przypadkiem.', delay: 1200 },
+  ],
+  welcomeReturning: [
+    { text: 'witaj z powrotem.', delay: 700 },
+    { text: 'ta znajdka już cię pamięta.', delay: 900 },
+  ],
+  transferConfirm: 'przejmij',
+  welcomeTransferred: [
+    { text: 'gotowe.', delay: 700 },
+    { text: 'znajdka jest teraz przypisana tutaj.', delay: 900 },
+  ],
+  noCodeIntro: [
+    { text: 'to nie błąd.', delay: 700 },
+    { text: 'trafiłeś do bramki lawendy.', delay: 900 },
+    { text: 'żeby wejść do wierszy, potrzebujesz znajdki.', delay: 1000 },
+    { text: 'znajdka to fizyczny przedmiot z kodem qr.', delay: 1100 },
+    { text: 'znajdki są poukrywane w warszawie.', delay: 1100 },
+    { text: 'jeśli nie chcesz jej zatrzymywać, zostaw ją dalej w obiegu.', delay: 1150 },
+  ],
+  noCodeManualInputLabel: 'mam znajdkę, wpiszę kod',
+  noCodeReturnLabel: '← wracam',
+  withCodeConfirm: [
+    { text: 'ten kod prowadzi do bramki lawendy.', delay: 800 },
+    { text: 'znajdki to fizyczne klucze do wejścia.', delay: 1000 },
+    { text: 'teraz pokaż swoją znajdkę kamerze.', delay: 1100 },
+  ],
+  withCodeActivateLabel: 'pokaż kamerze',
+  scanStatuses: {
+    searching: 'szukam znajdki',
+    detected: 'widzę kod',
+    opening: 'otwieram',
   },
+  manualInputPrompt: 'wpisz 4-znakowy kod ze znajdki',
+  manualInputErrorInvalid: 'taki kod nie istnieje',
+  cameraUnavailable: 'kamera niedostępna. wpisz kod ręcznie',
+  noAccess: [
+    { text: 'tu czegoś brakuje.', delay: 700 },
+    { text: 'nie mogę otworzyć wejścia w tym trybie.', delay: 900 },
+    { text: 'wejdź ponownie przez znajdkę albo wpisz kod ręcznie.', delay: 1000 },
+  ],
+  transferFlow: [
+    { text: 'ta znajdka była już aktywowana na innym urządzeniu.', delay: 800 },
+    { text: 'jeśli przejmiesz, tamten dostęp zgaśnie.', delay: 1000 },
+  ],
+  notFound: [
+    { text: 'taki kod nie istnieje.', delay: 650 },
+  ],
+  error: [
+    { text: 'coś poszło nie tak.', delay: 550 },
+    { text: 'spróbuj ponownie.', delay: 800 },
+  ],
   buttons: {
-    activate: 'aktywuj',
-    scan: 'skanuj kod',
     read: 'czytaj',
     transfer: 'przejmij',
-    cancel: 'nie',
+    cancel: 'nie teraz',
     retry: 'spróbuj ponownie',
+    manualSubmit: 'otwórz',
   },
 };
