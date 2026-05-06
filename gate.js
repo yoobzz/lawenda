@@ -144,24 +144,73 @@ function addBtn(label, cls, onClick) {
 let cameraStream = null;
 let scanActive = false;
 
+function initCameraZnaczki() {
+    const container = document.getElementById('camera-znaczki');
+    if (!container) return;
+    container.innerHTML = '';
+    const chars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+    const frameSize = Math.min(window.innerWidth * 0.72, 280);
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const half = frameSize / 2 + 20;
+
+    function randChar() {
+        const len = 2 + Math.floor(Math.random() * 3);
+        let s = '';
+        for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+        return s;
+    }
+
+    // place 40 znaczki in the zone OUTSIDE the frame
+    for (let i = 0; i < 40; i++) {
+        const p = document.createElement('div');
+        p.className = 'cam-znaczek';
+        p.textContent = randChar();
+
+        // random angle, place outside the frame square
+        const angle = Math.random() * Math.PI * 2;
+        const minR = half * Math.sqrt(2); // outside the square
+        const maxR = Math.min(cx, cy) * 0.95;
+        const r = minR + Math.random() * (maxR - minR);
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+
+        if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) continue;
+
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.animationDuration = (2 + Math.random() * 3).toFixed(2) + 's';
+        p.style.animationDelay = (Math.random() * 3).toFixed(2) + 's';
+        container.appendChild(p);
+    }
+}
+
 async function startCamera() {
     try {
         cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: 'environment' } },
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 1280 } },
         });
         cameraVideo.srcObject = cameraStream;
         await cameraVideo.play();
         cameraArea.classList.add('active');
+        initCameraZnaczki();
         return true;
     } catch {
         return false;
     }
 }
 
-function stopCamera() {
+async function stopCamera({ success = false } = {}) {
     scanActive = false;
+    if (success) {
+        const frame = document.getElementById('camera-frame');
+        if (frame) frame.classList.add('found');
+        await sleep(450);
+    }
     if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
     cameraArea.classList.remove('active');
+    const frame = document.getElementById('camera-frame');
+    if (frame) frame.classList.remove('found');
 }
 
 async function scanQR(onCode) {
@@ -193,7 +242,9 @@ async function scanQR(onCode) {
             const m = raw.match(/\/g\/([A-Za-z0-9]{4})(?:[/?#]|$)/i);
             const code = (m ? m[1] : raw.trim()).toUpperCase();
             if (/^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/.test(code)) {
-                stopCamera(); onCode(code); return;
+                await stopCamera({ success: true });
+                onCode(code);
+                return;
             }
         }
         requestAnimationFrame(tick);
@@ -243,21 +294,21 @@ async function stateCameraScan() {
     clearMessages();
     const ok = await startCamera();
     if (!ok) {
+        await stopCamera();
         await showMessages(GATE_CONFIG.chat.cameraError);
         clearActions();
         addBtn(GATE_CONFIG.buttons.retry, '', stateCameraScan);
         showActions();
         return;
     }
-    await showMessages(GATE_CONFIG.chat.scanning, { clear: false });
-    document.getElementById('camera-cancel').onclick = () => {
-        stopCamera(); clearMessages(); stateNoCode();
+    document.getElementById('camera-cancel').onclick = async () => {
+        await stopCamera(); clearMessages(); stateNoCode();
     };
     scanQR(code => stateVerify(code));
 }
 
 async function stateVerify(code) {
-    stopCamera();
+    await stopCamera();
     clearActions();
     await showMessages(GATE_CONFIG.chat.verifying, { clear: true });
 

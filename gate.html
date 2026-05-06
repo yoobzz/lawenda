@@ -183,41 +183,143 @@
             inset: 0;
             z-index: 10;
             background: #000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            overflow: hidden;
         }
-        #camera-area.active { display: flex; }
+        #camera-area.active { display: block; }
 
         #camera-video {
+            position: absolute;
+            inset: 0;
             width: 100%;
-            max-width: 480px;
-            aspect-ratio: 1;
+            height: 100%;
             object-fit: cover;
         }
         #camera-canvas { display: none; }
 
-        #camera-frame {
+        /* UI layer above video */
+        #camera-ui {
             position: absolute;
-            width: min(72vw, 260px);
-            aspect-ratio: 1;
-            border: 2px solid rgba(150, 130, 220, 0.7);
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             pointer-events: none;
         }
 
+        /* vignette — darkens everything outside frame */
+        #camera-vignette {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                circle at center,
+                transparent 0%,
+                transparent min(36vw, 145px),
+                rgba(0,0,0,0.72) min(52vw, 210px),
+                rgba(0,0,0,0.88) 100%
+            );
+        }
+
+        /* scanning frame */
+        #camera-frame {
+            position: relative;
+            width: min(72vw, 280px);
+            aspect-ratio: 1;
+            z-index: 1;
+        }
+
+        /* corner brackets */
+        .cam-corner {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-color: rgb(150, 130, 220);
+            border-style: solid;
+            animation: cornerPulse 2s ease-in-out infinite;
+        }
+        .cam-corner.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+        .cam-corner.tr { top: 0; right: 0; border-width: 2px 2px 0 0; animation-delay: 0.5s; }
+        .cam-corner.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; animation-delay: 1s; }
+        .cam-corner.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; animation-delay: 1.5s; }
+
+        @keyframes cornerPulse {
+            0%, 100% { opacity: 0.7; }
+            50%       { opacity: 1; box-shadow: 0 0 8px rgba(150,130,220,0.6); }
+        }
+
+        /* scanning line */
+        #scan-line {
+            position: absolute;
+            left: 4px; right: 4px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgb(150,130,220) 30%, rgb(180,160,240) 50%, rgb(150,130,220) 70%, transparent);
+            box-shadow: 0 0 6px 2px rgba(150,130,220,0.5);
+            animation: scanMove 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+        }
+        @keyframes scanMove {
+            0%   { top: 4px;  opacity: 0; }
+            8%   { opacity: 1; }
+            92%  { opacity: 1; }
+            100% { top: calc(100% - 5px); opacity: 0; }
+        }
+
+        /* znaczki wokół kamery */
+        .cam-znaczek {
+            position: absolute;
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 300;
+            color: rgb(150, 130, 220);
+            pointer-events: none;
+            animation: camFloat 0s ease-in-out infinite alternate;
+        }
+        @keyframes camFloat {
+            0%   { opacity: 0.25; transform: translateY(0); }
+            100% { opacity: 0.65; transform: translateY(-6px); }
+        }
+
+        /* hint text */
+        #camera-hint {
+            position: absolute;
+            bottom: calc(5rem + env(safe-area-inset-bottom, 0));
+            left: 50%; transform: translateX(-50%);
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        /* success flash */
+        #camera-frame.found .cam-corner {
+            border-color: #fff;
+            animation: none;
+            opacity: 1;
+            box-shadow: 0 0 16px rgba(255,255,255,0.8);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #camera-frame.found #scan-line { display: none; }
+
         #camera-cancel {
-            margin-top: 1.5rem;
+            position: absolute;
+            bottom: max(1.5rem, env(safe-area-inset-bottom, 0));
+            left: 50%; transform: translateX(-50%);
+            pointer-events: auto;
             background: transparent;
             border: 0;
             font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 300;
-            color: rgba(255,255,255,0.6);
+            color: rgba(255,255,255,0.45);
             cursor: pointer;
             letter-spacing: 0.08em;
-            padding: 10px 16px;
+            padding: 14px 20px;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.2s;
         }
-        #camera-cancel:hover { color: #fff; }
+        #camera-cancel:hover { color: rgba(255,255,255,0.8); }
 
         @media (max-width: 480px) {
             #gate { padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0)); }
@@ -241,7 +343,18 @@
 <div id="camera-area">
     <video id="camera-video" playsinline autoplay muted></video>
     <canvas id="camera-canvas"></canvas>
-    <div id="camera-frame"></div>
+    <div id="camera-ui">
+        <div id="camera-vignette"></div>
+        <div id="camera-frame">
+            <div class="cam-corner tl"></div>
+            <div class="cam-corner tr"></div>
+            <div class="cam-corner bl"></div>
+            <div class="cam-corner br"></div>
+            <div id="scan-line"></div>
+        </div>
+        <div id="camera-znaczki"></div>
+        <div id="camera-hint">skieruj kamerę na kod</div>
+    </div>
     <button id="camera-cancel">anuluj</button>
 </div>
 
