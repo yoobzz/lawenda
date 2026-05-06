@@ -329,4 +329,8 @@ async function init() {
     }
 }
 
-init();
+init().catch(err => {
+    console.error('gate init error:', err);
+    hideCursor();
+    addMsg('błąd ładowania — odśwież stronę');
+});

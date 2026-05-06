@@ -1,6 +1,4 @@
-'use strict';
-
-const GATE_CONFIG = {
+var GATE_CONFIG = {
   chat: {
     preScan: [
       { text: 'hej.', delay: 700 },
