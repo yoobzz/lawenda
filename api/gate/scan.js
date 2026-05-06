@@ -1,0 +1,61 @@
+'use strict';
+
+const kv = require('../_lib/kv.js');
+const { sign } = require('../_lib/jwt.js');
+
+const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_30_DAYS = 30 * 24 * 60 * 60;
+const TRANSFER_5_MIN = 5 * 60;
+const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
+
+function setCookie(res, value, maxAge) {
+  res.setHeader(
+    'Set-Cookie',
+    `szpineta_access=${value}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`,
+  );
+}
+
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).end();
+  if (!JWT_SECRET) return res.status(500).json({ error: 'server misconfigured' });
+
+  const { code, fingerprint } = req.body || {};
+  if (!code || !fingerprint || typeof code !== 'string' || typeof fingerprint !== 'string') {
+    return res.status(400).json({ error: 'missing code or fingerprint' });
+  }
+  if (!CODE_RE.test(code.toUpperCase())) {
+    return res.status(400).json({ error: 'invalid code format' });
+  }
+
+  const upperCode = code.toUpperCase();
+  const codeData = await kv.get(`codes:${upperCode}`);
+  if (!codeData || codeData.status !== 'active') {
+    return res.status(404).json({ error: 'code not found' });
+  }
+
+  const pairing = await kv.get(`code_pairings:${upperCode}`);
+  const now = new Date().toISOString();
+
+  if (!pairing) {
+    await kv.set(`code_pairings:${upperCode}`, {
+      code: upperCode,
+      fingerprint,
+      firstActivatedAt: now,
+      lastSeenAt: now,
+    });
+    const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
+    setCookie(res, token, JWT_30_DAYS);
+    return res.json({ state: 'first' });
+  }
+
+  if (pairing.fingerprint === fingerprint) {
+    await kv.set(`code_pairings:${upperCode}`, { ...pairing, lastSeenAt: now });
+    const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
+    setCookie(res, token, JWT_30_DAYS);
+    return res.json({ state: 'known' });
+  }
+
+  // Different device — short-lived transfer token
+  const transferToken = sign({ code: upperCode, action: 'transfer' }, JWT_SECRET, TRANSFER_5_MIN);
+  return res.json({ state: 'transfer', transferToken });
+};

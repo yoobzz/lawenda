@@ -1,4 +1,7 @@
 {
+  "rewrites": [
+    { "source": "/g/:code", "destination": "/gate.html" }
+  ],
   "headers": [
     {
       "source": "/poems.html",
