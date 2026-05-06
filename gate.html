@@ -207,18 +207,7 @@
             pointer-events: none;
         }
 
-        /* vignette — darkens everything outside frame */
-        #camera-vignette {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(
-                circle at center,
-                transparent 0%,
-                transparent min(36vw, 145px),
-                rgba(0,0,0,0.72) min(52vw, 210px),
-                rgba(0,0,0,0.88) 100%
-            );
-        }
+        #camera-vignette { display: none; }
 
         /* scanning frame */
         #camera-frame {
@@ -236,6 +225,7 @@
             border-color: rgb(150, 130, 220);
             border-style: solid;
             animation: cornerPulse 2s ease-in-out infinite;
+            box-shadow: none;
         }
         .cam-corner.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
         .cam-corner.tr { top: 0; right: 0; border-width: 2px 2px 0 0; animation-delay: 0.5s; }
@@ -243,25 +233,11 @@
         .cam-corner.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; animation-delay: 1.5s; }
 
         @keyframes cornerPulse {
-            0%, 100% { opacity: 0.7; }
-            50%       { opacity: 1; box-shadow: 0 0 8px rgba(150,130,220,0.6); }
+            0%, 100% { opacity: 0.6; }
+            50%       { opacity: 1; }
         }
 
-        /* scanning line */
-        #scan-line {
-            position: absolute;
-            left: 4px; right: 4px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgb(150,130,220) 30%, rgb(180,160,240) 50%, rgb(150,130,220) 70%, transparent);
-            box-shadow: 0 0 6px 2px rgba(150,130,220,0.5);
-            animation: scanMove 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-        }
-        @keyframes scanMove {
-            0%   { top: 4px;  opacity: 0; }
-            8%   { opacity: 1; }
-            92%  { opacity: 1; }
-            100% { top: calc(100% - 5px); opacity: 0; }
-        }
+        #scan-line { display: none; }
 
         /* znaczki wokół kamery */
         .cam-znaczek {
@@ -358,6 +334,7 @@
     <button id="camera-cancel">anuluj</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script src="/gate-config.js"></script>
 <script src="/gate.js"></script>
 </body>
