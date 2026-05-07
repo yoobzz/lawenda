@@ -2,29 +2,35 @@ var GATE_CONFIG = {
   intro: 'hej.',
   activateLabel: 'czytaj',
   welcomeFirst: [
-    { text: 'znajdka otwarta.', delay: 700 },
-    { text: 'to pierwsze wejście z tego urządzenia.', delay: 900 },
+    { text: 'otwarte.', delay: 700 },
+    { text: 'to pierwsze wejście z tego urządzenia.', delay: 950 },
+    { text: 'jest tu 157 wierszy — teraz należą do tej znajdki.', delay: 1200 },
   ],
   welcomeReturning: [
     { text: 'witaj z powrotem.', delay: 700 },
-    { text: 'ta znajdka już cię pamięta.', delay: 900 },
+    { text: 'ta znajdka cię pamięta.', delay: 900 },
+    { text: 'wiersze czekały.', delay: 1000 },
   ],
   transferConfirm: 'przejmij',
   welcomeTransferred: [
     { text: 'gotowe.', delay: 700 },
-    { text: 'znajdka jest teraz przypisana tutaj.', delay: 900 },
+    { text: 'znajdka jest teraz przypisana do tego urządzenia.', delay: 950 },
+    { text: 'poprzedni dostęp wygasł.', delay: 1100 },
   ],
   noCodeIntro: [
     { text: 'to nie błąd.', delay: 700 },
     { text: 'trafiłeś do lawendy.', delay: 900 },
-    { text: 'żeby wejść do wierszy, potrzebujesz znajdki.', delay: 1000 },
-    { text: 'znajdka to fizyczny przedmiot z kodem qr.', delay: 1100 },
-    { text: 'znajdki są poukrywane w warszawie.', delay: 1100 },
+    { text: 'jest tu 157 wierszy.', delay: 1100 },
+    { text: 'wejście jest przez znajdkę —', delay: 1100 },
+    { text: 'fizyczny przedmiot z kodem qr, klucz do środka.', delay: 900 },
+    { text: 'kilka jest ukrytych w warszawie, w przypadkowych miejscach.', delay: 1300 },
+    { text: 'może kiedyś trafisz na jedną z nich.', delay: 1100 },
   ],
   noCodeManualInputLabel: 'mam znajdkę, wpiszę kod',
   noCodeReturnLabel: '← wracam',
   withCodeConfirm: [
-    { text: 'teraz pokaż znajdkę kamerze.', delay: 800 },
+    { text: 'masz znajdkę.', delay: 800 },
+    { text: 'żeby wejść, pokaż ją kamerze.', delay: 1000 },
   ],
   withCodeActivateLabel: 'pokaż kamerze',
   scanStatuses: {
@@ -38,14 +44,16 @@ var GATE_CONFIG = {
   noAccess: [
     { text: 'tu czegoś brakuje.', delay: 700 },
     { text: 'nie mogę otworzyć wejścia w tym trybie.', delay: 900 },
-    { text: 'wejdź ponownie przez znajdkę albo wpisz kod ręcznie.', delay: 1000 },
+    { text: 'wejdź ponownie przez znajdkę albo wpisz kod ręcznie.', delay: 1100 },
   ],
   transferFlow: [
     { text: 'ta znajdka była już aktywowana na innym urządzeniu.', delay: 800 },
-    { text: 'jeśli przejmiesz, tamten dostęp zgaśnie.', delay: 1000 },
+    { text: 'jeśli przejmiesz — tamten dostęp zgaśnie.', delay: 1050 },
+    { text: 'znajdka może być przypisana tylko do jednego urządzenia naraz.', delay: 1300 },
   ],
   notFound: [
     { text: 'taki kod nie istnieje.', delay: 650 },
+    { text: 'sprawdź, czy dobrze go przepisałeś.', delay: 900 },
   ],
   error: [
     { text: 'coś poszło nie tak.', delay: 550 },

@@ -87,47 +87,33 @@
             width: min(640px, 92vw);
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 1.2rem;
             margin-bottom: 1.6rem;
         }
 
         .chat-bubble {
             max-width: 92%;
-            border-radius: 14px;
-            padding: 0.7rem 0.8rem;
-            font-size: clamp(0.95rem, 2.7vw, 1.08rem);
-            line-height: 1.42;
-            font-weight: 320;
-            background: rgba(255, 255, 255, 0.66);
-            border: 1px solid rgba(30, 30, 30, 0.09);
-            backdrop-filter: blur(2px);
-            color: #171717;
+            padding: 0.1rem 0 0.1rem 1rem;
+            border-left: 1px solid rgba(150, 130, 220, 0.28);
+            font-size: clamp(0.93rem, 2.6vw, 1.05rem);
+            line-height: 1.65;
+            font-weight: 300;
+            color: #1a1a1a;
+            letter-spacing: 0.012em;
             opacity: 0;
-            transform: translateY(6px);
+            transform: translateY(8px);
         }
 
         .chat-bubble.show {
             opacity: 1;
             transform: translateY(0);
-            transition: opacity 0.28s ease, transform 0.28s ease;
-        }
-
-        .chat-bubble.me {
-            align-self: flex-end;
-            background: rgba(150, 130, 220, 0.14);
-            border-color: rgba(150, 130, 220, 0.26);
+            transition: opacity 0.42s ease, transform 0.42s ease;
         }
 
         .typing-bubble {
-            width: 54px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 0.65rem 0.6rem;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.75);
-            border: 1px solid rgba(40, 40, 40, 0.1);
+            display: flex;
+            gap: 0.45em;
+            padding: 0.1rem 0 0.1rem 1rem;
             opacity: 0;
             transform: translateY(4px);
         }
@@ -139,19 +125,19 @@
         }
 
         .typing-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 999px;
-            background: rgba(90, 90, 90, 0.6);
-            animation: dotPulse 1s infinite ease-in-out;
+            color: rgb(150, 130, 220);
+            font-size: 0.85rem;
+            font-weight: 300;
+            opacity: 0.25;
+            animation: dotPulse 1.1s infinite ease-in-out;
         }
 
-        .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.22s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.44s; }
 
         @keyframes dotPulse {
-            0%, 100% { opacity: 0.3; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-2px); }
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.85; }
         }
 
         #actions {

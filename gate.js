@@ -104,7 +104,7 @@ function clearChat() {
 function createTypingBubble() {
   const typing = document.createElement('div');
   typing.className = 'typing-bubble';
-  typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  typing.innerHTML = '<span class="typing-dot">_</span><span class="typing-dot">_</span><span class="typing-dot">_</span>';
   chatEl.appendChild(typing);
   requestAnimationFrame(() => typing.classList.add('show'));
   return typing;
