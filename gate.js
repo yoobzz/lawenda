@@ -241,7 +241,7 @@ function initScanSymbols() {
     s.textContent = chars[Math.floor(Math.random() * chars.length)];
     s.style.left = xPct + '%';
     s.style.top = yPct + '%';
-    s.style.setProperty('--pd', (Math.random() * 3).toFixed(2) + 's');
+    s.style.setProperty('--pd', '-' + (Math.random() * 2.2).toFixed(2) + 's');
     scanSymbolsEl.appendChild(s);
   }
 
@@ -282,16 +282,16 @@ function animatePullToQr(meta) {
       gsap.to(s, {
         x: targetX - (b.left + b.width / 2),
         y: targetY - (b.top + b.height / 2),
-        opacity: 0.95,
-        duration: 0.34 + Math.random() * 0.3,
-        delay: i * 0.015,
+        opacity: 1,
+        duration: 0.55 + Math.random() * 0.5,
+        delay: i * 0.018,
         ease: 'power2.in',
       });
     });
     gsap.to(scanFlashEl, {
-      opacity: 0.85,
-      duration: 0.24,
-      delay: 0.34,
+      opacity: 0.68,
+      duration: 0.45,
+      delay: 0.6,
       yoyo: true,
       repeat: 1,
       onComplete: () => {
@@ -402,6 +402,7 @@ async function scanQR(onCode, scanToken) {
         scanActive = false;
         cameraCanvas.style.display = 'block';
         await animatePullToQr(meta);
+        await sleep(550);
         await stopCamera();
         onCode(code);
         return;

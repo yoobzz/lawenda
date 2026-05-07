@@ -258,19 +258,19 @@
         .scan-symbol {
             position: absolute;
             font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
-            color: rgb(150, 130, 220);
-            font-size: 0.78rem;
+            color: rgb(160, 140, 230);
+            font-size: 1rem;
             font-weight: 300;
             user-select: none;
             pointer-events: none;
-            opacity: 0.18;
-            animation: borderPulse 2.8s ease-in-out infinite;
+            opacity: 0.4;
+            animation: borderPulse 2.2s ease-in-out infinite;
             animation-delay: var(--pd, 0s);
         }
 
         @keyframes borderPulse {
-            0%, 100% { opacity: 0.15; }
-            50% { opacity: 0.72; }
+            0%, 100% { opacity: 0.28; }
+            50% { opacity: 1; }
         }
 
         #manual-scan-hint {
@@ -316,7 +316,7 @@
         #scan-flash {
             position: absolute;
             inset: 0;
-            background: rgba(120, 100, 200, 0.55);
+            background: rgb(130, 110, 215);
             opacity: 0;
             pointer-events: none;
             z-index: 3;
