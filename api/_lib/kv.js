@@ -41,4 +41,8 @@ async function exists(key) {
   return Boolean(await kvCommand(['EXISTS', key]));
 }
 
-module.exports = { set, get, exists, kvCommand };
+async function del(key) {
+  return kvCommand(['DEL', key]);
+}
+
+module.exports = { set, get, del, exists, kvCommand };
