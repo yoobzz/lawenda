@@ -4,8 +4,6 @@ var GATE_CONFIG = {
   welcomeFirst: [
     { text: 'znajdka otwarta.', delay: 700 },
     { text: 'to pierwsze wejście z tego urządzenia.', delay: 900 },
-    { text: 'jeśli kiedyś nie chcesz jej zatrzymywać, puść ją dalej.', delay: 1100 },
-    { text: 'zostaw ją tam, gdzie ktoś trafi na nią przypadkiem.', delay: 1200 },
   ],
   welcomeReturning: [
     { text: 'witaj z powrotem.', delay: 700 },
@@ -18,18 +16,15 @@ var GATE_CONFIG = {
   ],
   noCodeIntro: [
     { text: 'to nie błąd.', delay: 700 },
-    { text: 'trafiłeś do bramki lawendy.', delay: 900 },
+    { text: 'trafiłeś do lawendy.', delay: 900 },
     { text: 'żeby wejść do wierszy, potrzebujesz znajdki.', delay: 1000 },
     { text: 'znajdka to fizyczny przedmiot z kodem qr.', delay: 1100 },
     { text: 'znajdki są poukrywane w warszawie.', delay: 1100 },
-    { text: 'jeśli nie chcesz jej zatrzymywać, zostaw ją dalej w obiegu.', delay: 1150 },
   ],
   noCodeManualInputLabel: 'mam znajdkę, wpiszę kod',
   noCodeReturnLabel: '← wracam',
   withCodeConfirm: [
-    { text: 'ten kod prowadzi do bramki lawendy.', delay: 800 },
-    { text: 'znajdki to fizyczne klucze do wejścia.', delay: 1000 },
-    { text: 'teraz pokaż swoją znajdkę kamerze.', delay: 1100 },
+    { text: 'teraz pokaż znajdkę kamerze.', delay: 800 },
   ],
   withCodeActivateLabel: 'pokaż kamerze',
   scanStatuses: {
