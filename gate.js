@@ -7,7 +7,6 @@ const cameraVideo = document.getElementById('camera-video');
 const cameraCanvas = document.getElementById('camera-canvas');
 const cameraCancel = document.getElementById('camera-cancel');
 const scanSymbolsEl = document.getElementById('scan-symbols');
-const scanStatusEl = document.getElementById('scan-status');
 const manualScanHintEl = document.getElementById('manual-scan-hint');
 const scanFlashEl = document.getElementById('scan-flash');
 
@@ -223,69 +222,36 @@ function addManualInput({ onSubmit, onCancel } = {}) {
 
 let cameraStream = null;
 let scanActive = false;
-let scanStatusTimer = null;
 let manualHintTimer = null;
-let symbolJitterTimer = null;
 let currentScanToken = 0;
 
 function clearScanTimers() {
-  if (scanStatusTimer) clearInterval(scanStatusTimer);
   if (manualHintTimer) clearTimeout(manualHintTimer);
-  if (symbolJitterTimer) clearInterval(symbolJitterTimer);
-  scanStatusTimer = null;
   manualHintTimer = null;
-  symbolJitterTimer = null;
 }
 
 function initScanSymbols() {
   scanSymbolsEl.innerHTML = '';
-  const atoms = ['~', '||', '-', '_', '^', '+', '*.'];
-  const count = 18;
-  for (let i = 0; i < count; i += 1) {
+  const chars = ['_', '-', '~', '"', '*', '^', '|', ',', '.', '+', '=', '`', "'", '!'];
+  const N = 16;
+
+  function place(xPct, yPct) {
     const s = document.createElement('span');
     s.className = 'scan-symbol';
-    s.textContent = atoms[i % atoms.length];
-    s.style.left = 24 + Math.random() * 52 + '%';
-    s.style.top = 24 + Math.random() * 52 + '%';
+    s.textContent = chars[Math.floor(Math.random() * chars.length)];
+    s.style.left = xPct + '%';
+    s.style.top = yPct + '%';
+    s.style.setProperty('--pd', (Math.random() * 3).toFixed(2) + 's');
     scanSymbolsEl.appendChild(s);
   }
-}
 
-function startSymbolJitter() {
-  symbolJitterTimer = setInterval(() => {
-    scanSymbolsEl.querySelectorAll('.scan-symbol').forEach((s, i) => {
-      gsap.to(s, {
-        x: (Math.random() - 0.5) * 6,
-        y: (Math.random() - 0.5) * 6,
-        opacity: 0.5 + Math.random() * 0.4,
-        duration: 0.11 + i * 0.001,
-        ease: 'sine.out',
-      });
-    });
-  }, 100);
-}
-
-function startScanStatusLoop() {
-  const sequence = [
-    '...',
-    GATE_CONFIG.scanStatuses.searching,
-    '...',
-    GATE_CONFIG.scanStatuses.detected,
-    '...',
-    GATE_CONFIG.scanStatuses.opening,
-  ];
-  let idx = 0;
-  scanStatusEl.textContent = sequence[0];
-  scanStatusTimer = setInterval(() => {
-    idx = (idx + 1) % sequence.length;
-    scanStatusEl.textContent = sequence[idx];
-  }, 1200);
-}
-
-function stopScanStatusLoop(finalText) {
-  if (scanStatusTimer) clearInterval(scanStatusTimer);
-  scanStatusTimer = null;
-  if (finalText) scanStatusEl.textContent = finalText;
+  for (let i = 0; i <= N; i += 1) {
+    const t = (i / N) * 100;
+    place(t, 0);
+    place(100, t);
+    place(100 - t, 100);
+    place(0, 100 - t);
+  }
 }
 
 function convertVideoRectToViewport(meta) {
@@ -350,8 +316,6 @@ async function startCamera() {
     cameraArea.classList.add('active');
     manualScanHintEl.classList.remove('show');
     initScanSymbols();
-    startSymbolJitter();
-    startScanStatusLoop();
     manualHintTimer = setTimeout(() => {
       manualScanHintEl.classList.add('show');
     }, 30000);
@@ -369,6 +333,7 @@ async function stopCamera() {
     cameraStream = null;
   }
   manualScanHintEl.classList.remove('show');
+  cameraCanvas.style.display = 'none';
   cameraArea.classList.remove('active');
 }
 
@@ -435,7 +400,7 @@ async function scanQR(onCode, scanToken) {
       const code = (m ? m[1] : raw.trim()).toUpperCase();
       if (CODE_RE.test(code)) {
         scanActive = false;
-        stopScanStatusLoop(GATE_CONFIG.scanStatuses.opening);
+        cameraCanvas.style.display = 'block';
         await animatePullToQr(meta);
         await stopCamera();
         onCode(code);
