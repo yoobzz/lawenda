@@ -486,7 +486,11 @@ async function stateNoAccess() {
 async function statePreGateNoCode() {
   await runChat([{ text: GATE_CONFIG.intro, delay: 450 }, ...GATE_CONFIG.noCodeIntro]);
   clearActions();
-  addBtn(GATE_CONFIG.noCodeManualInputLabel, '', () => stateManualInput(statePreGateNoCode));
+  addBtn(GATE_CONFIG.noCodeScanLabel, '', () => stateCameraScan({
+    returnState: statePreGateNoCode,
+    fallbackManualState: () => stateManualInput(statePreGateNoCode),
+  }));
+  addBtn(GATE_CONFIG.noCodeManualInputLabel, 'soft', () => stateManualInput(statePreGateNoCode));
   addBtn(GATE_CONFIG.noCodeReturnLabel, 'soft', () => {
     window.location.href = '/';
   });

@@ -26,6 +26,7 @@ var GATE_CONFIG = {
     { text: 'kilka jest ukrytych w warszawie, w przypadkowych miejscach.', delay: 1300 },
     { text: 'może kiedyś trafisz na jedną z nich.', delay: 1100 },
   ],
+  noCodeScanLabel: 'skanuj znajdkę',
   noCodeManualInputLabel: 'mam znajdkę, wpiszę kod',
   noCodeReturnLabel: '← wracam',
   withCodeConfirm: [
