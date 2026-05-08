@@ -441,7 +441,8 @@ let codeFromUrl = null;
 
 const gateEl = document.getElementById('gate');
 const nocodeLanding = document.getElementById('nocode-landing');
-const nocodeTitle = document.getElementById('nocode-title');
+const nocodeLine1 = document.getElementById('nocode-line1');
+const nocodeLine2 = document.getElementById('nocode-line2');
 const nocodeSubtitle = document.getElementById('nocode-subtitle');
 const nocodeBtns = document.getElementById('nocode-btns');
 
@@ -466,33 +467,66 @@ async function stateNoAccess() {
   showActions();
 }
 
-async function statePreGateNoCode() {
-  showLandingMode();
+function addNocodeZnaczki() {
+  nocodeLanding.querySelectorAll('.nocode-deco-char').forEach(el => el.remove());
+  const chars = ['_', '-', '~', '*', '^', '|', ',', '.', '+', '=', '"', "'", '!'];
+  const positions = [
+    { x: 4 + Math.random() * 14, y: 8 + Math.random() * 35 },
+    { x: 4 + Math.random() * 14, y: 55 + Math.random() * 30 },
+    { x: 82 + Math.random() * 14, y: 8 + Math.random() * 35 },
+    { x: 82 + Math.random() * 14, y: 55 + Math.random() * 30 },
+    { x: 25 + Math.random() * 50, y: 4 + Math.random() * 10 },
+    { x: 25 + Math.random() * 50, y: 86 + Math.random() * 10 },
+    { x: 6 + Math.random() * 8, y: 44 + Math.random() * 12 },
+    { x: 86 + Math.random() * 8, y: 44 + Math.random() * 12 },
+  ];
+  positions.forEach((pos, i) => {
+    const s = document.createElement('span');
+    s.className = 'nocode-deco-char';
+    s.textContent = chars[Math.floor(Math.random() * chars.length)];
+    s.style.left = pos.x.toFixed(1) + '%';
+    s.style.top = pos.y.toFixed(1) + '%';
+    nocodeLanding.appendChild(s);
+    setTimeout(() => s.classList.add('visible'), 80 + i * 60);
+  });
+}
 
-  nocodeTitle.innerHTML = '';
-  nocodeSubtitle.classList.remove('show');
-  nocodeBtns.classList.remove('show');
-  nocodeBtns.innerHTML = '';
-
-  const text = 'lawenda zamknięta';
-  for (let i = 0; i < text.length; i++) {
+async function animateLine(el, text) {
+  for (const ch of text) {
     const s = document.createElement('span');
     s.className = 'nocode-char';
-    s.textContent = text[i] === ' ' ? ' ' : text[i];
+    s.textContent = ch;
     s.style.opacity = '0';
     s.style.transform = 'translateY(5px)';
-    nocodeTitle.appendChild(s);
+    el.appendChild(s);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       s.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
       s.style.opacity = '1';
       s.style.transform = 'translateY(0)';
     }));
-    await sleep(54 + Math.floor(Math.random() * 22));
+    await sleep(58 + Math.floor(Math.random() * 24));
   }
+}
 
-  await sleep(260);
+async function statePreGateNoCode() {
+  showLandingMode();
+
+  nocodeLine1.innerHTML = '';
+  nocodeLine2.innerHTML = '';
+  nocodeSubtitle.classList.remove('show');
+  nocodeBtns.classList.remove('show');
+  nocodeBtns.innerHTML = '';
+  nocodeLanding.querySelectorAll('.nocode-deco-char').forEach(el => el.remove());
+
+  await animateLine(nocodeLine1, 'lawenda');
+  await sleep(460);
+  await animateLine(nocodeLine2, 'zamknięta');
+
+  await sleep(280);
   nocodeSubtitle.classList.add('show');
-  await sleep(400);
+  await sleep(380);
+
+  addNocodeZnaczki();
 
   const scanBtn = document.createElement('button');
   scanBtn.type = 'button';
@@ -513,7 +547,6 @@ async function statePreGateNoCode() {
 
   requestAnimationFrame(() => nocodeBtns.classList.add('show'));
 }
-
 async function statePreGateWithCode(code) {
   await runChat([{ text: GATE_CONFIG.intro, delay: 450 }, ...GATE_CONFIG.withCodeConfirm]);
   clearActions();
