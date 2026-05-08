@@ -1,5 +1,5 @@
 var GATE_CONFIG = {
-  intro: 'hej.',
+  intro: '~ hej.',
   activateLabel: 'czytaj',
   welcomeFirst: [
     { text: 'otwarte.', delay: 700 },
@@ -15,9 +15,9 @@ var GATE_CONFIG = {
     { text: 'tamten dostęp wygasł.', delay: 950 },
   ],
   noCodeIntro: [
-    { text: 'to nie błąd.', delay: 700 },
+    { text: '_ to nie błąd.', delay: 700 },
     { text: 'tu są wiersze.', delay: 950 },
-    { text: 'wejście przez znajdkę.', delay: 1100 },
+    { text: '| wejście przez znajdkę.', delay: 1100 },
     { text: 'szukaj w warszawie.', delay: 1100 },
   ],
   noCodeScanLabel: 'skanuj znajdkę',
