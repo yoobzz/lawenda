@@ -62,11 +62,11 @@ async function generateFingerprint() {
 
 function initZnaczki() {
   const container = document.getElementById('starContainer');
-  const chars = ['·', '∴', '∗', '†', '°', '–', '…', '∞', '∘', '⌖', '·', '∗'];
+  const chars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced) return;
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  const count = isTouch ? 28 : 70;
+  const count = isTouch ? 60 : 150;
 
   function randStr(min, max) {
     const len = Math.floor(Math.random() * (max - min + 1)) + min;
@@ -469,7 +469,7 @@ async function stateNoAccess() {
 
 function addNocodeZnaczki() {
   nocodeLanding.querySelectorAll('.nocode-deco-char').forEach(el => el.remove());
-  const chars = ['·', '∴', '∗', '†', '°', '–', '…', '∞', '∘', '⌖'];
+  const chars = ['_', '-', '~', '*', '^', '|', ',', '.', '+', '=', '"', "'", '!'];
   const positions = [
     { x: 4 + Math.random() * 14, y: 8 + Math.random() * 35 },
     { x: 4 + Math.random() * 14, y: 55 + Math.random() * 30 },
@@ -555,11 +555,10 @@ async function statePreGateNoCode() {
   seekBtn.type = 'button';
   seekBtn.className = 'nocode-btn soft';
   seekBtn.textContent = 'wciąż szukam';
-  seekBtn.addEventListener('click', () => { showPoemHint(); });
+  seekBtn.addEventListener('click', () => { window.location.href = '/'; });
   nocodeBtns.appendChild(seekBtn);
 
   requestAnimationFrame(() => nocodeBtns.classList.add('show'));
-  startGlitchEffect();
 }
 async function statePreGateWithCode(code) {
   await runChat([{ text: GATE_CONFIG.intro, delay: 450 }, ...GATE_CONFIG.withCodeConfirm]);
@@ -732,83 +731,8 @@ async function stateTransfer(token, backState) {
   showActions();
 }
 
-const POEM_HINTS = [
-  'szukaj tam, gdzie czas zatrzymał się w połowie zdania',
-  'niektóre klucze są mniejsze niż myślisz',
-  'warszawa pamięta więcej niż mówi',
-  'trzy kroki od kwitnącego bzu',
-  'poczekaj aż liście ułożą się w zdanie',
-];
-
-function showPoemHint() {
-  const el = document.getElementById('poem-hint');
-  if (!el) return;
-  const hint = POEM_HINTS[Math.floor(Math.random() * POEM_HINTS.length)];
-  el.textContent = hint;
-  el.classList.add('show');
-  clearTimeout(el._hideTimer);
-  el._hideTimer = setTimeout(() => {
-    el.classList.remove('show');
-    setTimeout(() => { el.textContent = ''; }, 900);
-  }, 4500);
-}
-
-const GLITCH_CHARS = 'λΨΩαβγδ∂∑√≈∞';
-let _glitchActive = false;
-
-function startGlitchEffect() {
-  if (_glitchActive) return;
-  _glitchActive = true;
-  const el = document.getElementById('nocode-line1');
-  if (!el) return;
-
-  function glitch() {
-    const spans = el.querySelectorAll('.nocode-char');
-    if (!spans.length) return;
-    const idx = Math.floor(Math.random() * spans.length);
-    const span = spans[idx];
-    const original = span.textContent;
-    span.classList.add('glitch');
-    span.textContent = GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-    setTimeout(() => {
-      span.textContent = original;
-      span.classList.remove('glitch');
-    }, 80 + Math.floor(Math.random() * 120));
-    setTimeout(glitch, 8000 + Math.floor(Math.random() * 5000));
-  }
-
-  setTimeout(glitch, 3500 + Math.floor(Math.random() * 2000));
-}
-
-function initCursorTrail() {
-  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
-  const MAX = 18;
-  const pool = [];
-  for (let i = 0; i < MAX; i++) {
-    const el = document.createElement('div');
-    el.className = 'cursor-drop';
-    document.body.appendChild(el);
-    pool.push(el);
-  }
-  let idx = 0;
-  document.addEventListener('mousemove', e => {
-    const drop = pool[idx % MAX];
-    idx++;
-    drop.style.left = e.clientX + 'px';
-    drop.style.top = e.clientY + 'px';
-    drop.style.opacity = '0.72';
-    drop.style.transform = 'translate(-50%, -50%) scale(1)';
-    clearTimeout(drop._t);
-    drop._t = setTimeout(() => {
-      drop.style.opacity = '0';
-      drop.style.transform = 'translate(-50%, -50%) scale(0.3)';
-    }, 55);
-  });
-}
-
 async function init() {
   initZnaczki();
-  initCursorTrail();
   fingerprint = await generateFingerprint();
   codeFromUrl = getCodeFromUrl();
   if (codeFromUrl) {
