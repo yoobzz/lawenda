@@ -518,6 +518,19 @@ async function statePreGateNoCode() {
   nocodeBtns.innerHTML = '';
   nocodeLanding.querySelectorAll('.nocode-deco-char').forEach(el => el.remove());
 
+  const sprigEl = document.getElementById('nocode-sprig');
+  if (sprigEl) {
+    sprigEl.style.transition = '';
+    sprigEl.style.opacity = '0';
+    sprigEl.style.transform = 'translateY(10px)';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      sprigEl.style.transition = 'opacity 1s ease, transform 1s cubic-bezier(0.22,1,0.36,1)';
+      sprigEl.style.opacity = '1';
+      sprigEl.style.transform = 'translateY(0)';
+    }));
+  }
+  await sleep(320);
+
   await animateLine(nocodeLine1, 'lawenda');
   await sleep(460);
   await animateLine(nocodeLine2, 'zamknięta');

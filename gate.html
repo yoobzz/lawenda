@@ -434,21 +434,38 @@
 
         #nocode-landing.active { display: flex; }
 
+        #nocode-sprig {
+            margin-bottom: 1.8rem;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
         #nocode-lines {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 1.05rem;
+            margin-bottom: 1rem;
         }
 
         .nocode-title-line {
             font-family: var(--ff);
-            font-size: clamp(2.1rem, 7.5vw, 4.2rem);
             font-weight: 100;
-            letter-spacing: 0.05em;
             color: var(--ink);
             text-align: center;
-            line-height: 1.18;
+            line-height: 1.15;
+        }
+
+        #nocode-line1 {
+            font-size: clamp(3rem, 11vw, 6rem);
+            letter-spacing: 0.04em;
+        }
+
+        #nocode-line2 {
+            font-size: clamp(1rem, 3.5vw, 1.9rem);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: rgba(13, 13, 13, 0.62);
+            margin-top: 0.1em;
         }
 
         .nocode-char {
@@ -458,11 +475,11 @@
 
         #nocode-subtitle {
             font-family: var(--ff);
-            font-size: clamp(0.66rem, 1.8vw, 0.78rem);
+            font-size: clamp(0.88rem, 2.6vw, 1.06rem);
             font-weight: 300;
-            letter-spacing: 0.12em;
-            color: rgba(150, 130, 220, 0.62);
-            margin-bottom: 2.8rem;
+            letter-spacing: 0.04em;
+            color: var(--ink);
+            margin-bottom: 2.4rem;
             text-align: center;
             opacity: 0;
             transform: translateY(7px);
@@ -556,6 +573,20 @@
 </div>
 
 <div id="nocode-landing">
+    <svg id="nocode-sprig" viewBox="0 0 30 68" width="30" height="68" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line x1="15" y1="68" x2="15" y2="26" stroke="rgb(150,130,220)" stroke-width="1.1" stroke-linecap="round"/>
+        <ellipse cx="15" cy="22.5" rx="2.2" ry="3.1" fill="rgba(150,130,220,0.22)" stroke="rgb(150,130,220)" stroke-width="0.9"/>
+        <ellipse cx="15" cy="17"   rx="2"   ry="2.8" fill="rgba(150,130,220,0.27)" stroke="rgb(150,130,220)" stroke-width="0.85"/>
+        <ellipse cx="15" cy="12"   rx="1.7" ry="2.4" fill="rgba(150,130,220,0.32)" stroke="rgb(150,130,220)" stroke-width="0.8"/>
+        <ellipse cx="15" cy="7.5"  rx="1.4" ry="2"   fill="rgba(150,130,220,0.38)" stroke="rgb(150,130,220)" stroke-width="0.75"/>
+        <ellipse cx="15" cy="4"    rx="1.1" ry="1.5" fill="rgba(150,130,220,0.44)" stroke="rgb(150,130,220)" stroke-width="0.7"/>
+        <path d="M15 35 C12 32 7 33 5 36"  stroke="rgb(150,130,220)" stroke-width="0.9" stroke-linecap="round"/>
+        <path d="M15 35 C18 32 23 33 25 36" stroke="rgb(150,130,220)" stroke-width="0.9" stroke-linecap="round"/>
+        <path d="M15 46 C12 43 8 44 6 47"  stroke="rgb(150,130,220)" stroke-width="0.85" stroke-linecap="round"/>
+        <path d="M15 46 C18 43 22 44 24 47" stroke="rgb(150,130,220)" stroke-width="0.85" stroke-linecap="round"/>
+        <path d="M15 57 C13 55 10 56 8 59"  stroke="rgb(150,130,220)" stroke-width="0.8" stroke-linecap="round"/>
+        <path d="M15 57 C17 55 20 56 22 59" stroke="rgb(150,130,220)" stroke-width="0.8" stroke-linecap="round"/>
+    </svg>
     <div id="nocode-lines">
         <div id="nocode-line1" class="nocode-title-line"></div>
         <div id="nocode-line2" class="nocode-title-line"></div>
