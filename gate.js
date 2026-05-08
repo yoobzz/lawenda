@@ -439,7 +439,24 @@ async function apiTransfer(token, fp) {
 let fingerprint = null;
 let codeFromUrl = null;
 
+const gateEl = document.getElementById('gate');
+const nocodeLanding = document.getElementById('nocode-landing');
+const nocodeTitle = document.getElementById('nocode-title');
+const nocodeSubtitle = document.getElementById('nocode-subtitle');
+const nocodeBtns = document.getElementById('nocode-btns');
+
+function showGateMode() {
+  gateEl.style.display = '';
+  nocodeLanding.classList.remove('active');
+}
+
+function showLandingMode() {
+  gateEl.style.display = 'none';
+  nocodeLanding.classList.add('active');
+}
+
 async function stateNoAccess() {
+  showGateMode();
   await runChat([{ text: GATE_CONFIG.intro, delay: 450 }, ...GATE_CONFIG.noAccess]);
   clearActions();
   addBtn(GATE_CONFIG.noCodeManualInputLabel, '', () => stateManualInput(statePreGateNoCode));
@@ -450,17 +467,51 @@ async function stateNoAccess() {
 }
 
 async function statePreGateNoCode() {
-  await runChat([{ text: GATE_CONFIG.intro, delay: 450 }, ...GATE_CONFIG.noCodeIntro]);
-  clearActions();
-  addBtn(GATE_CONFIG.noCodeScanLabel, '', () => stateCameraScan({
+  showLandingMode();
+
+  nocodeTitle.innerHTML = '';
+  nocodeSubtitle.classList.remove('show');
+  nocodeBtns.classList.remove('show');
+  nocodeBtns.innerHTML = '';
+
+  const text = 'lawenda zamknięta';
+  for (let i = 0; i < text.length; i++) {
+    const s = document.createElement('span');
+    s.className = 'nocode-char';
+    s.textContent = text[i] === ' ' ? ' ' : text[i];
+    s.style.opacity = '0';
+    s.style.transform = 'translateY(5px)';
+    nocodeTitle.appendChild(s);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      s.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+      s.style.opacity = '1';
+      s.style.transform = 'translateY(0)';
+    }));
+    await sleep(54 + Math.floor(Math.random() * 22));
+  }
+
+  await sleep(260);
+  nocodeSubtitle.classList.add('show');
+  await sleep(400);
+
+  const scanBtn = document.createElement('button');
+  scanBtn.type = 'button';
+  scanBtn.className = 'nocode-btn';
+  scanBtn.textContent = 'mam znajdkę';
+  scanBtn.addEventListener('click', () => stateCameraScan({
     returnState: statePreGateNoCode,
     fallbackManualState: () => stateManualInput(statePreGateNoCode),
   }));
-  addBtn(GATE_CONFIG.noCodeManualInputLabel, 'soft', () => stateManualInput(statePreGateNoCode));
-  addBtn(GATE_CONFIG.noCodeReturnLabel, 'soft', () => {
-    window.location.href = '/';
-  });
-  showActions();
+  nocodeBtns.appendChild(scanBtn);
+
+  const seekBtn = document.createElement('button');
+  seekBtn.type = 'button';
+  seekBtn.className = 'nocode-btn soft';
+  seekBtn.textContent = 'wciąż szukam';
+  seekBtn.addEventListener('click', () => { window.location.href = '/'; });
+  nocodeBtns.appendChild(seekBtn);
+
+  requestAnimationFrame(() => nocodeBtns.classList.add('show'));
 }
 
 async function statePreGateWithCode(code) {
@@ -478,6 +529,7 @@ async function statePreGateWithCode(code) {
 }
 
 async function stateManualInput(backState) {
+  showGateMode();
   await runChat([{ text: GATE_CONFIG.manualInputPrompt, delay: 380 }]);
   addManualInput({
     onSubmit: code => stateVerify(code, backState),
@@ -494,6 +546,7 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   const ok = await startCamera();
   if (!ok) {
     await stopCamera();
+    showGateMode();
     await runChat([{ text: GATE_CONFIG.cameraUnavailable, delay: 500 }]);
     clearActions();
     addBtn(GATE_CONFIG.noCodeManualInputLabel, '', fallbackManualState);
@@ -530,6 +583,7 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
     stateVerify(code, returnState);
   }, thisToken).catch(async () => {
     await stopCamera();
+    showGateMode();
     await runChat(GATE_CONFIG.error);
     clearActions();
     addBtn(GATE_CONFIG.buttons.retry, '', () => stateCameraScan({ returnState, fallbackManualState }));
@@ -539,6 +593,7 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
 
 async function stateVerify(code, backState) {
   await stopCamera();
+  showGateMode();
   hideActions();
   await quickLine('sprawdzam...');
   let result;

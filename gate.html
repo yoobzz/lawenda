@@ -332,6 +332,98 @@
             filter: grayscale(0.7) contrast(1.15) brightness(0.9);
             z-index: 1;
         }
+
+        /* no-code landing */
+        #nocode-landing {
+            display: none;
+            position: relative;
+            z-index: 2;
+            min-height: 100dvh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.25rem calc(2rem + env(safe-area-inset-bottom, 0));
+        }
+
+        #nocode-landing.active { display: flex; }
+
+        #nocode-title {
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: clamp(1.55rem, 5vw, 2.6rem);
+            font-weight: 200;
+            letter-spacing: 0.12em;
+            color: #1a1a1a;
+            margin-bottom: 1rem;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .nocode-char {
+            display: inline-block;
+            white-space: pre;
+        }
+
+        #nocode-subtitle {
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: clamp(0.75rem, 2.1vw, 0.88rem);
+            font-weight: 300;
+            letter-spacing: 0.09em;
+            color: rgba(26, 26, 26, 0.42);
+            margin-bottom: 2.6rem;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #nocode-subtitle.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #nocode-btns {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        #nocode-btns.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .nocode-btn {
+            background: transparent;
+            border: 1px solid rgba(150, 130, 220, 0.48);
+            font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
+            font-size: clamp(0.82rem, 2.3vw, 0.93rem);
+            font-weight: 300;
+            letter-spacing: 0.07em;
+            color: #1c1c1c;
+            cursor: pointer;
+            padding: 0.52rem 1.3rem;
+            min-width: 152px;
+            transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .nocode-btn:hover {
+            border-color: rgba(150, 130, 220, 0.9);
+            color: rgb(100, 80, 185);
+        }
+
+        .nocode-btn.soft {
+            border-color: rgba(20, 20, 20, 0.15);
+            color: rgba(20, 20, 20, 0.48);
+            font-size: clamp(0.77rem, 2.1vw, 0.86rem);
+        }
+
+        .nocode-btn.soft:hover {
+            border-color: rgba(20, 20, 20, 0.35);
+            color: rgba(20, 20, 20, 0.7);
+        }
     </style>
 </head>
 <body>
@@ -343,6 +435,12 @@
 <div id="gate">
     <div id="chat"></div>
     <div id="actions"></div>
+</div>
+
+<div id="nocode-landing">
+    <div id="nocode-title"></div>
+    <div id="nocode-subtitle">klucze kryją się w warszawie</div>
+    <div id="nocode-btns"></div>
 </div>
 
 <div id="camera-area">
