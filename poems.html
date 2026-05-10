@@ -1773,11 +1773,18 @@
                 const line = raw.split('\n').map(x=>x.trim()).find(x=>x.length>0) || '';
                 return line;
             }
-            const poemsIndex = poems.map((el, idx) => {
-                const text = (el.innerText || '').trim();
-                const preview = firstNonEmptyLine(el);
-                return { idx, text, normText: normalizePl(text), preview };
-            });
+            let poemsIndex = [];
+            let filteredItems = [];
+            function buildSearchIndex() {
+                poemsIndex = poems.map((el, idx) => {
+                    const text = (el.innerText || '').trim();
+                    const preview = firstNonEmptyLine(el);
+                    return { idx, text, normText: normalizePl(text), preview };
+                });
+                filteredItems = poemsIndex;
+            }
+            buildSearchIndex();
+            window.__rebuildSearchIndex = buildSearchIndex;
             function openSearchPopover(){
                 if (!searchPopover) return;
                 searchPopover.style.display = 'block';
@@ -1793,7 +1800,6 @@
                 searchPopover.style.display = 'none';
                 searchPopover.setAttribute('aria-hidden','true');
             }
-            let filteredItems = poemsIndex;
             let renderedCount = 0;
             const PAGE = 12;
             function attachItemHandlers(scopeEl){
@@ -1853,7 +1859,7 @@
 
             // funkcje canvas przeniesione do scope globalnego (powyżej)
             document.addEventListener('keydown', (e)=>{
-                if (e.key === '/' && hasTransitioned) {
+                if (e.key === '/') {
                     e.preventDefault(); openSearchPopover();
                 }
                 if (e.key === 'ArrowLeft' && currentPoem > 0) {
@@ -2051,6 +2057,9 @@
             document.fonts.ready.then(() => {
                 if (poems[currentPoem]) poemDecryptReveal(poems[currentPoem]);
             });
+
+            // odbuduj indeks wyszukiwarki po załadowaniu wierszy
+            if (typeof window.__rebuildSearchIndex === 'function') window.__rebuildSearchIndex();
         };
     </script>
 
