@@ -1595,79 +1595,145 @@ async function stopCamera() {
 
 async function scanQR(onCode, scanToken) {
   scanActive = true;
-  const ctx = cameraCanvas.getContext('2d', { willReadFrequently: true });
+  const offscreen = document.createElement('canvas');
+  const ctx = offscreen.getContext('2d', { willReadFrequently: true });
+  const SCAN_SIZE = 600;
+
   let detector = null;
   if ('BarcodeDetector' in window) {
     try {
-      detector = new BarcodeDetector({ formats: ['qr_code'] });
-    } catch {
-      detector = null;
-    }
+      const supported = await BarcodeDetector.getSupportedFormats().catch(() => ['qr_code']);
+      if (supported.includes('qr_code')) {
+        detector = new BarcodeDetector({ formats: ['qr_code'] });
+      }
+    } catch { detector = null; }
   }
+
+  // compute the portion of the raw video frame that maps to the overlay window
+  function getVideoCropRect(vw, vh) {
+    if (!cameraOverlayRect) return null;
+    const cW = window.innerWidth;
+    const cH = window.innerHeight;
+    // object-fit: cover scale factor
+    const s = Math.max(cW / vw, cH / vh);
+    const dx = (cW - vw * s) / 2;
+    const dy = (cH - vh * s) / 2;
+    const r = cameraOverlayRect;
+    const cx = Math.max(0, (r.x - dx) / s);
+    const cy = Math.max(0, (r.y - dy) / s);
+    const cw = Math.min(vw - cx, r.w / s);
+    const ch = Math.min(vh - cy, r.h / s);
+    if (cw < 20 || ch < 20) return null;
+    return { cx, cy, cw, ch };
+  }
+
+  function tryJsQR(w, h) {
+    if (!window.jsQR) return null;
+    const img = ctx.getImageData(0, 0, w, h);
+    return jsQR(img.data, w, h, { inversionAttempts: 'attemptBoth' });
+  }
+
+  let intervalId = null;
+  let ticking = false;
 
   async function tick() {
-    if (!scanActive || scanToken !== currentScanToken) return;
-    if (cameraVideo.readyState < cameraVideo.HAVE_ENOUGH_DATA) {
-      requestAnimationFrame(tick);
+    if (ticking) return;
+    if (!scanActive || scanToken !== currentScanToken) {
+      if (intervalId) clearInterval(intervalId);
       return;
     }
-    const w = cameraVideo.videoWidth;
-    const h = cameraVideo.videoHeight;
-    cameraCanvas.width = w;
-    cameraCanvas.height = h;
-    ctx.drawImage(cameraVideo, 0, 0, w, h);
+    if (cameraVideo.readyState < 2) return;
+    const vw = cameraVideo.videoWidth;
+    const vh = cameraVideo.videoHeight;
+    if (!vw || !vh) return;
 
-    let raw = null;
-    let meta = null;
+    ticking = true;
+    try {
+      let raw = null;
+      let meta = null;
 
-    if (detector) {
-      try {
-        const rs = await detector.detect(cameraVideo);
-        if (rs.length) {
-          raw = rs[0].rawValue || null;
-          const bb = rs[0].boundingBox;
-          if (bb) meta = { x: bb.x, y: bb.y, w: bb.width, h: bb.height, videoWidth: w, videoHeight: h };
+      // 1) BarcodeDetector on live video (Chrome/Android only)
+      if (detector) {
+        try {
+          const rs = await detector.detect(cameraVideo);
+          if (rs.length) {
+            raw = rs[0].rawValue || null;
+            const bb = rs[0].boundingBox;
+            if (bb) meta = { x: bb.x, y: bb.y, w: bb.width, h: bb.height, videoWidth: vw, videoHeight: vh };
+          }
+        } catch { raw = null; }
+      }
+
+      // 2) jsQR on the cropped overlay-window region (fills entire canvas → bigger QR pixels)
+      if (!raw) {
+        const crop = getVideoCropRect(vw, vh);
+        if (crop) {
+          const sz = SCAN_SIZE;
+          offscreen.width = sz;
+          offscreen.height = sz;
+          ctx.drawImage(cameraVideo, crop.cx, crop.cy, crop.cw, crop.ch, 0, 0, sz, sz);
+          const qr = tryJsQR(sz, sz);
+          if (qr) {
+            raw = qr.data;
+            const scaleInv = crop.cw / sz;
+            const xs = [qr.location.topLeftCorner.x, qr.location.topRightCorner.x, qr.location.bottomLeftCorner.x, qr.location.bottomRightCorner.x];
+            const ys = [qr.location.topLeftCorner.y, qr.location.topRightCorner.y, qr.location.bottomLeftCorner.y, qr.location.bottomRightCorner.y];
+            meta = {
+              x: crop.cx + Math.min(...xs) * scaleInv,
+              y: crop.cy + Math.min(...ys) * scaleInv,
+              w: (Math.max(...xs) - Math.min(...xs)) * scaleInv,
+              h: (Math.max(...ys) - Math.min(...ys)) * scaleInv,
+              videoWidth: vw,
+              videoHeight: vh,
+            };
+          }
         }
-      } catch {
-        raw = null;
       }
-    }
 
-    if (!raw && window.jsQR) {
-      const img = ctx.getImageData(0, 0, w, h);
-      const qr = jsQR(img.data, w, h, { inversionAttempts: 'dontInvert' });
-      if (qr) {
-        raw = qr.data;
-        const xs = [qr.location.topLeftCorner.x, qr.location.topRightCorner.x, qr.location.bottomLeftCorner.x, qr.location.bottomRightCorner.x];
-        const ys = [qr.location.topLeftCorner.y, qr.location.topRightCorner.y, qr.location.bottomLeftCorner.y, qr.location.bottomRightCorner.y];
-        meta = {
-          x: Math.min(...xs),
-          y: Math.min(...ys),
-          w: Math.max(...xs) - Math.min(...xs),
-          h: Math.max(...ys) - Math.min(...ys),
-          videoWidth: w,
-          videoHeight: h,
-        };
+      // 3) jsQR on full frame (fallback when no overlay rect)
+      if (!raw) {
+        const scale = SCAN_SIZE / Math.max(vw, vh);
+        const sw = Math.round(vw * scale);
+        const sh = Math.round(vh * scale);
+        offscreen.width = sw;
+        offscreen.height = sh;
+        ctx.drawImage(cameraVideo, 0, 0, sw, sh);
+        const qr = tryJsQR(sw, sh);
+        if (qr) {
+          raw = qr.data;
+          const scaleInv = 1 / scale;
+          const xs = [qr.location.topLeftCorner.x, qr.location.topRightCorner.x, qr.location.bottomLeftCorner.x, qr.location.bottomRightCorner.x];
+          const ys = [qr.location.topLeftCorner.y, qr.location.topRightCorner.y, qr.location.bottomLeftCorner.y, qr.location.bottomRightCorner.y];
+          meta = {
+            x: Math.min(...xs) * scaleInv,
+            y: Math.min(...ys) * scaleInv,
+            w: (Math.max(...xs) - Math.min(...xs)) * scaleInv,
+            h: (Math.max(...ys) - Math.min(...ys)) * scaleInv,
+            videoWidth: vw,
+            videoHeight: vh,
+          };
+        }
       }
-    }
 
-    if (raw) {
-      const m = raw.match(/\/g\/([A-Za-z0-9]{4})(?:[/?#]|$)/i);
-      const code = (m ? m[1] : raw.trim()).toUpperCase();
-      if (CODE_RE.test(code)) {
-        scanActive = false;
-        cameraCanvas.style.display = 'block';
-        await animatePullToQr(meta);
-        await sleep(550);
-        await stopCamera();
-        onCode(code);
-        return;
+      if (raw) {
+        const m = raw.match(/\/g\/([A-Za-z0-9]{4})(?:[/?#]|$)/i);
+        const code = (m ? m[1] : raw.trim()).toUpperCase();
+        if (CODE_RE.test(code)) {
+          if (intervalId) clearInterval(intervalId);
+          scanActive = false;
+          cameraCanvas.style.display = 'block';
+          await animatePullToQr(meta);
+          await sleep(550);
+          await stopCamera();
+          onCode(code);
+        }
       }
+    } finally {
+      ticking = false;
     }
-    requestAnimationFrame(tick);
   }
 
-  requestAnimationFrame(tick);
+  intervalId = setInterval(tick, 180);
 }
 
 async function apiScan(code, fp) {
