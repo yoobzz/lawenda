@@ -393,6 +393,11 @@
             pointer-events: none;
             font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
         }
+        @keyframes page-enter {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        body { animation: page-enter 0.55s ease forwards; }
     </style>
 </head>
 <body>
@@ -491,6 +496,9 @@
 
         function randomSym() { return SYMS[Math.floor(Math.random() * SYMS.length)]; }
         function randomSymChunk(n) { let s = ''; for (let i = 0; i < n; i++) s += randomSym(); return s; }
+        function markZnajdkaTamed() {
+            try { localStorage.setItem('znajdka_oswojona', '1'); } catch (e) {}
+        }
 
         function scrollBottom() {
             messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
@@ -1201,6 +1209,7 @@
         }
 
         async function act5() {
+            markZnajdkaTamed();
             await wait(1000);
             await say('mogę cię zabrać do reszty.');
             await say('do wszystkich wierszy.', { pause: 800 });

@@ -15,6 +15,27 @@ function setCookie(res, value, maxAge) {
   );
 }
 
+async function logScan(req, code, fingerprint, state) {
+  try {
+    const ip = ((req.headers['x-forwarded-for'] || '').split(',')[0].trim())
+      || req.headers['x-real-ip'] || '?';
+    const event = {
+      at: new Date().toISOString(),
+      code,
+      state,
+      ip,
+      country: req.headers['x-vercel-ip-country'] || '?',
+      city: req.headers['x-vercel-ip-city'] || '?',
+      lat: req.headers['x-vercel-ip-latitude'] || null,
+      lng: req.headers['x-vercel-ip-longitude'] || null,
+      ua: (req.headers['user-agent'] || '?').slice(0, 150),
+      fp: fingerprint ? fingerprint.slice(0, 16) : '?',
+    };
+    await kv.kvCommand(['RPUSH', 'scans:log', JSON.stringify(event)]);
+    await kv.kvCommand(['LTRIM', 'scans:log', '-500', '-1']);
+  } catch (_) {}
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!JWT_SECRET) return res.status(500).json({ error: 'server misconfigured' });
@@ -45,6 +66,7 @@ module.exports = async function handler(req, res) {
     });
     const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
     setCookie(res, token, JWT_30_DAYS);
+    await logScan(req, upperCode, fingerprint, 'first');
     return res.json({ state: 'first' });
   }
 
@@ -52,10 +74,12 @@ module.exports = async function handler(req, res) {
     await kv.set(`code_pairings:${upperCode}`, { ...pairing, lastSeenAt: now });
     const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
     setCookie(res, token, JWT_30_DAYS);
+    await logScan(req, upperCode, fingerprint, 'known');
     return res.json({ state: 'known' });
   }
 
   // Different device — short-lived transfer token
   const transferToken = sign({ code: upperCode, action: 'transfer' }, JWT_SECRET, TRANSFER_5_MIN);
+  await logScan(req, upperCode, fingerprint, 'transfer');
   return res.json({ state: 'transfer', transferToken });
 };
