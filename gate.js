@@ -581,6 +581,8 @@ function applyCameraOverlayRect(rect) {
     cameraArea.style.removeProperty('--camera-overlay-size');
     cameraArea.style.removeProperty('--camera-overlay-cx');
     cameraArea.style.removeProperty('--camera-overlay-cy');
+    cameraArea.style.removeProperty('--camera-overlay-right');
+    cameraArea.style.removeProperty('--camera-overlay-bottom');
     clearCameraOverlayFrame();
     return;
   }
@@ -596,6 +598,9 @@ function applyCameraOverlayRect(rect) {
   cameraArea.style.setProperty('--camera-overlay-size', `${size}px`);
   cameraArea.style.setProperty('--camera-overlay-cx', `${cx}px`);
   cameraArea.style.setProperty('--camera-overlay-cy', `${cy}px`);
+  // compute right/bottom in JS — CSS 100vh on iOS includes browser chrome and is wrong
+  cameraArea.style.setProperty('--camera-overlay-right', `${window.innerWidth - x - size}px`);
+  cameraArea.style.setProperty('--camera-overlay-bottom', `${window.innerHeight - y - size}px`);
   cameraArea.classList.add('qr-overlay');
 }
 

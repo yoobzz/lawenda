@@ -347,12 +347,13 @@
         }
 
         /* video stays full-size (so browser decodes at full resolution),
-           clip-path reveals only the QR window — fixes iOS low-res decode bug */
+           clip-path reveals only the QR window — uses JS-computed vars so iOS
+           100vh (which includes browser chrome) doesn't cut the window in half */
         #camera-area.qr-overlay #camera-video {
             clip-path: inset(
                 var(--camera-overlay-y)
-                calc(100vw - var(--camera-overlay-x) - var(--camera-overlay-size))
-                calc(100vh - var(--camera-overlay-y) - var(--camera-overlay-size))
+                var(--camera-overlay-right)
+                var(--camera-overlay-bottom)
                 var(--camera-overlay-x)
             );
         }
@@ -440,7 +441,7 @@
         #scan-flash {
             position: absolute;
             inset: 0;
-            background: var(--lav);
+            background: rgba(13,13,13,0.55);
             opacity: 0;
             pointer-events: none;
             z-index: 3;
