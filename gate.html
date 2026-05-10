@@ -331,7 +331,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 20;
+            z-index: 10000;
             background: transparent;
             overflow: hidden;
         }
@@ -344,10 +344,23 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: grayscale(0.55) brightness(0.9);
+            filter: grayscale(0.4) brightness(1.05);
+        }
+
+        /* camera positioned inside the QR char frame */
+        #camera-area.qr-overlay #camera-video {
+            inset: auto;
+            left: var(--camera-overlay-x);
+            top: var(--camera-overlay-y);
+            width: var(--camera-overlay-size);
+            height: var(--camera-overlay-size);
+            filter: none;
+            border-radius: 2px;
         }
 
         #camera-canvas { display: none; }
+
+        #camera-area.qr-overlay #scan-symbols { display: none; }
 
         #camera-ui {
             position: absolute;
@@ -363,15 +376,6 @@
             width: min(74vw, 295px);
             height: min(74vw, 295px);
             pointer-events: none;
-        }
-
-        /* proto stage transparent when camera is active underneath */
-        #scan-prototype-stage.camera-mode {
-            background: transparent;
-        }
-        #scan-prototype-stage.camera-mode .scan-prototype-cell {
-            color: rgba(255, 255, 255, 0.55);
-            text-shadow: 0 0 6px rgba(255,255,255,0.3);
         }
 
         .scan-symbol {
@@ -692,17 +696,16 @@
             background: transparent;
             border: none;
             font-family: var(--ff);
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 200;
             line-height: 1;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(13, 13, 13, 0.35);
             cursor: pointer;
             padding: 8px;
             z-index: 7;
-            transition: color 0.2s ease, opacity 0.2s ease;
+            transition: color 0.2s ease;
         }
-        #proto-close:hover { color: rgba(255, 255, 255, 0.95); }
-        #scan-prototype-stage:not(.camera-mode) #proto-close { display: none !important; }
+        #proto-close:hover { color: rgba(13, 13, 13, 0.75); }
 
         #proto-status {
             position: absolute;
