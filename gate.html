@@ -338,29 +338,13 @@
 
         #camera-area.active { display: block; }
 
-        #camera-area.qr-overlay {
-            background: transparent;
-            z-index: 10000;
-        }
-
         #camera-video {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: grayscale(0.7) contrast(1.12) brightness(0.86);
-        }
-
-        #camera-area.qr-overlay #camera-video,
-        #camera-area.qr-overlay #camera-canvas {
-            inset: auto;
-            left: var(--camera-overlay-x);
-            top: var(--camera-overlay-y);
-            width: var(--camera-overlay-size);
-            height: var(--camera-overlay-size);
-            border: none;
-            filter: none;
+            filter: grayscale(0.55) brightness(0.9);
         }
 
         #camera-canvas { display: none; }
@@ -381,8 +365,13 @@
             pointer-events: none;
         }
 
-        #camera-area.qr-overlay #scan-symbols {
-            display: none;
+        /* proto stage transparent when camera is active underneath */
+        #scan-prototype-stage.camera-mode {
+            background: transparent;
+        }
+        #scan-prototype-stage.camera-mode .scan-prototype-cell {
+            color: rgba(255, 255, 255, 0.55);
+            text-shadow: 0 0 6px rgba(255,255,255,0.3);
         }
 
         .scan-symbol {
@@ -445,19 +434,6 @@
 
         #camera-cancel:hover { color: rgba(255, 255, 255, 0.7); }
 
-        #camera-area.qr-overlay #camera-cancel {
-            color: rgba(13, 13, 13, 0.42);
-        }
-        #camera-area.qr-overlay #camera-cancel:hover {
-            color: rgba(13, 13, 13, 0.75);
-        }
-        #camera-area.qr-overlay #manual-scan-hint {
-            color: rgba(13, 13, 13, 0.32);
-        }
-        #camera-area.qr-overlay #manual-scan-hint:hover {
-            color: rgba(13, 13, 13, 0.65);
-        }
-
         #scan-flash {
             position: absolute;
             inset: 0;
@@ -474,7 +450,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: grayscale(0.7) contrast(1.12) brightness(0.86);
             z-index: 1;
         }
 
@@ -710,6 +685,25 @@
             100% { transform: translate(-50%, -50%) scale(1) rotate(-1deg); }
         }
 
+        #proto-close {
+            position: absolute;
+            top: max(18px, env(safe-area-inset-top, 0px));
+            right: max(18px, env(safe-area-inset-right, 0px));
+            background: transparent;
+            border: none;
+            font-family: var(--ff);
+            font-size: 1.5rem;
+            font-weight: 200;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            padding: 8px;
+            z-index: 7;
+            transition: color 0.2s ease, opacity 0.2s ease;
+        }
+        #proto-close:hover { color: rgba(255, 255, 255, 0.95); }
+        #scan-prototype-stage:not(.camera-mode) #proto-close { display: none !important; }
+
         #proto-status {
             position: absolute;
             left: 50%;
@@ -873,6 +867,7 @@
     <div id="scan-prototype-grid"></div>
     <div id="scan-prototype-seed"></div>
     <div id="proto-status"></div>
+    <button id="proto-close" type="button" aria-label="zamknij" style="display:none">×</button>
     <div id="proto-manual">
         <div id="proto-manual-prompt"></div>
         <div id="proto-manual-row">

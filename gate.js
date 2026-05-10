@@ -366,12 +366,15 @@ function clearFlowingQrFrame() {
 
 function hideScanPrototypeStage() {
   setProtoStatus('');
+  hideProtoManualInput();
+  const protoCloseBtn = document.getElementById('proto-close');
+  if (protoCloseBtn) protoCloseBtn.style.display = 'none';
   scanPrototypeActive = false;
   clearFlowingQrFrame();
   if (scanPrototypeStarEl) scanPrototypeStarEl.classList.remove('show');
   if (scanPrototypeStageEl) {
     scanPrototypeStageEl.style.display = 'none';
-    scanPrototypeStageEl.classList.remove('active');
+    scanPrototypeStageEl.classList.remove('active', 'camera-mode');
     scanPrototypeStageEl.style.opacity = '';
   }
 }
@@ -1853,35 +1856,38 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
     fallbackManualState();
     return;
   }
-  applyCameraOverlayVisuals(desiredOverlayRect);
+  // camera full-screen under proto stage — make proto bg transparent
+  if (scanPrototypeStageEl) scanPrototypeStageEl.classList.add('camera-mode');
+  const protoCloseBtn = document.getElementById('proto-close');
+  if (protoCloseBtn) protoCloseBtn.style.display = '';
 
-  cameraCancel.onclick = async () => {
+  function exitCamera(next) {
     if (scanClosed) return;
     scanClosed = true;
-    await stopCamera();
-    hideScanPrototypeStage();
-    returnState();
-  };
+    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
+    stopCamera().then(next);
+  }
 
-  manualScanHintEl.onclick = async () => {
-    if (scanClosed) return;
-    scanClosed = true;
-    await stopCamera();
-    hideScanPrototypeStage();
-    fallbackManualState();
-  };
+  if (protoCloseBtn) {
+    protoCloseBtn.onclick = () => exitCamera(() => { hideScanPrototypeStage(); returnState(); });
+  }
+  cameraCancel.onclick = null;
+  manualScanHintEl.onclick = null;
 
   scanQR(code => {
     if (scanClosed) return;
     scanClosed = true;
+    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
     stopCamera();
-    applyCameraOverlayRect(null);
-    // proto stage stays visible during verification
     stateVerifyProto(code, returnState).catch(() => {
       hideScanPrototypeStage();
       returnState();
     });
   }, thisToken).catch(async () => {
+    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
     await stopCamera();
     setProtoStatus('błąd skanowania');
     await sleep(1300);
