@@ -374,8 +374,9 @@ function hideScanPrototypeStage() {
   if (scanPrototypeStarEl) scanPrototypeStarEl.classList.remove('show');
   if (scanPrototypeStageEl) {
     scanPrototypeStageEl.style.display = 'none';
-    scanPrototypeStageEl.classList.remove('active', 'camera-mode');
+    scanPrototypeStageEl.style.background = '';
     scanPrototypeStageEl.style.opacity = '';
+    scanPrototypeStageEl.classList.remove('active', 'camera-mode');
   }
 }
 
@@ -1845,14 +1846,20 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   let scanClosed = false;
   currentScanToken += 1;
   const thisToken = currentScanToken;
-  // make proto transparent immediately — camera will show through from below
-  if (scanPrototypeStageEl) scanPrototypeStageEl.classList.add('camera-mode');
+  // make proto transparent immediately via inline style — camera shows through from below
+  if (scanPrototypeStageEl) {
+    scanPrototypeStageEl.classList.add('camera-mode');
+    scanPrototypeStageEl.style.background = 'transparent';
+  }
   const protoCloseBtn = document.getElementById('proto-close');
   if (protoCloseBtn) protoCloseBtn.style.display = '';
 
   const ok = await startCamera();
   if (!ok) {
-    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
+    if (scanPrototypeStageEl) {
+      scanPrototypeStageEl.classList.remove('camera-mode');
+      scanPrototypeStageEl.style.background = '';
+    }
     if (protoCloseBtn) protoCloseBtn.style.display = 'none';
     setProtoStatus('kamera niedostępna');
     await sleep(1200);
@@ -1862,11 +1869,18 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
     return;
   }
 
+  function leaveCameraMode() {
+    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (scanPrototypeStageEl) {
+      scanPrototypeStageEl.classList.remove('camera-mode');
+      scanPrototypeStageEl.style.background = '';
+    }
+  }
+
   function exitCamera(next) {
     if (scanClosed) return;
     scanClosed = true;
-    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
-    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
+    leaveCameraMode();
     stopCamera().then(next);
   }
 
@@ -1879,16 +1893,14 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   scanQR(code => {
     if (scanClosed) return;
     scanClosed = true;
-    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
-    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
+    leaveCameraMode();
     stopCamera();
     stateVerifyProto(code, returnState).catch(() => {
       hideScanPrototypeStage();
       returnState();
     });
   }, thisToken).catch(async () => {
-    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
-    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
+    leaveCameraMode();
     await stopCamera();
     setProtoStatus('błąd skanowania');
     await sleep(1300);
