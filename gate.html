@@ -710,6 +710,24 @@
             100% { transform: translate(-50%, -50%) scale(1) rotate(-1deg); }
         }
 
+        #proto-status {
+            position: absolute;
+            left: 50%;
+            top: clamp(18px, 5.5vh, 48px);
+            transform: translateX(-50%);
+            font-family: var(--ff);
+            font-size: 0.78rem;
+            font-weight: 300;
+            letter-spacing: 0.18em;
+            color: var(--ink-mid);
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 5;
+        }
+        #proto-status.show { opacity: 1; }
+
         /* page enter */
         @keyframes page-enter {
             from { opacity: 0; }
@@ -769,6 +787,7 @@
 <div id="scan-prototype-stage" aria-hidden="true">
     <div id="scan-prototype-grid"></div>
     <div id="scan-prototype-seed"></div>
+    <div id="proto-status"></div>
     <button id="scan-prototype-star" type="button" aria-label="przejdź do skanowania"></button>
 </div>
 

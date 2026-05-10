@@ -365,6 +365,7 @@ function clearFlowingQrFrame() {
 }
 
 function hideScanPrototypeStage() {
+  setProtoStatus('');
   scanPrototypeActive = false;
   clearFlowingQrFrame();
   if (scanPrototypeStarEl) scanPrototypeStarEl.classList.remove('show');
@@ -373,6 +374,13 @@ function hideScanPrototypeStage() {
     scanPrototypeStageEl.classList.remove('active');
     scanPrototypeStageEl.style.opacity = '';
   }
+}
+
+function setProtoStatus(text) {
+  const el = document.getElementById('proto-status');
+  if (!el) return;
+  el.textContent = text || '';
+  el.classList.toggle('show', Boolean(text));
 }
 
 function getScanPrototypeQrViewportRect(startRow, startCol, side) {
@@ -1654,14 +1662,54 @@ function showLandingMode() {
 }
 
 async function stateNoAccess() {
-  showGateMode();
-  await runChat([{ text: GATE_CONFIG.intro, delay: 450 }, ...GATE_CONFIG.noAccess]);
-  clearActions();
-  addBtn(GATE_CONFIG.noCodeManualInputLabel, '', () => stateManualInput(statePreGateNoCode));
-  addBtn(GATE_CONFIG.noCodeReturnLabel, 'soft', () => {
-    pageOut('/');
-  });
-  showActions();
+  return statePreGateNoCode();
+}
+
+async function stateVerifyProto(code, backState) {
+  setProtoStatus('sprawdzam...');
+  let result;
+  try { result = await apiScan(code, fingerprint); } catch { result = null; }
+
+  if (result && result.state === 'first' || result && result.state === 'known') {
+    setProtoStatus('');
+    hideScanPrototypeStage();
+    pageOut('/poems.html');
+    return;
+  }
+
+  if (result && result.state === 'transfer') {
+    setProtoStatus('');
+    hideScanPrototypeStage();
+    showGateMode();
+    await runChat(GATE_CONFIG.transferFlow);
+    clearActions();
+    addBtn(GATE_CONFIG.transferConfirm || GATE_CONFIG.buttons.transfer, '', () => stateTransfer(result.transferToken, backState));
+    addBtn(GATE_CONFIG.buttons.cancel, 'soft', () => backState());
+    showActions();
+    return;
+  }
+
+  if (result && result.error === 'code not found') {
+    setProtoStatus('nie ma takiego kodu');
+    await sleep(1300);
+    setProtoStatus('');
+    hideScanPrototypeStage();
+    stateManualInput(backState);
+    return;
+  }
+
+  if (result && (result.error === 'no access' || result.error === 'no session')) {
+    setProtoStatus('');
+    hideScanPrototypeStage();
+    statePreGateNoCode();
+    return;
+  }
+
+  setProtoStatus('błąd połączenia');
+  await sleep(1400);
+  setProtoStatus('');
+  hideScanPrototypeStage();
+  backState();
 }
 
 function addNocodeZnaczki() {
@@ -1706,69 +1754,17 @@ async function animateLine(el, text) {
 }
 
 async function statePreGateNoCode() {
-  showLandingMode();
-
-  nocodeLine1.innerHTML = '';
-  nocodeLine2.innerHTML = '';
-  nocodeSubtitle.classList.remove('show');
-  nocodeBtns.classList.remove('show');
-  nocodeBtns.innerHTML = '';
-  nocodeLanding.querySelectorAll('.nocode-deco-char').forEach(el => el.remove());
-
-  const sprigEl = document.getElementById('nocode-sprig');
-  if (sprigEl) {
-    sprigEl.style.transition = '';
-    sprigEl.style.opacity = '0';
-    sprigEl.style.transform = 'translateY(10px)';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      sprigEl.style.transition = 'opacity 1s ease, transform 1s cubic-bezier(0.22,1,0.36,1)';
-      sprigEl.style.opacity = '1';
-      sprigEl.style.transform = 'translateY(0)';
-    }));
-  }
-  await sleep(320);
-
-  await animateLine(nocodeLine1, 'lawenda');
-  await sleep(460);
-  await animateLine(nocodeLine2, 'zamknięta');
-
-  await sleep(280);
-  nocodeSubtitle.classList.add('show');
-  await sleep(380);
-
-  addNocodeZnaczki();
-
-  const scanBtn = document.createElement('button');
-  scanBtn.type = 'button';
-  scanBtn.className = 'nocode-btn';
-  scanBtn.textContent = 'mam znajdkę';
-  scanBtn.addEventListener('click', () => stateCameraScan({
+  await stateCameraScan({
     returnState: statePreGateNoCode,
     fallbackManualState: () => stateManualInput(statePreGateNoCode),
-  }));
-  nocodeBtns.appendChild(scanBtn);
-
-  const seekBtn = document.createElement('button');
-  seekBtn.type = 'button';
-  seekBtn.className = 'nocode-btn soft';
-  seekBtn.textContent = 'wciąż szukam';
-  seekBtn.addEventListener('click', () => { pageOut('/'); });
-  nocodeBtns.appendChild(seekBtn);
-
-  requestAnimationFrame(() => nocodeBtns.classList.add('show'));
-}
-async function statePreGateWithCode(code) {
-  await runChat([{ text: GATE_CONFIG.intro, delay: 450 }, ...GATE_CONFIG.withCodeConfirm]);
-  clearActions();
-  addBtn(GATE_CONFIG.withCodeActivateLabel, '', () => stateCameraScan({
-    returnState: () => statePreGateWithCode(code),
-    fallbackManualState: () => stateManualInput(() => statePreGateWithCode(code)),
-  }));
-  addBtn(GATE_CONFIG.noCodeManualInputLabel, 'soft', () => stateManualInput(() => statePreGateWithCode(code)));
-  addBtn(GATE_CONFIG.noCodeReturnLabel, 'soft', () => {
-    pageOut('/');
   });
-  showActions();
+}
+
+async function statePreGateWithCode(code) {
+  showGateMode();
+  await runScanPrototypeStage();
+  // proto stage stays visible — verify URL code directly, no camera
+  await stateVerifyProto(code, () => statePreGateWithCode(code));
 }
 
 async function stateManualInput(backState) {
@@ -1834,8 +1830,13 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   scanQR(code => {
     if (scanClosed) return;
     scanClosed = true;
-    hideScanPrototypeStage();
-    stateVerify(code, returnState);
+    stopCamera();
+    applyCameraOverlayRect(null);
+    // proto stage stays visible during verification
+    stateVerifyProto(code, returnState).catch(async () => {
+      hideScanPrototypeStage();
+      returnState();
+    });
   }, thisToken).catch(async () => {
     await stopCamera();
     hideScanPrototypeStage();
