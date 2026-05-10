@@ -383,6 +383,54 @@ function setProtoStatus(text) {
   el.classList.toggle('show', Boolean(text));
 }
 
+function showProtoManualInput({ prompt = '', onSubmit, onCancel }) {
+  if (scanPrototypeStageEl) {
+    scanPrototypeStageEl.style.display = 'block';
+    scanPrototypeStageEl.classList.add('active');
+    scanPrototypeStageEl.style.opacity = '1';
+  }
+  const container = document.getElementById('proto-manual');
+  const promptEl   = document.getElementById('proto-manual-prompt');
+  const inputEl    = document.getElementById('proto-manual-input');
+  const submitEl   = document.getElementById('proto-manual-submit');
+  const errorEl    = document.getElementById('proto-manual-error');
+  const cancelEl   = document.getElementById('proto-manual-cancel');
+  if (!container || !inputEl) return;
+
+  promptEl.textContent = prompt;
+  inputEl.value = '';
+  errorEl.textContent = '';
+  container.classList.add('show');
+
+  function cleanup() {
+    container.classList.remove('show');
+    submitEl.onclick = null;
+    cancelEl.onclick = null;
+    inputEl.onkeydown = null;
+    inputEl.oninput = null;
+  }
+  function doSubmit() {
+    const value = inputEl.value.trim().toUpperCase();
+    if (!CODE_RE.test(value)) { errorEl.textContent = GATE_CONFIG.manualInputErrorInvalid; return; }
+    errorEl.textContent = '';
+    cleanup();
+    onSubmit(value);
+  }
+  inputEl.oninput = () => {
+    inputEl.value = inputEl.value.toUpperCase().replace(/[^ABCDEFGHJKMNPQRSTVWXYZ23456789]/g, '').slice(0, 4);
+    errorEl.textContent = '';
+  };
+  inputEl.onkeydown = e => { if (e.key === 'Enter') doSubmit(); };
+  submitEl.onclick = doSubmit;
+  cancelEl.onclick = () => { cleanup(); onCancel(); };
+  setTimeout(() => inputEl.focus(), 40);
+}
+
+function hideProtoManualInput() {
+  const el = document.getElementById('proto-manual');
+  if (el) el.classList.remove('show');
+}
+
 function getScanPrototypeQrViewportRect(startRow, startCol, side) {
   if (!scanPrototypeGridEl) return null;
   const gridRect = scanPrototypeGridEl.getBoundingClientRect();
@@ -1691,9 +1739,8 @@ async function stateVerifyProto(code, backState) {
 
   if (result && result.error === 'code not found') {
     setProtoStatus('nie ma takiego kodu');
-    await sleep(1300);
+    await sleep(1000);
     setProtoStatus('');
-    hideScanPrototypeStage();
     stateManualInput(backState);
     return;
   }
@@ -1768,11 +1815,17 @@ async function statePreGateWithCode(code) {
 }
 
 async function stateManualInput(backState) {
-  showGateMode();
-  await runChat([{ text: GATE_CONFIG.manualInputPrompt, delay: 380 }]);
-  addManualInput({
-    onSubmit: code => stateVerify(code, backState),
-    onCancel: () => backState(),
+  showProtoManualInput({
+    prompt: GATE_CONFIG.manualInputPrompt,
+    onSubmit: code => {
+      hideProtoManualInput();
+      stateVerifyProto(code, backState);
+    },
+    onCancel: () => {
+      hideProtoManualInput();
+      hideScanPrototypeStage();
+      backState();
+    },
   });
 }
 

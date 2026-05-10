@@ -728,6 +728,91 @@
         }
         #proto-status.show { opacity: 1; }
 
+        #proto-manual {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.6rem;
+            z-index: 6;
+        }
+        #proto-manual.show { display: flex; }
+
+        #proto-manual-prompt {
+            font-family: var(--ff);
+            font-size: 0.82rem;
+            font-weight: 300;
+            letter-spacing: 0.16em;
+            color: var(--ink-mid);
+        }
+
+        #proto-manual-row {
+            display: flex;
+            align-items: baseline;
+            gap: 1.2rem;
+        }
+
+        #proto-manual-input {
+            font-family: var(--ff);
+            font-size: 1.15rem;
+            font-weight: 300;
+            letter-spacing: 0.28em;
+            color: var(--ink);
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(13, 13, 13, 0.22);
+            width: 5.8rem;
+            text-align: center;
+            padding: 0.3rem 0;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        #proto-manual-input::placeholder { color: rgba(13, 13, 13, 0.2); }
+        #proto-manual-input:focus { border-bottom-color: rgba(13, 13, 13, 0.55); }
+
+        #proto-manual-submit {
+            font-family: var(--ff);
+            font-size: 0.78rem;
+            font-weight: 300;
+            letter-spacing: 0.14em;
+            color: var(--ink);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.3rem 0;
+            opacity: 0.55;
+            transition: opacity 0.2s ease;
+        }
+        #proto-manual-submit:hover { opacity: 1; }
+
+        #proto-manual-error {
+            font-family: var(--ff);
+            font-size: 0.72rem;
+            font-weight: 300;
+            letter-spacing: 0.12em;
+            color: rgba(13, 13, 13, 0.4);
+            min-height: 1em;
+            text-align: center;
+            margin-top: -0.8rem;
+        }
+
+        #proto-manual-cancel {
+            font-family: var(--ff);
+            font-size: 0.72rem;
+            font-weight: 300;
+            letter-spacing: 0.12em;
+            color: rgba(13, 13, 13, 0.28);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            transition: color 0.2s ease;
+        }
+        #proto-manual-cancel:hover { color: rgba(13, 13, 13, 0.6); }
+
         /* page enter */
         @keyframes page-enter {
             from { opacity: 0; }
@@ -788,6 +873,15 @@
     <div id="scan-prototype-grid"></div>
     <div id="scan-prototype-seed"></div>
     <div id="proto-status"></div>
+    <div id="proto-manual">
+        <div id="proto-manual-prompt"></div>
+        <div id="proto-manual-row">
+            <input id="proto-manual-input" type="text" maxlength="4" placeholder="A1B2" autocomplete="off" spellcheck="false" />
+            <button id="proto-manual-submit" type="button">otwórz</button>
+        </div>
+        <div id="proto-manual-error"></div>
+        <button id="proto-manual-cancel" type="button">← wracam</button>
+    </div>
     <button id="scan-prototype-star" type="button" aria-label="przejdź do skanowania"></button>
 </div>
 
