@@ -1792,39 +1792,30 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   const ok = await startCamera();
   if (!ok) {
     await stopCamera();
+    // proto stage stays visible — show status, then go to manual input
+    setProtoStatus('kamera niedostępna');
+    await sleep(1200);
+    setProtoStatus('');
     hideScanPrototypeStage();
-    showGateMode();
-    await runChat([{ text: GATE_CONFIG.cameraUnavailable, delay: 500 }]);
-    clearActions();
-    addBtn(GATE_CONFIG.noCodeManualInputLabel, '', fallbackManualState);
-    addBtn(GATE_CONFIG.buttons.retry, 'soft', () => stateCameraScan({ returnState, fallbackManualState }));
-    showActions();
+    fallbackManualState();
     return;
   }
   applyCameraOverlayVisuals(desiredOverlayRect);
 
   cameraCancel.onclick = async () => {
-    try {
-      if (scanClosed) return;
-      scanClosed = true;
-      await stopCamera();
-      hideScanPrototypeStage();
-      returnState();
-    } catch {
-      await runChat(GATE_CONFIG.error);
-    }
+    if (scanClosed) return;
+    scanClosed = true;
+    await stopCamera();
+    hideScanPrototypeStage();
+    returnState();
   };
 
   manualScanHintEl.onclick = async () => {
-    try {
-      if (scanClosed) return;
-      scanClosed = true;
-      await stopCamera();
-      hideScanPrototypeStage();
-      fallbackManualState();
-    } catch {
-      await runChat(GATE_CONFIG.error);
-    }
+    if (scanClosed) return;
+    scanClosed = true;
+    await stopCamera();
+    hideScanPrototypeStage();
+    fallbackManualState();
   };
 
   scanQR(code => {
@@ -1833,18 +1824,17 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
     stopCamera();
     applyCameraOverlayRect(null);
     // proto stage stays visible during verification
-    stateVerifyProto(code, returnState).catch(async () => {
+    stateVerifyProto(code, returnState).catch(() => {
       hideScanPrototypeStage();
       returnState();
     });
   }, thisToken).catch(async () => {
     await stopCamera();
+    setProtoStatus('błąd skanowania');
+    await sleep(1300);
+    setProtoStatus('');
     hideScanPrototypeStage();
-    showGateMode();
-    await runChat(GATE_CONFIG.error);
-    clearActions();
-    addBtn(GATE_CONFIG.buttons.retry, '', () => stateCameraScan({ returnState, fallbackManualState }));
-    showActions();
+    returnState();
   });
 }
 
