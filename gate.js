@@ -1845,10 +1845,15 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   let scanClosed = false;
   currentScanToken += 1;
   const thisToken = currentScanToken;
+  // make proto transparent immediately — camera will show through from below
+  if (scanPrototypeStageEl) scanPrototypeStageEl.classList.add('camera-mode');
+  const protoCloseBtn = document.getElementById('proto-close');
+  if (protoCloseBtn) protoCloseBtn.style.display = '';
+
   const ok = await startCamera();
   if (!ok) {
-    await stopCamera();
-    // proto stage stays visible — show status, then go to manual input
+    if (scanPrototypeStageEl) scanPrototypeStageEl.classList.remove('camera-mode');
+    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
     setProtoStatus('kamera niedostępna');
     await sleep(1200);
     setProtoStatus('');
@@ -1856,10 +1861,6 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
     fallbackManualState();
     return;
   }
-  // camera full-screen under proto stage — make proto bg transparent
-  if (scanPrototypeStageEl) scanPrototypeStageEl.classList.add('camera-mode');
-  const protoCloseBtn = document.getElementById('proto-close');
-  if (protoCloseBtn) protoCloseBtn.style.display = '';
 
   function exitCamera(next) {
     if (scanClosed) return;
