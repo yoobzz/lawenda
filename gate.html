@@ -344,18 +344,17 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: grayscale(0.4) brightness(1.05);
         }
 
-        /* camera positioned inside the QR char frame */
+        /* video stays full-size (so browser decodes at full resolution),
+           clip-path reveals only the QR window — fixes iOS low-res decode bug */
         #camera-area.qr-overlay #camera-video {
-            inset: auto;
-            left: var(--camera-overlay-x);
-            top: var(--camera-overlay-y);
-            width: var(--camera-overlay-size);
-            height: var(--camera-overlay-size);
-            filter: none;
-            border-radius: 2px;
+            clip-path: inset(
+                var(--camera-overlay-y)
+                calc(100vw - var(--camera-overlay-x) - var(--camera-overlay-size))
+                calc(100vh - var(--camera-overlay-y) - var(--camera-overlay-size))
+                var(--camera-overlay-x)
+            );
         }
 
         #camera-canvas { display: none; }
@@ -689,7 +688,7 @@
             100% { transform: translate(-50%, -50%) scale(1) rotate(-1deg); }
         }
 
-        #proto-close {
+        #camera-close-x {
             position: absolute;
             top: max(18px, env(safe-area-inset-top, 0px));
             right: max(18px, env(safe-area-inset-right, 0px));
@@ -702,10 +701,11 @@
             color: rgba(13, 13, 13, 0.35);
             cursor: pointer;
             padding: 8px;
-            z-index: 7;
+            z-index: 2;
+            pointer-events: auto;
             transition: color 0.2s ease;
         }
-        #proto-close:hover { color: rgba(13, 13, 13, 0.75); }
+        #camera-close-x:hover { color: rgba(13, 13, 13, 0.75); }
 
         #proto-status {
             position: absolute;
@@ -858,6 +858,7 @@
 <div id="camera-area">
     <video id="camera-video" playsinline autoplay muted></video>
     <canvas id="camera-canvas"></canvas>
+    <button id="camera-close-x" type="button" style="display:none">×</button>
     <div id="camera-ui">
         <div id="scan-symbols"></div>
         <button id="manual-scan-hint" type="button">wpisz kod ręcznie</button>
@@ -870,7 +871,6 @@
     <div id="scan-prototype-grid"></div>
     <div id="scan-prototype-seed"></div>
     <div id="proto-status"></div>
-    <button id="proto-close" type="button" aria-label="zamknij" style="display:none">×</button>
     <div id="proto-manual">
         <div id="proto-manual-prompt"></div>
         <div id="proto-manual-row">

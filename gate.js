@@ -1845,12 +1845,12 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   let scanClosed = false;
   currentScanToken += 1;
   const thisToken = currentScanToken;
-  const protoCloseBtn = document.getElementById('proto-close');
-  if (protoCloseBtn) protoCloseBtn.style.display = '';
+  const closeXBtn = document.getElementById('camera-close-x');
+  if (closeXBtn) closeXBtn.style.display = '';
 
   const ok = await startCamera();
   if (!ok) {
-    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (closeXBtn) closeXBtn.style.display = 'none';
     setProtoStatus('kamera niedostępna');
     await sleep(1200);
     setProtoStatus('');
@@ -1859,18 +1859,17 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
     return;
   }
 
-  // position camera inside the QR char frame window
   applyCameraOverlayVisuals(desiredOverlayRect);
 
   function exitCamera(next) {
     if (scanClosed) return;
     scanClosed = true;
-    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (closeXBtn) closeXBtn.style.display = 'none';
     stopCamera().then(next);
   }
 
-  if (protoCloseBtn) {
-    protoCloseBtn.onclick = () => exitCamera(() => { hideScanPrototypeStage(); returnState(); });
+  if (closeXBtn) {
+    closeXBtn.onclick = () => exitCamera(() => { hideScanPrototypeStage(); returnState(); });
   }
   cameraCancel.onclick = null;
   manualScanHintEl.onclick = null;
@@ -1878,14 +1877,14 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   scanQR(code => {
     if (scanClosed) return;
     scanClosed = true;
-    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (closeXBtn) closeXBtn.style.display = 'none';
     stopCamera();
     stateVerifyProto(code, returnState).catch(() => {
       hideScanPrototypeStage();
       returnState();
     });
   }, thisToken).catch(async () => {
-    if (protoCloseBtn) protoCloseBtn.style.display = 'none';
+    if (closeXBtn) closeXBtn.style.display = 'none';
     await stopCamera();
     setProtoStatus('błąd skanowania');
     await sleep(1300);
