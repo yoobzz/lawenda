@@ -338,6 +338,11 @@
 
         #camera-area.active { display: block; }
 
+        #camera-area.qr-overlay {
+            background: transparent;
+            z-index: 10000;
+        }
+
         #camera-video {
             position: absolute;
             inset: 0;
@@ -354,7 +359,8 @@
             top: var(--camera-overlay-y);
             width: var(--camera-overlay-size);
             height: var(--camera-overlay-size);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border: none;
+            filter: none;
         }
 
         #camera-canvas { display: none; }
@@ -376,10 +382,7 @@
         }
 
         #camera-area.qr-overlay #scan-symbols {
-            left: var(--camera-overlay-cx);
-            top: var(--camera-overlay-cy);
-            width: var(--camera-overlay-size);
-            height: var(--camera-overlay-size);
+            display: none;
         }
 
         .scan-symbol {
@@ -441,6 +444,19 @@
         }
 
         #camera-cancel:hover { color: rgba(255, 255, 255, 0.7); }
+
+        #camera-area.qr-overlay #camera-cancel {
+            color: rgba(13, 13, 13, 0.42);
+        }
+        #camera-area.qr-overlay #camera-cancel:hover {
+            color: rgba(13, 13, 13, 0.75);
+        }
+        #camera-area.qr-overlay #manual-scan-hint {
+            color: rgba(13, 13, 13, 0.32);
+        }
+        #camera-area.qr-overlay #manual-scan-hint:hover {
+            color: rgba(13, 13, 13, 0.65);
+        }
 
         #scan-flash {
             position: absolute;

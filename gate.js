@@ -1786,9 +1786,9 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   await stopCamera();
   showGateMode();
   const protoResult = await runScanPrototypeStage();
-  hideScanPrototypeStage();
+  // nie chowamy proto stage — zostaje jako tło podczas skanowania
   const protoChoice = typeof protoResult === 'string' ? protoResult : protoResult?.choice;
-  if (protoChoice === 'manual') { fallbackManualState(); return; }
+  if (protoChoice === 'manual') { hideScanPrototypeStage(); fallbackManualState(); return; }
   const desiredOverlayRect = typeof protoResult === 'object' ? protoResult.qrRect : scanPrototypeLastQrViewportRect;
   let scanClosed = false;
   currentScanToken += 1;
@@ -1796,6 +1796,7 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   const ok = await startCamera();
   if (!ok) {
     await stopCamera();
+    hideScanPrototypeStage();
     showGateMode();
     await runChat([{ text: GATE_CONFIG.cameraUnavailable, delay: 500 }]);
     clearActions();
@@ -1811,6 +1812,7 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
       if (scanClosed) return;
       scanClosed = true;
       await stopCamera();
+      hideScanPrototypeStage();
       returnState();
     } catch {
       await runChat(GATE_CONFIG.error);
@@ -1822,6 +1824,7 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
       if (scanClosed) return;
       scanClosed = true;
       await stopCamera();
+      hideScanPrototypeStage();
       fallbackManualState();
     } catch {
       await runChat(GATE_CONFIG.error);
@@ -1831,9 +1834,11 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
   scanQR(code => {
     if (scanClosed) return;
     scanClosed = true;
+    hideScanPrototypeStage();
     stateVerify(code, returnState);
   }, thisToken).catch(async () => {
     await stopCamera();
+    hideScanPrototypeStage();
     showGateMode();
     await runChat(GATE_CONFIG.error);
     clearActions();
