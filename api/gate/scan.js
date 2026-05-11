@@ -3,7 +3,6 @@
 const kv = require('../_lib/kv.js');
 const { sign } = require('../_lib/jwt.js');
 
-const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_30_DAYS = 30 * 24 * 60 * 60;
 const TRANSFER_5_MIN = 5 * 60;
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
@@ -37,6 +36,7 @@ async function logScan(req, code, fingerprint, state) {
 }
 
 module.exports = async function handler(req, res) {
+  const JWT_SECRET = process.env.JWT_SECRET;
   if (req.method !== 'POST') return res.status(405).end();
   if (!JWT_SECRET) return res.status(500).json({ error: 'server misconfigured' });
 

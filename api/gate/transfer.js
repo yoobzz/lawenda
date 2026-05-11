@@ -3,7 +3,6 @@
 const kv = require('../_lib/kv.js');
 const { sign, verify } = require('../_lib/jwt.js');
 
-const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_30_DAYS = 30 * 24 * 60 * 60;
 
 function setCookie(res, value, maxAge) {
@@ -14,6 +13,7 @@ function setCookie(res, value, maxAge) {
 }
 
 module.exports = async function handler(req, res) {
+  const JWT_SECRET = process.env.JWT_SECRET;
   if (req.method !== 'POST') return res.status(405).end();
   if (!JWT_SECRET) return res.status(500).json({ error: 'server misconfigured' });
 

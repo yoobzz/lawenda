@@ -2,6 +2,7 @@
   "name": "szpineta-strona",
   "private": true,
   "scripts": {
+    "test": "jest --runInBand",
     "start": "node server.js",
     "extract:poems": "node scripts/extract-poems.js",
     "mint:codes": "node scripts/mint-codes.js",
@@ -15,6 +16,7 @@
     "express-basic-auth": "^1.2.1"
   },
   "devDependencies": {
+    "jest": "^30.4.2",
     "qrcode": "^1.5.4"
   }
 }
