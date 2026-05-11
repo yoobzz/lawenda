@@ -18,6 +18,7 @@ async function logScan(req, code, fingerprint, state) {
   try {
     const ip = ((req.headers['x-forwarded-for'] || '').split(',')[0].trim())
       || req.headers['x-real-ip'] || '?';
+    const gps = req.body.gps || null;
     const event = {
       at: new Date().toISOString(),
       code,
@@ -25,8 +26,9 @@ async function logScan(req, code, fingerprint, state) {
       ip,
       country: req.headers['x-vercel-ip-country'] || '?',
       city: req.headers['x-vercel-ip-city'] || '?',
-      lat: req.headers['x-vercel-ip-latitude'] || null,
-      lng: req.headers['x-vercel-ip-longitude'] || null,
+      lat: gps?.lat ?? req.headers['x-vercel-ip-latitude'] ?? null,
+      lng: gps?.lng ?? req.headers['x-vercel-ip-longitude'] ?? null,
+      acc: gps?.acc ?? null,
       ua: (req.headers['user-agent'] || '?').slice(0, 150),
       fp: fingerprint ? fingerprint.slice(0, 16) : '?',
     };
