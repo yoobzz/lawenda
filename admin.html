@@ -63,12 +63,21 @@
             const rows = scans.map(s => {
                 const d = new Date(s.at);
                 const date = d.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' });
-                const loc = [s.city, s.country].filter(x => x && x !== '?').join(', ') || '?';
+                const locText = [s.city, s.country].filter(x => x && x !== '?').join(', ') || '?';
+                const loc = (s.lat && s.lng)
+                    ? `<a href="https://www.google.com/maps?q=${s.lat},${s.lng}" target="_blank" rel="noopener" title="${s.lat}, ${s.lng}">${locText} 📍</a>`
+                    : locText;
                 const state = s.state === 'first' ? '★ pierwsza' : s.state === 'known' ? '↩ powrót' : '⇄ transfer';
                 const ua = (s.ua || '').replace(/</g, '&lt;');
-                return `<tr><td>${date}</td><td><b>${s.code}</b></td><td>${state}</td><td>${loc}</td><td class="hint" title="${ua}">${detectDevice(s.ua)}</td></tr>`;
+                return `<tr><td><input type="checkbox" class="code-cb" value="${s.code}"></td><td>${date}</td><td><b>${s.code}</b></td><td>${state}</td><td>${loc}</td><td class="hint" title="${ua}">${detectDevice(s.ua)}</td></tr>`;
             }).join('');
-            out.innerHTML = `<table><thead><tr><th>kiedy</th><th>kod</th><th>stan</th><th>skąd</th><th>urządzenie</th></tr></thead><tbody>${rows}</tbody></table>`;
+            out.innerHTML = `
+                <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
+                    <button type="button" onclick="selectAll()">zaznacz wszystkie</button>
+                    <button type="button" onclick="releaseSelected()" style="background:#b00020;color:#fff;border:none;padding:8px 12px;cursor:pointer;font:inherit;">porzuć zaznaczone</button>
+                    <span id="releaseStatus" style="font-size:12px;color:#555;"></span>
+                </div>
+                <table><thead><tr><th></th><th>kiedy</th><th>kod</th><th>stan</th><th>skąd</th><th>urządzenie</th></tr></thead><tbody>${rows}</tbody></table>`;
         } catch (e) {
             out.textContent = 'błąd: ' + e.message;
         }
@@ -80,6 +89,33 @@
         if (/Mac/i.test(ua)) return 'Mac';
         if (/Windows/i.test(ua)) return 'Windows';
         return 'inne';
+    }
+    function selectAll() {
+        document.querySelectorAll('.code-cb').forEach(cb => cb.checked = true);
+    }
+    async function releaseSelected() {
+        const codes = [...new Set(
+            Array.from(document.querySelectorAll('.code-cb:checked')).map(cb => cb.value)
+        )];
+        if (codes.length === 0) { alert('nic nie zaznaczone'); return; }
+        if (!confirm(`Porzucić ${codes.length} kod(ów): ${codes.join(', ')}?\nKody będą mogły być znalezione na nowo.`)) return;
+        const token = localStorage.getItem('adminToken') || '';
+        const status = document.getElementById('releaseStatus');
+        status.textContent = 'porzucam...';
+        try {
+            const resp = await fetch('/api/admin/release-codes', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codes })
+            });
+            const data = await resp.json();
+            if (!resp.ok) { status.textContent = 'błąd: ' + (data.error || resp.status); return; }
+            const ok = data.results.filter(r => r.ok).map(r => r.code);
+            status.textContent = `porzucono: ${ok.join(', ')}`;
+            loadScans();
+        } catch (e) {
+            status.textContent = 'błąd: ' + e.message;
+        }
     }
     </script>
     </head>
