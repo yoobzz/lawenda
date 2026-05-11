@@ -94,14 +94,27 @@
         document.querySelectorAll('.code-cb').forEach(cb => cb.checked = true);
     }
     async function releaseSelected() {
+        const status = document.getElementById('releaseStatus');
         const codes = [...new Set(
             Array.from(document.querySelectorAll('.code-cb:checked')).map(cb => cb.value)
         )];
-        if (codes.length === 0) { alert('nic nie zaznaczone'); return; }
-        if (!confirm(`Porzucić ${codes.length} kod(ów): ${codes.join(', ')}?\nKody będą mogły być znalezione na nowo.`)) return;
-        const token = localStorage.getItem('adminToken') || '';
+        if (codes.length === 0) {
+            status.textContent = '← zaznacz kody checkboxami';
+            status.style.color = '#b00020';
+            return;
+        }
+        const confirmEl = document.getElementById('releaseConfirm');
+        confirmEl.style.display = 'block';
+        confirmEl.innerHTML = `Porzucić <b>${codes.length}</b> kod(ów): <b>${codes.join(', ')}</b>?
+            <button onclick="doRelease(${JSON.stringify(codes)})" style="margin-left:8px;background:#b00020;color:#fff;border:none;padding:4px 10px;cursor:pointer;font:inherit;">tak, porzuć</button>
+            <button onclick="document.getElementById('releaseConfirm').style.display='none'" style="margin-left:4px;padding:4px 10px;cursor:pointer;font:inherit;">anuluj</button>`;
+    }
+    async function doRelease(codes) {
+        document.getElementById('releaseConfirm').style.display = 'none';
         const status = document.getElementById('releaseStatus');
+        status.style.color = '#555';
         status.textContent = 'porzucam...';
+        const token = localStorage.getItem('adminToken') || '';
         try {
             const resp = await fetch('/api/admin/release-codes', {
                 method: 'POST',
@@ -109,11 +122,13 @@
                 body: JSON.stringify({ codes })
             });
             const data = await resp.json();
-            if (!resp.ok) { status.textContent = 'błąd: ' + (data.error || resp.status); return; }
+            if (!resp.ok) { status.style.color='#b00020'; status.textContent = 'błąd: ' + (data.error || resp.status); return; }
             const ok = data.results.filter(r => r.ok).map(r => r.code);
-            status.textContent = `porzucono: ${ok.join(', ')}`;
-            loadScans();
+            status.style.color = '#0a7d2e';
+            status.textContent = `✓ porzucono: ${ok.join(', ')}`;
+            setTimeout(loadScans, 800);
         } catch (e) {
+            status.style.color = '#b00020';
             status.textContent = 'błąd: ' + e.message;
         }
     }
@@ -139,6 +154,7 @@
     <hr>
     <h2>Skany znajdek</h2>
     <button type="button" onclick="loadScans()">odśwież skany</button>
+    <div id="releaseConfirm" style="display:none;margin-top:10px;padding:10px;background:#fff3cd;border:1px solid #ffc107;font-size:13px;max-width:700px;"></div>
     <div id="scansOut" class="mono" style="margin-top:12px;font-size:13px;"></div>
 </body>
 </html>
