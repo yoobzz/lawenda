@@ -55,5 +55,11 @@ var GATE_CONFIG = {
     cancel: 'nie teraz',
     retry: 'spróbuj ponownie',
     manualSubmit: 'otwórz',
+    locationAllow: 'jasne',
+    locationSkip: 'wolę nie',
   },
+  locationConsent: [
+    { text: 'chcę wiedzieć, gdzie znalazłeś znajdkę.', delay: 600 },
+    { text: 'mogę sprawdzić twoją lokalizację?', delay: 900 },
+  ],
 };

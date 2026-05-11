@@ -1741,11 +1741,11 @@ async function scanQR(onCode, scanToken) {
   intervalId = setInterval(tick, 180);
 }
 
-async function apiScan(code, fp) {
+async function apiScan(code, fp, gps) {
   const r = await fetch('/api/gate/scan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code, fingerprint: fp }),
+    body: JSON.stringify({ code, fingerprint: fp, gps: gps || undefined }),
   });
   const data = await r.json().catch(() => null);
   if (!r.ok && !data) throw new Error('scan request failed');
@@ -1765,6 +1765,31 @@ async function apiTransfer(token, fp) {
 
 let fingerprint = null;
 let codeFromUrl = null;
+let gpsPermissionAsked = false;
+let cachedGps = null;
+
+async function requestGps() {
+  if (gpsPermissionAsked) return cachedGps;
+  gpsPermissionAsked = true;
+  if (!navigator.geolocation) return null;
+  await runChat(GATE_CONFIG.locationConsent, { clear: false });
+  const granted = await new Promise(resolve => {
+    clearActions();
+    addBtn(GATE_CONFIG.buttons.locationAllow, '', () => resolve(true));
+    addBtn(GATE_CONFIG.buttons.locationSkip, 'soft', () => resolve(false));
+    showActions();
+  });
+  hideActions();
+  if (!granted) return null;
+  cachedGps = await new Promise(resolve => {
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy }),
+      () => resolve(null),
+      { timeout: 5000 },
+    );
+  });
+  return cachedGps;
+}
 
 const gateEl = document.getElementById('gate');
 const nocodeLanding = document.getElementById('nocode-landing');
@@ -1788,22 +1813,21 @@ async function stateNoAccess() {
 }
 
 async function stateVerifyProto(code, backState) {
-  setProtoStatus('sprawdzam...');
+  hideScanPrototypeStage();
+  showGateMode();
+  hideActions();
+  const gps = await requestGps();
+  await quickLine('sprawdzam...');
   let result;
-  try { result = await apiScan(code, fingerprint); } catch { result = null; }
+  try { result = await apiScan(code, fingerprint, gps); } catch { result = null; }
 
-  if (result && result.state === 'first' || result && result.state === 'known') {
-    setProtoStatus('');
-    hideScanPrototypeStage();
+  if (result && (result.state === 'first' || result.state === 'known')) {
     pageOut('/poems.html');
     return;
   }
 
   if (result && result.state === 'transfer') {
-    setProtoStatus('');
-    hideScanPrototypeStage();
-    showGateMode();
-    await runChat(GATE_CONFIG.transferFlow);
+    await runChat(GATE_CONFIG.transferFlow, { clear: false });
     clearActions();
     addBtn(GATE_CONFIG.transferConfirm || GATE_CONFIG.buttons.transfer, '', () => stateTransfer(result.transferToken, backState));
     addBtn(GATE_CONFIG.buttons.cancel, 'soft', () => backState());
@@ -1812,25 +1836,23 @@ async function stateVerifyProto(code, backState) {
   }
 
   if (result && result.error === 'code not found') {
-    setProtoStatus('nie ma takiego kodu');
-    await sleep(1000);
-    setProtoStatus('');
-    stateManualInput(backState);
+    await runChat(GATE_CONFIG.notFound, { clear: false });
+    addManualInput({
+      onSubmit: newCode => stateVerifyProto(newCode, backState),
+      onCancel: () => backState(),
+    });
     return;
   }
 
   if (result && (result.error === 'no access' || result.error === 'no session')) {
-    setProtoStatus('');
-    hideScanPrototypeStage();
     statePreGateNoCode();
     return;
   }
 
-  setProtoStatus('błąd połączenia');
-  await sleep(1400);
-  setProtoStatus('');
-  hideScanPrototypeStage();
-  backState();
+  await runChat(GATE_CONFIG.error, { clear: false });
+  clearActions();
+  addBtn(GATE_CONFIG.buttons.retry, '', () => backState());
+  showActions();
 }
 
 function addNocodeZnaczki() {
@@ -1969,10 +1991,11 @@ async function stateVerify(code, backState) {
   await stopCamera();
   showGateMode();
   hideActions();
+  const gps = await requestGps();
   await quickLine('sprawdzam...');
   let result;
   try {
-    result = await apiScan(code, fingerprint);
+    result = await apiScan(code, fingerprint, gps);
   } catch {
     result = null;
   }
