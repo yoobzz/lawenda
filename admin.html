@@ -3,160 +3,455 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>panel — dodaj wiersz</title>
+    <title>szpineta / panel</title>
     <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <style>
-        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; margin: 24px; }
-        label { display:block; margin: 12px 0 6px; font-weight: 600; }
-        input[type=text], textarea { width: 100%; max-width: 820px; padding: 10px; font: inherit; }
-        textarea { height: 320px; }
-        button { margin-top: 16px; padding: 10px 14px; font: inherit; cursor: pointer; }
-        .hint { color: #666; font-size: 12px; margin-top: 4px; }
-        .ok { color: #0a7d2e; }
-        .err { color: #b00020; }
-        .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-        hr { margin: 32px 0; border: none; border-top: 1px solid #ddd; }
-        table { border-collapse: collapse; width: 100%; max-width: 900px; font-size: 13px; margin-top: 12px; }
-        th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #eee; }
-        th { background: #f5f5f5; font-weight: 600; }
-        tr:hover td { background: #fafafa; }
-    </style>
-    <script>
-    async function submitPoem(e) {
-        e.preventDefault();
-        const poemTitle = document.getElementById('poemTitle').value;
-        const poemText = document.getElementById('poemText').value;
-        const token = localStorage.getItem('adminToken') || '';
-        const resp = await fetch('/api/add-poem', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ poemTitle, poemText })
-        });
-        const out = document.getElementById('out');
-        if (resp.ok) {
-            const data = await resp.json();
-            out.innerHTML = `<span class="ok">OK:</span> ${data.message || 'dodano'}`;
-        } else {
-            const err = await resp.json().catch(() => ({}));
-            out.innerHTML = `<span class="err">Błąd:</span> ${err.error || resp.status}`;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #f9f9f8;
+            --ink: #0d0d0d;
+            --ink-dim: rgba(13,13,13,0.38);
+            --ink-mid: rgba(13,13,13,0.6);
+            --border: rgba(13,13,13,0.12);
+            --border-strong: rgba(13,13,13,0.28);
+            --lav: #9688d4;
+            --lav-bg: rgba(150,136,212,0.08);
+            --red: #8b1a1a;
+            --red-bg: rgba(139,26,26,0.06);
+            --green: #1a4d2e;
+            --green-bg: rgba(26,77,46,0.06);
+            --mono: 'IBM Plex Mono', ui-monospace, monospace;
         }
-    }
+
+        html { font-size: 13px; }
+        body {
+            font-family: var(--mono);
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* ── layout ── */
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 48px 32px 80px;
+        }
+
+        /* ── header ── */
+        .site-header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-strong);
+            margin-bottom: 48px;
+        }
+        .site-header h1 {
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+        }
+        .site-header .dot { color: var(--lav); }
+
+        /* ── token bar ── */
+        .token-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            background: rgba(13,13,13,0.02);
+        }
+        .token-bar label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; }
+        .token-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink);
+            outline: none;
+            min-width: 0;
+        }
+        .token-bar input::placeholder { color: var(--ink-dim); }
+        .token-status { font-size: 10px; color: var(--lav); letter-spacing: 0.1em; white-space: nowrap; }
+
+        /* ── sections ── */
+        .section { margin-bottom: 56px; }
+        .section-title {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── form fields ── */
+        .field { margin-bottom: 16px; }
+        .field label {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            margin-bottom: 6px;
+        }
+        .field input[type=text],
+        .field textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: transparent;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink);
+            padding: 9px 12px;
+            outline: none;
+            resize: vertical;
+            transition: border-color 0.15s;
+        }
+        .field input:focus, .field textarea:focus { border-color: var(--border-strong); }
+        .field textarea { height: 220px; line-height: 1.7; }
+        .field-hint { font-size: 10px; color: var(--ink-dim); margin-top: 4px; }
+
+        /* ── buttons ── */
+        .btn {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 1px solid var(--border-strong);
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+            transition: background 0.12s, color 0.12s;
+        }
+        .btn:hover { background: var(--ink); color: var(--bg); }
+        .btn-danger {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        .btn-danger:hover { background: var(--red); color: var(--bg); }
+        .btn-sm { padding: 5px 10px; font-size: 10px; }
+
+        /* ── status messages ── */
+        .status-line {
+            font-size: 11px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            display: none;
+        }
+        .status-line.show { display: block; }
+        .status-line.ok { background: var(--green-bg); color: var(--green); border-left: 2px solid var(--green); }
+        .status-line.err { background: var(--red-bg); color: var(--red); border-left: 2px solid var(--red); }
+        .status-line.info { background: var(--lav-bg); color: var(--lav); border-left: 2px solid var(--lav); }
+
+        /* ── confirm strip ── */
+        .confirm-strip {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border: 1px solid rgba(139,26,26,0.3);
+            background: var(--red-bg);
+            margin: 10px 0;
+            font-size: 11px;
+            color: var(--red);
+        }
+        .confirm-strip.show { display: flex; }
+        .confirm-strip .confirm-msg { flex: 1; }
+
+        /* ── scans toolbar ── */
+        .scans-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* ── scan table ── */
+        .scan-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .scan-table th {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--ink-dim);
+            text-align: left;
+            padding: 6px 10px 6px 0;
+            border-bottom: 1px solid var(--border-strong);
+            white-space: nowrap;
+        }
+        .scan-table th:first-child { padding-left: 0; width: 24px; }
+        .scan-table td {
+            padding: 7px 10px 7px 0;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+            color: var(--ink-mid);
+        }
+        .scan-table td:first-child { padding-left: 0; }
+        .scan-table tr:hover td { color: var(--ink); background: rgba(13,13,13,0.02); }
+        .scan-table .code-cell { font-weight: 500; color: var(--ink); letter-spacing: 0.08em; }
+        .scan-table .state-first { color: var(--lav); }
+        .scan-table .state-known { color: var(--ink-dim); }
+        .scan-table .state-transfer { color: #8b6a1a; }
+        .scan-table .loc-link { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+        .scan-table .loc-link:hover { color: var(--ink); }
+        .scan-table .device-cell { color: var(--ink-dim); font-size: 10px; }
+
+        /* ── checkbox ── */
+        input[type=checkbox] {
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border: 1px solid var(--border-strong);
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            vertical-align: middle;
+        }
+        input[type=checkbox]:checked {
+            background: var(--ink);
+            border-color: var(--ink);
+        }
+        input[type=checkbox]:checked::after {
+            content: '';
+            position: absolute;
+            left: 2px; top: 2px;
+            width: 6px; height: 6px;
+            background: var(--bg);
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .empty-state { color: var(--ink-dim); font-size: 11px; padding: 20px 0; }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <header class="site-header">
+        <h1>szpineta<span class="dot"> · </span>panel administracyjny</h1>
+    </header>
+
+    <!-- token -->
+    <div class="token-bar">
+        <label for="token">token</label>
+        <input type="password" id="token" placeholder="ADMIN_TOKEN" oninput="saveToken()" autocomplete="off" />
+        <span class="token-status" id="tokInfo"></span>
+    </div>
+
+    <!-- dodaj wiersz -->
+    <section class="section">
+        <div class="section-title">dodaj wiersz</div>
+        <form onsubmit="submitPoem(event)">
+            <div class="field">
+                <label for="poemTitle">tytuł (opcjonalnie)</label>
+                <input type="text" id="poemTitle" placeholder="np. po pełni" />
+            </div>
+            <div class="field">
+                <label for="poemText">treść</label>
+                <textarea id="poemText" placeholder="wpisz wiersz — puste linie to przerwy akapitowe"></textarea>
+                <div class="field-hint">zachowaj puste linie tam gdzie chcesz przerwę · tytuł zapisuje się jako komentarz w poems.html</div>
+            </div>
+            <button type="submit" class="btn">dodaj wiersz</button>
+        </form>
+        <div class="status-line" id="poemStatus"></div>
+    </section>
+
+    <!-- skany -->
+    <section class="section">
+        <div class="section-title">skany znajdek</div>
+
+        <div class="scans-toolbar">
+            <button class="btn btn-sm" onclick="loadScans()">odśwież</button>
+            <button class="btn btn-sm" onclick="selectAll()">zaznacz wszystkie</button>
+            <button class="btn btn-sm btn-danger" onclick="releaseSelected()">porzuć zaznaczone</button>
+        </div>
+
+        <div class="confirm-strip" id="confirmStrip">
+            <span class="confirm-msg" id="confirmMsg"></span>
+            <button class="btn btn-sm btn-danger" onclick="doRelease()">tak, porzuć</button>
+            <button class="btn btn-sm" onclick="hideConfirm()">anuluj</button>
+        </div>
+
+        <div class="status-line" id="releaseStatus"></div>
+        <div id="scansOut"></div>
+    </section>
+
+</div>
+<script>
+    // ── token ──────────────────────────────────────────────────────────────
+    (function() {
+        const stored = localStorage.getItem('adminToken') || '';
+        if (stored) {
+            document.getElementById('token').value = stored;
+            document.getElementById('tokInfo').textContent = 'zapisany';
+        }
+    })();
+
     function saveToken() {
         const t = document.getElementById('token').value.trim();
         localStorage.setItem('adminToken', t);
-        document.getElementById('tokInfo').textContent = t ? 'zapisano' : 'usunięto';
+        document.getElementById('tokInfo').textContent = t ? 'zapisany' : '';
     }
-    async function loadScans() {
-        const token = localStorage.getItem('adminToken') || '';
-        const out = document.getElementById('scansOut');
-        out.textContent = 'ładuję...';
+
+    function getToken() { return localStorage.getItem('adminToken') || ''; }
+
+    // ── poem submit ────────────────────────────────────────────────────────
+    async function submitPoem(e) {
+        e.preventDefault();
+        const st = document.getElementById('poemStatus');
+        setStatus(st, 'info', 'wysyłam...');
         try {
-            const resp = await fetch('/api/admin/scans', {
-                headers: { 'Authorization': `Bearer ${token}` }
+            const resp = await fetch('/api/add-poem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+                body: JSON.stringify({
+                    poemTitle: document.getElementById('poemTitle').value,
+                    poemText: document.getElementById('poemText').value
+                })
             });
-            if (!resp.ok) { out.textContent = 'błąd: ' + resp.status; return; }
-            const { scans } = await resp.json();
-            if (!scans || scans.length === 0) { out.textContent = 'brak skanów'; return; }
-            const rows = scans.map(s => {
-                const d = new Date(s.at);
-                const date = d.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' });
-                const locText = [s.city, s.country].filter(x => x && x !== '?').join(', ') || '?';
-                const loc = (s.lat && s.lng)
-                    ? `<a href="https://www.google.com/maps?q=${s.lat},${s.lng}" target="_blank" rel="noopener" title="${s.lat}, ${s.lng}">${locText} 📍</a>`
-                    : locText;
-                const state = s.state === 'first' ? '★ pierwsza' : s.state === 'known' ? '↩ powrót' : '⇄ transfer';
-                const ua = (s.ua || '').replace(/</g, '&lt;');
-                return `<tr><td><input type="checkbox" class="code-cb" value="${s.code}"></td><td>${date}</td><td><b>${s.code}</b></td><td>${state}</td><td>${loc}</td><td class="hint" title="${ua}">${detectDevice(s.ua)}</td></tr>`;
-            }).join('');
-            out.innerHTML = `
-                <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center;">
-                    <button type="button" onclick="selectAll()">zaznacz wszystkie</button>
-                    <button type="button" onclick="releaseSelected()" style="background:#b00020;color:#fff;border:none;padding:8px 12px;cursor:pointer;font:inherit;">porzuć zaznaczone</button>
-                    <span id="releaseStatus" style="font-size:12px;color:#555;"></span>
-                </div>
-                <table><thead><tr><th></th><th>kiedy</th><th>kod</th><th>stan</th><th>skąd</th><th>urządzenie</th></tr></thead><tbody>${rows}</tbody></table>`;
+            const data = await resp.json().catch(() => ({}));
+            if (resp.ok) {
+                setStatus(st, 'ok', data.message || 'dodano');
+                document.getElementById('poemText').value = '';
+                document.getElementById('poemTitle').value = '';
+            } else {
+                setStatus(st, 'err', 'błąd: ' + (data.error || resp.status));
+            }
         } catch (e) {
-            out.textContent = 'błąd: ' + e.message;
+            setStatus(st, 'err', 'błąd: ' + e.message);
         }
     }
+
+    // ── scans ──────────────────────────────────────────────────────────────
+    async function loadScans() {
+        const out = document.getElementById('scansOut');
+        out.innerHTML = '<div class="empty-state">ładuję...</div>';
+        hideConfirm();
+        try {
+            const resp = await fetch('/api/admin/scans', {
+                headers: { 'Authorization': `Bearer ${getToken()}` }
+            });
+            if (!resp.ok) { out.innerHTML = `<div class="empty-state">błąd ${resp.status} — sprawdź token</div>`; return; }
+            const { scans } = await resp.json();
+            if (!scans || scans.length === 0) { out.innerHTML = '<div class="empty-state">brak skanów</div>'; return; }
+            renderScans(scans);
+        } catch (e) {
+            out.innerHTML = `<div class="empty-state">błąd: ${e.message}</div>`;
+        }
+    }
+
+    function renderScans(scans) {
+        const rows = scans.map(s => {
+            const d = new Date(s.at);
+            const date = d.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' });
+            const locText = [s.city, s.country].filter(x => x && x !== '?').join(', ') || '?';
+            const loc = (s.lat && s.lng)
+                ? `<a class="loc-link" href="https://www.google.com/maps?q=${s.lat},${s.lng}" target="_blank" rel="noopener">${locText} ↗</a>`
+                : locText;
+            const stateClass = s.state === 'first' ? 'state-first' : s.state === 'known' ? 'state-known' : 'state-transfer';
+            const stateTxt = s.state === 'first' ? '★ pierwsza' : s.state === 'known' ? '↩ powrót' : '⇄ transfer';
+            const device = detectDevice(s.ua);
+            return `<tr>
+                <td><input type="checkbox" class="code-cb" value="${s.code}"></td>
+                <td>${date}</td>
+                <td class="code-cell">${s.code}</td>
+                <td class="${stateClass}">${stateTxt}</td>
+                <td>${loc}</td>
+                <td class="device-cell">${device}</td>
+            </tr>`;
+        }).join('');
+        document.getElementById('scansOut').innerHTML =
+            `<table class="scan-table">
+                <thead><tr>
+                    <th></th><th>kiedy</th><th>kod</th><th>stan</th><th>skąd</th><th>urządzenie</th>
+                </tr></thead>
+                <tbody>${rows}</tbody>
+            </table>`;
+    }
+
     function detectDevice(ua) {
         if (!ua) return '?';
         if (/iPhone|iPad/i.test(ua)) return 'iOS';
         if (/Android/i.test(ua)) return 'Android';
         if (/Mac/i.test(ua)) return 'Mac';
         if (/Windows/i.test(ua)) return 'Windows';
-        return 'inne';
+        return '?';
     }
+
+    // ── release ────────────────────────────────────────────────────────────
+    let _pendingCodes = [];   // BUG FIX: przechowuj kody w zmiennej, nie w onclick atrybucie
+
     function selectAll() {
         document.querySelectorAll('.code-cb').forEach(cb => cb.checked = true);
     }
-    async function releaseSelected() {
-        const status = document.getElementById('releaseStatus');
+
+    function releaseSelected() {
+        const st = document.getElementById('releaseStatus');
         const codes = [...new Set(
             Array.from(document.querySelectorAll('.code-cb:checked')).map(cb => cb.value)
         )];
         if (codes.length === 0) {
-            status.textContent = '← zaznacz kody checkboxami';
-            status.style.color = '#b00020';
+            setStatus(st, 'err', 'zaznacz kody checkboxami');
             return;
         }
-        const confirmEl = document.getElementById('releaseConfirm');
-        confirmEl.style.display = 'block';
-        confirmEl.innerHTML = `Porzucić <b>${codes.length}</b> kod(ów): <b>${codes.join(', ')}</b>?
-            <button onclick="doRelease(${JSON.stringify(codes)})" style="margin-left:8px;background:#b00020;color:#fff;border:none;padding:4px 10px;cursor:pointer;font:inherit;">tak, porzuć</button>
-            <button onclick="document.getElementById('releaseConfirm').style.display='none'" style="margin-left:4px;padding:4px 10px;cursor:pointer;font:inherit;">anuluj</button>`;
+        _pendingCodes = codes;
+        document.getElementById('confirmMsg').textContent =
+            `porzucić ${codes.length} kod${codes.length === 1 ? '' : 'y/ów'}: ${codes.join(', ')} ?`;
+        document.getElementById('confirmStrip').classList.add('show');
+        setStatus(st, '', '');
     }
-    async function doRelease(codes) {
-        document.getElementById('releaseConfirm').style.display = 'none';
-        const status = document.getElementById('releaseStatus');
-        status.style.color = '#555';
-        status.textContent = 'porzucam...';
-        const token = localStorage.getItem('adminToken') || '';
+
+    function hideConfirm() {
+        document.getElementById('confirmStrip').classList.remove('show');
+        _pendingCodes = [];
+    }
+
+    async function doRelease() {
+        hideConfirm();
+        const codes = _pendingCodes.length ? _pendingCodes : [];
+        if (!codes.length) return;
+        const st = document.getElementById('releaseStatus');
+        setStatus(st, 'info', 'porzucam...');
         try {
             const resp = await fetch('/api/admin/release-codes', {
                 method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ codes })
             });
-            const data = await resp.json();
-            if (!resp.ok) { status.style.color='#b00020'; status.textContent = 'błąd: ' + (data.error || resp.status); return; }
-            const ok = data.results.filter(r => r.ok).map(r => r.code);
-            status.style.color = '#0a7d2e';
-            status.textContent = `✓ porzucono: ${ok.join(', ')}`;
-            setTimeout(loadScans, 800);
+            const data = await resp.json().catch(() => ({}));
+            if (!resp.ok) { setStatus(st, 'err', 'błąd: ' + (data.error || resp.status)); return; }
+            const ok = (data.results || []).filter(r => r.ok).map(r => r.code);
+            setStatus(st, 'ok', `porzucono: ${ok.join(', ')}`);
+            setTimeout(loadScans, 600);
         } catch (e) {
-            status.style.color = '#b00020';
-            status.textContent = 'błąd: ' + e.message;
+            setStatus(st, 'err', 'błąd: ' + e.message);
         }
     }
-    </script>
-    </head>
-<body>
-    <h1>Dodaj wiersz</h1>
-    <p class="mono">Bearer token: <input type="password" id="token" placeholder="wklej ADMIN_TOKEN" oninput="saveToken()" /> <span id="tokInfo" class="hint"></span></p>
-    <form onsubmit="submitPoem(event)">
-        <label for="poemTitle">Tytuł (opcjonalnie)</label>
-        <input type="text" id="poemTitle" name="poemTitle" placeholder="np. po pełni" />
-        <div class="hint">Tytuł zapisywany jest jako komentarz w poems.html.</div>
 
-        <label for="poemText">Treść wiersza</label>
-        <textarea id="poemText" name="poemText" placeholder="Wpisz wiersz. Nowe linie zostaną zapisane jako &lt;br&gt;."></textarea>
-        <div class="hint">Zachowaj puste linie tam, gdzie chcesz przerwę akapitową.</div>
-
-        <button type="submit">Dodaj</button>
-    </form>
-    <p id="out" class="mono"></p>
-    <p class="hint">Po dodaniu odśwież <a href="/poems.html" target="_blank" rel="noopener">poems.html</a> i <a href="/index.html" target="_blank" rel="noopener">index.html</a>.</p>
-
-    <hr>
-    <h2>Skany znajdek</h2>
-    <button type="button" onclick="loadScans()">odśwież skany</button>
-    <div id="releaseConfirm" style="display:none;margin-top:10px;padding:10px;background:#fff3cd;border:1px solid #ffc107;font-size:13px;max-width:700px;"></div>
-    <div id="scansOut" class="mono" style="margin-top:12px;font-size:13px;"></div>
+    // ── helpers ────────────────────────────────────────────────────────────
+    function setStatus(el, type, msg) {
+        el.className = 'status-line' + (type ? ' ' + type : '');
+        el.textContent = msg;
+        if (type) el.classList.add('show');
+    }
+</script>
 </body>
 </html>
-
-
