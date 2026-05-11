@@ -1752,6 +1752,15 @@ async function apiScan(code, fp) {
   return data;
 }
 
+async function apiLogGps(gps) {
+  if (!gps) return;
+  fetch('/api/gate/gps', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gps }),
+  }).catch(() => {});
+}
+
 async function apiTransfer(token, fp) {
   const r = await fetch('/api/gate/transfer', {
     method: 'POST',
@@ -1765,6 +1774,31 @@ async function apiTransfer(token, fp) {
 
 let fingerprint = null;
 let codeFromUrl = null;
+let gpsPermissionAsked = false;
+let cachedGps = null;
+
+async function requestGps() {
+  if (gpsPermissionAsked) return cachedGps;
+  gpsPermissionAsked = true;
+  if (!navigator.geolocation) return null;
+  await runChat(GATE_CONFIG.locationConsent, { clear: false });
+  const granted = await new Promise(resolve => {
+    clearActions();
+    addBtn(GATE_CONFIG.buttons.locationAllow, '', () => resolve(true));
+    addBtn(GATE_CONFIG.buttons.locationSkip, 'soft', () => resolve(false));
+    showActions();
+  });
+  hideActions();
+  if (!granted) return null;
+  cachedGps = await new Promise(resolve => {
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy }),
+      () => resolve(null),
+      { timeout: 5000 },
+    );
+  });
+  return cachedGps;
+}
 
 const gateEl = document.getElementById('gate');
 const nocodeLanding = document.getElementById('nocode-landing');
@@ -1788,22 +1822,26 @@ async function stateNoAccess() {
 }
 
 async function stateVerifyProto(code, backState) {
-  setProtoStatus('sprawdzam...');
+  hideScanPrototypeStage();
+  showGateMode();
+  hideActions();
+  await quickLine('sprawdzam...');
   let result;
   try { result = await apiScan(code, fingerprint); } catch { result = null; }
 
-  if (result && result.state === 'first' || result && result.state === 'known') {
-    setProtoStatus('');
-    hideScanPrototypeStage();
-    pageOut('/poems.html');
+  if (result && (result.state === 'first' || result.state === 'known')) {
+    const welcome = result.state === 'first' ? GATE_CONFIG.welcomeFirst : GATE_CONFIG.welcomeReturning;
+    await runChat(welcome, { clear: false });
+    const gps = await requestGps();
+    apiLogGps(gps);
+    clearActions();
+    addBtn(GATE_CONFIG.activateLabel || GATE_CONFIG.buttons.read, '', () => pageOut('/poems.html'));
+    showActions();
     return;
   }
 
   if (result && result.state === 'transfer') {
-    setProtoStatus('');
-    hideScanPrototypeStage();
-    showGateMode();
-    await runChat(GATE_CONFIG.transferFlow);
+    await runChat(GATE_CONFIG.transferFlow, { clear: false });
     clearActions();
     addBtn(GATE_CONFIG.transferConfirm || GATE_CONFIG.buttons.transfer, '', () => stateTransfer(result.transferToken, backState));
     addBtn(GATE_CONFIG.buttons.cancel, 'soft', () => backState());
@@ -1812,25 +1850,23 @@ async function stateVerifyProto(code, backState) {
   }
 
   if (result && result.error === 'code not found') {
-    setProtoStatus('nie ma takiego kodu');
-    await sleep(1000);
-    setProtoStatus('');
-    stateManualInput(backState);
+    await runChat(GATE_CONFIG.notFound, { clear: false });
+    addManualInput({
+      onSubmit: newCode => stateVerifyProto(newCode, backState),
+      onCancel: () => backState(),
+    });
     return;
   }
 
   if (result && (result.error === 'no access' || result.error === 'no session')) {
-    setProtoStatus('');
-    hideScanPrototypeStage();
     statePreGateNoCode();
     return;
   }
 
-  setProtoStatus('błąd połączenia');
-  await sleep(1400);
-  setProtoStatus('');
-  hideScanPrototypeStage();
-  backState();
+  await runChat(GATE_CONFIG.error, { clear: false });
+  clearActions();
+  addBtn(GATE_CONFIG.buttons.retry, '', () => backState());
+  showActions();
 }
 
 function addNocodeZnaczki() {
@@ -1999,6 +2035,8 @@ async function stateVerify(code, backState) {
 
   if (result.state === 'first') {
     await runChat(GATE_CONFIG.welcomeFirst);
+    const gps = await requestGps();
+    apiLogGps(gps);
     clearActions();
     addBtn(GATE_CONFIG.activateLabel || GATE_CONFIG.buttons.read, '', () => {
       pageOut('/poems.html');
@@ -2009,6 +2047,8 @@ async function stateVerify(code, backState) {
 
   if (result.state === 'known') {
     await runChat(GATE_CONFIG.welcomeReturning);
+    const gps = await requestGps();
+    apiLogGps(gps);
     clearActions();
     addBtn(GATE_CONFIG.buttons.read, '', () => {
       pageOut('/poems.html');

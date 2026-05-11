@@ -2,18 +2,7 @@
 
 const kv = require('../_lib/kv.js');
 const { verify } = require('../_lib/jwt.js');
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-function parseCookies(header) {
-  const out = {};
-  if (!header) return out;
-  for (const part of header.split(';')) {
-    const [k, ...v] = part.trim().split('=');
-    if (k) out[k.trim()] = v.join('=');
-  }
-  return out;
-}
+const { parseCookies } = require('../_lib/cookies.js');
 
 function clearCookie(res) {
   res.setHeader(
@@ -23,6 +12,7 @@ function clearCookie(res) {
 }
 
 module.exports = async function handler(req, res) {
+  const JWT_SECRET = process.env.JWT_SECRET;
   if (req.method !== 'POST') return res.status(405).end();
   if (!JWT_SECRET) return res.status(500).json({ error: 'server misconfigured' });
 

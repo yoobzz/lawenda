@@ -1,20 +1,10 @@
 'use strict';
 
 const { verify } = require('../_lib/jwt.js');
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-function parseCookies(header) {
-  const out = {};
-  if (!header) return out;
-  for (const part of header.split(';')) {
-    const [k, ...v] = part.trim().split('=');
-    if (k) out[k.trim()] = v.join('=');
-  }
-  return out;
-}
+const { parseCookies } = require('../_lib/cookies.js');
 
 module.exports = async function handler(req, res) {
+  const JWT_SECRET = process.env.JWT_SECRET;
   if (req.method !== 'GET') return res.status(405).end();
   if (!JWT_SECRET) return res.json({ valid: false });
 
