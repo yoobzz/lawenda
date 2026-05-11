@@ -1741,15 +1741,24 @@ async function scanQR(onCode, scanToken) {
   intervalId = setInterval(tick, 180);
 }
 
-async function apiScan(code, fp, gps) {
+async function apiScan(code, fp) {
   const r = await fetch('/api/gate/scan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code, fingerprint: fp, gps: gps || undefined }),
+    body: JSON.stringify({ code, fingerprint: fp }),
   });
   const data = await r.json().catch(() => null);
   if (!r.ok && !data) throw new Error('scan request failed');
   return data;
+}
+
+async function apiLogGps(gps) {
+  if (!gps) return;
+  fetch('/api/gate/gps', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ gps }),
+  }).catch(() => {});
 }
 
 async function apiTransfer(token, fp) {
@@ -1816,13 +1825,18 @@ async function stateVerifyProto(code, backState) {
   hideScanPrototypeStage();
   showGateMode();
   hideActions();
-  const gps = await requestGps();
   await quickLine('sprawdzam...');
   let result;
-  try { result = await apiScan(code, fingerprint, gps); } catch { result = null; }
+  try { result = await apiScan(code, fingerprint); } catch { result = null; }
 
   if (result && (result.state === 'first' || result.state === 'known')) {
-    pageOut('/poems.html');
+    const welcome = result.state === 'first' ? GATE_CONFIG.welcomeFirst : GATE_CONFIG.welcomeReturning;
+    await runChat(welcome, { clear: false });
+    const gps = await requestGps();
+    apiLogGps(gps);
+    clearActions();
+    addBtn(GATE_CONFIG.activateLabel || GATE_CONFIG.buttons.read, '', () => pageOut('/poems.html'));
+    showActions();
     return;
   }
 
@@ -1991,11 +2005,10 @@ async function stateVerify(code, backState) {
   await stopCamera();
   showGateMode();
   hideActions();
-  const gps = await requestGps();
   await quickLine('sprawdzam...');
   let result;
   try {
-    result = await apiScan(code, fingerprint, gps);
+    result = await apiScan(code, fingerprint);
   } catch {
     result = null;
   }
@@ -2022,6 +2035,8 @@ async function stateVerify(code, backState) {
 
   if (result.state === 'first') {
     await runChat(GATE_CONFIG.welcomeFirst);
+    const gps = await requestGps();
+    apiLogGps(gps);
     clearActions();
     addBtn(GATE_CONFIG.activateLabel || GATE_CONFIG.buttons.read, '', () => {
       pageOut('/poems.html');
@@ -2032,6 +2047,8 @@ async function stateVerify(code, backState) {
 
   if (result.state === 'known') {
     await runChat(GATE_CONFIG.welcomeReturning);
+    const gps = await requestGps();
+    apiLogGps(gps);
     clearActions();
     addBtn(GATE_CONFIG.buttons.read, '', () => {
       pageOut('/poems.html');
