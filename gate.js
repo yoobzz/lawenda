@@ -9,10 +9,10 @@ const cameraCancel = document.getElementById('camera-cancel');
 const scanSymbolsEl = document.getElementById('scan-symbols');
 const manualScanHintEl = document.getElementById('manual-scan-hint');
 const scanFlashEl = document.getElementById('scan-flash');
+const vignetteEl = document.querySelector('.vignette');
 let scanPrototypeStageEl = document.getElementById('scan-prototype-stage');
 let scanPrototypeGridEl = document.getElementById('scan-prototype-grid');
 let scanPrototypeSeedEl = document.getElementById('scan-prototype-seed');
-let scanPrototypeStarEl = document.getElementById('scan-prototype-star');
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -30,6 +30,12 @@ const SCAN_PROTO_QR_POOL = ['*', '+', '=', '^', '|', '~', ':', ';'];
 const SCAN_PROTO_FRAME_MARGIN_PX = 102;
 const SCAN_PROTO_FRAME_LINES = ['znaczy znaczek', 'swoje znajdki', 'tak oddaje', 'przeznaczenie'];
 const SCAN_PROTO_FRAME_ROTATE_MS = 1000;
+const SCAN_PROTO_PULSE_EVERY_N_ROTATIONS = 2;
+const SCAN_PROTO_PULSE_DURATION_MS = 460;
+const SCAN_PROTO_PULSE_MAX_DELAY_MS_NORMAL = 140;
+const SCAN_PROTO_PULSE_MAX_DELAY_MS_STRONG = 220;
+const SCAN_PROTO_PULSE_MAX_CELLS_TOUCH = 36;
+const SCAN_PROTO_PULSE_MAX_CELLS_DESKTOP = 64;
 const SCAN_PROTO_QR_GLYPH_FONT_SIZE = '102%';
 const SCAN_PROTO_QR_SIZE_SCALE = 0.78;
 const SCAN_PROTO_GLITCH_POOL = ['<', '>', '|', '/', '\\', '_', '^', ':', ';', '*', '+', '='];
@@ -124,6 +130,9 @@ let scanPrototypeFrameEl = null;
 let scanPrototypeTopTextTimer = null;
 let scanPrototypeTremorTimeouts = [];
 let scanPrototypeLastQrViewportRect = null;
+let scanPrototypePulsePlan = null;
+let scanPrototypeFrameRotationTick = 0;
+let scanPrototypePulseRunning = false;
 let cameraOverlayRect = null;
 let cameraOverlayFrameEl = null;
 let cameraOverlayFrameTimer = null;
@@ -362,6 +371,9 @@ function clearFlowingQrFrame() {
     scanPrototypeFrameEl.parentNode.removeChild(scanPrototypeFrameEl);
   }
   scanPrototypeFrameEl = null;
+  scanPrototypePulsePlan = null;
+  scanPrototypeFrameRotationTick = 0;
+  scanPrototypePulseRunning = false;
 }
 
 function hideScanPrototypeStage() {
@@ -371,11 +383,17 @@ function hideScanPrototypeStage() {
   if (protoCloseBtn) protoCloseBtn.style.display = 'none';
   scanPrototypeActive = false;
   clearFlowingQrFrame();
-  if (scanPrototypeStarEl) scanPrototypeStarEl.classList.remove('show');
   if (scanPrototypeStageEl) {
     scanPrototypeStageEl.style.display = 'none';
     scanPrototypeStageEl.style.opacity = '';
     scanPrototypeStageEl.classList.remove('active', 'camera-mode');
+    scanPrototypeStageEl.setAttribute('aria-hidden', 'true');
+  }
+  if (scanPrototypeGridEl) {
+    scanPrototypeGridEl.classList.remove('scan-prototype-grid-actionable');
+    scanPrototypeGridEl.removeAttribute('role');
+    scanPrototypeGridEl.removeAttribute('aria-label');
+    scanPrototypeGridEl.tabIndex = -1;
   }
 }
 
@@ -391,6 +409,7 @@ function showProtoManualInput({ prompt = '', onSubmit, onCancel }) {
     scanPrototypeStageEl.style.display = 'block';
     scanPrototypeStageEl.classList.add('active');
     scanPrototypeStageEl.style.opacity = '1';
+    scanPrototypeStageEl.removeAttribute('aria-hidden');
   }
   const container = document.getElementById('proto-manual');
   const promptEl   = document.getElementById('proto-manual-prompt');
@@ -443,28 +462,8 @@ function getScanPrototypeQrViewportRect(startRow, startCol, side) {
   return { x: left, y: top, w: size, h: size };
 }
 
-function positionScanPrototypeStar(startRow, startCol, side) {
-  if (!scanPrototypeStarEl || !scanPrototypeStageEl || !scanPrototypeGridEl) return;
-  const gridRect = scanPrototypeGridEl.getBoundingClientRect();
-  const stageRect = scanPrototypeStageEl.getBoundingClientRect();
-  const centerX = (startCol + side / 2) * scanPrototypeCellSize;
-  const centerY = (startRow + side / 2) * scanPrototypeCellSize;
-  const left = Math.round(gridRect.left - stageRect.left + centerX);
-  const top = Math.round(gridRect.top - stageRect.top + centerY);
-  scanPrototypeStarEl.style.left = `${left}px`;
-  scanPrototypeStarEl.style.top = `${top}px`;
-  scanPrototypeStarEl.dataset.baseLeft = String(left);
-  scanPrototypeStarEl.dataset.baseTop = String(top);
-  scanPrototypeStarEl.style.bottom = 'auto';
-  scanPrototypeStarEl.style.transform = 'translate(-50%, -50%)';
-}
-
 function animateScanPrototypeStarCover(qrRect) {
   if (!scanPrototypeStageEl) return Promise.resolve();
-  if (scanPrototypeStarEl) {
-    scanPrototypeStarEl.style.animation = 'none';
-    scanPrototypeStarEl.style.pointerEvents = 'none';
-  }
   const stageRect = scanPrototypeStageEl.getBoundingClientRect();
   const defaultSize = Math.min(window.innerWidth, window.innerHeight) * 0.26;
   const size = qrRect ? Math.min(qrRect.w, qrRect.h) : defaultSize;
@@ -510,7 +509,6 @@ function animateScanPrototypeStarCover(qrRect) {
 
   return new Promise(resolve => {
     if (typeof gsap === 'undefined') {
-      if (scanPrototypeStarEl) scanPrototypeStarEl.style.opacity = '0';
       setTimeout(() => {
         if (transitionBox.parentNode) transitionBox.parentNode.removeChild(transitionBox);
         resolve();
@@ -554,22 +552,7 @@ function animateScanPrototypeStarCover(qrRect) {
         ease: 'power2.out',
       }, '>-0.01')
       .to(transitionBox, { opacity: 0, duration: 0.08, ease: 'none' }, '>-0.02');
-    if (scanPrototypeStarEl) {
-      gsap.to(scanPrototypeStarEl, { opacity: 0, duration: 0.16, ease: 'power1.out' });
-    }
   });
-}
-
-function resetScanPrototypeStarShape() {
-  if (!scanPrototypeStarEl) return;
-  scanPrototypeStarEl.style.animation = '';
-  scanPrototypeStarEl.style.opacity = '';
-  scanPrototypeStarEl.style.rotate = '';
-  scanPrototypeStarEl.style.width = '';
-  scanPrototypeStarEl.style.height = '';
-  scanPrototypeStarEl.style.transform = 'translate(-50%, -50%)';
-  scanPrototypeStarEl.style.filter = '';
-  scanPrototypeStarEl.style.clipPath = '';
 }
 
 function applyCameraOverlayRect(rect) {
@@ -721,64 +704,94 @@ function applyCameraOverlayVisuals(rect) {
 
 function tremorQrChars(cells, opts = {}) {
   if (!scanPrototypeActive || !cells?.length || scanPrototypeQrLockedIndexes.size === 0) return;
+  if (scanPrototypePulseRunning) return;
   const { strong = false } = opts;
-  const locked = Array.from(scanPrototypeQrLockedIndexes);
-  for (let i = locked.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [locked[i], locked[j]] = [locked[j], locked[i]];
-  }
-  const ratio = strong
-    ? 0.52 + Math.random() * 0.26
-    : 0.24 + Math.random() * 0.28;
-  const subsetSize = Math.min(locked.length, Math.max(14, Math.floor(locked.length * ratio)));
-  const subset = locked.slice(0, subsetSize);
-  const waves = strong
-    ? 4 + Math.floor(Math.random() * 3)
-    : 2 + Math.floor(Math.random() * 3);
-  let delayAcc = 0;
+  const touchLike = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const maxCells = touchLike ? SCAN_PROTO_PULSE_MAX_CELLS_TOUCH : SCAN_PROTO_PULSE_MAX_CELLS_DESKTOP;
+  const lockedCount = scanPrototypeQrLockedIndexes.size;
 
-  for (let wave = 0; wave < waves; wave += 1) {
-    delayAcc += 18 + Math.floor(Math.random() * 34);
-    const timeoutId = setTimeout(() => {
-      if (!scanPrototypeActive) return;
-      const shift = strong ? 2.2 : 1.35;
-      const rotRange = strong ? 8.5 : 5.5;
-      for (const idx of subset) {
-        const cell = cells[idx];
-        if (!cell) continue;
-        const dx = (Math.random() - 0.5) * shift;
-        const dy = (Math.random() - 0.5) * shift;
-        const rot = (Math.random() - 0.5) * rotRange;
-        cell.style.transform = `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) rotate(${rot.toFixed(2)}deg)`;
+  if (!scanPrototypePulsePlan || scanPrototypePulsePlan.lockedCount !== lockedCount) {
+    const locked = Array.from(scanPrototypeQrLockedIndexes).filter(idx => cells[idx]);
+    if (!locked.length) return;
+
+    const points = locked.map(idx => {
+      const row = Math.floor(idx / scanPrototypeGridCols);
+      const col = idx % scanPrototypeGridCols;
+      return { idx, row, col };
+    });
+    const centerRow = points.reduce((sum, p) => sum + p.row, 0) / points.length;
+    const centerCol = points.reduce((sum, p) => sum + p.col, 0) / points.length;
+    const byDistance = points
+      .map(p => {
+        const dr = p.row - centerRow;
+        const dc = p.col - centerCol;
+        return { idx: p.idx, distance: Math.sqrt(dr * dr + dc * dc) };
+      })
+      .sort((a, b) => a.distance - b.distance);
+
+    const cap = Math.min(maxCells, byDistance.length);
+    const sampled = [];
+    if (cap === byDistance.length) {
+      sampled.push(...byDistance);
+    } else {
+      const step = (byDistance.length - 1) / Math.max(1, cap - 1);
+      const used = new Set();
+      for (let i = 0; i < cap; i += 1) {
+        const pick = Math.round(i * step);
+        if (used.has(pick)) continue;
+        used.add(pick);
+        sampled.push(byDistance[pick]);
       }
-      if (scanPrototypeStarEl) {
-        const baseLeft = Number(scanPrototypeStarEl.dataset.baseLeft || scanPrototypeStarEl.style.left.replace('px', ''));
-        const baseTop = Number(scanPrototypeStarEl.dataset.baseTop || scanPrototypeStarEl.style.top.replace('px', ''));
-        if (Number.isFinite(baseLeft) && Number.isFinite(baseTop)) {
-          const starShift = strong ? 2.6 : 1.6;
-          const sx = (Math.random() - 0.5) * starShift;
-          const sy = (Math.random() - 0.5) * starShift;
-          scanPrototypeStarEl.style.left = `${(baseLeft + sx).toFixed(2)}px`;
-          scanPrototypeStarEl.style.top = `${(baseTop + sy).toFixed(2)}px`;
-        }
-      }
-    }, delayAcc);
-    scanPrototypeTremorTimeouts.push(timeoutId);
+    }
+
+    const maxDistance = Math.max(1, ...sampled.map(item => item.distance));
+    scanPrototypePulsePlan = {
+      lockedCount,
+      items: sampled.map(item => ({
+        idx: item.idx,
+        ratio: item.distance / maxDistance,
+      })),
+    };
+    for (const item of scanPrototypePulsePlan.items) {
+      const cell = cells[item.idx];
+      if (!cell) continue;
+      const delay = Math.round(item.ratio * SCAN_PROTO_PULSE_MAX_DELAY_MS_STRONG);
+      cell.style.setProperty('--scan-proto-pulse-delay', `${delay}ms`);
+    }
   }
+
+  const pulseItems = scanPrototypePulsePlan?.items || [];
+  if (!pulseItems.length) return;
+
+  const maxDelay = strong ? SCAN_PROTO_PULSE_MAX_DELAY_MS_STRONG : SCAN_PROTO_PULSE_MAX_DELAY_MS_NORMAL;
+  const pulseDuration = SCAN_PROTO_PULSE_DURATION_MS;
+  scanPrototypePulseRunning = true;
+  for (const item of pulseItems) {
+    const cell = cells[item.idx];
+    if (!cell) continue;
+    cell.classList.remove('scan-prototype-cell--pulse');
+    const delay = Math.round(item.ratio * maxDelay);
+    cell.style.setProperty('--scan-proto-pulse-delay-active', `${delay}ms`);
+  }
+
+  requestAnimationFrame(() => {
+    if (!scanPrototypeActive) return;
+    for (const item of pulseItems) {
+      const cell = cells[item.idx];
+      if (!cell) continue;
+      cell.classList.add('scan-prototype-cell--pulse');
+    }
+  });
 
   const clearTimeoutId = setTimeout(() => {
-    for (const idx of subset) {
-      const cell = cells[idx];
+    for (const item of pulseItems) {
+      const cell = cells[item.idx];
       if (!cell) continue;
-      cell.style.transform = '';
+      cell.classList.remove('scan-prototype-cell--pulse');
+      cell.style.removeProperty('--scan-proto-pulse-delay-active');
     }
-    if (scanPrototypeStarEl) {
-      const baseLeft = Number(scanPrototypeStarEl.dataset.baseLeft || scanPrototypeStarEl.style.left.replace('px', ''));
-      const baseTop = Number(scanPrototypeStarEl.dataset.baseTop || scanPrototypeStarEl.style.top.replace('px', ''));
-      if (Number.isFinite(baseLeft)) scanPrototypeStarEl.style.left = `${baseLeft}px`;
-      if (Number.isFinite(baseTop)) scanPrototypeStarEl.style.top = `${baseTop}px`;
-    }
-  }, delayAcc + 90 + Math.floor(Math.random() * 70));
+    scanPrototypePulseRunning = false;
+  }, pulseDuration + maxDelay + 40);
   scanPrototypeTremorTimeouts.push(clearTimeoutId);
 }
 
@@ -894,7 +907,10 @@ function createFlowingQrFrame(startRow, startCol, side, cells) {
     if (!scanPrototypeFrameEl || !scanPrototypeFrameEl.isConnected) return;
     rotateOffset = (rotateOffset + 1) % SCAN_PROTO_FRAME_LINES.length;
     applyRotatingEdgeTexts(rotateOffset);
-    tremorQrChars(cells, { strong: false });
+    scanPrototypeFrameRotationTick += 1;
+    if (scanPrototypeFrameRotationTick % SCAN_PROTO_PULSE_EVERY_N_ROTATIONS === 0) {
+      tremorQrChars(cells, { strong: false });
+    }
   }, SCAN_PROTO_FRAME_ROTATE_MS);
 
   function makeCorner(x, y) {
@@ -972,13 +988,6 @@ function ensureScanPrototypeDom() {
     scanPrototypeSeedEl.id = 'scan-prototype-seed';
     scanPrototypeStageEl.appendChild(scanPrototypeSeedEl);
   }
-  if (!scanPrototypeStarEl) {
-    scanPrototypeStarEl = document.createElement('button');
-    scanPrototypeStarEl.id = 'scan-prototype-star';
-    scanPrototypeStarEl.type = 'button';
-    scanPrototypeStarEl.setAttribute('aria-label', 'przejdź do skanowania');
-    scanPrototypeStageEl.appendChild(scanPrototypeStarEl);
-  }
 
   scanPrototypeStageEl.style.display = 'none';
   scanPrototypeStageEl.style.position = 'fixed';
@@ -1001,6 +1010,7 @@ function ensureScanPrototypeDom() {
   scanPrototypeGridEl.style.pointerEvents = 'auto';
   scanPrototypeGridEl.style.justifyItems = 'center';
   scanPrototypeGridEl.style.alignItems = 'center';
+  scanPrototypeGridEl.tabIndex = -1;
 
   scanPrototypeSeedEl.style.position = 'absolute';
   scanPrototypeSeedEl.style.left = '50%';
@@ -1069,6 +1079,7 @@ function buildScanPrototypeGrid(qrMatrix) {
   for (let i = 0; i < total; i += 1) {
     const span = document.createElement('span');
     span.className = 'scan-prototype-cell';
+    span.dataset.idx = String(i);
     span.textContent = pool[i % pool.length];
     span.style.opacity = '0';
     span.style.color = SCAN_PROTO_NOISE_COLOR;
@@ -1090,6 +1101,54 @@ function buildScanPrototypeGrid(qrMatrix) {
   return cells;
 }
 
+function waitForScanPrototypeGridActivation(qrRect) {
+  if (!scanPrototypeGridEl) return Promise.resolve({ choice: 'scan', qrRect });
+  scanPrototypeGridEl.classList.add('scan-prototype-grid-actionable');
+  scanPrototypeGridEl.setAttribute('role', 'button');
+  scanPrototypeGridEl.setAttribute('aria-label', 'rozpocznij skanowanie kodu QR');
+  scanPrototypeGridEl.tabIndex = 0;
+  return new Promise(resolve => {
+    const activate = async () => {
+      if (!scanPrototypeGridEl) {
+        resolve({ choice: 'scan', qrRect });
+        return;
+      }
+      scanPrototypeGridEl.classList.remove('scan-prototype-grid-actionable');
+      scanPrototypeGridEl.removeAttribute('role');
+      scanPrototypeGridEl.removeAttribute('aria-label');
+      scanPrototypeGridEl.tabIndex = -1;
+      await animateScanPrototypeStarCover(qrRect);
+      resolve({ choice: 'scan', qrRect });
+    };
+
+    let activated = false;
+    const onClick = e => {
+      if (activated) return;
+      const target = e.target instanceof Element ? e.target.closest('.scan-prototype-cell') : null;
+      if (target) {
+        const idx = Number(target.dataset.idx);
+        if (!Number.isFinite(idx) || !scanPrototypeQrLockedIndexes.has(idx)) return;
+      }
+      activated = true;
+      scanPrototypeGridEl.removeEventListener('click', onClick);
+      scanPrototypeGridEl.removeEventListener('keydown', onKeyDown);
+      activate();
+    };
+    const onKeyDown = e => {
+      if (activated) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      activated = true;
+      scanPrototypeGridEl.removeEventListener('click', onClick);
+      scanPrototypeGridEl.removeEventListener('keydown', onKeyDown);
+      activate();
+    };
+
+    scanPrototypeGridEl.addEventListener('click', onClick);
+    scanPrototypeGridEl.addEventListener('keydown', onKeyDown);
+  });
+}
+
 async function runScanPrototypeStage() {
   ensureScanPrototypeDom();
   if (!scanPrototypeStageEl || !scanPrototypeGridEl || !scanPrototypeSeedEl) return;
@@ -1098,16 +1157,17 @@ async function runScanPrototypeStage() {
   scanPrototypeWordRevealStarted = false;
   scanPrototypeWordLockedIndexes = new Set();
   scanPrototypeQrLockedIndexes = new Set();
+  scanPrototypePulsePlan = null;
+  scanPrototypeFrameRotationTick = 0;
   clearFlowingQrFrame();
 
   scanPrototypeSeedEl.textContent = '';
   scanPrototypeSeedEl.style.opacity = '1';
-  resetScanPrototypeStarShape();
-  if (scanPrototypeStarEl) scanPrototypeStarEl.classList.remove('show');
   scanPrototypeGridEl.innerHTML = '';
   scanPrototypeStageEl.classList.add('active');
   scanPrototypeStageEl.style.display = 'block';
   scanPrototypeStageEl.style.opacity = '1';
+  scanPrototypeStageEl.removeAttribute('aria-hidden');
 
   // faza 1: wpisywanie seed w centrum
   for (const ch of Array.from(SCAN_PROTO_SEED)) {
@@ -1136,7 +1196,6 @@ async function runScanPrototypeStage() {
   // wcześniejsza ramka — pojawia się przed lotem charów
   scanPrototypeLastQrViewportRect = getScanPrototypeQrViewportRect(qrStartRow, qrStartCol, qrSide);
   createFlowingQrFrame(qrStartRow, qrStartCol, qrSide, cells);
-  positionScanPrototypeStar(qrStartRow, qrStartCol, qrSide);
   await sleep(680);
   if (!scanPrototypeActive) return;
 
@@ -1238,22 +1297,9 @@ async function runScanPrototypeStage() {
   await sleep(620);
   if (!scanPrototypeActive) return;
   tremorQrChars(cells, { strong: true });
-  await sleep(1500);
+  await sleep(760);
   if (!scanPrototypeActive) return;
-  if (scanPrototypeStarEl) scanPrototypeStarEl.classList.add('show');
-
-  return await new Promise(resolve => {
-    if (!scanPrototypeStarEl) {
-      resolve({ choice: 'scan', qrRect: scanPrototypeLastQrViewportRect });
-      return;
-    }
-    const onStar = async () => {
-      scanPrototypeStarEl.removeEventListener('click', onStar);
-      await animateScanPrototypeStarCover(scanPrototypeLastQrViewportRect);
-      resolve({ choice: 'scan', qrRect: scanPrototypeLastQrViewportRect });
-    };
-    scanPrototypeStarEl.addEventListener('click', onStar);
-  });
+  return await waitForScanPrototypeGridActivation(scanPrototypeLastQrViewportRect);
 }
 
 function getCodeFromUrl() {
@@ -1752,17 +1798,6 @@ async function apiScan(code, fp) {
   return data;
 }
 
-async function apiTransfer(token, fp) {
-  const r = await fetch('/api/gate/transfer', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ transferToken: token, fingerprint: fp }),
-  });
-  const data = await r.json().catch(() => null);
-  if (!r.ok && !data) throw new Error('transfer request failed');
-  return data;
-}
-
 let fingerprint = null;
 let codeFromUrl = null;
 
@@ -1772,6 +1807,35 @@ const nocodeLine1 = document.getElementById('nocode-line1');
 const nocodeLine2 = document.getElementById('nocode-line2');
 const nocodeSubtitle = document.getElementById('nocode-subtitle');
 const nocodeBtns = document.getElementById('nocode-btns');
+const firstAccessVisualEl = document.getElementById('first-access-visual');
+
+function prefersReducedMotion() {
+  return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
+function nextFrame() {
+  return new Promise(resolve => requestAnimationFrame(() => resolve()));
+}
+
+async function showFirstAccessVisual() {
+  if (!firstAccessVisualEl) {
+    await sleep(1300);
+    return;
+  }
+  const reducedMotion = prefersReducedMotion();
+  firstAccessVisualEl.classList.remove('fade-out', 'visible');
+  firstAccessVisualEl.classList.add('show');
+  firstAccessVisualEl.setAttribute('aria-hidden', 'false');
+  await nextFrame();
+  await nextFrame();
+  firstAccessVisualEl.classList.add('visible');
+  await sleep(reducedMotion ? 760 : 1850);
+  firstAccessVisualEl.classList.remove('visible');
+  firstAccessVisualEl.classList.add('fade-out');
+  await sleep(reducedMotion ? 180 : 460);
+  firstAccessVisualEl.classList.remove('show', 'visible', 'fade-out');
+  firstAccessVisualEl.setAttribute('aria-hidden', 'true');
+}
 
 function showGateMode() {
   gateEl.style.display = '';
@@ -1783,6 +1847,27 @@ function showLandingMode() {
   nocodeLanding.classList.add('active');
 }
 
+function setOwnerNoticeVisual(enabled) {
+  if (!vignetteEl) return;
+  vignetteEl.style.opacity = enabled ? '0' : '';
+}
+
+async function showOwnerNotice(backState) {
+  showGateMode();
+  setOwnerNoticeVisual(true);
+  await runChat(GATE_CONFIG.transferFlow);
+  clearActions();
+  addBtn(GATE_CONFIG.buttons.scanAgain, '', () => {
+    setOwnerNoticeVisual(false);
+    backState();
+  });
+  addBtn(GATE_CONFIG.buttons.findAnother, 'soft', () => {
+    setOwnerNoticeVisual(false);
+    statePreGateNoCode();
+  });
+  showActions();
+}
+
 async function stateNoAccess() {
   return statePreGateNoCode();
 }
@@ -1792,7 +1877,15 @@ async function stateVerifyProto(code, backState) {
   let result;
   try { result = await apiScan(code, fingerprint); } catch { result = null; }
 
-  if (result && result.state === 'first' || result && result.state === 'known') {
+  if (result && result.state === 'first') {
+    setProtoStatus('');
+    hideScanPrototypeStage();
+    await showFirstAccessVisual();
+    pageOut('/poems.html');
+    return;
+  }
+
+  if (result && result.state === 'known') {
     setProtoStatus('');
     hideScanPrototypeStage();
     pageOut('/poems.html');
@@ -1802,12 +1895,7 @@ async function stateVerifyProto(code, backState) {
   if (result && result.state === 'transfer') {
     setProtoStatus('');
     hideScanPrototypeStage();
-    showGateMode();
-    await runChat(GATE_CONFIG.transferFlow);
-    clearActions();
-    addBtn(GATE_CONFIG.transferConfirm || GATE_CONFIG.buttons.transfer, '', () => stateTransfer(result.transferToken, backState));
-    addBtn(GATE_CONFIG.buttons.cancel, 'soft', () => backState());
-    showActions();
+    await showOwnerNotice(backState);
     return;
   }
 
@@ -1966,6 +2054,7 @@ async function stateCameraScan({ returnState, fallbackManualState }) {
 }
 
 async function stateVerify(code, backState) {
+  setOwnerNoticeVisual(false);
   await stopCamera();
   showGateMode();
   hideActions();
@@ -1998,12 +2087,8 @@ async function stateVerify(code, backState) {
   }
 
   if (result.state === 'first') {
-    await runChat(GATE_CONFIG.welcomeFirst);
-    clearActions();
-    addBtn(GATE_CONFIG.activateLabel || GATE_CONFIG.buttons.read, '', () => {
-      pageOut('/poems.html');
-    });
-    showActions();
+    await showFirstAccessVisual();
+    pageOut('/poems.html');
     return;
   }
 
@@ -2018,11 +2103,7 @@ async function stateVerify(code, backState) {
   }
 
   if (result.state === 'transfer') {
-    await runChat(GATE_CONFIG.transferFlow);
-    clearActions();
-    addBtn(GATE_CONFIG.transferConfirm || GATE_CONFIG.buttons.transfer, '', () => stateTransfer(result.transferToken, backState));
-    addBtn(GATE_CONFIG.buttons.cancel, 'soft', () => backState());
-    showActions();
+    await showOwnerNotice(backState);
     return;
   }
 
@@ -2032,34 +2113,8 @@ async function stateVerify(code, backState) {
   showActions();
 }
 
-async function stateTransfer(token, backState) {
-  hideActions();
-  await quickLine('sprawdzam...');
-  let result;
-  try {
-    result = await apiTransfer(token, fingerprint);
-  } catch {
-    result = null;
-  }
-
-  if (result && result.state === 'success') {
-    await runChat(GATE_CONFIG.welcomeTransferred);
-    clearActions();
-    addBtn(GATE_CONFIG.buttons.read, '', () => {
-      pageOut('/poems.html');
-    });
-    showActions();
-    return;
-  }
-
-  await runChat(GATE_CONFIG.error);
-  clearActions();
-  addBtn(GATE_CONFIG.buttons.retry, '', () => stateTransfer(token, backState));
-  addBtn(GATE_CONFIG.buttons.cancel, 'soft', () => backState());
-  showActions();
-}
-
 async function init() {
+  setOwnerNoticeVisual(false);
   if (FORCE_SCAN_PROTO) {
     const protoResult = await runScanPrototypeStage();
     hideScanPrototypeStage();

@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>szpineta / admin znajdki</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f9f9f8;
+      --ink: #0d0d0d;
+      --ink-dim: rgba(13,13,13,0.45);
+      --border: rgba(13,13,13,0.14);
+      --border-strong: rgba(13,13,13,0.28);
+      --accent: #9688d4;
+      --ok: #1a4d2e;
+      --ok-bg: rgba(26,77,46,0.07);
+      --err: #8b1a1a;
+      --err-bg: rgba(139,26,26,0.07);
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    html { font-size: 13px; }
+    body { background: var(--bg); color: var(--ink); font-family: var(--mono); }
+    .page { max-width: 1200px; margin: 0 auto; padding: 38px 28px 70px; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-strong);
+      padding-bottom: 16px;
+    }
+    h1 {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--ink-dim);
+    }
+    .header-links a {
+      color: var(--ink-dim);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--border-strong);
+      margin-left: 10px;
+      font-size: 11px;
+    }
+    .header-links a:hover { color: var(--ink); }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .toolbar label {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+    input[type="text"], select {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--mono);
+      padding: 8px 10px;
+      font-size: 12px;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus { border-color: var(--border-strong); }
+    input[type="text"] { width: 180px; }
+    .btn {
+      border: 1px solid var(--border-strong);
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--ink); color: var(--bg); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-danger { border-color: var(--err); color: var(--err); }
+    .btn-danger:hover { background: var(--err); color: var(--bg); }
+    .btn-soft { border-color: var(--border); color: var(--ink-dim); }
+    .status {
+      margin-bottom: 12px;
+      font-size: 11px;
+      padding: 8px 10px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.ok { background: var(--ok-bg); color: var(--ok); border-left: 2px solid var(--ok); }
+    .status.err { background: var(--err-bg); color: var(--err); border-left: 2px solid var(--err); }
+    .status.info { color: var(--accent); border-left: 2px solid var(--accent); background: rgba(150,136,212,0.08); }
+    .meta { margin-bottom: 10px; color: var(--ink-dim); font-size: 11px; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; min-width: 930px; }
+    th {
+      text-align: left;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      border-bottom: 1px solid var(--border-strong);
+      padding: 8px 8px;
+      white-space: nowrap;
+      background: rgba(13,13,13,0.02);
+    }
+    td {
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--ink);
+      padding: 8px 8px;
+      vertical-align: top;
+    }
+    tr:hover td { background: rgba(13,13,13,0.02); }
+    .col-code { letter-spacing: 0.08em; font-weight: 600; }
+    .pill {
+      font-size: 10px;
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .pill.ok { color: var(--ok); border-color: rgba(26,77,46,0.4); background: var(--ok-bg); }
+    .pill.warn { color: #7a5a16; border-color: rgba(122,90,22,0.4); background: rgba(122,90,22,0.06); }
+    .pill.dim { color: var(--ink-dim); }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .empty { padding: 20px 12px; color: var(--ink-dim); font-size: 11px; }
+    .details-row td {
+      background: rgba(13,13,13,0.015);
+      color: var(--ink-dim);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    @media (max-width: 760px) {
+      .page { padding: 24px 12px 50px; }
+      .toolbar { align-items: stretch; }
+      input[type="text"], select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>szpineta · panel znajdek</h1>
+      <div class="header-links">
+        <a href="/api/admin/panel">odswiez panel</a>
+        <a href="/admin">stary admin</a>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <label for="search">kod</label>
+      <input id="search" type="text" maxlength="8" placeholder="np. A1B2" />
+
+      <label for="ownerFilter">wlasciciel</label>
+      <select id="ownerFilter">
+        <option value="all">wszyscy</option>
+        <option value="with">tylko z wlascicielem</option>
+        <option value="without">tylko bez wlasciciela</option>
+      </select>
+
+      <button id="refreshBtn" class="btn">odswiez</button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div id="meta" class="meta"></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>kod</th>
+            <th>status</th>
+            <th>wlasciciel</th>
+            <th>skrót fp</th>
+            <th>firstActivatedAt</th>
+            <th>lastSeenAt</th>
+            <th>transferredAt</th>
+            <th>akcje</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="8" class="empty">ladowanie...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      items: [],
+      openCode: null,
+      searchTimer: null,
+      loading: false,
+    };
+
+    const rowsEl = document.getElementById('rows');
+    const statusEl = document.getElementById('status');
+    const metaEl = document.getElementById('meta');
+    const searchEl = document.getElementById('search');
+    const ownerFilterEl = document.getElementById('ownerFilter');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    function esc(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function setStatus(type, message) {
+      statusEl.className = 'status' + (type ? ' ' + type + ' show' : '');
+      statusEl.textContent = message || '';
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '—';
+      return d.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    function statusPill(value) {
+      if (value === 'active') return '<span class="pill ok">active</span>';
+      if (value === 'inactive') return '<span class="pill warn">inactive</span>';
+      return '<span class="pill dim">' + esc(value || 'unknown') + '</span>';
+    }
+
+    function ownerPill(hasOwner) {
+      return hasOwner
+        ? '<span class="pill ok">sparowany</span>'
+        : '<span class="pill dim">brak</span>';
+    }
+
+    function makeRow(item) {
+      const isOpen = state.openCode === item.code;
+      const details = isOpen
+        ? '<tr class="details-row"><td colspan="8">kod: <strong>' + esc(item.code) + '</strong> · status: ' + esc(item.status || 'unknown')
+          + ' · wlasciciel: ' + (item.hasOwner ? 'tak' : 'nie')
+          + ' · fingerprint: ' + esc(item.ownerFingerprintShort || '—')
+          + '</td></tr>'
+        : '';
+
+      return '<tr>'
+        + '<td class="col-code">' + esc(item.code) + '</td>'
+        + '<td>' + statusPill(item.status) + '</td>'
+        + '<td>' + ownerPill(item.hasOwner) + '</td>'
+        + '<td>' + esc(item.ownerFingerprintShort || '—') + '</td>'
+        + '<td>' + esc(fmtDate(item.firstActivatedAt)) + '</td>'
+        + '<td>' + esc(fmtDate(item.lastSeenAt)) + '</td>'
+        + '<td>' + esc(fmtDate(item.transferredAt)) + '</td>'
+        + '<td><div class="actions">'
+        + '<button class="btn btn-soft" data-action="details" data-code="' + esc(item.code) + '">szczegoly</button>'
+        + '<button class="btn btn-danger" data-action="release" data-code="' + esc(item.code) + '"' + (item.hasOwner ? '' : ' disabled') + '>zwolnij</button>'
+        + '<button class="btn" data-action="editFp" data-code="' + esc(item.code) + '">edytuj fp</button>'
+        + '</div></td>'
+        + '</tr>' + details;
+    }
+
+    function renderRows() {
+      if (!state.items.length) {
+        rowsEl.innerHTML = '<tr><td colspan="8" class="empty">brak wynikow dla tego filtra</td></tr>';
+        return;
+      }
+      rowsEl.innerHTML = state.items.map(makeRow).join('');
+    }
+
+    function getFilters() {
+      return {
+        search: searchEl.value.trim().toUpperCase(),
+        owner: ownerFilterEl.value,
+      };
+    }
+
+    async function fetchList() {
+      if (state.loading) return;
+      state.loading = true;
+      setStatus('info', 'laduje liste...');
+      refreshBtn.disabled = true;
+      try {
+        const filters = getFilters();
+        const params = new URLSearchParams();
+        params.set('owner', filters.owner);
+        if (filters.search) params.set('search', filters.search);
+        const resp = await fetch('/api/admin/findings?' + params.toString(), { cache: 'no-store' });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) {
+          throw new Error(data.error || ('HTTP ' + resp.status));
+        }
+        state.items = Array.isArray(data.items) ? data.items : [];
+        renderRows();
+        metaEl.textContent = 'widoczne: ' + (data.total || 0) + ' / wszystkie kody: ' + (data.totalAllCodes || 0);
+        setStatus('', '');
+      } catch (error) {
+        rowsEl.innerHTML = '<tr><td colspan="8" class="empty">blad: ' + esc(error.message || 'nieznany') + '</td></tr>';
+        setStatus('err', 'nie udalo sie pobrac listy');
+      } finally {
+        state.loading = false;
+        refreshBtn.disabled = false;
+      }
+    }
+
+    async function postOwnerAction(payload) {
+      const resp = await fetch('/api/admin/owner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(data.error || ('HTTP ' + resp.status));
+      return data;
+    }
+
+    async function onAction(action, code) {
+      if (!code) return;
+      if (action === 'details') {
+        state.openCode = state.openCode === code ? null : code;
+        renderRows();
+        return;
+      }
+
+      if (action === 'release') {
+        const ok = window.confirm('Zwolnic wlasciciela dla kodu ' + code + '?');
+        if (!ok) return;
+        setStatus('info', 'zwalniam wlasciciela...');
+        try {
+          await postOwnerAction({ action: 'release', code: code });
+          setStatus('ok', 'zwolniono wlasciciela dla ' + code);
+          await fetchList();
+        } catch (error) {
+          setStatus('err', 'blad: ' + (error.message || 'nieznany'));
+        }
+        return;
+      }
+
+      if (action === 'editFp') {
+        const fp = window.prompt('Nowy fingerprint dla ' + code + ' (8-128 znakow [a-zA-Z0-9_-]):');
+        if (fp === null) return;
+        const trimmed = fp.trim();
+        if (!trimmed) {
+          setStatus('err', 'anulowano: pusty fingerprint');
+          return;
+        }
+        setStatus('info', 'zapisuje fingerprint...');
+        try {
+          await postOwnerAction({ action: 'setFingerprint', code: code, fingerprint: trimmed });
+          setStatus('ok', 'zapisano fingerprint dla ' + code);
+          await fetchList();
+        } catch (error) {
+          setStatus('err', 'blad: ' + (error.message || 'nieznany'));
+        }
+      }
+    }
+
+    rowsEl.addEventListener('click', function (event) {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      onAction(button.getAttribute('data-action'), button.getAttribute('data-code'));
+    });
+
+    refreshBtn.addEventListener('click', fetchList);
+    ownerFilterEl.addEventListener('change', fetchList);
+    searchEl.addEventListener('input', function () {
+      clearTimeout(state.searchTimer);
+      state.searchTimer = setTimeout(fetchList, 220);
+    });
+
+    fetchList();
+  </script>
+</body>
+</html>

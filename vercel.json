@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/g/:code", "destination": "/gate.html" }
+    { "source": "/g/:code", "destination": "/gate.html" },
+    { "source": "/admin/findings", "destination": "/api/admin/panel" }
   ],
   "headers": [
     {

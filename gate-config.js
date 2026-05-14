@@ -9,11 +9,6 @@ var GATE_CONFIG = {
     { text: 'z powrotem.', delay: 700 },
     { text: 'znajdka cię pamięta.', delay: 950 },
   ],
-  transferConfirm: 'przejmij',
-  welcomeTransferred: [
-    { text: 'gotowe.', delay: 700 },
-    { text: 'tamten dostęp wygasł.', delay: 950 },
-  ],
   noCodeIntro: [
     { text: '_ to nie błąd.', delay: 700 },
     { text: 'tu są wiersze.', delay: 950 },
@@ -41,7 +36,8 @@ var GATE_CONFIG = {
   ],
   transferFlow: [
     { text: 'ta znajdka ma już właściciela.', delay: 800 },
-    { text: 'jeśli przejmiesz — tamten dostęp zgaśnie.', delay: 1050 },
+    { text: 'tej ścieżki nie da się przejąć.', delay: 1000 },
+    { text: 'wróć i znajdź inną znajdkę.', delay: 1050 },
   ],
   notFound: [
     { text: 'nie ma takiego kodu.', delay: 650 },
@@ -51,7 +47,8 @@ var GATE_CONFIG = {
   ],
   buttons: {
     read: 'czytaj',
-    transfer: 'przejmij',
+    scanAgain: 'skanuj ponownie',
+    findAnother: 'znajdź inną znajdkę',
     cancel: 'nie teraz',
     retry: 'spróbuj ponownie',
     manualSubmit: 'otwórz',

@@ -26,3 +26,4 @@ build/
 # generowane lokalnie — zawiera całą poezję i sekretne kody, NIE commitujemy
 scripts/output/
 
+.vercel
