@@ -1807,10 +1807,10 @@ async function showFirstAccessVisual() {
   await nextFrame();
   await nextFrame();
   firstAccessVisualEl.classList.add('visible');
-  await sleep(reducedMotion ? 760 : 1850);
+  await sleep(reducedMotion ? 600 : 1450);
   firstAccessVisualEl.classList.remove('visible');
   firstAccessVisualEl.classList.add('fade-out');
-  await sleep(reducedMotion ? 180 : 460);
+  await sleep(reducedMotion ? 160 : 400);
   firstAccessVisualEl.classList.remove('show', 'visible', 'fade-out');
   firstAccessVisualEl.setAttribute('aria-hidden', 'true');
 }

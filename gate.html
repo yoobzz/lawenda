@@ -826,9 +826,7 @@
             align-items: center;
             justify-content: center;
             pointer-events: none;
-            background:
-                radial-gradient(circle at 50% 30%, rgba(150, 130, 220, 0.13), transparent 58%),
-                rgba(249, 249, 248, 0.94);
+            background: rgba(249, 249, 248, 0.97);
             opacity: 0;
             transition: opacity 0.35s ease;
         }
@@ -842,184 +840,38 @@
             opacity: 0;
         }
         .fav-core {
-            position: relative;
-            width: min(82vw, 420px);
-            aspect-ratio: 1;
             display: grid;
             place-items: center;
         }
-        .fav-ring {
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid rgba(13, 13, 13, 0.18);
-            animation: fav-ring 1.7s ease-out infinite;
+        .fav-sigil {
+            width: 72px;
+            height: 72px;
+            overflow: visible;
         }
-        .fav-ring.r1 { width: 44%; height: 44%; animation-delay: 0s; }
-        .fav-ring.r2 { width: 66%; height: 66%; animation-delay: 0.18s; }
-        .fav-ring.r3 { width: 90%; height: 90%; animation-delay: 0.36s; }
-        @keyframes fav-ring {
-            0% { opacity: 0; transform: scale(0.88); }
-            30% { opacity: 0.48; }
-            100% { opacity: 0; transform: scale(1.08); }
+        .fav-sigil-ring {
+            stroke-dasharray: 188.5;
+            stroke-dashoffset: 188.5;
+            animation: fav-ring-draw 0.95s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-        .fav-qr {
-            position: relative;
-            width: 138px;
-            height: 138px;
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            grid-template-rows: repeat(9, 1fr);
-            gap: 3px;
-            padding: 8px;
-            background: rgba(13, 13, 13, 0.04);
-            border: 1px solid rgba(13, 13, 13, 0.32);
-        }
-        .fav-qr::before,
-        .fav-qr::after {
-            content: '';
-            position: absolute;
-            border: 1px solid rgba(13, 13, 13, 0.5);
-            width: 24px;
-            height: 24px;
-        }
-        .fav-qr::before {
-            left: 8px;
-            top: 8px;
-            box-shadow: 0 96px 0 rgba(13, 13, 13, 0.5), 96px 0 0 rgba(13, 13, 13, 0.5);
-        }
-        .fav-qr::after {
-            left: 16px;
-            top: 16px;
-            width: 8px;
-            height: 8px;
-            background: rgba(13, 13, 13, 0.65);
-            box-shadow: 0 96px 0 rgba(13, 13, 13, 0.65), 96px 0 0 rgba(13, 13, 13, 0.65);
-        }
-        .fav-cell {
-            background: rgba(13, 13, 13, 0.78);
+        .fav-sigil-dot {
             opacity: 0;
-            animation: fav-cell-in 0.85s steps(2, end) forwards;
+            animation: fav-dot-in 0.25s ease 0.9s forwards;
         }
-        @keyframes fav-cell-in {
+        @keyframes fav-ring-draw {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes fav-dot-in {
             to { opacity: 1; }
         }
-        .fav-users {
-            position: absolute;
-            bottom: 8%;
-            width: 72%;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-        .fav-user {
-            position: relative;
-            width: 62px;
-            height: 84px;
-            opacity: 0.3;
-            transform: translateY(5px);
-            transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
-        }
-        .fav-user-head,
-        .fav-user-body {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 1px solid rgba(13, 13, 13, 0.68);
-        }
-        .fav-user-head {
-            top: 0;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: rgba(13, 13, 13, 0.08);
-        }
-        .fav-user-body {
-            top: 26px;
-            width: 34px;
-            height: 48px;
-            border-radius: 16px 16px 10px 10px;
-            background: rgba(13, 13, 13, 0.06);
-        }
-        .fav-user.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .fav-user.active .fav-user-head,
-        .fav-user.active .fav-user-body {
-            border-color: rgba(13, 13, 13, 0.92);
-            background: rgba(13, 13, 13, 0.14);
-        }
-        .fav-user.locked {
-            opacity: 0.16;
-            filter: grayscale(1);
-        }
-        .fav-user.locked::after {
-            content: '';
-            position: absolute;
-            inset: 4px 6px;
-            border-top: 1px solid rgba(13, 13, 13, 0.45);
-            transform: rotate(-28deg);
-        }
-        .fav-link {
-            position: absolute;
-            width: 1px;
-            height: 72px;
-            background: linear-gradient(
-                to bottom,
-                rgba(13, 13, 13, 0),
-                rgba(13, 13, 13, 0.52),
-                rgba(13, 13, 13, 0)
-            );
-            top: 59%;
-            left: 50%;
-            transform-origin: top center;
-            opacity: 0.18;
-        }
-        .fav-link.left { transform: rotate(-26deg); }
-        .fav-link.right { transform: rotate(26deg); }
-        .fav-lock {
-            position: absolute;
-            top: 15%;
-            left: 50%;
-            width: 40px;
-            height: 36px;
-            transform: translateX(-50%) scale(0.92);
-            opacity: 0;
-            animation: fav-lock-on 0.4s ease 0.75s forwards;
-        }
-        .fav-lock::before,
-        .fav-lock::after {
-            content: '';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 1px solid rgba(13, 13, 13, 0.72);
-        }
-        .fav-lock::before {
-            top: 12px;
-            width: 22px;
-            height: 16px;
-            border-radius: 2px;
-            background: rgba(13, 13, 13, 0.06);
-        }
-        .fav-lock::after {
-            top: 0;
-            width: 14px;
-            height: 14px;
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
-        }
-        @keyframes fav-lock-on {
-            to { opacity: 1; transform: translateX(-50%) scale(1); }
-        }
         @media (prefers-reduced-motion: reduce) {
-            .fav-ring,
-            .fav-cell,
-            .fav-lock {
-                animation: none !important;
+            .fav-sigil-ring {
+                animation: none;
+                stroke-dashoffset: 0;
             }
-            .fav-cell { opacity: 1; }
-            .fav-lock { opacity: 1; transform: translateX(-50%) scale(1); }
+            .fav-sigil-dot {
+                animation: none;
+                opacity: 1;
+            }
         }
         .sr-only {
             position: absolute;
@@ -1099,39 +951,14 @@
 <div id="first-access-visual" aria-hidden="true" role="status" aria-live="polite">
     <span class="sr-only">Dostęp do tej znajdki został przypisany do tego urządzenia.</span>
     <div class="fav-core">
-        <div class="fav-ring r1"></div>
-        <div class="fav-ring r2"></div>
-        <div class="fav-ring r3"></div>
-        <div class="fav-qr" aria-hidden="true">
-            <span class="fav-cell" style="animation-delay:0.04s"></span>
-            <span class="fav-cell" style="animation-delay:0.12s"></span>
-            <span class="fav-cell" style="animation-delay:0.28s"></span>
-            <span class="fav-cell" style="animation-delay:0.2s"></span>
-            <span class="fav-cell" style="animation-delay:0.34s"></span>
-            <span class="fav-cell" style="animation-delay:0.42s"></span>
-            <span class="fav-cell" style="animation-delay:0.1s"></span>
-            <span class="fav-cell" style="animation-delay:0.26s"></span>
-            <span class="fav-cell" style="animation-delay:0.48s"></span>
-            <span class="fav-cell" style="animation-delay:0.24s"></span>
-            <span class="fav-cell" style="animation-delay:0.52s"></span>
-            <span class="fav-cell" style="animation-delay:0.3s"></span>
-            <span class="fav-cell" style="animation-delay:0.16s"></span>
-            <span class="fav-cell" style="animation-delay:0.38s"></span>
-            <span class="fav-cell" style="animation-delay:0.56s"></span>
-        </div>
-        <div class="fav-link left"></div>
-        <div class="fav-link right"></div>
-        <div class="fav-users" aria-hidden="true">
-            <div class="fav-user active">
-                <span class="fav-user-head"></span>
-                <span class="fav-user-body"></span>
-            </div>
-            <div class="fav-user locked">
-                <span class="fav-user-head"></span>
-                <span class="fav-user-body"></span>
-            </div>
-        </div>
-        <div class="fav-lock" aria-hidden="true"></div>
+        <svg class="fav-sigil" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle class="fav-sigil-ring" cx="40" cy="40" r="30"
+                stroke="rgba(13,13,13,0.68)" stroke-width="1"
+                stroke-linecap="round"
+                transform="rotate(-90 40 40)"/>
+            <circle class="fav-sigil-dot" cx="40" cy="40" r="3.5"
+                fill="rgba(13,13,13,0.72)"/>
+        </svg>
     </div>
 </div>
 
