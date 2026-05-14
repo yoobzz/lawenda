@@ -819,7 +819,7 @@ function createFlowingQrFrame(startRow, startCol, side, cells) {
   wrapper.style.top = `${frameTop}px`;
   wrapper.style.width = `${frameW}px`;
   wrapper.style.height = `${frameH}px`;
-  wrapper.style.pointerEvents = 'auto';
+  wrapper.style.pointerEvents = 'none';
   wrapper.style.zIndex = '3';
   wrapper.style.fontFamily = "'Helvetica Neue', 'Arial', sans-serif";
   wrapper.style.fontWeight = '700';
@@ -948,28 +948,6 @@ function createFlowingQrFrame(startRow, startCol, side, cells) {
   scanPrototypeGridEl.appendChild(wrapper);
   scanPrototypeFrameEl = wrapper;
 
-  wrapper.addEventListener('mouseenter', () => {
-    edgeNodes.forEach(n => { n.style.color = 'rgba(0,0,0,1)'; });
-    cornerNodes.forEach(n => { n.style.color = 'rgba(0,0,0,1)'; });
-  });
-  wrapper.addEventListener('mouseleave', () => {
-    edgeNodes.forEach(n => { n.style.color = baseColor; });
-    cornerNodes.forEach(n => { n.style.color = baseColor; });
-  });
-  wrapper.addEventListener('click', () => {
-    for (const node of edgeNodes) {
-      const base = node.textContent;
-      const arr = Array.from(base);
-      const flips = 3 + Math.floor(Math.random() * 4);
-      for (let i = 0; i < flips; i += 1) {
-        const idx = Math.floor(Math.random() * arr.length);
-        if (arr[idx] === ' ') continue;
-        arr[idx] = SCAN_PROTO_GLITCH_POOL[Math.floor(Math.random() * SCAN_PROTO_GLITCH_POOL.length)];
-      }
-      node.textContent = arr.join('');
-      setTimeout(() => { node.textContent = base; }, 150);
-    }
-  });
 }
 
 function ensureScanPrototypeDom() {
