@@ -108,24 +108,25 @@
         .star-particle {
             position: absolute;
             font-family: 'ABC Diatype Rounded', 'Inter', sans-serif;
-            color: rgb(150, 130, 220);
             font-size: 0.85rem;
             font-weight: 300;
             user-select: none;
             will-change: transform, opacity;
             animation: particleSway 22s ease-in-out infinite alternate;
-            opacity: 0;
             pointer-events: auto !important;
             z-index: 10 !important;
             cursor: pointer;
             --appear-x: 0px;
             --appear-y: 0px;
-            transform: scale(0.2) translate(calc(var(--appear-x) * 2), calc(var(--appear-y) * 2)) translateZ(0);
+            /* start invisible — color/opacity set inline in JS so no flash */
+            color: rgb(150, 130, 220);
+            opacity: 0 !important;
+            transform: scale(0.01) translateZ(0);
             transition: opacity 1s ease-out, transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .star-particle.typing-in {
-            opacity: 0.5;
+            opacity: 0.5 !important;
             transform: scale(1) translate(0, 0) translateZ(0);
         }
 
@@ -203,6 +204,10 @@
                 var p = document.createElement('div');
                 p.className = 'star-particle';
                 p.textContent = randStr();
+                /* set inline so no FOUC — must be before appendChild */
+                p.style.color   = 'rgb(150, 130, 220)';
+                p.style.fontSize = '0.85rem';
+                p.style.opacity  = '0';
                 p.style.left = Math.random() * window.innerWidth + 'px';
                 p.style.top  = Math.random() * window.innerHeight + 'px';
                 p.style.animationDelay    = (Math.random() * 4).toFixed(2) + 's';
