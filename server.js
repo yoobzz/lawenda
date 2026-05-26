@@ -323,6 +323,18 @@ app.get('/poem-image.png', async (req, res) => {
 });
 
 // Serwowanie plików statycznych (publicznych)
+// Admin master key (local dev; na Vercel rewrite → api/session/check.js)
+app.post('/api/admin/master', async (req, res) => {
+  try {
+    req.url = '/api/admin/master';
+    const handler = require('./api/session/check.js');
+    await handler(req, res);
+  } catch (e) {
+    console.error('[api/admin/master]', e);
+    res.status(500).json({ error: 'server error' });
+  }
+});
+
 // API mama — wysyłka odpowiedzi (local dev; na Vercel działa api/mama/send.js)
 app.post('/api/mama/send', async (req, res) => {
   try {
