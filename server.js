@@ -17,6 +17,24 @@ try {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+function loadEnvLocal() {
+  const envPath = path.join(__dirname, '.env.local');
+  if (!fs.existsSync(envPath)) return;
+  for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq < 1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let val = trimmed.slice(eq + 1).trim();
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = val;
+  }
+}
+loadEnvLocal();
+
 // Uwierzytelnienie Basic Auth dla /admin
 const adminUser = process.env.ADMIN_USER || 'admin';
 const adminPass = process.env.ADMIN_PASS || 'changeme';
@@ -305,6 +323,17 @@ app.get('/poem-image.png', async (req, res) => {
 });
 
 // Serwowanie plików statycznych (publicznych)
+// API mama — wysyłka odpowiedzi (local dev; na Vercel działa api/mama/send.js)
+app.post('/api/mama/send', async (req, res) => {
+  try {
+    const handler = require('./api/mama/send.js');
+    await handler(req, res);
+  } catch (e) {
+    console.error('[api/mama/send]', e);
+    res.status(500).json({ error: 'server error' });
+  }
+});
+
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
 // Prosty panel admin (serwowany wyłącznie po uwierzytelnieniu)
