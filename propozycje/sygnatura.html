@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>sygnatura — proof of concept</title>
+<meta name="robots" content="noindex">
+<style>
+    @font-face {
+        font-family: 'ABC Diatype Rounded';
+        src: url('../fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
+        background: #fff;
+        color: #111;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(184, 160, 214, 0.35); }
+    button { font: inherit; background: none; border: 0; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+    header {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 1.1rem 1rem;
+        font-size: 13px;
+        letter-spacing: 0.05em;
+    }
+    header button { color: #bbb; padding: 4px 2px; transition: color 0.2s; }
+    header button:hover { color: #555; }
+    header button[aria-pressed="true"] { color: #111; border-bottom: 1px solid #111; }
+
+    .pane { display: none; }
+    .pane.on { display: block; }
+
+    /* ── GENERATOR ── */
+    #genPane { max-width: 560px; margin: 0 auto; padding: 2rem 1.25rem 4rem; text-align: center; }
+    #cardCanvas {
+        width: 100%;
+        max-width: 480px;
+        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    #genCode {
+        font-size: 24px;
+        font-weight: 350;
+        letter-spacing: 0.45em;
+        padding: 1.6rem 0 0.4rem;
+        color: #444;
+        user-select: all;
+    }
+    .gen-actions { display: flex; justify-content: center; gap: 2rem; padding-top: 0.8rem; font-size: 13px; }
+    .gen-actions button, .gen-actions a {
+        color: #888;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        padding: 4px 2px;
+        transition: color 0.2s;
+    }
+    .gen-actions button:hover, .gen-actions a:hover { color: #111; }
+    .note { font-size: 12px; color: #aaa; line-height: 1.7; padding-top: 2rem; text-align: left; }
+
+    /* ── SKANER ── */
+    #scanPane { position: relative; }
+    #scanWrap {
+        position: relative;
+        width: 100%;
+        max-width: 640px;
+        margin: 0 auto;
+    }
+    #scanCanvas {
+        display: block;
+        width: 100%;
+        background: #000;
+        border-radius: 8px;
+    }
+    #scanStatus {
+        text-align: center;
+        font-size: 13px;
+        color: #888;
+        padding: 0.9rem 1rem;
+        min-height: 2.6em;
+        letter-spacing: 0.03em;
+    }
+    #scanStatus .live { letter-spacing: 0.35em; font-size: 17px; color: #555; }
+    #scanResult {
+        display: none;
+        text-align: center;
+        padding: 2.5rem 1rem 1rem;
+    }
+    #scanResult.on { display: block; }
+    #scanResult .code { font-size: 30px; letter-spacing: 0.45em; padding-bottom: 0.6rem; }
+    #scanResult .ok { font-size: 13px; color: #6da06d; letter-spacing: 0.05em; }
+    #scanResult button { display: block; margin: 1.6rem auto 0; font-size: 13px; color: #888; }
+    #scanResult button:hover { color: #111; }
+
+    /* ── ręczna klawiatura (fallback) ── */
+    #manual { max-width: 360px; margin: 0 auto; padding: 1.5rem 1rem 4rem; text-align: center; }
+    #manualToggle { font-size: 12px; color: #bbb; padding: 8px; }
+    #manualToggle:hover { color: #555; }
+    #manualBox { display: none; padding-top: 1rem; }
+    #manualBox.on { display: block; }
+    #manualOut {
+        font-size: 26px;
+        letter-spacing: 0.4em;
+        min-height: 1.5em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.4rem;
+        margin-bottom: 1.2rem;
+    }
+    .kbd { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .kbd button {
+        font-size: 24px;
+        padding: 14px 0;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .kbd button:hover { border-color: #999; }
+    .kbd button:active { background: #f4f4f4; }
+    .kbd .wide { grid-column: span 2; font-size: 14px; color: #888; }
+</style>
+</head>
+<body>
+
+<header>
+    <button id="tabGen" aria-pressed="true">generator</button>
+    <button id="tabScan" aria-pressed="false">skaner</button>
+</header>
+
+<!-- ════ GENERATOR ════ -->
+<section class="pane on" id="genPane">
+    <canvas id="cardCanvas"></canvas>
+    <div id="genCode"></div>
+    <div class="gen-actions">
+        <button id="genNew">wylosuj nową</button>
+        <a id="genDownload" download="sygnatura.png" href="#">pobierz png</a>
+    </div>
+    <p class="note">
+        proof of concept: 8 znaków z 8-znakowego alfabetu = 16,7 mln kombinacji.
+        wydrukuj kartę (albo otwórz na drugim ekranie) i zeskanuj telefonem
+        w zakładce „skaner". skaner wymaga https — testuj przez podgląd
+        vercela, nie z pliku. cienka ramka na karcie służy do wycelowania.
+    </p>
+</section>
+
+<!-- ════ SKANER ════ -->
+<section class="pane" id="scanPane">
+    <div id="scanWrap">
+        <canvas id="scanCanvas"></canvas>
+    </div>
+    <div id="scanStatus">uruchamianie kamery…</div>
+    <div id="scanResult">
+        <div class="code" id="resultCode"></div>
+        <div class="ok">rozpoznano — tu w prawdziwej wersji idzie POST /api/gate/scan</div>
+        <button id="scanAgain">skanuj ponownie</button>
+    </div>
+    <div id="manual">
+        <button id="manualToggle">nie skanuje? wpisz znaki ręcznie</button>
+        <div id="manualBox">
+            <div id="manualOut">&nbsp;</div>
+            <div class="kbd" id="kbd"></div>
+        </div>
+    </div>
+    <video id="cam" playsinline muted style="display:none"></video>
+</section>
+
+<script>
+(function () {
+    'use strict';
+
+    /* alfabet: 8 znaków wybranych pod kątem rozróżnialności w druku
+       (odrzucone pary mylące się nawzajem: . , ' ; ! -) */
+    const GLYPHS = ['~', '*', '^', '+', '=', '\u0022', '|', ':'];
+
+    /* wspólna geometria karty — generator i skaner muszą się zgadzać */
+    const CARD = {
+        aspect: 1.5,                       // szer : wys
+        inset: 0.035,                      // ramka
+        grid: { x0: 0.10, x1: 0.90, y0: 0.26, y1: 0.82, cols: 4, rows: 2 }
+    };
+    function cellCenter(c, r) {
+        const g = CARD.grid;
+        return {
+            x: g.x0 + (c + 0.5) * (g.x1 - g.x0) / g.cols,
+            y: g.y0 + (r + 0.5) * (g.y1 - g.y0) / g.rows
+        };
+    }
+
+    const FONT = "'ABC Diatype Rounded', 'Inter', sans-serif";
+    const N = 32; // rozdzielczość znormalizowanego glifu
+
+    /* ── zakładki ── */
+    const tabs = { gen: document.getElementById('tabGen'), scan: document.getElementById('tabScan') };
+    const panes = { gen: document.getElementById('genPane'), scan: document.getElementById('scanPane') };
+    function switchTo(which) {
+        for (const k of ['gen', 'scan']) {
+            tabs[k].setAttribute('aria-pressed', k === which ? 'true' : 'false');
+            panes[k].classList.toggle('on', k === which);
+        }
+        if (which === 'scan') startScanner(); else stopScanner();
+    }
+    tabs.gen.addEventListener('click', function () { switchTo('gen'); });
+    tabs.scan.addEventListener('click', function () { switchTo('scan'); });
+
+    /* ════════════════════════════════════════════
+       GENERATOR
+       ════════════════════════════════════════════ */
+    const cardCanvas = document.getElementById('cardCanvas');
+    const W = 1440, H = W / CARD.aspect;
+    cardCanvas.width = W;
+    cardCanvas.height = H;
+    let currentCode = '';
+
+    function randomCode() {
+        const a = new Uint8Array(8);
+        crypto.getRandomValues(a);
+        let s = '';
+        for (let i = 0; i < 8; i++) s += GLYPHS[a[i] % GLYPHS.length];
+        return s;
+    }
+
+    function roundRectPath(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+
+    function drawCard(code) {
+        const ctx = cardCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
+
+        // ramka do celowania — cienka, zaokrąglona, jak obwódka kartki
+        const m = CARD.inset * W;
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 3.5;
+        roundRectPath(ctx, m, m, W - 2 * m, H - 2 * m, H * 0.055);
+        ctx.stroke();
+
+        ctx.fillStyle = '#1a1a1a';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // nagłówek i stopka — poza siatką skanu
+        if ('letterSpacing' in ctx) ctx.letterSpacing = Math.round(W * 0.006) + 'px';
+        ctx.font = '300 ' + Math.round(H * 0.052) + 'px ' + FONT;
+        ctx.globalAlpha = 0.34;
+        ctx.fillText('~||-_^+*.', W / 2, H * 0.158);
+        ctx.font = '300 ' + Math.round(H * 0.042) + 'px ' + FONT;
+        ctx.globalAlpha = 0.3;
+        ctx.fillText('s z p i n e t a . c o m', W / 2, H * 0.912);
+        ctx.globalAlpha = 1;
+        if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+
+        // glify sygnatury
+        const g = CARD.grid;
+        const cellH = (g.y1 - g.y0) / g.rows * H;
+        ctx.font = '500 ' + Math.round(cellH * 0.66) + 'px ' + FONT;
+        for (let i = 0; i < 8; i++) {
+            const p = cellCenter(i % g.cols, Math.floor(i / g.cols));
+            ctx.fillText(code[i], p.x * W, p.y * H);
+        }
+    }
+
+    function regen(code) {
+        currentCode = code || randomCode();
+        drawCard(currentCode);
+        document.getElementById('genCode').textContent = currentCode;
+        document.getElementById('genDownload').href = cardCanvas.toDataURL('image/png');
+    }
+    document.getElementById('genNew').addEventListener('click', function () { regen(); });
+
+    /* ════════════════════════════════════════════
+       ROZPOZNAWANIE — wspólne narzędzia
+       ════════════════════════════════════════════ */
+    function otsu(gray) {
+        const hist = new Uint32Array(256);
+        for (let i = 0; i < gray.length; i++) hist[gray[i]]++;
+        const total = gray.length;
+        let sum = 0;
+        for (let t = 0; t < 256; t++) sum += t * hist[t];
+        let sumB = 0, wB = 0, best = 0, thr = 127;
+        for (let t = 0; t < 256; t++) {
+            wB += hist[t];
+            if (wB === 0) continue;
+            const wF = total - wB;
+            if (wF === 0) break;
+            sumB += t * hist[t];
+            const mB = sumB / wB, mF = (sum - sumB) / wF;
+            const between = wB * wF * (mB - mF) * (mB - mF);
+            if (between > best) { best = between; thr = t; }
+        }
+        return thr;
+    }
+
+    /* z ImageData → znormalizowana maska N×N (bbox glifu wpasowany
+       z zachowaniem proporcji — proporcja sama w sobie odróżnia np. _ od |) */
+    function normalize(imgData) {
+        const w = imgData.width, h = imgData.height, d = imgData.data;
+        const gray = new Uint8Array(w * h);
+        for (let i = 0; i < w * h; i++) {
+            gray[i] = (d[i * 4] * 3 + d[i * 4 + 1] * 6 + d[i * 4 + 2]) / 10;
+        }
+        const thr = otsu(gray);
+        let minX = w, maxX = -1, minY = h, maxY = -1, ink = 0;
+        const bin = new Uint8Array(w * h);
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                if (gray[y * w + x] <= thr) {
+                    bin[y * w + x] = 1;
+                    ink++;
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+        const ratio = ink / (w * h);
+        if (ratio < 0.004 || ratio > 0.55) return null; // pusto albo śmieci
+        const bw = maxX - minX + 1, bh = maxY - minY + 1;
+        if (bw < 3 || bh < 3) return null;
+
+        const scale = (N - 4) / Math.max(bw, bh);
+        const ow = Math.max(1, Math.round(bw * scale));
+        const oh = Math.max(1, Math.round(bh * scale));
+        const ox = Math.floor((N - ow) / 2), oy = Math.floor((N - oh) / 2);
+        const out = new Uint8Array(N * N);
+        for (let y = 0; y < oh; y++) {
+            for (let x = 0; x < ow; x++) {
+                const sx = minX + Math.min(bw - 1, Math.floor(x / scale));
+                const sy = minY + Math.min(bh - 1, Math.floor(y / scale));
+                out[(oy + y) * N + (ox + x)] = bin[sy * w + sx];
+            }
+        }
+        return out;
+    }
+
+    function diceScore(a, b) {
+        let inter = 0, sa = 0, sb = 0;
+        for (let i = 0; i < N * N; i++) {
+            sa += a[i];
+            sb += b[i];
+            if (a[i] && b[i]) inter++;
+        }
+        if (sa + sb === 0) return 0;
+        return (2 * inter) / (sa + sb);
+    }
+
+    /* wzorce glifów — renderowane tym samym fontem co karta */
+    let templates = null;
+    function buildTemplates() {
+        const size = 96;
+        const c = document.createElement('canvas');
+        c.width = size; c.height = size;
+        const ctx = c.getContext('2d', { willReadFrequently: true });
+        templates = [];
+        for (const ch of GLYPHS) {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, size, size);
+            ctx.fillStyle = '#000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '500 ' + Math.round(size * 0.6) + 'px ' + FONT;
+            ctx.fillText(ch, size / 2, size / 2);
+            const norm = normalize(ctx.getImageData(0, 0, size, size));
+            templates.push({ ch: ch, mask: norm });
+        }
+    }
+
+    function classify(imgData) {
+        const mask = normalize(imgData);
+        if (!mask) return null;
+        let best = null, bestS = 0, second = 0;
+        for (const t of templates) {
+            if (!t.mask) continue;
+            const s = diceScore(mask, t.mask);
+            if (s > bestS) { second = bestS; bestS = s; best = t.ch; }
+            else if (s > second) { second = s; }
+        }
+        if (bestS < 0.55 || bestS - second < 0.06) return null;
+        return best;
+    }
+
+    /* ════════════════════════════════════════════
+       SKANER
+       ════════════════════════════════════════════ */
+    const video = document.getElementById('cam');
+    const scanCanvas = document.getElementById('scanCanvas');
+    const statusEl = document.getElementById('scanStatus');
+    const resultEl = document.getElementById('scanResult');
+    let stream = null, rafId = null, lastSample = 0;
+    let candidate = '', stable = 0, locked = false;
+
+    function guideRect(cw, ch) {
+        const gw = Math.min(cw * 0.86, ch * 0.86 * CARD.aspect);
+        const gh = gw / CARD.aspect;
+        return { x: (cw - gw) / 2, y: (ch - gh) / 2, w: gw, h: gh };
+    }
+
+    async function startScanner() {
+        if (stream) return;
+        locked = false;
+        resultEl.classList.remove('on');
+        statusEl.innerHTML = 'uruchamianie kamery…';
+        if (!templates) buildTemplates();
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 1280 } },
+                audio: false
+            });
+        } catch (e) {
+            statusEl.textContent = 'brak dostępu do kamery (https?) — użyj klawiatury poniżej';
+            document.getElementById('manualBox').classList.add('on');
+            return;
+        }
+        video.srcObject = stream;
+        await video.play();
+        statusEl.textContent = 'wyceluj ramkę karty w obrys';
+        loop();
+    }
+
+    function stopScanner() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+        if (stream) {
+            stream.getTracks().forEach(function (t) { t.stop(); });
+            stream = null;
+        }
+    }
+
+    function loop() {
+        rafId = requestAnimationFrame(loop);
+        if (!video.videoWidth) return;
+
+        const cw = scanCanvas.clientWidth || 640;
+        const ch = Math.round(cw * 0.75);
+        if (scanCanvas.width !== cw) { scanCanvas.width = cw; scanCanvas.height = ch; }
+        const ctx = scanCanvas.getContext('2d', { willReadFrequently: true });
+
+        // wideo w trybie cover
+        const vr = video.videoWidth / video.videoHeight;
+        const cr = cw / ch;
+        let sw, sh, sx, sy;
+        if (vr > cr) { sh = video.videoHeight; sw = sh * cr; sx = (video.videoWidth - sw) / 2; sy = 0; }
+        else { sw = video.videoWidth; sh = sw / cr; sx = 0; sy = (video.videoHeight - sh) / 2; }
+        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, cw, ch);
+
+        const gr = guideRect(cw, ch);
+
+        // próbkowanie co ~150ms, zanim narysujemy nakładkę
+        const now = performance.now();
+        if (!locked && now - lastSample > 150) {
+            lastSample = now;
+            sample(ctx, gr);
+        }
+
+        // nakładka
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.fillRect(0, 0, cw, gr.y);
+        ctx.fillRect(0, gr.y + gr.h, cw, ch - gr.y - gr.h);
+        ctx.fillRect(0, gr.y, gr.x, gr.h);
+        ctx.fillRect(gr.x + gr.w, gr.y, cw - gr.x - gr.w, gr.h);
+        ctx.strokeStyle = locked ? 'rgba(140,200,140,0.95)' : 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(gr.x, gr.y, gr.w, gr.h);
+
+        const g = CARD.grid;
+        const cellW = (g.x1 - g.x0) / g.cols * gr.w;
+        const cellH = (g.y1 - g.y0) / g.rows * gr.h;
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 8; i++) {
+            const p = cellCenter(i % g.cols, Math.floor(i / g.cols));
+            ctx.strokeRect(
+                gr.x + p.x * gr.w - cellW * 0.42,
+                gr.y + p.y * gr.h - cellH * 0.42,
+                cellW * 0.84, cellH * 0.84
+            );
+        }
+    }
+
+    function sample(ctx, gr) {
+        const g = CARD.grid;
+        const cellW = (g.x1 - g.x0) / g.cols * gr.w;
+        const cellH = (g.y1 - g.y0) / g.rows * gr.h;
+        const box = Math.round(Math.min(cellW, cellH) * 0.92);
+        let out = '';
+        for (let i = 0; i < 8; i++) {
+            const p = cellCenter(i % g.cols, Math.floor(i / g.cols));
+            const x = Math.round(gr.x + p.x * gr.w - box / 2);
+            const y = Math.round(gr.y + p.y * gr.h - box / 2);
+            const ch = classify(ctx.getImageData(x, y, box, box));
+            if (!ch) { candidate = ''; stable = 0; statusEl.textContent = 'wyceluj ramkę karty w obrys'; return; }
+            out += ch;
+        }
+        if (out === candidate) {
+            stable++;
+        } else {
+            candidate = out;
+            stable = 1;
+        }
+        statusEl.innerHTML = 'widzę: <span class="live">' + out + '</span>';
+        if (stable >= 3) accept(out);
+    }
+
+    function accept(code) {
+        locked = true;
+        if (navigator.vibrate) navigator.vibrate(60);
+        document.getElementById('resultCode').textContent = code;
+        resultEl.classList.add('on');
+        statusEl.textContent = '';
+        setTimeout(stopScanner, 400);
+    }
+
+    document.getElementById('scanAgain').addEventListener('click', function () {
+        candidate = ''; stable = 0;
+        startScanner();
+    });
+
+    /* ── ręczna klawiatura ── */
+    const kbd = document.getElementById('kbd');
+    const manualOut = document.getElementById('manualOut');
+    let manualCode = '';
+    GLYPHS.forEach(function (ch) {
+        const b = document.createElement('button');
+        b.textContent = ch;
+        b.addEventListener('click', function () {
+            if (manualCode.length >= 8) return;
+            manualCode += ch;
+            manualOut.textContent = manualCode;
+            if (manualCode.length === 8) accept(manualCode);
+        });
+        kbd.appendChild(b);
+    });
+    const back = document.createElement('button');
+    back.className = 'wide';
+    back.textContent = 'cofnij';
+    back.addEventListener('click', function () {
+        manualCode = manualCode.slice(0, -1);
+        manualOut.textContent = manualCode || ' ';
+    });
+    kbd.appendChild(back);
+    const clear = document.createElement('button');
+    clear.className = 'wide';
+    clear.textContent = 'wyczyść';
+    clear.addEventListener('click', function () {
+        manualCode = '';
+        manualOut.textContent = ' ';
+    });
+    kbd.appendChild(clear);
+    document.getElementById('manualToggle').addEventListener('click', function () {
+        document.getElementById('manualBox').classList.toggle('on');
+    });
+
+    /* hak do testów automatycznych (PoC) */
+    window.__syg = {
+        GLYPHS: GLYPHS, CARD: CARD, cellCenter: cellCenter,
+        cardCanvas: cardCanvas, regen: regen, buildTemplates: buildTemplates,
+        classify: classify, getCode: function () { return currentCode; },
+        normalize: normalize, diceScore: diceScore,
+        getTemplates: function () { return templates; }
+    };
+
+    /* start — poczekaj na font, żeby karta i wzorce były z Diatype */
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () { regen(); });
+        // safari potrafi rozwiązać fonts.ready przed załadowaniem — dorysuj po chwili
+        setTimeout(function () { regen(currentCode); buildTemplates(); }, 600);
+    } else {
+        regen();
+    }
+})();
+</script>
+</body>
+</html>
