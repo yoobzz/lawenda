@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>kierunki — poems.html</title>
+<meta name="robots" content="noindex">
+<style>
+    @font-face {
+        font-family: 'ABC Diatype Rounded';
+        src: url('../fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+        font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
+        background: #ffffff;
+        color: #111;
+        -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(184, 160, 214, 0.35); }
+    button { font: inherit; background: none; border: 0; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+    /* ── przełącznik wariantów (tylko na czas podglądu) ───── */
+    #switcher {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        padding: 0.9rem 1rem;
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        z-index: 500;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0));
+    }
+    #switcher button {
+        color: #bbb;
+        padding: 4px 2px;
+        transition: color 0.2s ease;
+    }
+    #switcher button:hover { color: #555; }
+    #switcher button[aria-pressed="true"] {
+        color: #111;
+        border-bottom: 1px solid #111;
+    }
+
+    section[data-view] { display: none; }
+    section[data-view].on { display: block; }
+
+    /* ════════════════════════════════════════════════════════
+       A — KARTKA  (jeden wiersz, nic więcej)
+       ════════════════════════════════════════════════════════ */
+    #viewA { position: fixed; inset: 0; }
+    #aPoem {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 1.5rem 5rem;
+        cursor: default;
+    }
+    #aPoemText {
+        font-size: clamp(18px, 2.4vw, 23px);
+        font-weight: 320;
+        line-height: 1.95;
+        letter-spacing: 0.01em;
+        white-space: pre-line;
+        max-width: 34ch;
+        opacity: 1;
+        transition: opacity 0.35s ease;
+    }
+    #aPoemText.fading { opacity: 0; }
+    .a-edge {
+        position: absolute;
+        top: 0; bottom: 0;
+        width: 18%;
+        z-index: 5;
+    }
+    .a-edge.prev { left: 0; cursor: w-resize; }
+    .a-edge.next { right: 0; cursor: e-resize; }
+    #aFooter {
+        position: fixed;
+        bottom: 1.4rem;
+        left: 0; right: 0;
+        display: flex;
+        justify-content: center;
+        z-index: 10;
+    }
+    #aSpisBtn {
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        color: #c0c0c0;
+        transition: color 0.25s ease;
+        padding: 6px 10px;
+    }
+    #aSpisBtn:hover { color: #111; }
+    #aHome {
+        position: fixed;
+        top: 3rem; left: 1.4rem;
+        font-size: 12px;
+        color: #d0d0d0;
+        text-decoration: none;
+        transition: color 0.25s ease;
+        z-index: 10;
+    }
+    #aHome:hover { color: #555; }
+    /* spis — pierwsze linijki */
+    #aSpis {
+        position: fixed;
+        inset: 0;
+        background: #fff;
+        z-index: 400;
+        overflow-y: auto;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+    #aSpis.open { opacity: 1; pointer-events: auto; }
+    #aSpisInner {
+        max-width: 44ch;
+        margin: 0 auto;
+        padding: 6rem 1.5rem 6rem;
+    }
+    .a-spis-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        font-size: 15px;
+        font-weight: 320;
+        line-height: 1.5;
+        color: #999;
+        padding: 0.55em 0;
+        transition: color 0.2s ease;
+    }
+    .a-spis-item:hover { color: #111; }
+    .a-spis-item.read { color: #444; }
+    .a-spis-item.current { color: #111; }
+    .a-spis-item .dot {
+        display: inline-block;
+        width: 1.4em;
+        color: rgba(138, 115, 200, 0.75);
+    }
+    #aSpisClose {
+        position: fixed;
+        bottom: 1.4rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        color: #c0c0c0;
+        z-index: 410;
+        padding: 6px 10px;
+    }
+    #aSpisClose:hover { color: #111; }
+
+    /* ════════════════════════════════════════════════════════
+       B — ZWÓJ  (wszystko jednym ciągiem)
+       ════════════════════════════════════════════════════════ */
+    #viewB { min-height: 100%; }
+    #bScroll {
+        max-width: 38ch;
+        margin: 0 auto;
+        padding: 9rem 1.5rem 10rem;
+    }
+    .b-poem {
+        font-size: clamp(17px, 2.2vw, 21px);
+        font-weight: 320;
+        line-height: 1.95;
+        letter-spacing: 0.01em;
+        white-space: pre-line;
+    }
+    .b-sep {
+        text-align: center;
+        padding: 4.5rem 0;
+        font-size: 14px;
+        letter-spacing: 0.5em;
+        color: #c9c2d6;
+        user-select: none;
+    }
+    .b-end {
+        text-align: center;
+        padding-top: 5rem;
+        font-size: 13px;
+        color: #c0c0c0;
+        letter-spacing: 0.08em;
+    }
+    /* nić — pozycja w zwoju */
+    #bThread {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 2px;
+        height: 0%;
+        background: rgba(138, 115, 200, 0.4);
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════════════════════
+       C — MASZYNOPIS  (archiwum, monospace)
+       ════════════════════════════════════════════════════════ */
+    #viewC {
+        position: fixed;
+        inset: 0;
+        font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+        background: #fbfbfa;
+        overflow-y: auto;
+    }
+    #cList {
+        max-width: 60ch;
+        margin: 0 auto;
+        padding: 6rem 1.25rem 6rem;
+    }
+    #cHead {
+        font-size: 12px;
+        color: #999;
+        padding-bottom: 2.2rem;
+        line-height: 1.7;
+    }
+    #cHead .sig { color: #8a73c8; }
+    .c-row {
+        display: flex;
+        gap: 1.25em;
+        width: 100%;
+        text-align: left;
+        font-size: 13px;
+        line-height: 1.6;
+        padding: 0.32em 0;
+        color: #555;
+        transition: color 0.15s ease;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+    .c-row:hover { color: #000; }
+    .c-row .idx {
+        color: #bbb;
+        flex: 0 0 4.5ch;
+        transition: color 0.15s ease;
+    }
+    .c-row:hover .idx { color: #8a73c8; }
+    .c-row .line {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+    }
+    .c-row.read .idx { color: #8a73c8; opacity: 0.6; }
+    /* czytanie w C */
+    #cReader {
+        position: fixed;
+        inset: 0;
+        background: #fbfbfa;
+        z-index: 400;
+        overflow-y: auto;
+        display: none;
+    }
+    #cReader.open { display: block; }
+    #cReaderInner {
+        max-width: 60ch;
+        margin: 0 auto;
+        padding: 6rem 1.25rem 8rem;
+    }
+    #cReaderMeta {
+        font-size: 12px;
+        color: #999;
+        padding-bottom: 3rem;
+    }
+    #cReaderMeta .sig { color: #8a73c8; }
+    #cReaderText {
+        font-size: 14px;
+        line-height: 2.1;
+        color: #1a1a1a;
+        white-space: pre-line;
+    }
+    #cBack {
+        position: fixed;
+        top: 3rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: inherit;
+        font-size: 12px;
+        color: #999;
+        z-index: 410;
+        padding: 4px 10px;
+    }
+    #cBack:hover { color: #000; }
+    #cNextPrev {
+        display: flex;
+        gap: 3rem;
+        padding-top: 5rem;
+        font-size: 12px;
+    }
+    #cNextPrev button { color: #999; padding: 4px 0; }
+    #cNextPrev button:hover { color: #000; }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+</style>
+</head>
+<body>
+
+<nav id="switcher" aria-label="warianty">
+    <button data-target="a" aria-pressed="true">a — kartka</button>
+    <button data-target="b" aria-pressed="false">b — zwój</button>
+    <button data-target="c" aria-pressed="false">c — maszynopis</button>
+</nav>
+
+<!-- ── A: KARTKA ──────────────────────────────────────────── -->
+<section id="viewA" data-view="a" class="on">
+    <a id="aHome" href="../index.html">~||-_^+*.</a>
+    <div id="aPoem">
+        <div id="aPoemText"></div>
+    </div>
+    <button class="a-edge prev" id="aPrev" aria-label="poprzedni"></button>
+    <button class="a-edge next" id="aNext" aria-label="następny"></button>
+    <div id="aFooter">
+        <button id="aSpisBtn">spis</button>
+    </div>
+    <div id="aSpis">
+        <div id="aSpisInner"></div>
+        <button id="aSpisClose">wróć</button>
+    </div>
+</section>
+
+<!-- ── B: ZWÓJ ────────────────────────────────────────────── -->
+<section id="viewB" data-view="b">
+    <div id="bThread" aria-hidden="true"></div>
+    <div id="bScroll"></div>
+</section>
+
+<!-- ── C: MASZYNOPIS ──────────────────────────────────────── -->
+<section id="viewC" data-view="c">
+    <div id="cList">
+        <div id="cHead">
+            lawenda / archiwum<br>
+            157 plików · staś szpineta · <span class="sig">~||-_^+*.</span>
+        </div>
+        <div id="cRows"></div>
+    </div>
+    <div id="cReader">
+        <button id="cBack">← archiwum</button>
+        <div id="cReaderInner">
+            <div id="cReaderMeta"></div>
+            <div id="cReaderText"></div>
+            <div id="cNextPrev">
+                <button id="cPrevBtn">‹ poprzedni</button>
+                <button id="cNextBtn">następny ›</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(function () {
+    'use strict';
+
+    /* 4 wiersze które już są publicznie w poems.html — w wersji
+       docelowej dane przychodzą jak teraz z /api/poems za bramką */
+    const POEMS = [
+        'jak fala\nnigdy się nie zamknę\nja tratwę\nwycierpiałem sam\n\ni sam\nciągne to samo\ni mam\nciągle za mało\n\nwinie zło\njak by co\nto mi\n\nnie',
+        'byłem w tym sam\n\nraz\n\nnie mniej\nty bardziej',
+        'obym się mylił\nalbo chociaż\nmylnie wierzył',
+        'często ciszę\nmam .,•^* za•zwyczaj ‚l-\ntakie nieme\nznane ciepło\n\nznowu piszę\no tym dzisiaj\nczym to? nie wiem?\nczy na pewno?\n\n…nie na pewno!!!'
+    ];
+    const TOTAL = 12; // demo: 4 wiersze × 3, w realu 157
+    const poemAt = function (i) { return POEMS[i % POEMS.length]; };
+    const lineAt = function (i) { return poemAt(i).split('\n')[0]; };
+
+    let read = new Set();
+    let current = 0;
+
+    /* ── przełącznik ── */
+    const views = document.querySelectorAll('section[data-view]');
+    document.querySelectorAll('#switcher button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('#switcher button').forEach(function (b) {
+                b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+            });
+            views.forEach(function (v) {
+                v.classList.toggle('on', v.dataset.view === btn.dataset.target);
+            });
+            window.scrollTo(0, 0);
+        });
+    });
+
+    /* ════ A: KARTKA ════ */
+    const aText = document.getElementById('aPoemText');
+    const aSpis = document.getElementById('aSpis');
+    const aSpisInner = document.getElementById('aSpisInner');
+
+    function aShow(i) {
+        current = ((i % TOTAL) + TOTAL) % TOTAL;
+        read.add(current);
+        aText.classList.add('fading');
+        setTimeout(function () {
+            aText.textContent = poemAt(current);
+            aText.classList.remove('fading');
+        }, 280);
+    }
+    document.getElementById('aPrev').addEventListener('click', function () { aShow(current - 1); });
+    document.getElementById('aNext').addEventListener('click', function () { aShow(current + 1); });
+    document.addEventListener('keydown', function (e) {
+        if (!document.getElementById('viewA').classList.contains('on')) return;
+        if (aSpis.classList.contains('open')) {
+            if (e.key === 'Escape') aSpis.classList.remove('open');
+            return;
+        }
+        if (e.key === 'ArrowLeft') aShow(current - 1);
+        if (e.key === 'ArrowRight') aShow(current + 1);
+    });
+
+    function buildSpis() {
+        aSpisInner.innerHTML = '';
+        for (let i = 0; i < TOTAL; i++) {
+            const b = document.createElement('button');
+            b.className = 'a-spis-item'
+                + (read.has(i) ? ' read' : '')
+                + (i === current ? ' current' : '');
+            b.innerHTML = '<span class="dot">' + (i === current ? '·' : '') + '</span>' + lineAt(i);
+            b.addEventListener('click', function () {
+                aSpis.classList.remove('open');
+                aShow(i);
+            });
+            aSpisInner.appendChild(b);
+        }
+    }
+    document.getElementById('aSpisBtn').addEventListener('click', function () {
+        buildSpis();
+        aSpis.classList.add('open');
+    });
+    document.getElementById('aSpisClose').addEventListener('click', function () {
+        aSpis.classList.remove('open');
+    });
+    aShow(0);
+
+    /* ════ B: ZWÓJ ════ */
+    const bScroll = document.getElementById('bScroll');
+    const SEP_CHARS = ['~', '|', '-', '_', '^', '+', '*', '.'];
+    for (let i = 0; i < TOTAL; i++) {
+        const p = document.createElement('div');
+        p.className = 'b-poem';
+        p.textContent = poemAt(i);
+        bScroll.appendChild(p);
+        if (i < TOTAL - 1) {
+            const s = document.createElement('div');
+            s.className = 'b-sep';
+            s.textContent = SEP_CHARS[i % SEP_CHARS.length] + ' ' + SEP_CHARS[(i + 3) % SEP_CHARS.length];
+            bScroll.appendChild(s);
+        }
+    }
+    const bEnd = document.createElement('div');
+    bEnd.className = 'b-end';
+    bEnd.textContent = '~||-_^+*.';
+    bScroll.appendChild(bEnd);
+
+    const thread = document.getElementById('bThread');
+    function updateThread() {
+        if (!document.getElementById('viewB').classList.contains('on')) return;
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        const p = h > 0 ? window.scrollY / h : 0;
+        thread.style.height = (p * 100) + '%';
+    }
+    window.addEventListener('scroll', updateThread, { passive: true });
+
+    /* ════ C: MASZYNOPIS ════ */
+    const cRows = document.getElementById('cRows');
+    const cReader = document.getElementById('cReader');
+    const cMeta = document.getElementById('cReaderMeta');
+    const cText = document.getElementById('cReaderText');
+    let cCurrent = 0;
+
+    function pad(n) { return String(n + 1).padStart(4, '0'); }
+
+    function cOpen(i) {
+        cCurrent = ((i % TOTAL) + TOTAL) % TOTAL;
+        read.add(cCurrent);
+        cMeta.innerHTML = pad(cCurrent) + ' · <span class="sig">~||-_^+*.</span>';
+        cText.textContent = poemAt(cCurrent);
+        cReader.classList.add('open');
+        cReader.scrollTop = 0;
+        cRefreshRows();
+    }
+    function cRefreshRows() {
+        cRows.querySelectorAll('.c-row').forEach(function (r, i) {
+            r.classList.toggle('read', read.has(i));
+        });
+    }
+    for (let i = 0; i < TOTAL; i++) {
+        const row = document.createElement('button');
+        row.className = 'c-row';
+        row.innerHTML = '<span class="idx">' + pad(i) + '</span><span class="line">' + lineAt(i) + '</span>';
+        row.addEventListener('click', function () { cOpen(i); });
+        cRows.appendChild(row);
+    }
+    document.getElementById('cBack').addEventListener('click', function () {
+        cReader.classList.remove('open');
+    });
+    document.getElementById('cPrevBtn').addEventListener('click', function () { cOpen(cCurrent - 1); });
+    document.getElementById('cNextBtn').addEventListener('click', function () { cOpen(cCurrent + 1); });
+    document.addEventListener('keydown', function (e) {
+        if (!document.getElementById('viewC').classList.contains('on')) return;
+        if (e.key === 'Escape') cReader.classList.remove('open');
+    });
+})();
+</script>
+</body>
+</html>
