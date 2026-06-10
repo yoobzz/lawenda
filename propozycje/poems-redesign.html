@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>łąka — ~||-_^+*.</title>
+    <meta name="description" content="staś szpineta archiwum — prototyp nowego wyglądu poems.html">
+    <meta name="robots" content="noindex">
+    <style>
+        @font-face {
+            font-family: 'ABC Diatype Rounded';
+            src: url('../fonts/ABCDiatypeRoundedVariable-Trial.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #080808;
+            --ink: #f0ede8;
+            --ink-soft: rgba(240, 237, 232, 0.45);
+            --ink-faint: rgba(240, 237, 232, 0.18);
+            --lav: #b8a0d6;
+            --lav-soft: rgba(184, 160, 214, 0.55);
+            --lav-faint: rgba(184, 160, 214, 0.18);
+        }
+        html.day {
+            --bg: #fafafa;
+            --ink: #1a1a1a;
+            --ink-soft: rgba(20, 20, 20, 0.5);
+            --ink-faint: rgba(20, 20, 20, 0.16);
+            --lav: #8a73c8;
+            --lav-soft: rgba(138, 115, 200, 0.6);
+            --lav-faint: rgba(138, 115, 200, 0.16);
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'ABC Diatype Rounded', 'Inter', -apple-system, sans-serif;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* ── GRAIN (jak w znajdka.html) ───────────────────────── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.025;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 256px;
+        }
+
+        /* ── SCATTER — znaczki w tle ──────────────────────────── */
+        #scatter {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        #scatter span {
+            position: absolute;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            user-select: none;
+            opacity: 0;
+            transition: opacity 4s ease;
+            color: var(--ink);
+        }
+        #scatter span.visible { opacity: 0.035; }
+
+        /* ── WIERSZ ───────────────────────────────────────────── */
+        #poemStage {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(2rem, 6vw, 5rem);
+            z-index: 2;
+        }
+        .poem-block {
+            max-width: min(58ch, 86vw);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .poem-block.show { opacity: 1; }
+        .poem-sigil {
+            display: block;
+            font-size: 0.72em;
+            font-weight: 400;
+            letter-spacing: 0.35em;
+            color: var(--lav-soft);
+            margin-bottom: 1.6em;
+            user-select: none;
+        }
+        .poem-text {
+            font-size: clamp(17px, 2.6vw, 24px);
+            font-weight: 300;
+            line-height: 1.85;
+            letter-spacing: 0.015em;
+            white-space: pre-line;
+        }
+        .dc { display: inline-block; text-align: center; }
+
+        /* ── ŁODYGA — pasek przeczytania ──────────────────────── */
+        #stem {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            height: 2px;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(75, 115, 65, 0.55), var(--lav-soft));
+            z-index: 50;
+            transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        .stem-bloom {
+            position: fixed;
+            bottom: 5px;
+            font-size: 11px;
+            color: var(--lav);
+            z-index: 50;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            user-select: none;
+            pointer-events: none;
+        }
+        .stem-bloom.show { opacity: 0.8; transform: none; }
+
+        /* ── NAWIGACJA ────────────────────────────────────────── */
+        #nav {
+            position: fixed;
+            bottom: calc(1.6rem + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.4rem;
+            z-index: 100;
+        }
+        .nav-glyph {
+            background: none;
+            border: 0;
+            font-family: inherit;
+            font-size: 22px;
+            font-weight: 300;
+            color: var(--ink-soft);
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: color 0.3s ease, transform 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-glyph:hover { color: var(--ink); transform: scale(1.12); }
+        .nav-glyph:disabled { opacity: 0.18; cursor: default; transform: none; }
+        #navSigil {
+            background: none;
+            border: 0;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 0.3em;
+            color: var(--lav-soft);
+            cursor: pointer;
+            padding: 8px 6px;
+            transition: color 0.3s ease, letter-spacing 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            min-width: 9ch;
+            text-align: center;
+        }
+        #navSigil:hover { color: var(--lav); letter-spacing: 0.42em; }
+        #navHint {
+            position: fixed;
+            bottom: calc(0.45rem + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            color: var(--ink-faint);
+            z-index: 100;
+            user-select: none;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        /* ── GÓRNE ROGI ───────────────────────────────────────── */
+        .corner {
+            position: fixed;
+            z-index: 110;
+            background: none;
+            border: 0;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 0.06em;
+            color: var(--ink-soft);
+            cursor: pointer;
+            padding: 6px 8px;
+            text-decoration: none;
+            transition: color 0.3s ease, opacity 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .corner:hover { color: var(--ink); }
+        #backBtn { top: calc(1rem + env(safe-area-inset-top)); left: 1rem; opacity: 0.55; }
+        #themeBtn { top: calc(1rem + env(safe-area-inset-top)); right: 1rem; }
+        #audioBtn { top: calc(1rem + env(safe-area-inset-top)); right: 3.4rem; }
+        #releaseBtn { bottom: calc(1.2rem + env(safe-area-inset-bottom)); right: 1rem; opacity: 0.45; }
+        #releaseBtn:hover { color: var(--lav); opacity: 1; }
+        #coffee {
+            position: fixed;
+            left: 1.2rem;
+            bottom: calc(1.2rem + env(safe-area-inset-bottom));
+            z-index: 101;
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 0.04em;
+            color: var(--ink-soft);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        #coffee:hover { color: var(--ink); }
+        #coffee .sym { color: var(--lav-soft); margin-right: 0.35em; }
+
+        /* ── ŁĄKA — widok wszystkich wierszy ──────────────────── */
+        #meadow {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: var(--bg);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        #meadow.open { opacity: 1; pointer-events: auto; }
+        #meadowField {
+            position: absolute;
+            inset: 0;
+        }
+        .mark {
+            position: absolute;
+            background: none;
+            border: 0;
+            font-family: inherit;
+            font-weight: 400;
+            cursor: pointer;
+            color: var(--ink-faint);
+            padding: 6px;
+            transition: color 0.4s ease, transform 0.4s ease, text-shadow 0.4s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            line-height: 1;
+            transform: translate(-50%, -50%);
+        }
+        .mark:hover {
+            color: var(--ink);
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+        .mark.read {
+            color: var(--lav-soft);
+            text-shadow: 0 0 12px var(--lav-faint);
+        }
+        .mark.read:hover { color: var(--lav); }
+        .mark.current {
+            color: var(--lav);
+            animation: mark-pulse 2.4s ease-in-out infinite;
+            text-shadow: 0 0 16px var(--lav-faint);
+        }
+        @keyframes mark-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+        #meadowCaption {
+            position: absolute;
+            top: calc(1.2rem + env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 0.22em;
+            color: var(--ink-soft);
+            user-select: none;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        #meadowCaption .lav { color: var(--lav-soft); }
+        #meadowTip {
+            position: absolute;
+            font-size: 13px;
+            font-weight: 300;
+            color: var(--ink-soft);
+            letter-spacing: 0.02em;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            white-space: nowrap;
+            z-index: 310;
+            max-width: 70vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #meadowTip.show { opacity: 1; }
+        #meadowClose {
+            position: absolute;
+            bottom: calc(1.6rem + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background: none;
+            border: 0;
+            font-family: inherit;
+            font-size: 13px;
+            letter-spacing: 0.14em;
+            color: var(--ink-soft);
+            cursor: pointer;
+            padding: 8px 14px;
+            transition: color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #meadowClose:hover { color: var(--ink); }
+
+        /* ── TRAIL kursora ────────────────────────────────────── */
+        .trail-char {
+            position: fixed;
+            pointer-events: none;
+            font-weight: 700;
+            color: var(--ink);
+            opacity: 0.05;
+            z-index: 1;
+            transition: opacity 0.5s ease;
+            user-select: none;
+        }
+
+        /* ── TOAST ────────────────────────────────────────────── */
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(4.4rem + env(safe-area-inset-bottom));
+            transform: translateX(-50%) translateY(12px);
+            font-size: 12px;
+            letter-spacing: 0.06em;
+            color: var(--lav);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            z-index: 1500;
+        }
+        #toast.show { opacity: 0.9; transform: translateX(-50%) translateY(0); }
+
+        /* ── NOTKA PROTOTYPU ──────────────────────────────────── */
+        #protoNote {
+            position: fixed;
+            top: calc(2.8rem + env(safe-area-inset-top));
+            left: 1rem;
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            color: var(--ink-faint);
+            z-index: 110;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            #navHint { display: none; }
+            .nav-glyph { font-size: 26px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        @keyframes page-enter { from { opacity: 0; } to { opacity: 1; } }
+        body { animation: page-enter 0.55s ease forwards; }
+    </style>
+</head>
+<body>
+    <div id="scatter" aria-hidden="true"></div>
+
+    <a class="corner" id="backBtn" href="../index.html" title="wróć">~||-_^+*.</a>
+    <div id="protoNote">prototyp — 4 wiersze demo</div>
+    <button class="corner" id="audioBtn" title="dźwięk">||</button>
+    <button class="corner" id="themeBtn" title="noc / dzień">*</button>
+
+    <main id="poemStage">
+        <div class="poem-block" id="poemBlock">
+            <span class="poem-sigil" id="poemSigil" aria-hidden="true"></span>
+            <div class="poem-text" id="poemText"></div>
+        </div>
+    </main>
+
+    <div id="stem" aria-hidden="true"></div>
+
+    <nav id="nav" aria-label="nawigacja">
+        <button class="nav-glyph" id="prevBtn" aria-label="poprzedni">‹</button>
+        <button id="navSigil" title="łąka — wszystkie wiersze"></button>
+        <button class="nav-glyph" id="nextBtn" aria-label="następny">›</button>
+    </nav>
+    <div id="navHint">znaczek otwiera łąkę &nbsp;·&nbsp; ← → przewijają</div>
+
+    <a id="coffee" href="https://buycoffee.to/szpineta" target="_blank" rel="noopener"><span class="sym">~</span>wesprzyj wydanie</a>
+    <button class="corner" id="releaseBtn" title="porzuć znajdkę">_</button>
+
+    <div id="meadow" aria-hidden="true">
+        <div id="meadowCaption">łąka &nbsp;·&nbsp; <span class="lav" id="meadowCount"></span></div>
+        <div id="meadowField"></div>
+        <div id="meadowTip"></div>
+        <button id="meadowClose">wróć do czytania</button>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        /* ── DANE DEMO ──────────────────────────────────────────
+           Prototyp używa 4 wierszy które już są publiczne w poems.html.
+           Docelowo: fetch('/api/poems') jak teraz, TOTAL = poems.length. */
+        const DEMO_POEMS = [
+            'jak fala\nnigdy się nie zamknę\nja tratwę\nwycierpiałem sam\n\ni sam\nciągne to samo\ni mam\nciągle za mało\n\nwinie zło\njak by co\nto mi\n\nnie',
+            'byłem w tym sam\n\nraz\n\nnie mniej\nty bardziej',
+            'obym się mylił\nalbo chociaż\nmylnie wierzył',
+            'często ciszę\nmam .,•^* za•zwyczaj ‚l-\ntakie nieme\nznane ciepło\n\nznowu piszę\no tym dzisiaj\nczym to? nie wiem?\nczy na pewno?\n\n…nie na pewno!!!'
+        ];
+        const TOTAL = 157;
+        const CHARS = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
+
+        function poemFor(i) { return DEMO_POEMS[i % DEMO_POEMS.length]; }
+        function firstLine(i) { return poemFor(i).split('\n')[0]; }
+
+        /* ── SEEDED RNG (ten sam co w poems.html) ─────────────── */
+        function rng(seed) {
+            let s = ((seed | 0) * 16807) % 2147483647;
+            if (s <= 0) s = 1;
+            return function () {
+                s = (s * 16807) % 2147483647;
+                return (s & 0x7fffffff) / 2147483647;
+            };
+        }
+
+        /* sygnatura wiersza — deterministyczna, bez numerów */
+        function sigilFor(i) {
+            const r = rng((i + 1) * 7919);
+            const len = 4 + Math.floor(r() * 4);
+            let out = '';
+            for (let k = 0; k < len; k++) out += CHARS[Math.floor(r() * CHARS.length)];
+            return out;
+        }
+
+        /* ── STAN ──────────────────────────────────────────────── */
+        let current = 0;
+        let read = new Set();
+        try { read = new Set(JSON.parse(localStorage.getItem('laka_read') || '[]')); } catch (e) {}
+        function saveRead() {
+            try { localStorage.setItem('laka_read', JSON.stringify([...read])); } catch (e) {}
+        }
+
+        /* ── MOTYW ─────────────────────────────────────────────── */
+        const themeBtn = document.getElementById('themeBtn');
+        try { if (localStorage.getItem('laka_theme') === 'day') document.documentElement.classList.add('day'); } catch (e) {}
+        themeBtn.addEventListener('click', function () {
+            const day = document.documentElement.classList.toggle('day');
+            try { localStorage.setItem('laka_theme', day ? 'day' : 'night'); } catch (e) {}
+        });
+
+        /* ── SCATTER w tle ─────────────────────────────────────── */
+        (function scatter() {
+            const host = document.getElementById('scatter');
+            const n = window.innerWidth < 600 ? 26 : 54;
+            for (let i = 0; i < n; i++) {
+                const s = document.createElement('span');
+                s.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+                s.style.left = (Math.random() * 100) + '%';
+                s.style.top = (Math.random() * 100) + '%';
+                s.style.fontSize = (10 + Math.random() * 22) + 'px';
+                s.style.transform = 'rotate(' + ((Math.random() - 0.5) * 40) + 'deg)';
+                host.appendChild(s);
+                setTimeout(function () { s.classList.add('visible'); }, 400 + Math.random() * 3500);
+            }
+        })();
+
+        /* ── DECRYPT REVEAL ────────────────────────────────────── */
+        let decryptTimers = [];
+        function clearDecrypt() {
+            decryptTimers.forEach(clearTimeout);
+            decryptTimers = [];
+        }
+        function decryptInto(el, text) {
+            clearDecrypt();
+            el.textContent = '';
+            const frag = document.createDocumentFragment();
+            const spans = [];
+            for (const ch of text) {
+                if (/\s/.test(ch)) {
+                    frag.appendChild(document.createTextNode(ch));
+                } else {
+                    const sp = document.createElement('span');
+                    sp.className = 'dc';
+                    sp.textContent = ch;
+                    frag.appendChild(sp);
+                    spans.push({ el: sp, final: ch });
+                }
+            }
+            el.appendChild(frag);
+            // zablokuj szerokości na finalnym znaku, potem mieszaj
+            spans.forEach(function (s) {
+                const w = s.el.getBoundingClientRect().width;
+                s.el.style.width = w + 'px';
+            });
+            const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduced) return;
+            spans.forEach(function (s) {
+                const cycles = 1 + Math.floor(Math.random() * 4);
+                const step = 35 + Math.random() * 75;
+                const start = Math.random() * 250;
+                for (let c = 0; c < cycles; c++) {
+                    decryptTimers.push(setTimeout(function () {
+                        s.el.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+                    }, start + c * step));
+                }
+                decryptTimers.push(setTimeout(function () {
+                    s.el.textContent = s.final;
+                }, start + cycles * step));
+            });
+        }
+
+        /* ── POKAZYWANIE WIERSZA ───────────────────────────────── */
+        const block = document.getElementById('poemBlock');
+        const sigilEl = document.getElementById('poemSigil');
+        const textEl = document.getElementById('poemText');
+        const navSigil = document.getElementById('navSigil');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        function show(i, instant) {
+            current = Math.max(0, Math.min(TOTAL - 1, i));
+            const doRender = function () {
+                sigilEl.textContent = sigilFor(current);
+                navSigil.textContent = sigilFor(current);
+                decryptInto(textEl, poemFor(current));
+                // lekka losowość położenia bloku (seeded — stała dla wiersza)
+                const r = rng((current + 1) * 104729);
+                const mx = ((r() - 0.5) * 6).toFixed(1);
+                const my = ((r() - 0.5) * 5).toFixed(1);
+                const rot = ((r() - 0.5) * 1.2).toFixed(2);
+                block.style.transform = 'translate(' + mx + 'vw,' + my + 'vh) rotate(' + rot + 'deg)';
+                block.classList.add('show');
+                prevBtn.disabled = current === 0;
+                nextBtn.disabled = current === TOTAL - 1;
+                if (!read.has(current)) {
+                    read.add(current);
+                    saveRead();
+                    growStem();
+                }
+            };
+            if (instant) { doRender(); return; }
+            block.classList.remove('show');
+            setTimeout(doRender, 260);
+        }
+
+        prevBtn.addEventListener('click', function () { show(current - 1); });
+        nextBtn.addEventListener('click', function () { show(current + 1); });
+        document.addEventListener('keydown', function (e) {
+            if (meadow.classList.contains('open')) {
+                if (e.key === 'Escape' || e.key === '~') closeMeadow();
+                return;
+            }
+            if (e.key === 'ArrowLeft') show(current - 1);
+            else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); show(current + 1); }
+            else if (e.key === '~' || e.key === '`') openMeadow();
+        });
+
+        /* swipe na mobile */
+        let touchX = null;
+        document.addEventListener('touchstart', function (e) {
+            if (meadow.classList.contains('open')) return;
+            touchX = e.touches[0].clientX;
+        }, { passive: true });
+        document.addEventListener('touchend', function (e) {
+            if (touchX === null) return;
+            const dx = e.changedTouches[0].clientX - touchX;
+            touchX = null;
+            if (Math.abs(dx) < 50) return;
+            show(current + (dx < 0 ? 1 : -1));
+        }, { passive: true });
+
+        /* ── ŁODYGA ────────────────────────────────────────────── */
+        const stem = document.getElementById('stem');
+        const blooms = [0.25, 0.5, 0.75, 1].map(function (frac) {
+            const b = document.createElement('span');
+            b.className = 'stem-bloom';
+            b.textContent = '*';
+            b.style.left = 'calc(' + (frac * 100) + '% - 12px)';
+            document.body.appendChild(b);
+            return { frac: frac, el: b };
+        });
+        function growStem() {
+            const p = read.size / TOTAL;
+            stem.style.width = (p * 100) + '%';
+            blooms.forEach(function (b) {
+                if (p >= b.frac) b.el.classList.add('show');
+            });
+        }
+
+        /* ── ŁĄKA ──────────────────────────────────────────────── */
+        const meadow = document.getElementById('meadow');
+        const field = document.getElementById('meadowField');
+        const tip = document.getElementById('meadowTip');
+        const countEl = document.getElementById('meadowCount');
+        let marksBuilt = false;
+
+        function buildMarks() {
+            if (marksBuilt) return;
+            marksBuilt = true;
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < TOTAL; i++) {
+                const r = rng((i + 1) * 31337);
+                const m = document.createElement('button');
+                m.className = 'mark';
+                m.dataset.i = i;
+                m.textContent = CHARS[Math.floor(r() * CHARS.length)];
+                m.style.left = (6 + r() * 88) + '%';
+                m.style.top = (10 + r() * 76) + '%';
+                m.style.fontSize = (13 + r() * 12) + 'px';
+                m.setAttribute('aria-label', 'wiersz ' + sigilFor(i));
+                m.addEventListener('click', function () {
+                    closeMeadow();
+                    show(i);
+                });
+                m.addEventListener('mouseenter', function (e) {
+                    tip.textContent = sigilFor(i) + '  ·  ' + firstLine(i);
+                    const rect = m.getBoundingClientRect();
+                    tip.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
+                    tip.style.top = (rect.top - 28) + 'px';
+                    tip.classList.add('show');
+                });
+                m.addEventListener('mouseleave', function () { tip.classList.remove('show'); });
+                frag.appendChild(m);
+            }
+            field.appendChild(frag);
+        }
+
+        function refreshMarks() {
+            field.querySelectorAll('.mark').forEach(function (m) {
+                const i = parseInt(m.dataset.i, 10);
+                m.classList.toggle('read', read.has(i));
+                m.classList.toggle('current', i === current);
+            });
+            countEl.textContent = read.size + ' z ' + TOTAL + ' rozkwitło';
+        }
+
+        function openMeadow() {
+            buildMarks();
+            refreshMarks();
+            meadow.classList.add('open');
+            meadow.setAttribute('aria-hidden', 'false');
+        }
+        function closeMeadow() {
+            meadow.classList.remove('open');
+            meadow.setAttribute('aria-hidden', 'true');
+            tip.classList.remove('show');
+        }
+        navSigil.addEventListener('click', openMeadow);
+        document.getElementById('meadowClose').addEventListener('click', closeMeadow);
+
+        /* ── TRAIL kursora (desktop, oszczędnie) ───────────────── */
+        if (window.matchMedia && window.matchMedia('(pointer: fine)').matches) {
+            let lastTrail = 0;
+            document.addEventListener('mousemove', function (e) {
+                const now = Date.now();
+                if (now - lastTrail < 120) return;
+                lastTrail = now;
+                const t = document.createElement('span');
+                t.className = 'trail-char';
+                t.textContent = CHARS[Math.floor(Math.random() * CHARS.length)];
+                t.style.left = (e.clientX + (Math.random() - 0.5) * 24) + 'px';
+                t.style.top = (e.clientY + (Math.random() - 0.5) * 24) + 'px';
+                t.style.fontSize = (9 + Math.random() * 8) + 'px';
+                document.body.appendChild(t);
+                setTimeout(function () { t.style.opacity = '0'; }, 350);
+                setTimeout(function () { t.remove(); }, 900);
+            });
+        }
+
+        /* ── TOAST + przyciski demo ────────────────────────────── */
+        const toast = document.getElementById('toast');
+        let toastTimer;
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+        }
+        document.getElementById('releaseBtn').addEventListener('click', function () {
+            showToast('w prototypie znajdki się nie porzuca');
+        });
+        document.getElementById('audioBtn').addEventListener('click', function () {
+            showToast('dźwięk — jak w obecnym poems.html (audio.js)');
+        });
+
+        /* start */
+        growStem();
+        show(0, true);
+    })();
+    </script>
+</body>
+</html>
