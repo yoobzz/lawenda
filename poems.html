@@ -22,21 +22,13 @@
       plausible.init()
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>wiersze — ~||-_^+*.</title>
     <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark-mode')})();</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    
-    <meta name="description" content="staś szpineta archiwum">
-    <meta property="og:title" content="~||-_^+*.">
-    <meta property="og:description" content="staś szpineta archiwum">
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="pl_PL">
-    <meta property="og:url" content="https://szpineta.com/poems.html">
-    <meta property="og:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="~||-_^+*.">
-    <meta name="twitter:description" content="staś szpineta archiwum">
-    <meta name="twitter:image" content="https://szpineta.com/Screenshot%202025-09-10%20at%2008.54.09.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400&family=Geist+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -620,6 +612,82 @@
         html.dark-mode .typing-cursor { background: rgba(240,237,232,0.5); }
         html.dark-mode #audioToggle { color: rgba(240,237,232,0.4) !important; }
         html.dark-mode *:focus-visible { outline-color: rgba(240,237,232,0.4); }
+        /* ── Spis treści (TOC) ── */
+        .toc-toggle {
+            position: fixed; top: 1rem; left: 50%; transform: translateX(-50%);
+            background: none; border: 0; cursor: pointer;
+            font-family: 'ABC Diatype Rounded','Inter',sans-serif;
+            font-size: 13px; letter-spacing: 0.12em; color: #000; opacity: 0.55;
+            z-index: 1200; padding: 6px 10px; -webkit-tap-highlight-color: transparent;
+            transition: opacity 0.2s ease;
+        }
+        .toc-toggle:hover { opacity: 1; }
+        .toc-overlay {
+            position: fixed; inset: 0; z-index: 1500;
+            background: rgba(250,250,250,0);
+            -webkit-backdrop-filter: blur(0px); backdrop-filter: blur(0px);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.32s ease, background 0.32s ease, backdrop-filter 0.32s ease;
+        }
+        .toc-overlay.show {
+            opacity: 1; pointer-events: auto;
+            background: rgba(250,250,250,0.72);
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+        }
+        .toc-panel {
+            position: absolute; top: 0; left: 0; height: 100%;
+            width: min(440px, 86vw);
+            background: linear-gradient(135deg,#fafafa 0%,#f5f5f5 100%);
+            box-shadow: 1px 0 40px rgba(0,0,0,0.06);
+            transform: translateX(-102%);
+            transition: transform 0.36s cubic-bezier(0.22,1,0.36,1);
+            display: flex; flex-direction: column;
+            padding: 1.4rem 1.2rem 2rem;
+        }
+        .toc-overlay.show .toc-panel { transform: translateX(0); }
+        .toc-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 1rem; }
+        .toc-heading { font-size: 13px; letter-spacing: 0.18em; opacity: 0.5; }
+        .toc-close { background:none;border:0;cursor:pointer;font-size:15px;opacity:0.5;color:#000; }
+        .toc-close:hover { opacity:1; }
+        .toc-list { list-style:none; margin:0; padding:0; overflow-y:auto; flex:1; }
+        .toc-item { margin: 0; }
+        .toc-link {
+            display:flex; gap:0.8rem; align-items:baseline; width:100%; text-align:left;
+            background:none;border:0;cursor:pointer; padding: 0.42rem 0.2rem;
+            font-family:'ABC Diatype Rounded','Inter',sans-serif; font-weight:300; color:#000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: opacity 0.18s ease, padding-left 0.18s ease; opacity: 0.78;
+        }
+        .toc-link:hover { opacity:1; padding-left: 0.5rem; }
+        .toc-item.current .toc-link { opacity:1; font-weight:400; }
+        .toc-num { font-size:11px; opacity:0.45; min-width:1.8em; font-variant-numeric: tabular-nums; }
+        .toc-inc { font-size:15px; line-height:1.3; }
+        /* ── Wskazówka zajawki publicznej ── */
+        .locked-hint {
+            position: fixed; left: 50%; bottom: 5.2rem;
+            transform: translateX(-50%) translateY(8px);
+            display:flex; gap:0.55rem; align-items:baseline; text-decoration:none;
+            font-family:'ABC Diatype Rounded','Inter',sans-serif; color:#000;
+            opacity:0; pointer-events:none; z-index:1100; white-space:nowrap;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .locked-hint.show { opacity:0.6; pointer-events:auto; transform: translateX(-50%) translateY(0); }
+        .locked-hint:hover { opacity:1; }
+        .locked-hint-count { font-size:11px; opacity:0.6; letter-spacing:0.08em; font-variant-numeric: tabular-nums; }
+        .locked-hint-text { font-size:12px; letter-spacing:0.04em; }
+        @media (max-width: 640px) {
+            .locked-hint { bottom: 5rem; }
+            .locked-hint-text { font-size: 11px; white-space: normal; }
+        }
+        /* tryb ciemny — warianty */
+        html.dark-mode .toc-panel { background: linear-gradient(135deg,#121214,#0d0d0f); box-shadow:1px 0 40px rgba(0,0,0,0.5); }
+        html.dark-mode .toc-overlay.show { background: rgba(10,10,12,0.72); }
+        html.dark-mode .toc-toggle,
+        html.dark-mode .toc-close,
+        html.dark-mode .toc-link,
+        html.dark-mode .toc-heading,
+        html.dark-mode .locked-hint { color:#eee; }
+        html.dark-mode .toc-link { border-bottom-color: rgba(255,255,255,0.06); }
     </style>
 </head>
 <body>
@@ -716,6 +784,21 @@
         </div>
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite">skopiowano link</div>
+
+    <button class="toc-toggle" id="tocToggle" title="spis wierszy" aria-haspopup="dialog" aria-expanded="false">spis</button>
+    <div class="toc-overlay" id="tocOverlay" aria-hidden="true">
+        <div class="toc-panel" role="dialog" aria-label="spis wierszy">
+            <div class="toc-head">
+                <span class="toc-heading">spis</span>
+                <button class="toc-close" id="tocClose" title="zamknij" aria-label="zamknij">✕</button>
+            </div>
+            <ol class="toc-list" id="tocList"></ol>
+        </div>
+    </div>
+    <a class="locked-hint" id="lockedHint" href="/gate.html" aria-hidden="true" title="odblokuj cały zbiór">
+        <span class="locked-hint-count"></span>
+        <span class="locked-hint-text">to zajawka — cały zbiór odsłoni kod z kartki ›</span>
+    </a>
 
     <div class="poem-typing" id="poemTyping">
         <span id="poemTypedText"></span><span class="typing-cursor"></span>
@@ -1474,9 +1557,9 @@
                 ctx.fillText(SYMS[Math.floor(seededRand() * SYMS.length)], x, yMidTop);
             }
 
-            // dół — znaki + "szpineta.com" wkomponowane w środek
-            // TODO: rozważyć usunięcie domeny z watermarku — kłóci się z modelem dostępu przez fizyczny kod (decyzja po Kroku F)
-            const watermark = 'szpineta.com';
+            // dół — znaki + glif marki wkomponowany w środek
+            // (glif zamiast domeny — spójny z duchem „znalazłeś, masz, możesz puścić")
+            const watermark = '~||-_^+*.';
             ctx.font = symFont;
             const wmWidth = ctx.measureText(watermark).width + 40; // z marginesem
             const wmStart = (W - wmWidth) / 2;
@@ -2046,6 +2129,46 @@
             btn.addEventListener('click', () => { plausible('wesprzyj_klik'); });
         })();
 
+        // ── Spis treści (TOC) ────────────────────────────────────────────────
+        window.__buildToc = function() {
+            const list = document.getElementById('tocList');
+            if (!list) return;
+            list.innerHTML = '';
+            poems.forEach((el, i) => {
+                const incipit = (el.textContent || '')
+                    .split('\n').map(s => s.trim()).find(Boolean) || '—';
+                const li = document.createElement('li');
+                li.className = 'toc-item' + (i === currentPoem ? ' current' : '');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'toc-link';
+                const num = document.createElement('span');
+                num.className = 'toc-num';
+                num.textContent = String(i + 1);
+                const inc = document.createElement('span');
+                inc.className = 'toc-inc';
+                inc.textContent = incipit.slice(0, 48);
+                btn.appendChild(num);
+                btn.appendChild(inc);
+                btn.addEventListener('click', () => {
+                    if (i !== currentPoem) goToPoem(i);
+                    if (typeof window.__closeToc === 'function') window.__closeToc();
+                });
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        };
+
+        // ── Wskazówka zajawki publicznej ──────────────────────────────────────
+        window.__showLockedHint = function(pub, total) {
+            const hint = document.getElementById('lockedHint');
+            if (!hint) return;
+            const c = hint.querySelector('.locked-hint-count');
+            if (c) c.textContent = (pub || poems.length) + ' z ' + (total || poems.length);
+            hint.classList.add('show');
+            hint.setAttribute('aria-hidden', 'false');
+        };
+
         // ── Eksponowana funkcja do inicjalizacji po dynamic load ──────────────
         window.__initPoemsAfterLoad = function() {
             const mount = document.getElementById('poemsMount');
@@ -2190,25 +2313,16 @@
         // jeśli URL ma ?master=, czekamy aż bypass-IIFE skończy reload — nie odpalamy gate-check
         if (new URLSearchParams(location.search).get('master')) return;
 
-        // 1. sprawdź sesję
-        let valid = false;
-        try {
-            const r = await fetch('/api/session/check');
-            const d = await r.json();
-            valid = d.valid === true;
-        } catch {}
-
-        if (!valid) {
-            window.location.replace('/gate.html');
-            return;
-        }
-
-        // 2. pobierz wiersze
+        // 1. pobierz wiersze — hybryda: bez kodu zajawka publiczna, z kodem pełny zbiór
         let poemsData = [];
+        let full = false;
+        let total = 0;
         try {
             const r = await fetch('/api/poems');
             const d = await r.json();
             poemsData = Array.isArray(d.poems) ? d.poems : [];
+            full = d.full === true;
+            total = Number(d.total) || poemsData.length;
         } catch {}
 
         if (!poemsData.length) {
@@ -2217,7 +2331,10 @@
             return;
         }
 
-        // 3. renderuj poem divy
+        window.__poemsFull = full;
+        window.__poemsTotal = total;
+
+        // 2. renderuj poem divy
         const mount = document.getElementById('poemsMount');
         if (!mount) return;
         mount.innerHTML = '';
@@ -2229,9 +2346,14 @@
             mount.appendChild(div);
         });
 
-        // 4. inicjalizuj nawigację i layout
+        // 3. inicjalizuj nawigację i layout
         if (typeof window.__initPoemsAfterLoad === 'function') {
             window.__initPoemsAfterLoad();
+        }
+
+        // 4. zajawka publiczna → wskazówka o kodzie z kartki
+        if (!full && typeof window.__showLockedHint === 'function') {
+            window.__showLockedHint(poemsData.length, total);
         }
     })();
     </script>
@@ -2282,6 +2404,33 @@
                 confirmBtn.disabled = false;
                 cancelBtn.disabled = false;
             }
+        });
+    })();
+    </script>
+    <script>
+    // ── Sterowanie spisem treści ──────────────────────────────────────────
+    (function tocToggle() {
+        const overlay = document.getElementById('tocOverlay');
+        const toggle = document.getElementById('tocToggle');
+        const closeBtn = document.getElementById('tocClose');
+        if (!overlay || !toggle) return;
+        function open() {
+            if (typeof window.__buildToc === 'function') window.__buildToc();
+            overlay.classList.add('show');
+            overlay.setAttribute('aria-hidden', 'false');
+            toggle.setAttribute('aria-expanded', 'true');
+        }
+        function close() {
+            overlay.classList.remove('show');
+            overlay.setAttribute('aria-hidden', 'true');
+            toggle.setAttribute('aria-expanded', 'false');
+        }
+        window.__closeToc = close;
+        toggle.addEventListener('click', () => overlay.classList.contains('show') ? close() : open());
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && overlay.classList.contains('show')) close();
         });
     })();
     </script>

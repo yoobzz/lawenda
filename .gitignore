@@ -27,3 +27,6 @@ build/
 scripts/output/
 
 .vercel
+
+# zrzuty robocze analizy
+docs/screens/
