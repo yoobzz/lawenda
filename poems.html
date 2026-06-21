@@ -2134,9 +2134,12 @@
             const list = document.getElementById('tocList');
             if (!list) return;
             list.innerHTML = '';
+            const decodeEnt = (s) => { const t = document.createElement('textarea'); t.innerHTML = s; return t.value; };
             poems.forEach((el, i) => {
-                const incipit = (el.textContent || '')
-                    .split('\n').map(s => s.trim()).find(Boolean) || '—';
+                const incipit = (el.innerHTML || '')
+                    .split(/<br\s*\/?>/i)
+                    .map(s => decodeEnt(s.replace(/<[^>]+>/g, '')).trim())
+                    .find(Boolean) || '—';
                 const li = document.createElement('li');
                 li.className = 'toc-item' + (i === currentPoem ? ' current' : '');
                 const btn = document.createElement('button');
