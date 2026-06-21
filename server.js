@@ -335,17 +335,6 @@ app.post('/api/admin/master', async (req, res) => {
   }
 });
 
-// API mama — wysyłka odpowiedzi (local dev; na Vercel działa api/mama/send.js)
-app.post('/api/mama/send', async (req, res) => {
-  try {
-    const handler = require('./api/mama/send.js');
-    await handler(req, res);
-  } catch (e) {
-    console.error('[api/mama/send]', e);
-    res.status(500).json({ error: 'server error' });
-  }
-});
-
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
 // Prosty panel admin (serwowany wyłącznie po uwierzytelnieniu)
