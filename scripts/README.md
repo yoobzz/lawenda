@@ -71,3 +71,26 @@ code_pairings:{KOD}     → JSON {code, fingerprint, firstActivatedAt, lastSeenA
 ## notatka bezpieczeństwa
 
 `scripts/output/` zawiera całą poezję + sekretne kody. **nigdy nie commituj tego folderu.** `.gitignore` już to chroni, ale zweryfikuj `git status` przed `git add -A`.
+
+---
+
+## rhino_technical_drawing.py — rysunek techniczny 3 rzuty (Rhino)
+
+Skrypt **Rhino Python** (Rhino 7/8) do automatycznego rysunku technicznego z modelu
+3D (np. `lavmodel.stl`). Niezwiązany z bramką QR — samodzielne narzędzie.
+
+Co robi:
+- tworzy layout (domyślnie A3 poziomo),
+- wstawia 3 rzuty: z góry / z przodu / z prawej (rzutowanie europejskie),
+- ustawia **jednakową, rzeczywistą skalę** dla wszystkich rzutów (auto albo ręcznie),
+- dodaje linie wymiarowe (szerokość / głębokość / wysokość) z bounding box modelu,
+- blokuje skalę detali, żeby nie „uciekła”.
+
+Uruchomienie w Rhino:
+1. otwórz model i (opcjonalnie) zaznacz obiekty do rzutowania,
+2. `_RunPythonScript` → wskaż `scripts/rhino_technical_drawing.py`
+   (albo wklej do `_EditPythonScript` i `F5`),
+3. przełącz się na zakładkę layoutu „Rysunek techniczny” u dołu okna.
+
+Najczęstsze ustawienia są na górze pliku (sekcja `KONFIGURACJA`): format strony
+`PAGE`, skala `SCALE` (`None` = auto-dobór), marginesy, włączenie wymiarów.
