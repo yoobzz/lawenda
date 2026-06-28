@@ -38,6 +38,14 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'invalid session' });
   }
 
+  // Kod osobisty zostaje przy posiadaczu — nie da się go "oddać" (admin/master wyjęty).
+  if (payload.admin !== true && payload.code) {
+    const codeData = await kv.get(`codes:${payload.code}`);
+    if (codeData && codeData.mode === 'personal') {
+      return res.status(403).json({ state: 'personal', message: 'ta znajdka jest osobista — zostaje przy tobie' });
+    }
+  }
+
   if (payload.code) {
     await kv.del(`code_pairings:${payload.code}`);
   }

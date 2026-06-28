@@ -1765,15 +1765,64 @@ async function scanQR(onCode, scanToken) {
   intervalId = setInterval(tick, 180);
 }
 
-async function apiScan(code, fp) {
+async function apiScan(code, fp, trace) {
+  const payload = { code, fingerprint: fp };
+  if (trace) payload.trace = trace;
   const r = await fetch('/api/gate/scan', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code, fingerprint: fp }),
+    body: JSON.stringify(payload),
   });
   const data = await r.json().catch(() => null);
   if (!r.ok && !data) throw new Error('scan request failed');
   return data;
+}
+
+// Opcjonalny ślad przy pierwszym wejściu. Zwraca string (wpisany) albo null (pominięto).
+function askTrace() {
+  return new Promise(resolve => {
+    const wrap = document.getElementById('proto-trace');
+    const promptEl = document.getElementById('proto-trace-prompt');
+    const hintEl = document.getElementById('proto-trace-hint');
+    const inputEl = document.getElementById('proto-trace-input');
+    const submitEl = document.getElementById('proto-trace-submit');
+    const skipEl = document.getElementById('proto-trace-skip');
+    if (!wrap || !inputEl) { resolve(null); return; }
+
+    promptEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.tracePrompt) || 'zostaw ślad?';
+    hintEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.traceHint) || 'możesz pominąć';
+    submitEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.traceSubmitLabel) || 'zostaw';
+    skipEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.traceSkipLabel) || 'pomiń';
+    inputEl.placeholder = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.tracePlaceholder) || '';
+    inputEl.value = '';
+    wrap.classList.add('show');
+    wrap.setAttribute('aria-hidden', 'false');
+
+    let done = false;
+    function finish(value) {
+      if (done) return;
+      done = true;
+      wrap.classList.remove('show');
+      wrap.setAttribute('aria-hidden', 'true');
+      submitEl.onclick = null;
+      skipEl.onclick = null;
+      inputEl.onkeydown = null;
+      resolve(value);
+    }
+    submitEl.onclick = () => finish(inputEl.value.trim() || null);
+    skipEl.onclick = () => finish(null);
+    inputEl.onkeydown = e => { if (e.key === 'Enter') finish(inputEl.value.trim() || null); };
+    setTimeout(() => inputEl.focus(), 40);
+  });
+}
+
+// Po pierwszym wejściu: zapytaj o ślad i (jeśli podany) dopisz go do pary.
+async function handleFirstWithTrace(code) {
+  let trace = null;
+  try { trace = await askTrace(); } catch (_) { trace = null; }
+  if (trace) {
+    try { await apiScan(code, fingerprint, trace); } catch (_) {}
+  }
 }
 
 let fingerprint = null;
@@ -1857,6 +1906,7 @@ async function stateVerifyProto(code, backState) {
 
   if (result && result.state === 'first') {
     setProtoStatus('');
+    await handleFirstWithTrace(code);
     hideScanPrototypeStage();
     await showFirstAccessVisual();
     pageOut('/poems.html');
@@ -2065,6 +2115,7 @@ async function stateVerify(code, backState) {
   }
 
   if (result.state === 'first') {
+    await handleFirstWithTrace(code);
     await showFirstAccessVisual();
     pageOut('/poems.html');
     return;

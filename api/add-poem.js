@@ -5,6 +5,8 @@
 // - GITHUB_REPO: "owner/repo"
 // - GITHUB_BRANCH: branch name (default: main)
 
+const { requireAdmin } = require('./_lib/admin-auth.js');
+
 /**
  * Convert raw text into HTML lines with <br> and escaped entities.
  */
@@ -103,14 +105,9 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    // Auth
-    const adminToken = process.env.ADMIN_TOKEN;
-    const auth = req.headers.authorization || '';
-    const provided = auth.startsWith('Bearer ') ? auth.slice('Bearer '.length).trim() : '';
-    if (!adminToken || !provided || provided !== adminToken) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-~
+    // Auth: JWT cookie (panel) lub Bearer ADMIN_TOKEN (skrypty)
+    if (requireAdmin(req, res) !== true) return;
+
     // Env
     const githubToken = process.env.GITHUB_TOKEN;
     const repoFull = process.env.GITHUB_REPO || '';

@@ -1,7 +1,7 @@
 'use strict';
 
 const kv = require('../_lib/kv.js');
-const { requireAdminBasicAuth } = require('../_lib/admin-auth.js');
+const { requireAdmin } = require('../_lib/admin-auth.js');
 
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
 
@@ -41,7 +41,7 @@ async function loadCodes() {
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
-  if (requireAdminBasicAuth(req, res) !== true) return;
+  if (requireAdmin(req, res) !== true) return;
 
   const ownerFilter = String(req.query.owner || 'all');
   const search = String(req.query.search || '').toUpperCase().trim();
@@ -60,12 +60,21 @@ module.exports = async function handler(req, res) {
         const ownerFingerprint = pairing && typeof pairing.fingerprint === 'string'
           ? pairing.fingerprint
           : null;
+        const cd = codeData && typeof codeData === 'object' ? codeData : {};
 
         return {
           code,
-          status: codeData && typeof codeData.status === 'string' ? codeData.status : 'unknown',
+          status: typeof cd.status === 'string' ? cd.status : 'unknown',
+          state: typeof cd.state === 'string' ? cd.state : 'minted',
+          mode: cd.mode === 'personal' ? 'personal' : 'wild',
+          label: typeof cd.label === 'string' ? cd.label : '',
+          recipient: typeof cd.recipient === 'string' ? cd.recipient : '',
+          note: typeof cd.note === 'string' ? cd.note : '',
+          issuedAt: cd.issuedAt || null,
+          assignedAt: cd.assignedAt || null,
           hasOwner: Boolean(ownerFingerprint),
           ownerFingerprintShort: shortFingerprint(ownerFingerprint),
+          holderName: pairing && typeof pairing.holderName === 'string' ? pairing.holderName : '',
           firstActivatedAt: pairing && pairing.firstActivatedAt ? pairing.firstActivatedAt : null,
           lastSeenAt: pairing && pairing.lastSeenAt ? pairing.lastSeenAt : null,
           transferredAt: pairing && pairing.transferredAt ? pairing.transferredAt : null,

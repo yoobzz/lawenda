@@ -1,457 +1,609 @@
 <!doctype html>
 <html lang="pl">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>szpineta / panel</title>
-    <meta name="robots" content="noindex, nofollow" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>szpineta / panel</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f9f9f8;
+      --ink: #0d0d0d;
+      --ink-dim: rgba(13,13,13,0.45);
+      --ink-mid: rgba(13,13,13,0.62);
+      --border: rgba(13,13,13,0.13);
+      --border-strong: rgba(13,13,13,0.28);
+      --lav: #9688d4;
+      --lav-bg: rgba(150,136,212,0.08);
+      --ok: #1a4d2e;
+      --ok-bg: rgba(26,77,46,0.07);
+      --warn: #7a5a16;
+      --warn-bg: rgba(122,90,22,0.07);
+      --err: #8b1a1a;
+      --err-bg: rgba(139,26,26,0.06);
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    }
+    html { font-size: 13px; }
+    body { background: var(--bg); color: var(--ink); font-family: var(--mono); min-height: 100vh; }
+    .page { max-width: 1180px; margin: 0 auto; padding: 34px 24px 80px; }
 
-        :root {
-            --bg: #f9f9f8;
-            --ink: #0d0d0d;
-            --ink-dim: rgba(13,13,13,0.38);
-            --ink-mid: rgba(13,13,13,0.6);
-            --border: rgba(13,13,13,0.12);
-            --border-strong: rgba(13,13,13,0.28);
-            --lav: #9688d4;
-            --lav-bg: rgba(150,136,212,0.08);
-            --red: #8b1a1a;
-            --red-bg: rgba(139,26,26,0.06);
-            --green: #1a4d2e;
-            --green-bg: rgba(26,77,46,0.06);
-            --mono: 'IBM Plex Mono', ui-monospace, monospace;
-        }
+    /* login */
+    #login { max-width: 380px; margin: 16vh auto 0; padding: 0 24px; }
+    #login h1 { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 22px; }
+    #login .row { display: flex; gap: 8px; }
+    #login input { flex: 1; }
+    #login .hint { font-size: 10px; color: var(--ink-dim); margin-top: 12px; line-height: 1.6; }
 
-        html { font-size: 13px; }
-        body {
-            font-family: var(--mono);
-            background: var(--bg);
-            color: var(--ink);
-            min-height: 100vh;
-            padding: 0;
-        }
+    /* header + tabs */
+    .header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 1px solid var(--border-strong); padding-bottom: 14px; margin-bottom: 4px; }
+    .header h1 { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; color: var(--ink-dim); }
+    .header h1 .dot { color: var(--lav); }
+    .tabs { display: flex; gap: 4px; margin: 18px 0 22px; flex-wrap: wrap; }
+    .tab { border: 1px solid var(--border); background: transparent; color: var(--ink-dim); font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 14px; cursor: pointer; }
+    .tab:hover { color: var(--ink); }
+    .tab.active { border-color: var(--border-strong); color: var(--ink); background: rgba(13,13,13,0.03); }
+    .panel { display: none; }
+    .panel.active { display: block; }
 
-        /* ── layout ── */
-        .page {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 48px 32px 80px;
-        }
+    /* inputs / buttons */
+    input[type="text"], input[type="password"], input[type="number"], select, textarea {
+      border: 1px solid var(--border); background: transparent; color: var(--ink);
+      font-family: var(--mono); font-size: 12px; padding: 8px 10px; outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--border-strong); }
+    textarea { width: 100%; height: 200px; line-height: 1.7; resize: vertical; }
+    .btn { border: 1px solid var(--border-strong); background: transparent; color: var(--ink); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 12px; cursor: pointer; }
+    .btn:hover { background: var(--ink); color: var(--bg); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-sm { padding: 5px 9px; font-size: 9px; }
+    .btn-danger { border-color: var(--err); color: var(--err); }
+    .btn-danger:hover { background: var(--err); color: var(--bg); }
+    .btn-soft { border-color: var(--border); color: var(--ink-dim); }
+    .btn-lav { border-color: var(--lav); color: var(--lav); }
+    .btn-lav:hover { background: var(--lav); color: #fff; }
 
-        /* ── header ── */
-        .site-header {
-            display: flex;
-            align-items: baseline;
-            gap: 16px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-strong);
-            margin-bottom: 48px;
-        }
-        .site-header h1 {
-            font-size: 11px;
-            font-weight: 400;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--ink-dim);
-        }
-        .site-header .dot { color: var(--lav); }
+    /* status */
+    .status { font-size: 11px; padding: 8px 10px; margin: 10px 0; display: none; }
+    .status.show { display: block; }
+    .status.ok { background: var(--ok-bg); color: var(--ok); border-left: 2px solid var(--ok); }
+    .status.err { background: var(--err-bg); color: var(--err); border-left: 2px solid var(--err); }
+    .status.info { background: var(--lav-bg); color: var(--lav); border-left: 2px solid var(--lav); }
 
-        /* ── token bar ── */
-        .token-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 40px;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            background: rgba(13,13,13,0.02);
-        }
-        .token-bar label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; }
-        .token-bar input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            font-family: var(--mono);
-            font-size: 12px;
-            color: var(--ink);
-            outline: none;
-            min-width: 0;
-        }
-        .token-bar input::placeholder { color: var(--ink-dim); }
-        .token-status { font-size: 10px; color: var(--lav); letter-spacing: 0.1em; white-space: nowrap; }
+    .section-title { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim); margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 6px; }
+    .field input[type=text], .field textarea { width: 100%; }
+    .hint { font-size: 10px; color: var(--ink-dim); margin-top: 4px; line-height: 1.6; }
 
-        /* ── sections ── */
-        .section { margin-bottom: 56px; }
-        .section-title {
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--ink-dim);
-            margin-bottom: 20px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--border);
-        }
+    /* mint */
+    .mint-box { border: 1px solid var(--border); padding: 16px; margin-bottom: 22px; background: rgba(13,13,13,0.015); }
+    .mint-grid { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+    .mint-grid .field { margin-bottom: 0; }
+    .mint-grid input[type=number] { width: 70px; }
+    .mint-grid input[type=text] { width: 150px; }
+    .qr-grid { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
+    .qr-card { border: 1px solid var(--border-strong); padding: 12px; text-align: center; background: #fff; }
+    .qr-card .qr-img { width: 132px; height: 132px; display: flex; align-items: center; justify-content: center; }
+    .qr-card .qr-img img, .qr-card .qr-img canvas { width: 132px !important; height: 132px !important; }
+    .qr-card .qr-code { font-size: 15px; letter-spacing: 0.18em; font-weight: 600; margin: 8px 0 2px; }
+    .qr-card .qr-url { font-size: 9px; color: var(--ink-dim); word-break: break-all; }
+    .qr-card .qr-actions { margin-top: 8px; display: flex; gap: 6px; justify-content: center; }
 
-        /* ── form fields ── */
-        .field { margin-bottom: 16px; }
-        .field label {
-            display: block;
-            font-size: 10px;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--ink-dim);
-            margin-bottom: 6px;
-        }
-        .field input[type=text],
-        .field textarea {
-            width: 100%;
-            border: 1px solid var(--border);
-            background: transparent;
-            font-family: var(--mono);
-            font-size: 12px;
-            color: var(--ink);
-            padding: 9px 12px;
-            outline: none;
-            resize: vertical;
-            transition: border-color 0.15s;
-        }
-        .field input:focus, .field textarea:focus { border-color: var(--border-strong); }
-        .field textarea { height: 220px; line-height: 1.7; }
-        .field-hint { font-size: 10px; color: var(--ink-dim); margin-top: 4px; }
+    /* toolbar + table */
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .toolbar label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-dim); }
+    .meta { margin-bottom: 10px; color: var(--ink-dim); font-size: 11px; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; min-width: 880px; }
+    th { text-align: left; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--ink-dim); border-bottom: 1px solid var(--border-strong); padding: 8px; white-space: nowrap; background: rgba(13,13,13,0.02); }
+    td { border-bottom: 1px solid var(--border); font-size: 11px; padding: 8px; vertical-align: top; }
+    tr:hover td { background: rgba(13,13,13,0.015); }
+    .col-code { letter-spacing: 0.08em; font-weight: 600; white-space: nowrap; }
+    .pill { font-size: 10px; border: 1px solid var(--border); padding: 2px 7px; display: inline-block; white-space: nowrap; }
+    .pill.ok { color: var(--ok); border-color: rgba(26,77,46,0.4); background: var(--ok-bg); }
+    .pill.warn { color: var(--warn); border-color: rgba(122,90,22,0.4); background: var(--warn-bg); }
+    .pill.dim { color: var(--ink-dim); }
+    .pill.lav { color: var(--lav); border-color: rgba(150,136,212,0.5); background: var(--lav-bg); }
+    .mode-personal { color: var(--lav); }
+    .mode-wild { color: var(--ink-dim); }
+    .actions { display: flex; gap: 5px; flex-wrap: wrap; }
+    .empty { padding: 18px 12px; color: var(--ink-dim); font-size: 11px; }
+    .edit-row td { background: rgba(150,136,212,0.05); }
+    .edit-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+    .edit-grid .field { margin: 0; }
+    .row-hi td { background: var(--lav-bg) !important; transition: background 1.2s; }
 
-        /* ── buttons ── */
-        .btn {
-            font-family: var(--mono);
-            font-size: 11px;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            padding: 8px 16px;
-            border: 1px solid var(--border-strong);
-            background: transparent;
-            color: var(--ink);
-            cursor: pointer;
-            transition: background 0.12s, color 0.12s;
-        }
-        .btn:hover { background: var(--ink); color: var(--bg); }
-        .btn-danger {
-            border-color: var(--red);
-            color: var(--red);
-        }
-        .btn-danger:hover { background: var(--red); color: var(--bg); }
-        .btn-sm { padding: 5px 10px; font-size: 10px; }
+    /* scans */
+    .scan-table td .loc-link { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
+    input[type=checkbox] { width: 13px; height: 13px; vertical-align: middle; }
 
-        /* ── status messages ── */
-        .status-line {
-            font-size: 11px;
-            padding: 8px 12px;
-            margin-top: 10px;
-            display: none;
-        }
-        .status-line.show { display: block; }
-        .status-line.ok { background: var(--green-bg); color: var(--green); border-left: 2px solid var(--green); }
-        .status-line.err { background: var(--red-bg); color: var(--red); border-left: 2px solid var(--red); }
-        .status-line.info { background: var(--lav-bg); color: var(--lav); border-left: 2px solid var(--lav); }
-
-        /* ── confirm strip ── */
-        .confirm-strip {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border: 1px solid rgba(139,26,26,0.3);
-            background: var(--red-bg);
-            margin: 10px 0;
-            font-size: 11px;
-            color: var(--red);
-        }
-        .confirm-strip.show { display: flex; }
-        .confirm-strip .confirm-msg { flex: 1; }
-
-        /* ── scans toolbar ── */
-        .scans-toolbar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-        }
-
-        /* ── scan table ── */
-        .scan-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-        }
-        .scan-table th {
-            font-size: 9px;
-            font-weight: 500;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--ink-dim);
-            text-align: left;
-            padding: 6px 10px 6px 0;
-            border-bottom: 1px solid var(--border-strong);
-            white-space: nowrap;
-        }
-        .scan-table th:first-child { padding-left: 0; width: 24px; }
-        .scan-table td {
-            padding: 7px 10px 7px 0;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-            color: var(--ink-mid);
-        }
-        .scan-table td:first-child { padding-left: 0; }
-        .scan-table tr:hover td { color: var(--ink); background: rgba(13,13,13,0.02); }
-        .scan-table .code-cell { font-weight: 500; color: var(--ink); letter-spacing: 0.08em; }
-        .scan-table .state-first { color: var(--lav); }
-        .scan-table .state-known { color: var(--ink-dim); }
-        .scan-table .state-transfer { color: #8b6a1a; }
-        .scan-table .loc-link { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--border-strong); }
-        .scan-table .loc-link:hover { color: var(--ink); }
-        .scan-table .device-cell { color: var(--ink-dim); font-size: 10px; }
-
-        /* ── checkbox ── */
-        input[type=checkbox] {
-            appearance: none;
-            width: 12px;
-            height: 12px;
-            border: 1px solid var(--border-strong);
-            background: transparent;
-            cursor: pointer;
-            position: relative;
-            vertical-align: middle;
-        }
-        input[type=checkbox]:checked {
-            background: var(--ink);
-            border-color: var(--ink);
-        }
-        input[type=checkbox]:checked::after {
-            content: '';
-            position: absolute;
-            left: 2px; top: 2px;
-            width: 6px; height: 6px;
-            background: var(--bg);
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-        }
-
-        .empty-state { color: var(--ink-dim); font-size: 11px; padding: 20px 0; }
-    </style>
+    @media (max-width: 720px) {
+      .page { padding: 22px 12px 60px; }
+      .mint-grid input[type=text] { width: 100%; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
 
-    <header class="site-header">
-        <h1>szpineta<span class="dot"> · </span>panel administracyjny</h1>
+  <!-- ── ekran logowania ── -->
+  <div id="login" style="display:none;">
+    <h1>szpineta<span class="dot"> · </span>panel</h1>
+    <div class="row">
+      <input type="password" id="masterKey" placeholder="master key" autocomplete="off" />
+      <button class="btn btn-lav" id="loginBtn">wejdź</button>
+    </div>
+    <div class="status" id="loginStatus"></div>
+    <div class="hint">jedno hasło = twój master key (ADMIN_MASTER_KEY). po wejściu zostajesz zalogowany na rok.</div>
+  </div>
+
+  <!-- ── aplikacja ── -->
+  <div class="page" id="app" style="display:none;">
+    <header class="header">
+      <h1>szpineta<span class="dot"> · </span>panel</h1>
+      <div><button class="btn btn-soft btn-sm" id="logoutBtn">wyloguj</button></div>
     </header>
 
-    <!-- token -->
-    <div class="token-bar">
-        <label for="token">token</label>
-        <input type="password" id="token" placeholder="ADMIN_TOKEN" oninput="saveToken()" autocomplete="off" />
-        <span class="token-status" id="tokInfo"></span>
-    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="codes">znajdki</button>
+      <button class="tab" data-tab="scans">skany</button>
+      <button class="tab" data-tab="poems">wiersze</button>
+    </nav>
 
-    <!-- dodaj wiersz -->
-    <section class="section">
-        <div class="section-title">dodaj wiersz</div>
-        <form onsubmit="submitPoem(event)">
-            <div class="field">
-                <label for="poemTitle">tytuł (opcjonalnie)</label>
-                <input type="text" id="poemTitle" placeholder="np. po pełni" />
-            </div>
-            <div class="field">
-                <label for="poemText">treść</label>
-                <textarea id="poemText" placeholder="wpisz wiersz — puste linie to przerwy akapitowe"></textarea>
-                <div class="field-hint">zachowaj puste linie tam gdzie chcesz przerwę · tytuł zapisuje się jako komentarz w poems.html</div>
-            </div>
-            <button type="submit" class="btn">dodaj wiersz</button>
-        </form>
-        <div class="status-line" id="poemStatus"></div>
+    <!-- ───────── ZNAJDKI ───────── -->
+    <section class="panel active" id="panel-codes">
+      <div class="section-title">nowe kody</div>
+      <div class="mint-box">
+        <div class="mint-grid">
+          <div class="field"><label>ile</label><input type="number" id="mintCount" min="1" max="50" value="1" /></div>
+          <div class="field"><label>tryb</label>
+            <select id="mintMode">
+              <option value="wild">dzika (można puścić)</option>
+              <option value="personal">osobista (dla jednej osoby)</option>
+            </select>
+          </div>
+          <div class="field"><label>odbiorca (opc.)</label><input type="text" id="mintRecipient" placeholder="np. Kasia" /></div>
+          <div class="field"><label>etykieta (opc.)</label><input type="text" id="mintLabel" placeholder="np. broszka" /></div>
+          <button class="btn btn-lav" id="mintBtn">generuj + QR</button>
+        </div>
+        <div class="hint">odbiorca/etykieta dotyczą całej partii. domena na QR: <input type="text" id="siteBase" style="width:200px;padding:4px 6px;font-size:11px;" /></div>
+        <div class="status" id="mintStatus"></div>
+        <div class="qr-grid" id="qrGrid"></div>
+      </div>
+
+      <div class="section-title">inwentarz</div>
+      <div class="toolbar">
+        <label for="search">kod</label>
+        <input type="text" id="search" maxlength="8" placeholder="np. A1B2" style="width:140px;" />
+        <label for="stateFilter">stan</label>
+        <select id="stateFilter">
+          <option value="all">wszystkie</option>
+          <option value="fresh">świeże</option>
+          <option value="assigned">wydane</option>
+          <option value="claimed">zeskanowane</option>
+          <option value="revoked">wycofane</option>
+        </select>
+        <button class="btn" id="refreshBtn">odśwież</button>
+        <button class="btn btn-lav" id="nextFreeBtn" title="zaznacza najstarszy świeży kod i kopiuje jego link">weź następny wolny</button>
+      </div>
+      <div class="status" id="codesStatus"></div>
+      <div class="meta" id="codesMeta"></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>kod</th><th>stan</th><th>kto</th><th>tryb</th><th>etykieta</th><th>odbiorca</th><th>1. skan</th><th>akcje</th>
+          </tr></thead>
+          <tbody id="codeRows"><tr><td colspan="8" class="empty">ładowanie…</td></tr></tbody>
+        </table>
+      </div>
     </section>
 
-    <!-- skany -->
-    <section class="section">
-        <div class="section-title">skany znajdek</div>
-
-        <div class="scans-toolbar">
-            <button class="btn btn-sm" onclick="loadScans()">odśwież</button>
-            <button class="btn btn-sm" onclick="selectAll()">zaznacz wszystkie</button>
-            <button class="btn btn-sm btn-danger" onclick="releaseSelected()">porzuć zaznaczone</button>
-        </div>
-
-        <div class="confirm-strip" id="confirmStrip">
-            <span class="confirm-msg" id="confirmMsg"></span>
-            <button class="btn btn-sm btn-danger" onclick="doRelease()">tak, porzuć</button>
-            <button class="btn btn-sm" onclick="hideConfirm()">anuluj</button>
-        </div>
-
-        <div class="status-line" id="releaseStatus"></div>
-        <div id="scansOut"></div>
+    <!-- ───────── SKANY ───────── -->
+    <section class="panel" id="panel-scans">
+      <div class="section-title">skany znajdek</div>
+      <div class="toolbar">
+        <button class="btn" id="scansRefreshBtn">odśwież</button>
+        <span class="hint">ostatnie do 500 skanów. ★ pierwszy · ↩ powrót · ⇄ transfer</span>
+      </div>
+      <div class="status" id="scansStatus"></div>
+      <div id="scansOut"><div class="empty">kliknij „odśwież”.</div></div>
     </section>
 
-</div>
-<script>
-    // ── token ──────────────────────────────────────────────────────────────
-    (function() {
-        const stored = localStorage.getItem('adminToken') || '';
-        if (stored) {
-            document.getElementById('token').value = stored;
-            document.getElementById('tokInfo').textContent = 'zapisany';
-        }
-    })();
+    <!-- ───────── WIERSZE ───────── -->
+    <section class="panel" id="panel-poems">
+      <div class="section-title">dodaj wiersz</div>
+      <form id="poemForm">
+        <div class="field"><label for="poemTitle">tytuł (opcjonalnie)</label><input type="text" id="poemTitle" placeholder="np. po pełni" /></div>
+        <div class="field"><label for="poemText">treść</label>
+          <textarea id="poemText" placeholder="wpisz wiersz — puste linie to przerwy akapitowe"></textarea>
+          <div class="hint">puste linie = przerwy · tytuł zapisuje się jako komentarz · zapis = commit do GitHub (poems.html + index.html)</div>
+        </div>
+        <button type="submit" class="btn">dodaj wiersz</button>
+      </form>
+      <div class="status" id="poemStatus"></div>
+    </section>
+  </div>
 
-    function saveToken() {
-        const t = document.getElementById('token').value.trim();
-        localStorage.setItem('adminToken', t);
-        document.getElementById('tokInfo').textContent = t ? 'zapisany' : '';
+  <script>
+    'use strict';
+
+    // ── helpers ──
+    function $(id) { return document.getElementById(id); }
+    function esc(v) {
+      return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
-
-    function getToken() { return localStorage.getItem('adminToken') || ''; }
-
-    // ── poem submit ────────────────────────────────────────────────────────
-    async function submitPoem(e) {
-        e.preventDefault();
-        const st = document.getElementById('poemStatus');
-        setStatus(st, 'info', 'wysyłam...');
-        try {
-            const resp = await fetch('/api/add-poem', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-                body: JSON.stringify({
-                    poemTitle: document.getElementById('poemTitle').value,
-                    poemText: document.getElementById('poemText').value
-                })
-            });
-            const data = await resp.json().catch(() => ({}));
-            if (resp.ok) {
-                setStatus(st, 'ok', data.message || 'dodano');
-                document.getElementById('poemText').value = '';
-                document.getElementById('poemTitle').value = '';
-            } else {
-                setStatus(st, 'err', 'błąd: ' + (data.error || resp.status));
-            }
-        } catch (e) {
-            setStatus(st, 'err', 'błąd: ' + e.message);
-        }
-    }
-
-    // ── scans ──────────────────────────────────────────────────────────────
-    async function loadScans() {
-        const out = document.getElementById('scansOut');
-        out.innerHTML = '<div class="empty-state">ładuję...</div>';
-        hideConfirm();
-        try {
-            const resp = await fetch('/api/admin/scans', {
-                headers: { 'Authorization': `Bearer ${getToken()}` }
-            });
-            if (!resp.ok) { out.innerHTML = `<div class="empty-state">błąd ${resp.status} — sprawdź token</div>`; return; }
-            const { scans } = await resp.json();
-            if (!scans || scans.length === 0) { out.innerHTML = '<div class="empty-state">brak skanów</div>'; return; }
-            renderScans(scans);
-        } catch (e) {
-            out.innerHTML = `<div class="empty-state">błąd: ${e.message}</div>`;
-        }
-    }
-
-    function renderScans(scans) {
-        const rows = scans.map(s => {
-            const d = new Date(s.at);
-            const date = d.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' });
-            const locText = [s.city, s.country].filter(x => x && x !== '?').join(', ') || '?';
-            const loc = (s.lat && s.lng)
-                ? `<a class="loc-link" href="https://www.google.com/maps?q=${s.lat},${s.lng}" target="_blank" rel="noopener">${locText} ↗</a>`
-                : locText;
-            const stateClass = s.state === 'first' ? 'state-first' : s.state === 'known' ? 'state-known' : 'state-transfer';
-            const stateTxt = s.state === 'first' ? '★ pierwsza' : s.state === 'known' ? '↩ powrót' : '⇄ transfer';
-            const device = detectDevice(s.ua);
-            return `<tr>
-                <td><input type="checkbox" class="code-cb" value="${s.code}"></td>
-                <td>${date}</td>
-                <td class="code-cell">${s.code}</td>
-                <td class="${stateClass}">${stateTxt}</td>
-                <td>${loc}</td>
-                <td class="device-cell">${device}</td>
-            </tr>`;
-        }).join('');
-        document.getElementById('scansOut').innerHTML =
-            `<table class="scan-table">
-                <thead><tr>
-                    <th></th><th>kiedy</th><th>kod</th><th>stan</th><th>skąd</th><th>urządzenie</th>
-                </tr></thead>
-                <tbody>${rows}</tbody>
-            </table>`;
-    }
-
-    function detectDevice(ua) {
-        if (!ua) return '?';
-        if (/iPhone|iPad/i.test(ua)) return 'iOS';
-        if (/Android/i.test(ua)) return 'Android';
-        if (/Mac/i.test(ua)) return 'Mac';
-        if (/Windows/i.test(ua)) return 'Windows';
-        return '?';
-    }
-
-    // ── release ────────────────────────────────────────────────────────────
-    let _pendingCodes = [];   // BUG FIX: przechowuj kody w zmiennej, nie w onclick atrybucie
-
-    function selectAll() {
-        document.querySelectorAll('.code-cb').forEach(cb => cb.checked = true);
-    }
-
-    function releaseSelected() {
-        const st = document.getElementById('releaseStatus');
-        const codes = [...new Set(
-            Array.from(document.querySelectorAll('.code-cb:checked')).map(cb => cb.value)
-        )];
-        if (codes.length === 0) {
-            setStatus(st, 'err', 'zaznacz kody checkboxami');
-            return;
-        }
-        _pendingCodes = codes;
-        document.getElementById('confirmMsg').textContent =
-            `porzucić ${codes.length} kod${codes.length === 1 ? '' : 'y/ów'}: ${codes.join(', ')} ?`;
-        document.getElementById('confirmStrip').classList.add('show');
-        setStatus(st, '', '');
-    }
-
-    function hideConfirm() {
-        document.getElementById('confirmStrip').classList.remove('show');
-        _pendingCodes = [];
-    }
-
-    async function doRelease() {
-        hideConfirm();
-        const codes = _pendingCodes.length ? _pendingCodes : [];
-        if (!codes.length) return;
-        const st = document.getElementById('releaseStatus');
-        setStatus(st, 'info', 'porzucam...');
-        try {
-            const resp = await fetch('/api/admin/release-codes', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ codes })
-            });
-            const data = await resp.json().catch(() => ({}));
-            if (!resp.ok) { setStatus(st, 'err', 'błąd: ' + (data.error || resp.status)); return; }
-            const ok = (data.results || []).filter(r => r.ok).map(r => r.code);
-            setStatus(st, 'ok', `porzucono: ${ok.join(', ')}`);
-            setTimeout(loadScans, 600);
-        } catch (e) {
-            setStatus(st, 'err', 'błąd: ' + e.message);
-        }
-    }
-
-    // ── helpers ────────────────────────────────────────────────────────────
     function setStatus(el, type, msg) {
-        el.className = 'status-line' + (type ? ' ' + type : '');
-        el.textContent = msg;
-        if (type) el.classList.add('show');
+      el.className = 'status' + (type ? ' ' + type + ' show' : '');
+      el.textContent = msg || '';
     }
-</script>
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '—';
+      return d.toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' });
+    }
+    async function api(url, opts) {
+      const resp = await fetch(url, Object.assign({ cache: 'no-store' }, opts || {}));
+      let data = {};
+      try { data = await resp.json(); } catch (_) {}
+      if (!resp.ok) throw new Error(data.error || ('HTTP ' + resp.status));
+      return data;
+    }
+
+    // ── site base (domena na QR) ──
+    const SITE_KEY = 'szp_admin_site';
+    function siteBase() {
+      let v = ($('siteBase').value || '').trim().replace(/\/+$/, '');
+      if (!v) v = 'https://szpineta.com';
+      return v;
+    }
+    function codeUrl(code) { return siteBase() + '/g/' + code; }
+
+    // ════════ AUTH ════════
+    async function boot() {
+      try {
+        const s = await api('/api/session/check');
+        if (s && s.admin === true) return showApp();
+      } catch (_) {}
+      showLogin();
+    }
+    function showLogin() {
+      $('login').style.display = 'block';
+      $('app').style.display = 'none';
+      $('masterKey').focus();
+    }
+    function showApp() {
+      $('login').style.display = 'none';
+      $('app').style.display = 'block';
+      $('siteBase').value = localStorage.getItem(SITE_KEY) || 'https://szpineta.com';
+      fetchCodes();
+    }
+    async function login() {
+      const key = $('masterKey').value.trim();
+      if (!key) return;
+      setStatus($('loginStatus'), 'info', 'sprawdzam…');
+      try {
+        await api('/api/admin/master', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key }),
+        });
+        location.reload();
+      } catch (e) {
+        setStatus($('loginStatus'), 'err', 'błędny klucz');
+      }
+    }
+    async function logout() {
+      try { await fetch('/api/gate/release', { method: 'POST' }); } catch (_) {}
+      location.reload();
+    }
+
+    // ════════ ZNAJDKI ════════
+    const codesState = { items: [], openCode: null, searchTimer: null };
+
+    function deriveState(row) {
+      if (row.state === 'revoked') return { key: 'revoked', label: 'wycofany', cls: 'dim' };
+      if (row.hasOwner) return { key: 'claimed', label: 'zeskanowany', cls: 'ok' };
+      if (row.state === 'assigned' || row.recipient) return { key: 'assigned', label: 'wydany', cls: 'warn' };
+      return { key: 'fresh', label: 'świeży', cls: 'lav' };
+    }
+    function whoText(row) {
+      if (row.holderName) return row.holderName;
+      if (row.recipient) return row.recipient;
+      if (row.hasOwner) return row.ownerFingerprintShort || 'urządzenie';
+      return '—';
+    }
+
+    function rowHtml(item) {
+      const d = deriveState(item);
+      const isOpen = codesState.openCode === item.code;
+      const modeCls = item.mode === 'personal' ? 'mode-personal' : 'mode-wild';
+      const modeTxt = item.mode === 'personal' ? 'osobista' : 'dzika';
+      const main = '<tr data-code="' + esc(item.code) + '">'
+        + '<td class="col-code">' + esc(item.code) + '</td>'
+        + '<td><span class="pill ' + d.cls + '">' + d.label + '</span></td>'
+        + '<td>' + esc(whoText(item)) + '</td>'
+        + '<td class="' + modeCls + '">' + modeTxt + '</td>'
+        + '<td>' + esc(item.label || '—') + '</td>'
+        + '<td>' + esc(item.recipient || '—') + '</td>'
+        + '<td>' + esc(fmtDate(item.firstActivatedAt)) + '</td>'
+        + '<td><div class="actions">'
+        + '<button class="btn btn-sm btn-soft" data-act="toggle" data-code="' + esc(item.code) + '">qr · edytuj</button>'
+        + (item.hasOwner ? '<button class="btn btn-sm" data-act="release" data-code="' + esc(item.code) + '">zwolnij</button>' : '')
+        + (item.state === 'revoked' ? '' : '<button class="btn btn-sm btn-danger" data-act="revoke" data-code="' + esc(item.code) + '">wycofaj</button>')
+        + '</div></td>'
+        + '</tr>';
+      if (!isOpen) return main;
+      const edit = '<tr class="edit-row" data-edit="' + esc(item.code) + '"><td colspan="8">'
+        + '<div style="margin-bottom:10px;display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;">'
+        + '<div class="qr-card" style="margin:0;">'
+        + '<div class="qr-img" id="rowqr-' + esc(item.code) + '"></div>'
+        + '<div class="qr-code">' + esc(item.code) + '</div>'
+        + '<div class="qr-url">' + esc(codeUrl(item.code)) + '</div>'
+        + '<div class="qr-actions"><button class="btn btn-sm" data-act="copy" data-code="' + esc(item.code) + '">kopiuj link</button>'
+        + '<button class="btn btn-sm" data-act="print" data-code="' + esc(item.code) + '">drukuj</button></div>'
+        + '</div>'
+        + '<div style="flex:1;min-width:260px;">'
+        + '<div class="edit-grid">'
+        + '<div class="field"><label>etykieta</label><input type="text" id="ed-label-' + esc(item.code) + '" value="' + esc(item.label) + '" /></div>'
+        + '<div class="field"><label>odbiorca</label><input type="text" id="ed-recip-' + esc(item.code) + '" value="' + esc(item.recipient) + '" /></div>'
+        + '<div class="field"><label>tryb</label><select id="ed-mode-' + esc(item.code) + '">'
+        + '<option value="wild"' + (item.mode !== 'personal' ? ' selected' : '') + '>dzika</option>'
+        + '<option value="personal"' + (item.mode === 'personal' ? ' selected' : '') + '>osobista</option>'
+        + '</select></div>'
+        + '</div>'
+        + '<div class="field" style="margin-top:12px;"><label>notatka</label><input type="text" id="ed-note-' + esc(item.code) + '" value="' + esc(item.note) + '" style="width:100%;" /></div>'
+        + '<div style="margin-top:12px;display:flex;gap:8px;">'
+        + '<button class="btn btn-lav btn-sm" data-act="save" data-code="' + esc(item.code) + '">zapisz</button>'
+        + '<span class="hint">ost. skan: ' + esc(fmtDate(item.lastSeenAt)) + ' · status: ' + esc(item.status) + '</span>'
+        + '</div></div></div></td></tr>';
+      return main + edit;
+    }
+
+    function applyFilters(items) {
+      const q = $('search').value.trim().toUpperCase();
+      const sf = $('stateFilter').value;
+      return items.filter(function (it) {
+        if (q && !it.code.includes(q)) return false;
+        if (sf !== 'all' && deriveState(it).key !== sf) return false;
+        return true;
+      });
+    }
+
+    function renderCodes() {
+      const rows = applyFilters(codesState.items);
+      const body = $('codeRows');
+      if (!rows.length) { body.innerHTML = '<tr><td colspan="8" class="empty">brak kodów dla tego filtra</td></tr>'; return; }
+      // sort: świeże najpierw wg serii, reszta wg kodu
+      rows.sort(function (a, b) { return (a.serial || 0) - (b.serial || 0) || a.code.localeCompare(b.code); });
+      body.innerHTML = rows.map(rowHtml).join('');
+      if (codesState.openCode) {
+        const el = $('rowqr-' + codesState.openCode);
+        if (el && window.QRCode) { el.innerHTML = ''; new QRCode(el, { text: codeUrl(codesState.openCode), width: 132, height: 132, correctLevel: QRCode.CorrectLevel.M }); }
+      }
+      $('codesMeta').textContent = 'widoczne: ' + rows.length + ' / wszystkie: ' + codesState.items.length;
+    }
+
+    async function fetchCodes() {
+      setStatus($('codesStatus'), 'info', 'ładuję…');
+      try {
+        const data = await api('/api/admin/findings?owner=all');
+        codesState.items = Array.isArray(data.items) ? data.items : [];
+        renderCodes();
+        setStatus($('codesStatus'), '', '');
+      } catch (e) {
+        setStatus($('codesStatus'), 'err', 'błąd: ' + e.message);
+      }
+    }
+
+    async function ownerAction(payload) {
+      return api('/api/admin/owner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    }
+
+    async function onCodeAction(act, code) {
+      if (act === 'toggle') {
+        codesState.openCode = codesState.openCode === code ? null : code;
+        renderCodes();
+        return;
+      }
+      if (act === 'copy') { copyText(codeUrl(code)); setStatus($('codesStatus'), 'ok', 'skopiowano link ' + code); return; }
+      if (act === 'print') { printQR(code); return; }
+      if (act === 'save') {
+        const payload = {
+          action: 'setLabel', code: code,
+          label: ($('ed-label-' + code).value || ''),
+          recipient: ($('ed-recip-' + code).value || ''),
+          note: ($('ed-note-' + code).value || ''),
+          mode: $('ed-mode-' + code).value,
+        };
+        setStatus($('codesStatus'), 'info', 'zapisuję…');
+        try { await ownerAction(payload); codesState.openCode = null; await fetchCodes(); setStatus($('codesStatus'), 'ok', 'zapisano ' + code); }
+        catch (e) { setStatus($('codesStatus'), 'err', 'błąd: ' + e.message); }
+        return;
+      }
+      if (act === 'release') {
+        if (!confirm('Zwolnić posiadacza kodu ' + code + '? (znajdka stanie się wolna)')) return;
+        try { await ownerAction({ action: 'release', code: code }); await fetchCodes(); setStatus($('codesStatus'), 'ok', 'zwolniono ' + code); }
+        catch (e) { setStatus($('codesStatus'), 'err', 'błąd: ' + e.message); }
+        return;
+      }
+      if (act === 'revoke') {
+        if (!confirm('Wycofać kod ' + code + '? Przestanie wpuszczać, a obecny posiadacz zostanie odpięty.')) return;
+        try { await ownerAction({ action: 'revoke', code: code }); await fetchCodes(); setStatus($('codesStatus'), 'ok', 'wycofano ' + code); }
+        catch (e) { setStatus($('codesStatus'), 'err', 'błąd: ' + e.message); }
+      }
+    }
+
+    function copyText(t) {
+      if (navigator.clipboard) navigator.clipboard.writeText(t).catch(function () {});
+    }
+
+    function qrDataUrl(code) {
+      const tmp = document.createElement('div');
+      tmp.style.display = 'none';
+      document.body.appendChild(tmp);
+      new QRCode(tmp, { text: codeUrl(code), width: 320, height: 320, correctLevel: QRCode.CorrectLevel.M });
+      const img = tmp.querySelector('img');
+      const canvas = tmp.querySelector('canvas');
+      const url = (img && img.src) || (canvas && canvas.toDataURL('image/png')) || '';
+      document.body.removeChild(tmp);
+      return url;
+    }
+    function printQR(code) {
+      const url = qrDataUrl(code);
+      const w = window.open('', '_blank');
+      if (!w) return;
+      w.document.write('<html><head><title>' + code + '</title><style>body{font-family:monospace;text-align:center;padding:40px;}img{width:300px;height:300px;}h2{letter-spacing:.2em;margin:18px 0 4px;}p{color:#666;font-size:12px;}</style></head><body>'
+        + '<img src="' + url + '" /><h2>' + code + '</h2><p>' + codeUrl(code) + '</p></body></html>');
+      w.document.close();
+      w.focus();
+      setTimeout(function () { w.print(); }, 250);
+    }
+
+    async function mint() {
+      const count = Math.max(1, Math.min(50, parseInt($('mintCount').value, 10) || 1));
+      const payload = {
+        action: 'mint', count: count,
+        mode: $('mintMode').value,
+        recipient: $('mintRecipient').value || '',
+        label: $('mintLabel').value || '',
+      };
+      setStatus($('mintStatus'), 'info', 'generuję…');
+      $('mintBtn').disabled = true;
+      try {
+        const data = await ownerAction(payload);
+        const created = data.created || [];
+        setStatus($('mintStatus'), 'ok', 'utworzono ' + created.length + ' kod(ów): ' + created.join(', '));
+        renderMintedQR(created);
+        $('mintRecipient').value = ''; $('mintLabel').value = '';
+        await fetchCodes();
+      } catch (e) {
+        setStatus($('mintStatus'), 'err', 'błąd: ' + e.message);
+      } finally {
+        $('mintBtn').disabled = false;
+      }
+    }
+    function renderMintedQR(codes) {
+      const grid = $('qrGrid');
+      grid.innerHTML = codes.map(function (c) {
+        return '<div class="qr-card">'
+          + '<div class="qr-img" id="mintqr-' + c + '"></div>'
+          + '<div class="qr-code">' + c + '</div>'
+          + '<div class="qr-url">' + esc(codeUrl(c)) + '</div>'
+          + '<div class="qr-actions"><button class="btn btn-sm" data-act="copy" data-code="' + c + '">kopiuj</button>'
+          + '<button class="btn btn-sm" data-act="print" data-code="' + c + '">drukuj</button></div>'
+          + '</div>';
+      }).join('');
+      codes.forEach(function (c) {
+        const el = $('mintqr-' + c);
+        if (el && window.QRCode) new QRCode(el, { text: codeUrl(c), width: 132, height: 132, correctLevel: QRCode.CorrectLevel.M });
+      });
+    }
+
+    function takeNextFree() {
+      const fresh = codesState.items
+        .filter(function (it) { return deriveState(it).key === 'fresh'; })
+        .sort(function (a, b) { return (a.serial || 0) - (b.serial || 0); });
+      if (!fresh.length) { setStatus($('codesStatus'), 'err', 'brak świeżych kodów — wygeneruj nowe'); return; }
+      const next = fresh[0];
+      $('search').value = ''; $('stateFilter').value = 'all';
+      renderCodes();
+      copyText(codeUrl(next.code));
+      setStatus($('codesStatus'), 'ok', 'następny wolny: ' + next.code + ' — link skopiowany');
+      const tr = document.querySelector('tr[data-code="' + next.code + '"]');
+      if (tr) { tr.classList.add('row-hi'); tr.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { tr.classList.remove('row-hi'); }, 2200); }
+    }
+
+    // ════════ SKANY ════════
+    function detectDevice(ua) {
+      if (!ua) return '?';
+      if (/iPhone|iPad/i.test(ua)) return 'iOS';
+      if (/Android/i.test(ua)) return 'Android';
+      if (/Mac/i.test(ua)) return 'Mac';
+      if (/Windows/i.test(ua)) return 'Windows';
+      return '?';
+    }
+    async function loadScans() {
+      const out = $('scansOut');
+      out.innerHTML = '<div class="empty">ładuję…</div>';
+      try {
+        const data = await api('/api/admin/scans');
+        const scans = data.scans || [];
+        if (!scans.length) { out.innerHTML = '<div class="empty">brak skanów</div>'; return; }
+        const rows = scans.map(function (s) {
+          const locText = [s.city, s.country].filter(function (x) { return x && x !== '?'; }).join(', ') || '?';
+          const loc = (s.lat && s.lng) ? '<a class="loc-link" href="https://www.google.com/maps?q=' + s.lat + ',' + s.lng + '" target="_blank" rel="noopener">' + esc(locText) + ' ↗</a>' : esc(locText);
+          const stateTxt = s.state === 'first' ? '★ pierwszy' : s.state === 'known' ? '↩ powrót' : '⇄ transfer';
+          return '<tr><td>' + esc(fmtDate(s.at)) + '</td><td class="col-code">' + esc(s.code) + '</td><td>' + stateTxt + '</td><td>' + loc + '</td><td>' + esc(detectDevice(s.ua)) + '</td></tr>';
+        }).join('');
+        out.innerHTML = '<div class="table-wrap"><table class="scan-table" style="min-width:640px;"><thead><tr><th>kiedy</th><th>kod</th><th>stan</th><th>skąd</th><th>urządzenie</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+      } catch (e) {
+        out.innerHTML = '<div class="empty">błąd: ' + esc(e.message) + '</div>';
+      }
+    }
+
+    // ════════ WIERSZE ════════
+    async function submitPoem(e) {
+      e.preventDefault();
+      setStatus($('poemStatus'), 'info', 'wysyłam…');
+      try {
+        const data = await api('/api/add-poem', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ poemTitle: $('poemTitle').value, poemText: $('poemText').value }),
+        });
+        setStatus($('poemStatus'), 'ok', data.message || 'dodano');
+        $('poemText').value = ''; $('poemTitle').value = '';
+      } catch (err) {
+        setStatus($('poemStatus'), 'err', 'błąd: ' + err.message);
+      }
+    }
+
+    // ════════ wiring ════════
+    $('loginBtn').addEventListener('click', login);
+    $('masterKey').addEventListener('keydown', function (e) { if (e.key === 'Enter') login(); });
+    $('logoutBtn').addEventListener('click', logout);
+
+    document.querySelectorAll('.tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('.tab').forEach(function (x) { x.classList.remove('active'); });
+        document.querySelectorAll('.panel').forEach(function (x) { x.classList.remove('active'); });
+        t.classList.add('active');
+        $('panel-' + t.dataset.tab).classList.add('active');
+        if (t.dataset.tab === 'scans') loadScans();
+      });
+    });
+
+    $('mintBtn').addEventListener('click', mint);
+    $('refreshBtn').addEventListener('click', fetchCodes);
+    $('nextFreeBtn').addEventListener('click', takeNextFree);
+    $('stateFilter').addEventListener('change', renderCodes);
+    $('search').addEventListener('input', function () { clearTimeout(codesState.searchTimer); codesState.searchTimer = setTimeout(renderCodes, 180); });
+    $('siteBase').addEventListener('change', function () { localStorage.setItem(SITE_KEY, siteBase()); renderCodes(); });
+    $('scansRefreshBtn').addEventListener('click', loadScans);
+    $('poemForm').addEventListener('submit', submitPoem);
+
+    $('codeRows').addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-act]');
+      if (b) onCodeAction(b.dataset.act, b.dataset.code);
+    });
+    $('qrGrid').addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-act]');
+      if (!b) return;
+      if (b.dataset.act === 'copy') { copyText(codeUrl(b.dataset.code)); setStatus($('mintStatus'), 'ok', 'skopiowano ' + b.dataset.code); }
+      if (b.dataset.act === 'print') printQR(b.dataset.code);
+    });
+
+    boot();
+  </script>
 </body>
 </html>

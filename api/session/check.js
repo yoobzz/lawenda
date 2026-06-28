@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const payload = verify(token, JWT_SECRET);
-    return res.json({ valid: true, code: payload.code });
+    return res.json({ valid: true, code: payload.code, admin: payload.admin === true });
   } catch {
     return res.json({ valid: false });
   }

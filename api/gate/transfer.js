@@ -34,6 +34,13 @@ module.exports = async function handler(req, res) {
   }
 
   const { code } = payload;
+
+  // Kody osobiste lub wycofane nie podlegają przejęciu.
+  const codeData = await kv.get(`codes:${code}`);
+  if (codeData && (codeData.mode === 'personal' || codeData.state === 'revoked')) {
+    return res.status(403).json({ error: 'code cannot be transferred' });
+  }
+
   const pairing = await kv.get(`code_pairings:${code}`);
   if (!pairing) return res.status(404).json({ error: 'pairing not found' });
 

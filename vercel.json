@@ -1,7 +1,8 @@
 {
   "rewrites": [
     { "source": "/g/:code", "destination": "/gate.html" },
-    { "source": "/admin/findings", "destination": "/api/admin/panel" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/admin/findings", "destination": "/admin.html" },
     { "source": "/api/admin/master", "destination": "/api/session/check" }
   ],
   "headers": [

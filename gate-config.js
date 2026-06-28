@@ -42,6 +42,12 @@ var GATE_CONFIG = {
   notFound: [
     { text: 'nie ma takiego kodu.', delay: 650 },
   ],
+  // Opcjonalny ślad zostawiany przy pierwszym wejściu (imię / @insta). Można pominąć.
+  tracePrompt: 'zostaw ślad? imię albo @insta',
+  traceHint: 'możesz pominąć',
+  traceSubmitLabel: 'zostaw',
+  traceSkipLabel: 'pomiń',
+  tracePlaceholder: 'kto?',
   error: [
     { text: 'coś poszło nie tak.', delay: 550 },
   ],

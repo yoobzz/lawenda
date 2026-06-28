@@ -7,6 +7,18 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_30_DAYS = 30 * 24 * 60 * 60;
 const TRANSFER_5_MIN = 5 * 60;
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
+const MAX_TRACE = 60;
+
+// Opcjonalny "ślad" zostawiany przez znalazcę (imię/@insta). Bez znaków kontrolnych.
+function cleanTrace(value) {
+  if (typeof value !== 'string') return '';
+  let out = '';
+  for (let i = 0; i < value.length; i += 1) {
+    const c = value.charCodeAt(i);
+    out += (c < 32 || c === 127) ? ' ' : value[i];
+  }
+  return out.trim().slice(0, MAX_TRACE);
+}
 
 function setCookie(res, value, maxAge) {
   res.setHeader(
@@ -40,7 +52,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!JWT_SECRET) return res.status(500).json({ error: 'server misconfigured' });
 
-  const { code, fingerprint } = req.body || {};
+  const { code, fingerprint, trace } = req.body || {};
   if (!code || !fingerprint || typeof code !== 'string' || typeof fingerprint !== 'string') {
     return res.status(400).json({ error: 'missing code or fingerprint' });
   }
@@ -49,8 +61,9 @@ module.exports = async function handler(req, res) {
   }
 
   const upperCode = code.toUpperCase();
+  const traceName = cleanTrace(trace);
   const codeData = await kv.get(`codes:${upperCode}`);
-  if (!codeData || codeData.status !== 'active') {
+  if (!codeData || codeData.status !== 'active' || codeData.state === 'revoked') {
     return res.status(404).json({ error: 'code not found' });
   }
 
@@ -63,6 +76,7 @@ module.exports = async function handler(req, res) {
       fingerprint,
       firstActivatedAt: now,
       lastSeenAt: now,
+      ...(traceName ? { holderName: traceName } : {}),
     });
     const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
     setCookie(res, token, JWT_30_DAYS);
@@ -71,14 +85,25 @@ module.exports = async function handler(req, res) {
   }
 
   if (pairing.fingerprint === fingerprint) {
-    await kv.set(`code_pairings:${upperCode}`, { ...pairing, lastSeenAt: now });
+    // dopisz ślad jeśli posiadacz go teraz zostawił, a wcześniej go nie było
+    const holderName = pairing.holderName || traceName;
+    await kv.set(`code_pairings:${upperCode}`, {
+      ...pairing,
+      lastSeenAt: now,
+      ...(holderName ? { holderName } : {}),
+    });
     const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
     setCookie(res, token, JWT_30_DAYS);
     await logScan(req, upperCode, fingerprint, 'known');
     return res.json({ state: 'known' });
   }
 
-  // Different device — short-lived transfer token
+  // Inne urządzenie. Tryb "personal" = nie da się przejąć (brak tokenu transferu).
+  if (codeData.mode === 'personal') {
+    await logScan(req, upperCode, fingerprint, 'transfer');
+    return res.json({ state: 'transfer', personal: true });
+  }
+  // Tryb "wild" — krótkotrwały token transferu (zachowanie dotychczasowe).
   const transferToken = sign({ code: upperCode, action: 'transfer' }, JWT_SECRET, TRANSFER_5_MIN);
   await logScan(req, upperCode, fingerprint, 'transfer');
   return res.json({ state: 'transfer', transferToken });

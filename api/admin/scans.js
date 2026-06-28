@@ -1,17 +1,11 @@
 'use strict';
 
 const kv = require('../_lib/kv.js');
-
-const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+const { requireAdmin } = require('../_lib/admin-auth.js');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
-
-  const auth = req.headers['authorization'] || '';
-  const token = auth.replace(/^Bearer\s+/i, '').trim();
-  if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
-    return res.status(401).json({ error: 'unauthorized' });
-  }
+  if (requireAdmin(req, res) !== true) return;
 
   try {
     const items = await kv.kvCommand(['LRANGE', 'scans:log', '0', '-1']);
