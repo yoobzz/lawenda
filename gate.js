@@ -1779,50 +1779,107 @@ async function apiScan(code, fp, trace) {
 }
 
 // Opcjonalny ślad przy pierwszym wejściu. Zwraca string (wpisany) albo null (pominięto).
+var TRACE_GLYPHS = ['_', '-', '~', '*', '^', '|', ',', '.', '+', '=', '"', "'", '!'];
+
 function askTrace() {
   return new Promise(resolve => {
     const wrap = document.getElementById('proto-trace');
     const promptEl = document.getElementById('proto-trace-prompt');
     const hintEl = document.getElementById('proto-trace-hint');
     const inputEl = document.getElementById('proto-trace-input');
-    const submitEl = document.getElementById('proto-trace-submit');
     const skipEl = document.getElementById('proto-trace-skip');
     if (!wrap || !inputEl) { resolve(null); return; }
 
-    promptEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.tracePrompt) || 'zostaw ślad?';
-    hintEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.traceHint) || 'możesz pominąć';
-    submitEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.traceSubmitLabel) || 'zostaw';
-    skipEl.textContent = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.traceSkipLabel) || 'pomiń';
-    inputEl.placeholder = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.tracePlaceholder) || '';
+    const cfg = (typeof GATE_CONFIG !== 'undefined') ? GATE_CONFIG : {};
+    function clearGlyphs() { wrap.querySelectorAll('.trace-glyph').forEach(e => e.remove()); }
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+    function glyph() { return TRACE_GLYPHS[Math.floor(Math.random() * TRACE_GLYPHS.length)]; }
+
+    // tło: rozsypane znaczki (jak na landingu)
+    clearGlyphs();
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('span');
+      s.className = 'trace-glyph';
+      s.textContent = glyph();
+      s.style.left = rnd(6, 94).toFixed(1) + '%';
+      s.style.top = rnd(8, 92).toFixed(1) + '%';
+      s.style.fontSize = rnd(0.8, 2.4).toFixed(2) + 'rem';
+      wrap.appendChild(s);
+      setTimeout(() => s.classList.add('visible'), 60 + i * 55);
+    }
+
+    promptEl.textContent = cfg.tracePrompt || 'jak masz na imię?';
+    hintEl.textContent = cfg.traceHint || 'enter';
+    skipEl.textContent = cfg.traceSkipLabel || 'pomiń';
+    inputEl.placeholder = cfg.tracePlaceholder || '';
     inputEl.value = '';
     wrap.classList.add('show');
     wrap.setAttribute('aria-hidden', 'false');
 
     let done = false;
-    function finish(value) {
+    function cleanup() {
+      inputEl.onkeydown = null;
+      skipEl.onclick = null;
+      wrap.onclick = null;
+    }
+    function skip() {
       if (done) return;
       done = true;
+      cleanup();
+      clearGlyphs();
       wrap.classList.remove('show');
       wrap.setAttribute('aria-hidden', 'true');
-      submitEl.onclick = null;
-      skipEl.onclick = null;
-      inputEl.onkeydown = null;
-      resolve(value);
+      resolve(null);
     }
-    submitEl.onclick = () => finish(inputEl.value.trim() || null);
-    skipEl.onclick = () => finish(null);
-    inputEl.onkeydown = e => { if (e.key === 'Enter') finish(inputEl.value.trim() || null); };
-    setTimeout(() => inputEl.focus(), 40);
+    // po wpisaniu imienia: gęsty wysyp znaczków, potem przejście (overlay zostaje do nawigacji)
+    function burstThen(value) {
+      if (done) return;
+      done = true;
+      cleanup();
+      promptEl.style.opacity = '0';
+      inputEl.style.opacity = '0';
+      hintEl.style.opacity = '0';
+      skipEl.style.opacity = '0';
+      clearGlyphs();
+      const N = 64;
+      for (let i = 0; i < N; i++) {
+        const s = document.createElement('span');
+        s.className = 'trace-glyph burst';
+        s.textContent = glyph();
+        s.style.left = rnd(0, 100).toFixed(1) + '%';
+        s.style.top = rnd(0, 100).toFixed(1) + '%';
+        s.style.fontSize = rnd(0.7, 2.8).toFixed(2) + 'rem';
+        wrap.appendChild(s);
+        setTimeout(() => s.classList.add('visible'), i * 12);
+      }
+      setTimeout(() => resolve(value), 1150);
+    }
+
+    inputEl.onkeydown = e => {
+      if (e.key === 'Enter') {
+        const v = inputEl.value.trim();
+        if (v) burstThen(v); else skip();
+      }
+    };
+    skipEl.onclick = skip;
+    // tap gdziekolwiek (poza „pomiń") = klawiatura na mobilnym
+    wrap.onclick = e => { if (!done && e.target !== skipEl) { try { inputEl.focus(); } catch (_) {} } };
+
+    // auto-focus → klawiatura + migający kursor
+    setTimeout(() => { try { inputEl.focus(); } catch (_) {} }, 80);
   });
 }
 
-// Po pierwszym wejściu: zapytaj o ślad i (jeśli podany) dopisz go do pary.
+// Po pierwszym wejściu: zapytaj o imię i (jeśli podane) dopisz je do pary.
+// Zwraca true gdy imię podano (wysyp znaczków już zagrał).
 async function handleFirstWithTrace(code) {
   let trace = null;
   try { trace = await askTrace(); } catch (_) { trace = null; }
   if (trace) {
     try { await apiScan(code, fingerprint, trace); } catch (_) {}
+    return true;
   }
+  return false;
 }
 
 let fingerprint = null;
@@ -1906,9 +1963,9 @@ async function stateVerifyProto(code, backState) {
 
   if (result && result.state === 'first') {
     setProtoStatus('');
-    await handleFirstWithTrace(code);
+    const named = await handleFirstWithTrace(code);
     hideScanPrototypeStage();
-    await showFirstAccessVisual();
+    if (!named) await showFirstAccessVisual();
     pageOut('/poems.html');
     return;
   }
@@ -2115,8 +2172,8 @@ async function stateVerify(code, backState) {
   }
 
   if (result.state === 'first') {
-    await handleFirstWithTrace(code);
-    await showFirstAccessVisual();
+    const named = await handleFirstWithTrace(code);
+    if (!named) await showFirstAccessVisual();
     pageOut('/poems.html');
     return;
   }
