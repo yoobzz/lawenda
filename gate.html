@@ -814,72 +814,76 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.2rem;
-            z-index: 60;
-            background: rgba(249, 249, 248, 0.95);
+            gap: 1.4rem;
+            z-index: 12000;
+            background: rgba(249, 249, 248, 0.985);
         }
         #proto-trace.show { display: flex; }
         #proto-trace-prompt {
             font-family: var(--ff);
-            font-size: 0.86rem;
-            font-weight: 300;
-            letter-spacing: 0.14em;
-            color: var(--ink-mid);
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            color: var(--ink);
             text-align: center;
+            padding: 0 1.5rem;
         }
         #proto-trace-hint {
             font-family: var(--ff);
-            font-size: 0.7rem;
+            font-size: 0.74rem;
             font-weight: 300;
-            letter-spacing: 0.12em;
-            color: rgba(13, 13, 13, 0.32);
-            margin-top: -0.6rem;
+            letter-spacing: 0.1em;
+            color: rgba(13, 13, 13, 0.4);
+            margin-top: -0.7rem;
         }
-        #proto-trace-row { display: flex; align-items: baseline; gap: 1.2rem; }
+        #proto-trace-row { display: flex; align-items: center; gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
         #proto-trace-input {
             font-family: var(--ff);
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             font-weight: 300;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.03em;
             color: var(--ink);
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid rgba(13, 13, 13, 0.22);
-            width: 12rem;
+            background: #fff;
+            border: 1px solid rgba(13, 13, 13, 0.45);
+            border-radius: 3px;
+            width: 15rem;
+            max-width: 70vw;
             text-align: center;
-            padding: 0.3rem 0;
+            padding: 0.7rem 0.7rem;
             outline: none;
             transition: border-color 0.2s ease;
         }
-        #proto-trace-input::placeholder { color: rgba(13, 13, 13, 0.2); }
-        #proto-trace-input:focus { border-bottom-color: rgba(13, 13, 13, 0.55); }
+        #proto-trace-input::placeholder { color: rgba(13, 13, 13, 0.28); }
+        #proto-trace-input:focus { border-color: var(--ink); }
         #proto-trace-submit {
+            font-family: var(--ff);
+            font-size: 0.86rem;
+            font-weight: 400;
+            letter-spacing: 0.1em;
+            color: #fff;
+            background: var(--ink);
+            border: 1px solid var(--ink);
+            border-radius: 3px;
+            cursor: pointer;
+            padding: 0.7rem 1.4rem;
+            transition: opacity 0.2s ease;
+        }
+        #proto-trace-submit:hover { opacity: 0.85; }
+        #proto-trace-skip {
             font-family: var(--ff);
             font-size: 0.78rem;
             font-weight: 300;
-            letter-spacing: 0.14em;
-            color: var(--ink);
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0.3rem 0;
-            opacity: 0.55;
-            transition: opacity 0.2s ease;
-        }
-        #proto-trace-submit:hover { opacity: 1; }
-        #proto-trace-skip {
-            font-family: var(--ff);
-            font-size: 0.72rem;
-            font-weight: 300;
             letter-spacing: 0.12em;
-            color: rgba(13, 13, 13, 0.28);
+            color: rgba(13, 13, 13, 0.45);
             background: transparent;
             border: none;
             cursor: pointer;
-            padding: 0.2rem 0.5rem;
+            padding: 0.4rem 0.8rem;
+            text-decoration: underline;
+            text-underline-offset: 3px;
             transition: color 0.2s ease;
         }
-        #proto-trace-skip:hover { color: rgba(13, 13, 13, 0.6); }
+        #proto-trace-skip:hover { color: rgba(13, 13, 13, 0.75); }
 
         /* page enter */
         @keyframes page-enter {
