@@ -4,25 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>~||-_^+*.</title>
-    <script>
-    /* bramka na wejsciu: bez waznej sesji index prowadzi na /gate.html (zero darmowych wierszy).
-       z waznym kluczem (znajdka/admin) — normalny landing. */
-    (function () {
-      var root = document.documentElement;
-      root.style.visibility = 'hidden';
-      var done = false;
-      var reveal = function () { if (done) return; done = true; root.style.visibility = ''; };
-      var safety = setTimeout(reveal, 2500); // bezpiecznik: backend nie moze zablokowac strony na zawsze
-      fetch('/api/session/check', { cache: 'no-store' })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          clearTimeout(safety);
-          if (d && d.valid === true) { reveal(); }
-          else { done = true; window.location.replace('/gate.html'); }
-        })
-        .catch(function () { clearTimeout(safety); reveal(); });
-    })();
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2550,7 +2531,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 next();
             }
             
-            const safetyTimeout = setTimeout(() => { if (!hasTransitioned) window.location.href = 'poems.html'; }, 15000);
+            const safetyTimeout = setTimeout(() => { if (!hasTransitioned) window.location.href = 'gate.html'; }, 15000);
             
             setTimeout(() => {
                 if (typingText && typingText.parentNode) typingText.style.display = 'none';
@@ -2562,7 +2543,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                     document.body.appendChild(overlay);
                     overlay.classList.add('active');
 
-                    // od razu animacja znaków → poems.html
+                    // od razu animacja znaków → gate.html
                     setTimeout(() => {
                         (window.dataLayer = window.dataLayer || []).push({ event: 'read_poems_click' });
                         clearTimeout(safetyTimeout);
@@ -2605,7 +2586,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                                 setTimeout(() => {
                                     try { overlay.remove(); } catch(e) {}
                                     try { cvs.remove(); } catch(e) {}
-                                    window.location.href = 'poems.html';
+                                    window.location.href = 'gate.html';
                                 }, 600);
                                 return;
                             }
