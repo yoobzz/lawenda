@@ -48,7 +48,7 @@ function openViewer(i) {
   track.innerHTML = p.pages
     .map((f, n) =>
       '<div class="viewer-slide"><img loading="' + (n < 2 ? 'eager' : 'lazy') +
-      '" src="assets/' + p.slug + '/' + f + '" alt="' + p.title + ' — strona ' + (n + 1) + '"></div>')
+      '" src="/portfolio/assets/' + p.slug + '/' + f + '" alt="' + p.title + ' — strona ' + (n + 1) + '"></div>')
     .join('');
   label.innerHTML = '<b>' + p.title + '</b>&nbsp;<i>' + String(i + 1).padStart(2, '0') + '</i>';
   lastFocus = document.activeElement;
