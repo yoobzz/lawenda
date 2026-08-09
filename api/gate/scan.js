@@ -7,6 +7,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_30_DAYS = 30 * 24 * 60 * 60;
 const TRANSFER_5_MIN = 5 * 60;
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
+// kody uniwersalne: sekwencje znaczkow (3-16 znakow), np. |+_.! — dzialaja dla kazdego, bez parowania
+const UNIVERSAL_RE = /^[|+_.,!*^~\-=:;"'`<>/\\]{3,16}$/;
 const MAX_TRACE = 60;
 
 // Opcjonalny "ślad" zostawiany przez znalazcę (imię/@insta). Bez znaków kontrolnych.
@@ -56,14 +58,31 @@ module.exports = async function handler(req, res) {
   if (!code || !fingerprint || typeof code !== 'string' || typeof fingerprint !== 'string') {
     return res.status(400).json({ error: 'missing code or fingerprint' });
   }
-  if (!CODE_RE.test(code.toUpperCase())) {
+  const rawCode = code.trim();
+  const upperCode = rawCode.toUpperCase();
+  const isZnajdka = CODE_RE.test(upperCode);
+  const isUniversalFormat = !isZnajdka && UNIVERSAL_RE.test(rawCode);
+  if (!isZnajdka && !isUniversalFormat) {
     return res.status(400).json({ error: 'invalid code format' });
   }
 
-  const upperCode = code.toUpperCase();
+  const codeKey = isZnajdka ? upperCode : rawCode;
   const traceName = cleanTrace(trace);
-  const codeData = await kv.get(`codes:${upperCode}`);
+  const codeData = await kv.get(`codes:${codeKey}`);
   if (!codeData || codeData.status !== 'active' || codeData.state === 'revoked') {
+    return res.status(404).json({ error: 'code not found' });
+  }
+
+  // kod uniwersalny: sesja dla kazdego, bez parowania i bez przejmowania
+  if (codeData.mode === 'universal') {
+    const token = sign({ code: codeKey, fingerprint, universal: true }, JWT_SECRET, JWT_30_DAYS);
+    setCookie(res, token, JWT_30_DAYS);
+    await logScan(req, codeKey, fingerprint, 'universal');
+    return res.json({ state: 'universal' });
+  }
+
+  // format znaczkowy bez trybu universal nie przechodzi do logiki parowania znajdek
+  if (isUniversalFormat) {
     return res.status(404).json({ error: 'code not found' });
   }
 

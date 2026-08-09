@@ -29,6 +29,7 @@ var GATE_CONFIG = {
   },
   manualInputPrompt: 'wpisz kod ze znajdki',
   manualInputErrorInvalid: 'nie ma takiego kodu',
+  protoManualLabel: 'wpisz kod ręcznie',
   cameraUnavailable: 'kamera niedostępna — wpisz kod',
   noAccess: [
     { text: 'brak dostępu.', delay: 700 },

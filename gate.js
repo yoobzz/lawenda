@@ -24,6 +24,20 @@ function pageOut(href) {
   setTimeout(() => { window.location.href = href; }, 560);
 }
 const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
+/* kody uniwersalne: sekwencje znaczków (3-16 znakow), np. |+_.! — weryfikowane po stronie API */
+const UNIVERSAL_RE = /^[|+_.,!*^~\-=:;"'`<>/\\]{3,16}$/;
+const MANUAL_INPUT_ALLOWED_RE = /[^A-Z0-9|+_.,!*^~\-=:;"'`<>/\\]/g;
+const MANUAL_INPUT_MAX = 16;
+
+/* znajdka (4 znaki) na wielkie litery, kod uniwersalny bez zmian; null gdy format obcy */
+function normalizeCodeInput(raw) {
+  const value = String(raw || '').trim();
+  if (!value) return null;
+  const upper = value.toUpperCase();
+  if (CODE_RE.test(upper)) return upper;
+  if (UNIVERSAL_RE.test(value)) return value;
+  return null;
+}
 const SCAN_PROTO_SEED = '+_**++~+_+~/„-„*+*^_^*++~__';
 const SCAN_PROTO_RANDOM_POOL = ['<', '_', '>', '.', ',', '!', '^', '*', '|', '\\', '~', '`', ':', ';', '=', '+'];
 const SCAN_PROTO_QR_POOL = ['*', '+', '=', '^', '|', '~', ':', ';'];
@@ -432,14 +446,14 @@ function showProtoManualInput({ prompt = '', onSubmit, onCancel }) {
     inputEl.oninput = null;
   }
   function doSubmit() {
-    const value = inputEl.value.trim().toUpperCase();
-    if (!CODE_RE.test(value)) { errorEl.textContent = GATE_CONFIG.manualInputErrorInvalid; return; }
+    const value = normalizeCodeInput(inputEl.value);
+    if (!value) { errorEl.textContent = GATE_CONFIG.manualInputErrorInvalid; return; }
     errorEl.textContent = '';
     cleanup();
     onSubmit(value);
   }
   inputEl.oninput = () => {
-    inputEl.value = inputEl.value.toUpperCase().replace(/[^ABCDEFGHJKMNPQRSTVWXYZ23456789]/g, '').slice(0, 4);
+    inputEl.value = inputEl.value.toUpperCase().replace(MANUAL_INPUT_ALLOWED_RE, '').slice(0, MANUAL_INPUT_MAX);
     errorEl.textContent = '';
   };
   inputEl.onkeydown = e => { if (e.key === 'Enter') doSubmit(); };
@@ -1079,13 +1093,46 @@ function buildScanPrototypeGrid(qrMatrix) {
   return cells;
 }
 
+function createProtoManualLink() {
+  if (!scanPrototypeStageEl) return null;
+  const existing = document.getElementById('proto-manual-link');
+  if (existing) existing.remove();
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'proto-manual-link';
+  btn.textContent = GATE_CONFIG.protoManualLabel || 'wpisz kod ręcznie';
+  btn.style.cssText = [
+    'position:absolute',
+    'left:50%',
+    'bottom:calc(2.4rem + env(safe-area-inset-bottom, 0px))',
+    'transform:translateX(-50%)',
+    'background:none',
+    'border:none',
+    'border-bottom:1px solid rgba(13,13,13,0.28)',
+    'padding:0.2rem 0.1rem',
+    'font-family:inherit',
+    'font-size:0.8rem',
+    'font-weight:300',
+    'letter-spacing:0.16em',
+    'color:rgba(13,13,13,0.6)',
+    'cursor:pointer',
+    'opacity:0',
+    'transition:opacity 0.6s ease',
+  ].join(';');
+  scanPrototypeStageEl.appendChild(btn);
+  requestAnimationFrame(() => requestAnimationFrame(() => { btn.style.opacity = '1'; }));
+  return btn;
+}
+
 function waitForScanPrototypeGridActivation(qrRect) {
   if (!scanPrototypeGridEl) return Promise.resolve({ choice: 'scan', qrRect });
   scanPrototypeGridEl.classList.add('scan-prototype-grid-actionable');
   scanPrototypeGridEl.setAttribute('role', 'button');
   scanPrototypeGridEl.setAttribute('aria-label', 'rozpocznij skanowanie kodu QR');
   scanPrototypeGridEl.tabIndex = 0;
+  const manualLink = createProtoManualLink();
   return new Promise(resolve => {
+    const removeManualLink = () => { if (manualLink) manualLink.remove(); };
     const activate = async () => {
       if (!scanPrototypeGridEl) {
         resolve({ choice: 'scan', qrRect });
@@ -1110,6 +1157,7 @@ function waitForScanPrototypeGridActivation(qrRect) {
       activated = true;
       scanPrototypeGridEl.removeEventListener('click', onClick);
       scanPrototypeGridEl.removeEventListener('keydown', onKeyDown);
+      removeManualLink();
       activate();
     };
     const onKeyDown = e => {
@@ -1119,11 +1167,23 @@ function waitForScanPrototypeGridActivation(qrRect) {
       activated = true;
       scanPrototypeGridEl.removeEventListener('click', onClick);
       scanPrototypeGridEl.removeEventListener('keydown', onKeyDown);
+      removeManualLink();
       activate();
     };
 
     scanPrototypeGridEl.addEventListener('click', onClick);
     scanPrototypeGridEl.addEventListener('keydown', onKeyDown);
+
+    if (manualLink) {
+      manualLink.addEventListener('click', () => {
+        if (activated) return;
+        activated = true;
+        scanPrototypeGridEl.removeEventListener('click', onClick);
+        scanPrototypeGridEl.removeEventListener('keydown', onKeyDown);
+        removeManualLink();
+        resolve({ choice: 'manual', qrRect });
+      });
+    }
   });
 }
 
@@ -1440,7 +1500,7 @@ function addManualInput({ onSubmit, onCancel } = {}) {
 
   const input = document.createElement('input');
   input.type = 'text';
-  input.maxLength = 4;
+  input.maxLength = MANUAL_INPUT_MAX;
   input.placeholder = 'A1B2';
   input.autocomplete = 'off';
   input.spellcheck = false;
@@ -1462,8 +1522,8 @@ function addManualInput({ onSubmit, onCancel } = {}) {
   }
 
   function submitValue() {
-    const value = input.value.trim().toUpperCase();
-    if (!CODE_RE.test(value)) {
+    const value = normalizeCodeInput(input.value);
+    if (!value) {
       setError(GATE_CONFIG.manualInputErrorInvalid);
       return;
     }
@@ -1472,7 +1532,7 @@ function addManualInput({ onSubmit, onCancel } = {}) {
   }
 
   input.addEventListener('input', () => {
-    input.value = input.value.toUpperCase().replace(/[^ABCDEFGHJKMNPQRSTVWXYZ23456789]/g, '').slice(0, 4);
+    input.value = input.value.toUpperCase().replace(MANUAL_INPUT_ALLOWED_RE, '').slice(0, MANUAL_INPUT_MAX);
     if (err.style.display === 'block') err.style.display = 'none';
   });
   input.addEventListener('keydown', e => {
@@ -1599,7 +1659,7 @@ async function startCamera() {
     initScanSymbols();
     manualHintTimer = setTimeout(() => {
       manualScanHintEl.classList.add('show');
-    }, 30000);
+    }, 6000);
     return true;
   } catch {
     cameraArea.classList.remove('active');
@@ -1970,7 +2030,7 @@ async function stateVerifyProto(code, backState) {
     return;
   }
 
-  if (result && result.state === 'known') {
+  if (result && (result.state === 'known' || result.state === 'universal')) {
     setProtoStatus('');
     hideScanPrototypeStage();
     pageOut('/poems.html');
@@ -2056,7 +2116,13 @@ async function statePreGateNoCode() {
 
 async function statePreGateWithCode(code) {
   showGateMode();
-  await runScanPrototypeStage();
+  const protoResult = await runScanPrototypeStage();
+  const protoChoice = typeof protoResult === 'string' ? protoResult : protoResult?.choice;
+  if (protoChoice === 'manual') {
+    hideScanPrototypeStage();
+    stateManualInput(() => statePreGateWithCode(code));
+    return;
+  }
   // proto stage stays visible — verify URL code directly, no camera
   await stateVerifyProto(code, () => statePreGateWithCode(code));
 }
@@ -2174,6 +2240,11 @@ async function stateVerify(code, backState) {
   if (result.state === 'first') {
     const named = await handleFirstWithTrace(code);
     if (!named) await showFirstAccessVisual();
+    pageOut('/poems.html');
+    return;
+  }
+
+  if (result.state === 'universal') {
     pageOut('/poems.html');
     return;
   }
