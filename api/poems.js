@@ -38,6 +38,9 @@ async function isFullAccess(req) {
   const codeData = await kv.get(`codes:${code}`);
   if (!codeData || codeData.status !== 'active' || codeData.state === 'revoked') return false;
 
+  // kod uniwersalny: wazna sesja wystarczy, nie ma parowania z fingerprintem
+  if (codeData.mode === 'universal') return true;
+
   const pairing = await kv.get(`code_pairings:${code}`);
   if (!pairing) return false;
   if (payload.fingerprint && pairing.fingerprint && pairing.fingerprint !== payload.fingerprint) return false;
