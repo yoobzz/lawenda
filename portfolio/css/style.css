@@ -198,6 +198,34 @@ section:nth-of-type(even) .pagenum { left: var(--pad); }
 }
 .project-meta b { font-weight: 700; color: var(--ink); }
 
+/* chowane menu: 1 rok na studiach */
+.project-list li.year-group { border-bottom: none; }
+.year-toggle {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(12px, 2vw, 28px);
+  width: 100%;
+  padding: clamp(18px, 3vh, 32px) 4px clamp(10px, 1.6vh, 18px);
+  background: none;
+  border: none;
+  border-bottom: 1px solid #e5e5e5;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.year-sign {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: clamp(20px, 2.4vw, 32px);
+  /* same width as the 01, 02… column of the project list */
+  min-width: calc(clamp(14px, 1.4vw, 18px) * 2.2);
+  line-height: 1;
+}
+.year-toggle:hover .project-title { letter-spacing: 0.28em; color: var(--accent); }
+.year-list { list-style: none; }
+.year-list[hidden] { display: none; }
+
 /* ---------- why ---------- */
 
 .why { justify-content: center; }
@@ -324,7 +352,7 @@ section:nth-of-type(even) .pagenum { left: var(--pad); }
 @media (max-width: 720px) {
   .bio-grid, .why-grid { grid-template-columns: 1fr; }
   .project-meta { display: none; }
-  .project-list a:hover .project-title { letter-spacing: 0.12em; }
+  .project-list a:hover .project-title, .year-toggle:hover .project-title { letter-spacing: 0.12em; }
   .side-label { font-size: 15px; }
   .viewer-track { margin: 40px 0 8px; }
   .contact-list { font-size: 20px; }

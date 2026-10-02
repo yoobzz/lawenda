@@ -6,6 +6,48 @@ const $ = (sel) => document.querySelector(sel);
 
 const listEl = $('#projectList');
 
+/* warsztaty mistrzowskie: na wierzchu, otwierają własną stronę */
+if (typeof FEATURED !== 'undefined' && FEATURED.length) {
+  const sep = document.createElement('li');
+  sep.className = 'sem-divider';
+  sep.innerHTML = '<span>[warsztaty mistrzowskie]</span>';
+  listEl.appendChild(sep);
+  FEATURED.forEach((p) => {
+    const li = document.createElement('li');
+    li.innerHTML =
+      '<a href="' + p.href + '"><span class="project-title">' + p.title + '</span>' +
+      '<span class="project-meta">' + p.kind + ' &middot; ' + p.course + '</span></a>';
+    listEl.appendChild(li);
+  });
+}
+
+/* 1 rok na studiach: chowane menu, domyślnie zwinięte */
+const yearLi = document.createElement('li');
+yearLi.className = 'year-group';
+const yearBtn = document.createElement('button');
+yearBtn.type = 'button';
+yearBtn.className = 'year-toggle';
+yearBtn.setAttribute('aria-expanded', 'false');
+yearBtn.setAttribute('aria-controls', 'yearList');
+yearBtn.innerHTML =
+  '<span class="year-sign" aria-hidden="true">+</span>' +
+  '<span class="project-title">1 rok na studiach</span>' +
+  '<span class="project-meta"><b>' + PROJECTS.length + '</b> projektów &middot; 2025/26</span>';
+const yearList = document.createElement('ol');
+yearList.className = 'year-list';
+yearList.id = 'yearList';
+yearList.hidden = true;
+yearLi.appendChild(yearBtn);
+yearLi.appendChild(yearList);
+listEl.appendChild(yearLi);
+
+function setYearOpen(open) {
+  yearList.hidden = !open;
+  yearBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  yearBtn.querySelector('.year-sign').textContent = open ? '\u2212' : '+';
+}
+yearBtn.addEventListener('click', () => setYearOpen(yearList.hidden));
+
 let lastSem = null;
 PROJECTS.forEach((p, i) => {
   if (p.sem && p.sem !== lastSem) {
@@ -13,7 +55,7 @@ PROJECTS.forEach((p, i) => {
     const sep = document.createElement('li');
     sep.className = 'sem-divider';
     sep.innerHTML = '<span>[' + p.sem + ']</span>';
-    listEl.appendChild(sep);
+    yearList.appendChild(sep);
   }
   const li = document.createElement('li');
   const a = document.createElement('a');
@@ -26,7 +68,7 @@ PROJECTS.forEach((p, i) => {
     openViewer(i);
   });
   li.appendChild(a);
-  listEl.appendChild(li);
+  yearList.appendChild(li);
 });
 
 /* ---------- viewer ---------- */
@@ -101,6 +143,7 @@ document.addEventListener('keydown', (e) => {
 /* deep-link: #slug otwiera projekt (przy wejściu i przy zmianie hasha) */
 function openFromHash() {
   const idx = PROJECTS.findIndex((p) => p.slug === location.hash.slice(1));
+  if (idx >= 0) setYearOpen(true);
   if (idx >= 0 && idx !== current) openViewer(idx);
 }
 window.addEventListener('hashchange', openFromHash);

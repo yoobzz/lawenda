@@ -1,0 +1,1057 @@
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>staś — oczyszczacz noszony na szyi · staś szpineta</title><meta name="description" content="Staś — oczyszczacz powietrza noszony na szyi. Projekt spekulatywny z warsztatów mistrzowskich: prezentacja z interaktywnym modelem 3D."><meta name="robots" content="noindex, nofollow, noarchive"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Set like the essay: a Pages document in Times Roman 12 pt, 14 pt leading, 12 pt between paragraphs,
+   an empty line between sections, ragged right, black on white, no headings.
+   Desktop: one 16:9 page per slide, sized in --u (1 % of the page width). Phones: one long page. */
+:root {
+  --ink: #000;
+  --paper: #fff;
+  --hair: #9a9a9a;      /* only for the edge of white drawing sheets on white paper */
+  --serif: Times, "Times New Roman", Tinos, serif;
+  --u: min(1vw, 1.7778vh);
+  --fs: calc(var(--u) * 1.6);
+  --small: calc(var(--u) * 1.25);  /* the one smaller size: footer, controls, tables, sheet captions */
+  color-scheme: light;
+}
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: var(--fs); line-height: 1.1667; overflow: hidden; -webkit-font-smoothing: auto; font-kerning: normal; }
+*, *::before, *::after { box-sizing: border-box; }
+p, figure, blockquote, ul, ol, table, dl, dd { margin: 0; }
+img { max-width: 100%; display: block; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 1px dotted var(--ink); outline-offset: 2px; }
+
+/* paragraphs: 12 pt after each, an empty line for a section break */
+.t p, .t li { margin: 0 0 1em; }
+.t p:last-child, .t li:last-child { margin-bottom: 0; }
+.t .brk { height: 1.1667em; margin: 0; }
+.t ol, .t ul { padding: 0 0 0 1.6em; margin: 0 0 1em; }
+.t ol:last-child, .t ul:last-child { margin-bottom: 0; }
+.t ol.plain, .t ul.plain { list-style: none; padding: 0; }
+.t ol.tight li, .t ul.tight li { margin-bottom: 0.25em; }
+.t .small { font-size: var(--small); }
+.t .first { font-size: 1em; }
+
+/* links and the buttons that behave like links */
+a, .ln { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.14em; }
+.ln { background: none; border: 0; padding: 0; margin: 0; cursor: pointer; font: inherit; line-height: inherit; text-align: left; }
+/* toggles say their state in words */
+.ln.tg[aria-pressed="true"]::after { content: ": tak"; }
+.ln.tg[aria-pressed="false"]::after { content: ": nie"; }
+
+/* figures: plain rectangles, caption as a line underneath */
+figure img { width: 100%; height: auto; }
+figcaption { margin-top: 0.45em; }
+.sheetimg { border: 1px solid var(--hair); }
+
+/* ---------- deck ---------- */
+.deck { position: fixed; inset: 0; }
+.slide { position: absolute; inset: 0; display: grid; place-items: center; visibility: hidden; background: var(--paper); }
+.slide.is-active { visibility: visible; }
+.page { position: relative; width: calc(var(--u) * 100); height: calc(var(--u) * 56.25); padding: calc(var(--u) * 4.6) calc(var(--u) * 7) calc(var(--u) * 6); display: grid; align-content: start; align-items: start; column-gap: calc(var(--u) * 4); row-gap: calc(var(--u) * 2.4); }
+.t { max-width: 40em; }
+
+/* layouts */
+.l-text { grid-template-columns: minmax(0, 40em); }
+.l-side { grid-template-columns: minmax(0, 27em) minmax(0, 1fr); }
+.l-side-wide { grid-template-columns: minmax(0, 22em) minmax(0, 1fr); }
+.l-two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.l-figleft { grid-template-columns: minmax(0, 1fr) minmax(0, 24em); }
+
+/* page footer: like a page number in Pages, plus the way forward and back */
+.foot { position: fixed; right: calc(50vw - var(--u) * 50 + var(--u) * 7); bottom: calc(50vh - var(--u) * 28.125 + var(--u) * 2.2); display: flex; gap: 1.4em; align-items: baseline; font-size: var(--small); z-index: 40; }
+.foot .num { font-variant-numeric: normal; }
+
+/* ---------- 1. first page ---------- */
+#s-cover .page { grid-template-columns: minmax(0, 26em) minmax(0, 1fr); }
+
+/* ---------- essay pages ---------- */
+.essay { max-width: 40em; }
+
+/* ---------- 5. essay to prototype ---------- */
+
+/* ---------- 6. form ---------- */
+/* text on top, figures under it, left-aligned like images placed in a document */
+.l-stack { grid-template-columns: minmax(0, 1fr); }
+.figs { display: grid; grid-template-columns: repeat(2, minmax(0, calc(var(--u) * 31))); gap: calc(var(--u) * 1.6); align-items: start; }
+
+/* ---------- 7. 3D model ---------- */
+#s-model { place-items: stretch; }
+.viewer { position: absolute; inset: 0; overflow: hidden; background: var(--paper); }
+.viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.viewer canvas:active { cursor: grabbing; }
+.v-text { position: absolute; left: calc(50vw - var(--u) * 50 + var(--u) * 7); top: calc(50vh - var(--u) * 28.125 + var(--u) * 4.6); width: calc(var(--u) * 26); z-index: 4; pointer-events: none; }
+.v-text > * { pointer-events: auto; }
+.v-text p { margin-bottom: 1em; }
+.v-groups { display: none; }
+.v-groups label { display: block; cursor: pointer; margin: 0 0 0.2em; }
+.v-groups input { accent-color: var(--ink); margin: 0 0.4em 0 0; vertical-align: -0.1em; }
+/* a chosen part is described in the page column, where the page text was */
+.v-info { position: static; }
+.viewer.picked .v-text > p:not(.v-legend) { display: none; }
+.viewer.picked .v-text { width: calc(var(--u) * 30); }
+.v-info p { margin: 0 0 0.8em; }
+.v-controls { position: absolute; left: calc(50vw - var(--u) * 50 + var(--u) * 7); right: calc(50vw - var(--u) * 50 + var(--u) * 7); bottom: calc(50vh - var(--u) * 28.125 + var(--u) * 5.2); z-index: 4; display: flex; flex-wrap: wrap; gap: 0.35em 1.1em; align-items: baseline; font-size: var(--small); background: var(--paper); padding: 0.3em 0; }
+.v-controls .views { display: inline-flex; gap: 0.6em; }
+.v-controls label { display: inline-flex; gap: 0.5em; align-items: center; }
+/* part names written on the model; a name that would cover another one is left out */
+.hot { position: absolute; left: 0; top: 0; z-index: 2; transform: translate(-50%, -50%); border: 0; background: var(--paper); color: var(--ink); font-size: var(--small); line-height: 1.2; padding: 0 0.3em; cursor: pointer; white-space: nowrap; }
+.hot.compact { visibility: hidden; }
+.hot:hover, .hot.on { text-decoration: underline; z-index: 3; }
+.hot[hidden] { display: none !important; }
+.v-hots.off .hot { display: none; }
+.v-loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 5; pointer-events: none; }
+.v-fallback { position: absolute; inset: 0; display: grid; place-content: center; justify-items: start; padding: calc(var(--u) * 6); gap: 0.8em; z-index: 6; background: var(--paper); }
+.v-fallback img { max-height: 60vh; width: auto; }
+.v-legend { font-size: 1em; }
+
+/* ---------- 8. air path ---------- */
+
+/* ---------- 9. mechanism ---------- */
+
+/* ---------- 10. cartridge ---------- */
+#s-wklad .page { grid-template-columns: minmax(0, 27em) minmax(0, 1fr); }
+#s-wklad .illu img { max-height: calc(var(--u) * 40); width: auto; }
+
+/* ---------- 11. light ---------- */
+
+/* ---------- 12. build ---------- */
+#s-budowa .page { grid-template-columns: minmax(0, 17em) minmax(0, 1fr); }
+#s-budowa figure img { max-height: calc(var(--u) * 41); width: auto; }
+
+/* ---------- 13. print ---------- */
+#s-druk .page { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+table.plates { border-collapse: collapse; width: 100%; font-size: var(--small); }
+.plates th, .plates td { text-align: left; font-weight: normal; padding: 0.12em 0.8em 0.12em 0; vertical-align: top; }
+.plates thead th { border-bottom: 1px solid var(--ink); }
+.plates tbody tr:last-child td { border-bottom: 1px solid var(--ink); }
+.plates td.r, .plates th.r { text-align: right; padding-right: 0; white-space: nowrap; }
+
+/* ---------- 14. drawings ---------- */
+#s-rysunki .page { grid-template-columns: minmax(0, 1fr); }
+.sheets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(var(--u) * 1.2) calc(var(--u) * 2); }
+.sheet { display: block; align-self: start; background: none; border: 0; padding: 0; cursor: zoom-in; text-align: left; }
+.sheet img { width: 100%; border: 1px solid var(--hair); }
+.sheet span { display: block; font-size: var(--small); margin-top: 0.35em; }
+
+/* ---------- 15. manual ---------- */
+#s-instrukcja .page { grid-template-columns: minmax(0, 24em) minmax(0, 1fr); }
+.pages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(var(--u) * 1.6); align-items: start; }
+.pages img { border: 1px solid var(--hair); }
+
+/* ---------- 18. last page ---------- */
+#s-epilog .t p { margin-bottom: 1em; }
+
+/* ---------- lightbox ---------- */
+.lb { border: 0; padding: 0; max-width: none; max-height: none; width: 100vw; height: 100vh; background: var(--paper); color: var(--ink); }
+.lb::backdrop { background: var(--paper); }
+.lb-bar { position: sticky; top: 0; display: flex; justify-content: space-between; gap: 1.4em; align-items: baseline; padding: 12px 16px; background: var(--paper); z-index: 2; font-size: var(--small); }
+.lb-bar span { display: flex; gap: 1.4em; }
+.lb-wrap { height: calc(100vh - 48px); overflow: auto; display: grid; place-items: center; cursor: zoom-in; }
+.lb-wrap img { max-width: 96vw; max-height: calc(100vh - 64px); }
+.lb-wrap.zoom { place-items: start; cursor: grab; }
+.lb-wrap.zoom img { max-width: none; max-height: none; width: 2200px; cursor: zoom-out; }
+
+/* ---------- phones and narrow windows: one long page, like scrolling the PDF ---------- */
+@media (max-width: 860px), (max-aspect-ratio: 4/5) {
+  :root { --u: clamp(9px, 2.5vw, 13px); --fs: 16px; --small: 14px; }
+  body { overflow: auto; }
+  .deck { position: static; padding: 0 16px; }
+  .slide { position: relative; visibility: visible; display: block; padding: 0 0 2.3333em; }
+  .page, #s-cover .page, #s-wklad .page, #s-budowa .page, #s-druk .page, #s-instrukcja .page { width: 100%; height: auto; padding: 0; grid-template-columns: minmax(0, 1fr); row-gap: 1.2em; }
+  .page > * { grid-column: auto !important; }
+  .slide:first-child { padding-top: 32px; }
+  .foot { display: none; }
+  .figs { grid-template-columns: minmax(0, 1fr); }
+  .sheets { grid-template-columns: 1fr 1fr; }
+  .pages { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #s-wklad .illu img, #s-budowa figure img { max-height: none; width: 100%; }
+  #s-model { height: 92vh; min-height: 560px; margin: 0 -16px 2.3333em; }
+  .viewer { position: absolute; }
+  .v-text { left: 16px; top: 16px; width: calc(100% - 32px); }
+  .v-groups { display: none; }
+  .v-controls { left: 16px; right: 16px; bottom: 12px; }
+  .lb-wrap.zoom img { width: 1600px; }
+}
+@media print { .foot { display: none; } }
+
+/* ---------- tour in the 3D model ---------- */
+.viewer.touring .v-text > :not(#vTour) { display: none; }
+.viewer.touring .v-controls, .viewer.touring .v-hots, .viewer.touring .v-info { display: none !important; }
+#vTour p { margin: 0 0 1em; }
+.tour-nav { display: flex; flex-wrap: wrap; gap: 0.3em 1.1em; align-items: baseline; font-size: var(--small); margin-top: 1.1667em !important; }
+.viewer.touring .v-text { width: calc(var(--u) * 30); }
+@media (max-width: 860px), (max-aspect-ratio: 4/5) {
+  .viewer.touring .v-text { background: var(--paper); padding-bottom: 10px; width: calc(100% - 32px); }
+}
+@media (max-width: 860px), (max-aspect-ratio: 4/5) {
+  .viewer.picked .v-text { background: var(--paper); padding-bottom: 10px; width: calc(100% - 32px); }
+}
+</style>
+<main class="deck" id="deck" aria-label="Staś, prezentacja projektu">
+<section class="slide is-active" id="s-cover" aria-label="Pierwsza strona">
+<div class="page ">
+<div class="t"><p>Staś to oczyszczacz powietrza noszony na szyi, prototyp do druku 3D. Projekt powstał na warsztatach mistrzowskich, na podstawie eseju spekulatywnego. Model 3D, który można obracać i oglądać po kolei, jest na <button class="ln" type="button" data-go="s-model">stronie 7</button>.</p>
+<p class="brk" aria-hidden="true"></p>
+<p>Smród. Dzisiaj znowu obudził mnie ten okrutny smród.</p>
+<p>Najpierw poczułem go w gardle. Potem na języku, chociaż jeszcze nie otworzyłem ust. Jak mokra moneta trzymana zbyt długo w dłoni, zmieszana z czymś słodkim i gnijącym. W nocy musiałem zsunąć oczyszczacz z poduszki. Leżał teraz między łóżkiem a ścianą, poza zasięgiem ręki.</p></div>
+<figure><img src="/portfolio/stas/img/r06.jpg" alt="oczyszczacz od przodu, ze świecącymi grotami i kryształem" loading="lazy"><figcaption>Render: oczyszczacz od przodu, ze świecącymi grotami i kryształem.</figcaption></figure>
+</div>
+</section>
+
+<section class="slide" id="s-prolog" aria-label="Z eseju: świat">
+<div class="page l-text">
+<div class="t essay"><p>Jest rok 2400. Mieszkam sto osiemdziesiąt metrów pod powierzchnią Ziemi, w pomieszczeniu, którego szerokość mogę zmierzyć trzema krokami.</p>
+<p>W kompleksie mieszka nas sześcioro. Każdy ma własny segment, własną zmianę i przypisany odcinek infrastruktury.</p>
+<p>Pracujemy dla OpenAI. Pilnujemy centrów danych, które zajmują znaczną część powierzchni ziemi.</p>
+<p class="brk" aria-hidden="true"></p>
+<p>Powietrze jest stale filtrowane. Instalacja usuwa pył i utrzymuje parametry niezbędne do życia. Na ekranie przy drzwiach prawie zawsze świeci się zielony komunikat.</p>
+<p>A jednak śmierdzi.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-problem" aria-label="Z eseju: zapach">
+<div class="page l-text">
+<div class="t essay"><p>Zapach przedostaje się przez śluzy, osiada na ubraniach wracających z poziomów technicznych, pozostaje w przewodach i ciepłych zakamarkach kompleksu. Ma w sobie rdzę, przegrzaną instalację i wilgotną zgniliznę. Przy coraz mniejszych zasobach wody mycie całych korytarzy jest luksusem, którego nikt nie uwzględnia w codziennym harmonogramie.</p>
+<p>Inni mówią, że po pewnym czasie przestają go zauważać.</p>
+<p>Ja zauważam go zawsze.</p>
+<p>Budzi mnie. Odbiera apetyt. Potrafi przerwać myśl w połowie zdania. Kiedy się nasila, wszystko mnie drażni: szelest ubrania, głos systemu, czyjeś kroki za ścianą. Czytam raport i po chwili orientuję się, że od kilku minut zaciskam szczękę.</p>
+<p>Dlatego noszę oczyszczacz na szyi.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-esencja" aria-label="Z eseju: esencja">
+<div class="page l-text">
+<div class="t essay"><p>Najbardziej lubię mieszankę sosnową.</p>
+<p>Najpierw czuję żywicę. Potem igliwie i coś wilgotnego, ziemistego, co zostaje na końcu wdechu. Zawsze próbuję to nazwać, ale nigdy dokładnie mi się nie udaje.</p>
+<p>Próbowałem gotowych kompozycji syntetycznych. System odtwarzał je na podstawie archiwalnych zapisów. Pachniały przyjemnie, czasami nawet zbyt przyjemnie. Po kilku dniach znałem już każdy następny wdech.</p>
+<p>Naturalna esencja jest trochę inna przy każdej dostawie. Jedna ma więcej goryczy, druga pachnie suchymi igłami, kolejna wilgotną korą. Lubię te różnice. Otwierając nowy wkład, przez chwilę skupiam się wyłącznie na tym, co czuję.</p>
+<p class="brk" aria-hidden="true"></p>
+<p>Drony startują z hangaru na powierzchni. Każdy ma mapę pozostałych skupisk roślinności, niewielki chwytak i szczelne pojemniki. Szukają przede wszystkim opadłych szyszek, igliwia i fragmentów kory. Nie wolno im uszkadzać żywych drzew.</p>
+<p>Po powrocie materiał trafia do komory przygotowawczej. Jest oczyszczany, sortowany i poddawany ekstrakcji w zamkniętym obiegu. Instalacja odzyskuje większość użytej wody. Powstały koncentrat przechodzi kontrolę, a następnie trafia do małych wkładów.</p>
+<p>Na moim widnieją data przygotowania, skład i numer obszaru zbioru.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-mapa" aria-label="Z eseju do prototypu">
+<div class="page l-text">
+<div class="t"><p>„Powietrze wpada przez szczeliny po bokach, przechodzi przez wymienny filtr i wydostaje się górną częścią obudowy.”</p>
+<p>W prototypie wlotem jest kratka w pokrywie, a filtr HEPA H13 z węglem leży w kominie nad dmuchawą.</p>
+<p>„Wylot kieruje łagodny strumień w stronę nosa.”</p>
+<p>Dwie rurki z miękkimi końcówkami mają dawać 2–6 l/min. Upust Ø1,2 mm chroni przed nadciśnieniem.</p>
+<p>„W jego wnętrzu są dwa wkłady.”</p>
+<p>W prototypie to filtr i kaseta esencji z klapką zwrotną. Kasetę wymienia się od góry, bez rozkręcania. Filtr dopiero po zdjęciu pokrywy.</p>
+<p>„Esencja jest podawana w bardzo małych porcjach do oczyszczonego strumienia.”</p>
+<p>Klapka na serwie dzieli strumień. Przy 0° zapachu nie ma, przy 64,4° jest go najwięcej.</p>
+<p>„Od spodu obudowa jest lekko wklęsła, żeby przylegała do ciała.”</p>
+<p>Spód jest z miękkiej pianki TPU, wyprofilowanej pod barki.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-forma" aria-label="Forma">
+<div class="page l-stack">
+<div class="t"><p>W eseju oczyszczacz ma metalową obudowę wielkości płaskiego kamienia i wisi na taśmie. Prototyp jest kołnierzem z PETG, który leży na barkach. W środku mieszczą się akumulator 1800 mAh, dmuchawa i mechanizm zapachu.</p>
+<p>Obudowa nawiązuje do kamienia z eseju, ale ma płaskie fasety jak kryształ. Fasety dobrze się drukują i łamią światło.</p>
+<p>Kołnierz ma z przodu otwarcie 125 mm i przez nie zakłada się go na szyję. Spód jest z miękkiej pianki. Ramiona kończą się grotami z pierścieniem światła.</p>
+<p>Kolor pokrywy nie jest jeszcze ustalony. Podgląd 3D pokazuje szarość kamienia, a wykaz druku podaje biały PETG.</p></div>
+<div class="figs"><figure><img src="/portfolio/stas/img/r01.jpg" alt="cały kołnierz z rurkami nosowymi" loading="lazy"><figcaption>Render: cały kołnierz z rurkami nosowymi.</figcaption></figure><figure><img src="/portfolio/stas/img/r10.jpg" alt="tył z kratką wlotu i pokrywką wkładu" loading="lazy"><figcaption>Render: tył z kratką wlotu i pokrywką wkładu.</figcaption></figure></div>
+</div>
+</section>
+
+<section class="slide" id="s-model" aria-label="Model 3D">
+  <div class="viewer" id="viewer">
+    <canvas id="v3d" aria-label="Model 3D oczyszczacza Staś"></canvas>
+    <div class="v-loading" id="vLoading"><p>Ładowanie modelu 3D, <span id="vPct">0 %</span><span id="vBar" hidden></span></p></div>
+    <div class="v-fallback" id="vFallback" hidden><img src="/portfolio/stas/img/r01.jpg" alt="Render oczyszczacza"><p>Ta przeglądarka nie wyświetla grafiki 3D. Zamiast modelu jest render.</p></div>
+    <div class="v-text"><p>Po kliknięciu części pojawia się jej opis. Model obraca się przeciągnięciem, przybliża kółkiem albo dwoma palcami, a przesuwa prawym przyciskiem.</p>
+      <p>Można też <button class="ln" type="button" id="vTourBtn">obejrzeć urządzenie po kolei</button>, od kratki w pokrywie do nosa, a potem światło, elektronikę i spód. Kamera przechodzi wtedy od części do części.</p>
+      <aside class="v-info" id="vInfo" hidden aria-live="polite"></aside>
+      <div id="vTour" hidden aria-live="polite"><div id="vTourBody"></div>
+        <p class="tour-nav"><span id="vTourN"></span><button class="ln" type="button" id="vTourPrev">wstecz</button><button class="ln" type="button" id="vTourNext">dalej</button><button class="ln" type="button" id="vTourPlay">pauza</button><button class="ln" type="button" id="vTourEnd">zakończ</button></p>
+      </div>
+      <div class="v-groups" id="vGroups"><p style="margin-bottom:0.3em">Pokaż:</p></div>
+      <p class="v-legend" id="vLegend" hidden>Czarne punkty to czyste powietrze, brązowe to powietrze z esencją.</p>
+    </div>
+    <div class="v-hots off" id="vHots"></div>
+    <div class="v-controls" role="toolbar" aria-label="Sterowanie modelem">
+      <button class="ln tg" type="button" id="vExplode" aria-pressed="false">rozstrzał</button>
+      <button class="ln tg" type="button" id="vAir" aria-pressed="false">przepływ</button>
+      <button class="ln tg" type="button" id="vXray" aria-pressed="false">prześwietlenie</button>
+      <button class="ln tg" type="button" id="vLed" aria-pressed="true">światło</button>
+      <button class="ln" type="button" id="vDoor" aria-pressed="false" title="pozycja klapki zapachu">klapka otwarta</button>
+      <span class="views">widok: <button class="ln" type="button" data-view="iso">3/4</button> <button class="ln" type="button" data-view="front">przód</button> <button class="ln" type="button" data-view="side">bok</button> <button class="ln" type="button" data-view="top">góra</button> <button class="ln" type="button" data-view="back">tył</button></span>
+      <button class="ln tg" type="button" id="vSpin" aria-pressed="false">obrót</button>
+      <button class="ln tg" type="button" id="vPins" aria-pressed="false">nazwy</button>
+    </div>
+  </div>
+</section>
+
+<section class="slide" id="s-powietrze" aria-label="Droga powietrza">
+<div class="page l-text">
+<div class="t"><p>Powietrze wchodzi przez kratkę w pokrywie, nad dmuchawą, i przechodzi przez filtr HEPA H13 z węglem aktywnym, 42 × 42 × 6 mm. Dmuchawa promieniowa 40 × 40 × 7 mm (5 V, do 177 Pa) tłoczy je kanałem do okna w płytce modułu.</p>
+<p>Tam klapka na serwie decyduje, ile powietrza idzie przez kasetę z esencją, a ile obejściem. Do klapki płynie samo oczyszczone powietrze, za nią część strumienia niesie zapach. Siatka w komorze wylotowej miesza oba strumienie.</p>
+<p>Rozdzielacz Y z upustem Ø1,2 mm dzieli powietrze na stronę L i P, a kryzy Ø2,2 mm mają wyrównywać przepływ między stronami. Rurki FEP, które nie chłoną olejku, prowadzą je do grotów. Na końcu są rurki nosowe z silikonu medycznego, a ich kupne końcówki mają leżeć w nozdrzach luźno.</p>
+<p>W modelu 3D można <button class="ln" type="button" id="goAir">włączyć ten przepływ</button> albo <button class="ln" type="button" id="goTour">obejrzeć urządzenie po kolei</button>.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-mechanizm" aria-label="Mechanizm zapachu">
+<div class="page l-stack">
+<div class="t"><p>Przy 0° klapka jest zamknięta: warga z EPDM dociska się do sufitu komory, odcina kanał wkładu i całe powietrze idzie obejściem. Przy 64,4° kanał wkładu jest otwarty, obejście uchylone w około 27 % i zapachu jest najwięcej. Dwa stopnie dalej, przy 66,4°, stoi mechaniczny ogranicznik, do którego serwo nie powinno dojeżdżać.</p>
+<p>Serwo MG996R obraca stalowy wałek Ø3 w tulei PTFE. Bez zasilania przekładnia stoi w miejscu, dlatego zamknięcie klapki musi zapewnić oprogramowanie.</p></div>
+<div class="figs"><figure><img src="/portfolio/stas/img/r03b.jpg" alt="przekrój modułu zaworu, klapka zamknięta, 0°" loading="lazy"><figcaption>Render: przekrój modułu zaworu, klapka zamknięta, 0°.</figcaption></figure><figure><img src="/portfolio/stas/img/r03a.jpg" alt="ten sam przekrój, klapka otwarta, 64,4°" loading="lazy"><figcaption>Render: ten sam przekrój, klapka otwarta, 64,4°.</figcaption></figure></div>
+</div>
+</section>
+
+<section class="slide" id="s-wklad" aria-label="Wkład esencji">
+<div class="page ">
+<div class="t"><p>Kaseta esencji wsuwa się od góry do komina modułu. Wymienia się ją bez rozkręcania obudowy. Pokrywka kasety jest fragmentem fasety pokrywy.</p>
+<p>Poz. 43. Kaseta z PETG naturalnego, bez barwnika, z siatkami na wlocie i wylocie. Bursztynowy kolor ma tylko w podglądzie 3D.</p>
+<p>Poz. 45. Wkład chłonny z włókniny, nasączany małą ilością esencji. Dawki jeszcze nie ustalono.</p>
+<p>Poz. 46. Membrana klapki zwrotnej. Ma się otwierać poniżej 30 Pa i nie wypuszczać esencji wstecz.</p>
+<p>Poz. 47–48. Pokrywka z szyjką i O-ringiem, która uszczelnia komin.</p>
+<p>Poz. 49. Uszczelka komina z pianki 1,0 mm.</p></div>
+<figure class="illu"><img src="/portfolio/stas/img/rys14.png" alt="wkład esencji w rozstrzale" loading="lazy"><figcaption>Ilustracja z instrukcji: wkład esencji w rozstrzale.</figcaption></figure>
+</div>
+</section>
+
+<section class="slide" id="s-swiatlo" aria-label="Światło">
+<div class="page l-text">
+<div class="t"><p>Kryształ z przezroczystego PETG albo z żywicy siedzi na barku strony L. Są w nim trzy diody RGB. Ma pokazywać stan baterii i siłę zapachu.</p>
+<p>Każdy grot ma pierścień sześciu diod pod dyfuzorem, wokół złączki rurki. Znaczenie kolorów trzeba jeszcze zaprojektować w oprogramowaniu.</p></div>
+<div class="figs"><figure><img src="/portfolio/stas/img/r09.jpg" alt="świecący kryształ na barku" loading="lazy"><figcaption>Render: świecący kryształ na barku.</figcaption></figure><figure><img src="/portfolio/stas/img/r08.jpg" alt="grot ramienia z pierścieniem LED" loading="lazy"><figcaption>Render: grot ramienia z pierścieniem LED.</figcaption></figure></div>
+</div>
+</section>
+
+<section class="slide" id="s-budowa" aria-label="Budowa">
+<div class="page ">
+<div class="t"><p>Kołnierz składa się z warstw. Na dole jest pianka, wyżej dolna skorupa z elektroniką, torem powietrza i modułem zapachu. Na wierzchu leży pokrywa z kryształem i wkładem. Groty i rurki nosowe zakłada się od przodu.</p>
+<p>Model 3D ma 155 części, a wykaz części 80 pozycji. Połówki obudowy łączy dziewięć kołków, a pokrywę trzyma sześć wkrętów wkręcanych od spodu.</p></div>
+<figure><img src="/portfolio/stas/img/r05.jpg" alt="widok rozstrzelony wszystkich części" loading="lazy"><figcaption>Render: widok rozstrzelony wszystkich części.</figcaption></figure>
+</div>
+</section>
+
+<section class="slide" id="s-druk" aria-label="Druk">
+<div class="page ">
+<div class="t"><p>Prototyp drukuje się z PETG i TPU na Bambu Lab A1. Przygotowano 29 plików STL rozłożonych na 13 płyt.</p>
+<p>Według OrcaSlicer druk zajmie około 60 h i zużyje około 574 g PETG oraz około 274 g TPU. To szacunek sprzed dodania blokerów podpór.</p>
+<figure><img src="/portfolio/stas/img/r11.jpg" alt="części ułożone w orientacji druku" loading="lazy"><figcaption>Render: części ułożone w orientacji druku.</figcaption></figure></div>
+<div class="t"><table class="plates"><thead><tr><th>Płyta</th><th>Części</th><th>Materiał</th><th class="r">Czas</th></tr></thead><tbody id="platesBody"></tbody></table><p style="margin-top:1em">Czasy w tabeli pochodzą z tego samego szacunku. Skorupy i piankę podzielono na połówki L i P, żeby zmieściły się na stole 256 mm. Części toru oddechowego drukuje się z PETG naturalnego, bez barwnika.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-rysunki" aria-label="Rysunki techniczne">
+<div class="page l-text">
+<div class="t"><p>Rysunki techniczne zajmują siedem arkuszy A3, a każdy z nich powiększa się po kliknięciu.</p>
+<p>Rzutowanie jest europejskie. Wymiary są nominalne, wzięte z modelu 3D, w milimetrach. Arkusze opisano jako koncepcję i prototyp. Nie są przeznaczone do produkcji.</p></div>
+<div class="sheets" id="sheets"></div>
+</div>
+</section>
+
+<section class="slide" id="s-instrukcja" aria-label="Instrukcja">
+<div class="page ">
+<div class="t"><p>Instrukcja druku, montażu i obsługi ma 54 strony, 14 ilustracji i wykaz 80 pozycji. Zaczyna się od opisu prototypu i listy rzeczy do przygotowania. Potem prowadzi przez druk w OrcaSlicer, montaż krok po kroku, pierwsze uruchomienie i testy, obsługę i rozwiązywanie problemów. Kończy się ograniczeniami prototypu.</p>
+<p>Urządzenia nie zakłada się na szyję, dopóki nie przejdzie testów z protokołu pierwszego uruchomienia i dopóki nie powstanie oprogramowanie.</p></div>
+<figure><div class="pages"><img src="/portfolio/stas/img/m3.jpg" alt="" loading="lazy"><img src="/portfolio/stas/img/m27.jpg" alt="" loading="lazy"><img src="/portfolio/stas/img/m46.jpg" alt="" loading="lazy"></div><figcaption>Strony 3, 27 i 46 instrukcji.</figcaption></figure>
+</div>
+</section>
+
+<section class="slide" id="s-dane" aria-label="Dane">
+<div class="page l-text">
+<div class="t"><p>Liczby pochodzą z modelu 3D i założeń projektu.</p>
+<p>Kołnierz ma 296,8 × 231,3 × 100,5 mm, a z kryształem 114 mm wysokości. Otwarcie z przodu ma 125 mm.</p>
+<p>Dmuchawa ma dawać 2–6 l/min na oba nozdrza i jest sterowana przez PWM. Filtr to wymienny HEPA H13 z węglem, 42 × 42 × 6 mm. Zapach reguluje klapka na serwie MG996R, od 0° do 64,4°.</p>
+<p>Zasilać ma go akumulator LiPo 1S 1800 mAh ładowany przez USB-C. Sterownikiem ma być ESP32-C3 na płytce, którą trzeba jeszcze zaprojektować. Części drukuje się z PETG i TPU w technologii FDM, dyszą 0,4 mm.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-dalej" aria-label="Co dalej">
+<div class="page l-text">
+<div class="t"><p>Model 3D i pliki do druku są przygotowane, ale prototypu nikt jeszcze nie wydrukował ani nie zmierzył. Po wydruku trzeba sprawdzić przepływ i szczelność po obu stronach i to, czy klapka zwrotna otwiera się poniżej 30 Pa. Szacunek masy to około 0,7 kg, a cel to 350 g, więc najpierw przyjdą cieńsze ścianki i lżejsza pianka. Wygodę pokaże dopiero dłuższe noszenie, a bezpieczną ilość olejku trzeba ustalić.</p>
+<p>Oprogramowania i płytki PCB nie ma. Są tylko wymagania: limit ruchu serwa, wyłączanie PWM i zamykanie klapki przed wyłączeniem. Nie ma też funkcji z eseju, regulacji palcem po krawędzi ani odczytu oddechu i pulsu.</p></div>
+</div>
+</section>
+
+<section class="slide" id="s-epilog" aria-label="Ostatnia strona">
+<div class="page l-text">
+<div class="t"><p>— Daj mi znać, kiedy wróci.</p>
+<p>— Oczywiście.</p>
+<p>— Nawet jeśli będę spał.</p></div>
+</div>
+</section>
+</main>
+<nav class="foot" aria-label="Strony"><a href="/portfolio/#projekty">portfolio</a><button class="ln" type="button" id="prevBtn" aria-label="Poprzednia strona" hidden>poprzednia</button><span class="num" id="hudCount">1 z 18</span><button class="ln" type="button" id="nextBtn" aria-label="Następna strona">następna</button><button class="ln" type="button" id="fsBtn">pełny ekran</button></nav>
+<dialog class="lb" id="lb" aria-label="Arkusz rysunku"><div class="lb-bar"><span id="lbTitle"></span><span><button class="ln" type="button" id="lbZoom">powiększ</button><button class="ln" type="button" id="lbClose">zamknij</button></span></div><div class="lb-wrap" id="lbWrap"><img id="lbImg" alt=""></div></dialog>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  /* ---------------- data ---------------- */
+  const PLATES = [
+    ["01", "Moduł zaworu: korpus, płytka, 2 klapki", "tor", "3 h 21 min"],
+    ["02", "Małe części toru: kanały, kryzy, złączki, kaseta", "tor", "2 h 5 min"],
+    ["03", "Osłona wlotu", "tor", "1 h 15 min"],
+    ["04", "Groty L i P", "tor", "2 h 55 min"],
+    ["05", "Dolna obudowa L z tacką", "petg", "5 h 11 min"],
+    ["06", "Dolna obudowa P", "petg", "5 h 27 min"],
+    ["07", "Pokrywa L", "petg", "6 h 46 min"],
+    ["08", "Pokrywa P", "petg", "6 h 46 min"],
+    ["09", "Pokrywka wkładu, pierścienie", "petg", "1 h 5 min"],
+    ["10", "Kryształ, dyfuzory", "prz", "36 min"],
+    ["11", "Podkładka, zaślepka USB-C, spinka", "tpu", "19 min"],
+    ["12", "Pianka L", "tpu", "10 h 44 min"],
+    ["13", "Pianka P", "tpu", "13 h 38 min"]
+  ];
+  const MATL = { tor: ["PETG naturalny", "tor"], petg: ["PETG", "petg"], prz: ["PETG przezroczysty", "prz"], tpu: ["TPU 95A", "tpu"] };
+  const SHEETS = [
+    ["Zespół, rzuty i gabaryty", "1:2"], ["Rozstrzał i wykaz pozycji", "~1:2,3"], ["Przekrój A–A, mechanizm klapki", "2:1, 5:1"],
+    ["Dolna obudowa L+P", "1:2"], ["Pokrywa L+P i groty", "1:2, 1:1"], ["Moduł zaworu", "1:1"], ["Pianka TPU, wykaz c.d.", "1:2"]
+  ];
+  const SHEET_CAPS = ["Arkusz 1. Zespół, rzuty i gabaryty, skala 1:2.", "Arkusz 2. Rozstrzał i wykaz pozycji, skala ok. 1:2,3.", "Arkusz 3. Przekrój A–A i mechanizm klapki, skala 2:1 i 5:1.", "Arkusz 4. Dolna obudowa L i P, skala 1:2.", "Arkusz 5. Pokrywa L i P, groty, skala 1:2 i 1:1.", "Arkusz 6. Moduł zaworu, skala 1:1.", "Arkusz 7. Pianka TPU i ciąg dalszy wykazu, skala 1:2."];
+  const LB = {"zoom": "powiększ", "fit": "dopasuj", "close": "zamknij"};
+  const INFO = {"list": "Wykaz", "group": "Grupa", "source": "Źródło", "material": "Materiał", "file": "Plik", "close": "zamknij", "essay": "(z eseju)"};
+  const CTRL = {"doorOpen": "klapka otwarta", "doorClosed": "klapka zamknięta"};
+  const GLABEL = {"Obudowa": "obudowa", "Tor powietrza": "tor powietrza", "Moduł zaworu": "moduł zaworu", "Wkład zapachowy": "wkład esencji", "Elektronika": "elektronika", "Elementy świetlne": "światło", "Elementy złączne": "łączniki", "Uszczelki": "uszczelki"};
+  const NAVTXT = {"full": "pełny ekran", "exit": "zamknij pełny ekran"};
+  const TOUR = {"labels": {"start": "obejrzeć urządzenie po kolei", "prev": "wstecz", "next": "dalej", "pause": "pauza", "play": "odtwarzaj", "end": "zakończ", "again": "od początku", "count": "krok {n} z {total}", "goTour": "obejrzyj to po kolei w modelu 3D", "intro_a": "Można też ", "intro_b": ", od kratki w pokrywie do nosa, a potem światło, elektronikę i spód. Kamera przechodzi wtedy od części do części.", "legend": "Czarne punkty to czyste powietrze, brązowe to powietrze z esencją."}, "steps": [{"parts": [], "q": "Dlatego noszę oczyszczacz na szyi.", "t": "Kołnierz leży na barkach i zakłada się go od przodu. Powietrze płynie przez niego od kratki w pokrywie do końcówek pod nosem.", "dir": [-0.56, 0.44, 0.66], "all": true}, {"parts": ["Oslona_wlotu_z_kominem_filtra", "Uszczelka_komina_wlotu"], "q": "Powietrze wpada przez szczeliny po bokach, przechodzi przez wymienny filtr i wydostaje się górną częścią obudowy.", "t": "W prototypie powietrze wchodzi z góry, przez kratkę w pokrywie. Pod kratką stoi osłona wlotu z kominem, a w kominie leży filtr.", "dir": [-0.35, 0.85, 0.4], "xray": true}, {"parts": ["Filtr_wlotowy_HEPA_wegiel"], "q": "W jego wnętrzu są dwa wkłady. Pierwszy zatrzymuje drobne zanieczyszczenia i ogranicza część nieprzyjemnych zapachów.", "t": "To filtr HEPA H13 z węglem aktywnym, 42 × 42 × 6 mm. Zatrzymuje pył i część zapachów. Żeby go wymienić, trzeba wysunąć groty, zdjąć piankę, odkręcić sześć wkrętów i unieść pokrywę. To znane ograniczenie prototypu.", "dir": [-0.3, 0.9, 0.3], "xray": true}, {"parts": ["Dmuchawa_promieniowa", "Kanal_dmuchawa_do_modulu", "Uszczelka_kanalu_dmuchawy"], "q": "Podczas chodzenia zwiększa przepływ. Gdy siedzę nieruchomo, pracuje ciszej.", "t": "Dmuchawa promieniowa 40 × 40 × 7 mm ciągnie powietrze przez filtr i tłoczy je kanałem do modułu zapachu. Ma dawać 2–6 l/min na oba nozdrza. Prędkość ma ustawiać oprogramowanie, którego jeszcze nie ma.", "dir": [-0.5, 0.75, 0.45], "xray": true}, {"parts": ["Korpus_modulu_zaworu", "Plytka_czolowa_modulu", "Klapka_mieszajaca", "Warga_klapki", "Walek_klapki", "Serwo_MG996R", "Orczyk_okragly", "Kolnierz_walka"], "q": "Esencja jest podawana w bardzo małych porcjach do oczyszczonego strumienia.", "t": "W module zapachu klapka dzieli strumień na dwie drogi, przez wkład albo obejściem. Przy 0° całe powietrze idzie obejściem i nie niesie zapachu. Przy 64,4° kanał wkładu jest otwarty i zapachu jest najwięcej. Klapkę obraca serwo MG996R. W podglądzie klapka przechodzi między tymi pozycjami.", "dir": [-0.45, 0.6, 0.65], "xray": true, "door": "cycle"}, {"parts": ["Wklad_esencji", "Oring_szyjki_wkladu", "Uszczelka_komina_wkladu"], "q": "Zdjąłem oczyszczacz z szyi, otworzyłem obudowę i wyjąłem pusty wkład. Nowy zatrzasnął się z cichym kliknięciem.", "t": "W prototypie nie trzeba otwierać obudowy. Kaseta z esencją wsuwa się od góry do komina modułu, a jej pokrywka jest fragmentem fasety. Klapka zwrotna w kasecie ma nie wypuszczać esencji wstecz.", "dir": [-0.4, 0.8, 0.45], "xray": true}, {"parts": ["Siatka_mieszajaca", "Kanal_zbiorczy_mieszajacy", "Rozdzielacz_Y", "Tuleja_laczaca_silikon"], "q": "", "t": "Za klapką oba strumienie mieszają się na siatce w komorze wylotowej. Króciec modułu wchodzi w silikonową tuleję na kanale zbiorczym, a kanał prowadzi powietrze do rozdzielacza Y, który dzieli je na stronę L i P. Upust Ø1,2 mm ma chronić przed nadciśnieniem.", "dir": [-0.3, 0.7, 0.65], "xray": true, "air": true}, {"parts": ["Kanal_galaz_L", "Kanal_galaz_P", "Kryza_dlawiaca", "Zlaczka_rurki", "Oring_zlaczki_rurki", "Koncowka_ramienia_L", "Koncowka_ramienia_P"], "q": "", "t": "Rurki FEP prowadzą powietrze wzdłuż ramion do grotów. W grotach siedzą kryzy Ø2,2 mm, które mają wyrównywać przepływ między stronami. FEP, inaczej niż silikon, nie chłonie olejku.", "dir": [0.05, 0.75, 0.75], "xray": true, "air": true}, {"parts": ["Rurka_silikonowa", "Spinka_rurek", "Koncowka_nosowa"], "q": "Wylot kieruje łagodny strumień w stronę nosa.", "t": "Z grotów wychodzą miękkie rurki nosowe z silikonu medycznego. Spinka trzyma je około 25 mm od siebie, około 20 mm pod nosem. Końcówki są kupne, nie drukowane. Mają leżeć w nozdrzach luźno, bez uszczelniania.", "dir": [-0.35, 0.3, 1.0], "xray": true, "air": true}, {"parts": ["Krysztal_swietlny", "Pierscien_ustalajacy_krysztalu", "Plytka_LED_krysztalu", "LED_RGB_krysztalu", "Dyfuzor_LED", "Plytka_LED_szesciokat", "LED_2020"], "q": "", "t": "W krysztale na barku strony L są trzy diody RGB. Ma pokazywać stan baterii i siłę zapachu. W każdym grocie jest pierścień sześciu diod pod dyfuzorem. Znaczenie kolorów trzeba jeszcze zaprojektować.", "dir": [-0.6, 0.55, 0.6], "tint": false, "zoom": 0.75}, {"parts": ["PCB_", "Akumulator_", "Przewod_akumulatora", "Tacka_akumulatora", "Plytka_USB-C", "Gniazdo_USB-C", "Tasma_FFC"], "q": "Zna rytm mojego oddechu, wie, kiedy przyspiesza mi puls, i pamięta, przy jakim ustawieniu najłatwiej zasypiam.", "t": "Na płytce ma pracować ESP32-C3 z ładowarką i przetwornicą 5 V. Całość ma zasilać akumulator LiPo 1800 mAh ładowany przez USB-C. Płytki i oprogramowania jeszcze nie ma. Odczyt oddechu i pulsu to dopiero następny etap.", "dir": [-0.5, 0.8, 0.35], "xray": true}, {"parts": ["Pianka_TPU_spod_kolnierza"], "q": "Od spodu obudowa jest lekko wklęsła, żeby przylegała do ciała.", "t": "Spód kołnierza jest z TPU drukowanego z wypełnieniem gyroid 12–25 %. Ugina się jak pianka i ma przylegać do barków.", "dir": [-0.45, -0.55, 0.7]}, {"parts": [], "q": "", "t": "W rozstrzale widać wszystkie części. Model ma ich 155, a wykaz na rysunkach technicznych i w instrukcji ma 80 pozycji.", "dir": [-0.56, 0.5, 0.66], "all": true, "explode": 0.65}]};
+  const SHEET_CAP = i => SHEET_CAPS[i];
+  const STONE = "#8a867c"; /* stone grey for the cover, tips and cartridge cap */
+  const FLOW = {"trunk":[[0.08407,0.10846,-0.07383],[0.08407,0.08646,-0.07383],[0.08398,0.048,-0.07561],[0.08398,0.038,-0.07561],[0.06972,0.038,-0.10288],[0.02454,0.0533,-0.09904],[0.0348,0.0228,-0.0778],[0.0348,0.0228,-0.0778],[0.0348,0.01995,-0.0778],[0.03464,0.01711,-0.07783],[0.03351,0.01452,-0.07804],[0.03146,0.0126,-0.07842],[0.02883,0.01166,-0.0789],[0.02603,0.0116,-0.07942],[0.02322,0.0116,-0.07993],[0.02042,0.0116,-0.08045],[0.01761,0.0116,-0.08097],[0.01481,0.0116,-0.08148],[0.012,0.0116,-0.082],[0.012,0.0116,-0.082],[0.01049,0.0116,-0.08238],[0.00899,0.0116,-0.08275],[0.00749,0.0116,-0.08313],[0.00598,0.0116,-0.0835],[0.00449,0.0116,-0.08393],[0.00311,0.0116,-0.08464],[0.00193,0.0116,-0.08564],[0.00099,0.0116,-0.08687],[0.00035,0.0116,-0.08828],[0.00003,0.0116,-0.0898],[-0,0.0116,-0.09135],[0,0.0116,-0.0929],[-0,0.0116,-0.09445],[0,0.0116,-0.096],[0,0.0104,-0.1039]],"galaz_L":[[0,0.0104,-0.1039],[-0.00819,0.0116,-0.10874],[-0.0086,0.0116,-0.10902],[-0.00901,0.0116,-0.10931],[-0.00942,0.0116,-0.1096],[-0.00983,0.0116,-0.10988],[-0.01024,0.0116,-0.11017],[-0.01065,0.0116,-0.11046],[-0.01106,0.0116,-0.11074],[-0.01147,0.0116,-0.11103],[-0.01188,0.0116,-0.11132],[-0.01229,0.0116,-0.1116],[-0.0127,0.0116,-0.11189],[-0.01311,0.0116,-0.11218],[-0.01311,0.0116,-0.11218],[-0.0168,0.0116,-0.1096],[-0.0205,0.0116,-0.10702],[-0.0242,0.0116,-0.10444],[-0.0279,0.0116,-0.10186],[-0.03159,0.0116,-0.09928],[-0.03529,0.0116,-0.0967],[-0.03899,0.0116,-0.09412],[-0.04268,0.0116,-0.09154],[-0.04268,0.0116,-0.09154],[-0.0479,0.012,-0.08774],[-0.05313,0.0124,-0.08395],[-0.05835,0.01281,-0.08016],[-0.06357,0.01321,-0.07637],[-0.06879,0.01361,-0.07257],[-0.07399,0.01403,-0.06876],[-0.07875,0.01483,-0.06446],[-0.08351,0.01564,-0.06016],[-0.08827,0.01645,-0.05585],[-0.09301,0.01725,-0.05153],[-0.09567,0.01774,-0.04576],[-0.09735,0.01808,-0.03952],[-0.09902,0.01841,-0.03328],[-0.10069,0.01875,-0.02705],[-0.10236,0.01908,-0.02081],[-0.10403,0.01942,-0.01457],[-0.1057,0.01975,-0.00834],[-0.10667,0.02042,-0.00204],[-0.10572,0.02192,0.00418],[-0.10477,0.02343,0.01039],[-0.10382,0.02494,0.01661],[-0.10287,0.02645,0.02282],[-0.10214,0.02819,0.02898],[-0.10338,0.0318,0.03417],[-0.10385,0.03544,0.03938],[-0.10042,0.03761,0.04427],[-0.09585,0.03903,0.04862],[-0.09128,0.04046,0.05297],[-0.08671,0.04188,0.05731],[-0.07685,0.04462,0.06664],[-0.0754,0.04541,0.06807],[-0.05972,0.05379,0.08505],[-0.0497,0.07053,0.1004],[-0.03812,0.08947,0.11147],[-0.02652,0.11111,0.11373],[-0.0183,0.1339,0.10832],[-0.01296,0.15674,0.10015],[-0.009,0.178,0.0885],[-0.009,0.18108,0.08826]],"galaz_P":[[0,0.0104,-0.1039],[0.00819,0.0116,-0.10874],[0.03902,0.0116,-0.10077],[0.06795,0.01191,-0.08407],[0.09166,0.01336,-0.06112],[0.10374,0.01616,-0.03093],[0.10409,0.02135,0.00182],[0.10322,0.03093,0.03332],[0.08701,0.04142,0.05747],[0.07715,0.04416,0.0668],[0.0757,0.04495,0.06823],[0.05994,0.05342,0.08515],[0.04979,0.07036,0.10027],[0.0382,0.08934,0.11138],[0.02657,0.11099,0.11376],[0.01832,0.13382,0.10834],[0.01297,0.15671,0.10017],[0.009,0.178,0.0885],[0.009,0.18108,0.08826]]};
+
+  /* part descriptions by BOM position */
+  const DESC = {
+    1: ["Dolna obudowa", "Dolna skorupa kołnierza z wieżami wkrętów i słupkami pod moduł, elektronikę i osłonę wlotu. Drukowana z PETG w dwóch połówkach (poz. 1 i 2), łączonych 9 kołkami Ø2 i klejem."],
+    3: ["Pokrywa", "Fasetowana pokrywa z kratką wlotu, kominem wkładu i oknem kryształu. Dwie połówki z PETG (poz. 3 i 4), przykręcane 6 wkrętami od spodu."],
+    5: ["Pianka TPU", "Miękki spód kołnierza. TPU z wypełnieniem gyroid 12–25 % ugina się jak pianka i ma przylegać do barków. Dwie połówki (poz. 5 i 6)."],
+    7: ["Grot ramienia L", "Zakończenie ramienia. W środku gniazdo złączki rurki, kryza Ø2,2 i pierścień sześciu diod pod dyfuzorem."],
+    8: ["Grot ramienia P", "Zakończenie ramienia po stronie P. Ma osobny plik. Kształtem nie jest lustrzanym odbiciem grotu L."],
+    9: ["Korpus modułu zaworu", "Główna część mechanizmu zapachu. Mieści komorę wlotową, klapkę, kanał wkładu, obejście i komorę wylotową. W kołysce siedzi serwo."],
+    10: ["Płytka czołowa modułu", "Zamyka komorę po włożeniu klapki. Klejona epoksydem, trzyma ślepe gniazdo PTFE wałka."],
+    11: ["Klapka mieszająca", "Obraca się od 0° (zapach odcięty) do 64,4° (najwięcej zapachu). Jej pozycję zmienia przycisk „klapka otwarta” pod modelem."],
+    12: ["Warga klapki", "Pasek EPDM na krawędzi klapki. Dociśnięty do sufitu komory odcina kanał wkładu."],
+    13: ["Wałek klapki", "Stal nierdzewna Ø3 h6, długość 34,8 mm. Łączy klapkę z serwem przez kołnierz i orczyk."],
+    14: ["Tuleja labiryntowa PTFE", "Prowadzi wałek w ściance korpusu bez O-ringu, z luzem 0,025 mm na stronę."],
+    16: ["Sprężyna skrętna", "Kasuje luz w mechanizmie. Nie cofnie przekładni serwa bez zasilania."],
+    17: ["Kołnierz wałka", "Aluminium Ø20, grubość 3,5 mm. Przykręcony dwiema śrubami M2 do orczyka."],
+    19: ["Orczyk", "Oryginalny okrągły orczyk serwa MG996R."],
+    20: ["Serwo MG996R", "Ustawia klapkę zapachu. Zasilane z przetwornicy 5 V. Po każdym ruchu sygnał PWM ma być wyłączany. To wymaganie dla oprogramowania."],
+    22: ["Osłona wlotu", "Komin z filtrem nad dmuchawą. Uszczelka z pianki 1,0 mm styka się z pokrywą."],
+    23: ["Filtr wlotowy", "HEPA H13 z węglem aktywnym, 42 × 42 × 6 mm. Zatrzymuje pył i część zapachów. Żeby go wymienić, trzeba wysunąć groty, zdjąć piankę, odkręcić sześć wkrętów i unieść pokrywę. To znane ograniczenie prototypu."],
+    24: ["Dmuchawa", "Promieniowa 40 × 40 × 7 mm, 5 V, do 177 Pa. Ma dawać 2–6 l/min na oba nozdrza."],
+    25: ["Kanał dmuchawy", "Prowadzi powietrze z dmuchawy do okna w płytce modułu. PETG naturalny, bo leży w torze oddechowym."],
+    28: ["Kanał zbiorczy z rozdzielaczem Y", "Zbiera powietrze z modułu i dzieli je na stronę L i P. Upust Ø1,2 mm chroni nos przed nadciśnieniem."],
+    30: ["Tuleja łącząca", "Silikonowa tuleja, w którą wchodzi króciec spod modułu."],
+    31: ["Kryza dławiąca L", "Krążek z otworem Ø2,2 mm. Wyrównuje przepływ między stronami. Wklejona na stałe w grot."],
+    32: ["Kryza dławiąca P", "Krążek z otworem Ø2,2 mm po stronie P."],
+    33: ["Złączka rurki L", "Łączy rurkę nosową z grotem. Uszczelniona O-ringiem 6 × 1,3."],
+    34: ["Złączka rurki P", "Łączy rurkę nosową z grotem po stronie P."],
+    36: ["Rurki FEP", "FEP 6 × 4 mm, gałęzie od rozdzielacza do grotów. W przeciwieństwie do silikonu nie chłoną olejku."],
+    38: ["Rurka nosowa", "Silikon medyczny OD 7 mm z cienką wkładką FEP i drutem do kształtowania pod twarz."],
+    41: ["Spinka rurek", "TPU 95A. Trzyma rurki ok. 25 mm od siebie, ok. 20 mm pod nosem."],
+    42: ["Końcówka nosowa", "Tylko gotowa, z silikonu medycznego. Leży luźno w nozdrzu i go nie uszczelnia."],
+    43: ["Kaseta wkładu esencji", "Wsuwana od góry do komina modułu. Ma siatki i klapkę zwrotną. Drukuje się ją z PETG naturalnego, bez barwnika. Bursztynowa jest tylko w podglądzie 3D."],
+    45: ["Wkład chłonny", "Włóknina nasączana małą ilością esencji. Dawki jeszcze nie ustalono."],
+    46: ["Klapka zwrotna", "Membrana. Ma się otwierać poniżej 30 Pa i nie wypuszczać esencji wstecz."],
+    47: ["Pokrywka wkładu", "Fragment fasety pokrywy z szyjką i O-ringiem. Dzięki niej kasetę wymienia się bez rozkręcania."],
+    49: ["Uszczelka komina wkładu", "Pianka 1,0 mm między pokrywą a kominem modułu."],
+    50: ["Uszczelka komina wlotu", "Pianka 1,0 mm między pokrywą a osłoną wlotu."],
+    51: ["Płytka PCB", "ESP32-C3, ładowarka akumulatora i przetwornica 5 V. To na razie założenie. Płytkę trzeba zaprojektować."],
+    52: ["Akumulator", "LiPo 1S 1800 mAh na tacce, z przekładkami ochronnymi."],
+    53: ["Tacka akumulatora", "Trzyma akumulator na słupkach dolnej obudowy."],
+    55: ["Płytka USB-C", "Gniazdo ładowania na fasecie strony L."],
+    56: ["Zaślepka USB-C", "Miękki korek z TPU chroniący gniazdo."],
+    57: ["Pierścień LED grotu", "Sześć diod WS2812-2020 wokół złączki rurki."],
+    58: ["Płytka LED kryształu", "Trzy diody RGB. Kryształ ma pokazywać stan baterii i siłę zapachu."],
+    60: ["Dyfuzor grotu L", "Przezroczysty PETG w rowku 0,6 mm na czole grotu."],
+    61: ["Dyfuzor grotu P", "Przezroczysty PETG po stronie P."],
+    62: ["Kryształ", "Przezroczysty PETG albo żywica. Świeci na barku strony L."],
+    63: ["Pierścień kryształu", "Zatrzaskiwany od środka pokrywy, trzyma kryształ w oknie."],
+    64: ["Wkręty obudowy", "Sześć wkrętów PT M2,5 × 20 od spodu: cztery pod pianką, dwa przednie pod ramionami."],
+    72: ["Uszczelka obwodowa", "Pianka 1,0 mm ściskana do 0,6 mm między skorupami. Szczelinę utrzymują wieże wkrętów."]
+  };
+  const QUOTES = {
+    23: "„W jego wnętrzu są dwa wkłady. Pierwszy zatrzymuje drobne zanieczyszczenia i ogranicza część nieprzyjemnych zapachów.”",
+    43: "„W jego wnętrzu są dwa wkłady. […] Drugi zawiera esencję.”",
+    45: "„Najbardziej lubię mieszankę sosnową.”",
+    11: "„Esencja jest podawana w bardzo małych porcjach do oczyszczonego strumienia.”",
+    5: "„Od spodu obudowa jest lekko wklęsła, żeby przylegała do ciała.”",
+    42: "„Wylot kieruje łagodny strumień w stronę nosa.”",
+    24: "„Podczas chodzenia zwiększa przepływ. Gdy siedzę nieruchomo, pracuje ciszej.”"
+  };
+  const GROUPS = [
+    ["Obudowa", "#d7dcd6"], ["Tor powietrza", "#93e8c8"], ["Moduł zaworu", "#e2a24c"], ["Wkład zapachowy", "#c98a3a"],
+    ["Elektronika", "#7aa6c9"], ["Elementy świetlne", "#b9f2df"], ["Elementy złączne", "#8b9590"], ["Uszczelki", "#5f6f69"]
+  ];
+  const HOTSPOTS = [
+    ["Filtr_wlotowy_HEPA_wegiel_42x42x6", "filtr"],
+    ["Dmuchawa_promieniowa_40x40x7_ZALOZENIE", "dmuchawa"],
+    ["Korpus_modulu_zaworu_z_kolyska_serwa", "moduł zapachu"],
+    ["Serwo_MG996R_TowerPro", "serwo"],
+    ["Wklad_esencji_pokrywka_z_szyjka", "wkład esencji"],
+    ["Krysztal_swietlny_PMMA_bark_strona_L", "kryształ"],
+    ["Koncowka_ramienia_P_grot_krysztalu", "grot z diodami"],
+    ["Koncowka_nosowa_L_silikon_30ShA", "końcówki nosowe"],
+    ["Akumulator_LiPo_1S_103450_1800mAh_ZALOZENIE", "akumulator"],
+    ["Pianka_TPU_spod_kolnierza", "pianka TPU"]
+  ];
+
+  /* ---------------- deck ---------------- */
+  const slides = $$(".slide");
+  let cur = 0;
+  const flowMode = () => window.matchMedia("(max-width: 860px), (max-aspect-ratio: 4/5)").matches;
+  function go(i, fromHash) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (flowMode()) { slides[i].scrollIntoView({ block: "start" }); return; }
+    slides.forEach((s, k) => { s.classList.toggle("is-active", k === i); s.setAttribute("aria-hidden", k === i ? "false" : "true"); });
+    cur = i;
+    $("#hudCount").textContent = (i + 1) + " z " + slides.length;
+    $("#prevBtn").hidden = i === 0; $("#nextBtn").hidden = i === slides.length - 1;
+    if (!fromHash) { try { history.replaceState(null, "", "#" + slides[i].id); } catch (e) {} }
+    V.setActive(slides[i].id === "s-model");
+  }
+  $("#prevBtn").addEventListener("click", () => go(cur - 1));
+  $("#nextBtn").addEventListener("click", () => go(cur + 1));
+  $$("[data-go]").forEach(b => b.addEventListener("click", () => go(slides.findIndex(s => s.id === b.dataset.go))));
+  document.addEventListener("keydown", e => {
+    if (V.tourKey && V.tourKey(e)) return;
+    if (flowMode() || e.defaultPrevented) return;
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
+    if ($("#lb").open) return;
+    if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+    else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(slides.length - 1);
+  });
+  let tx = null, ty = null;
+  $("#deck").addEventListener("touchstart", e => { if (e.target.closest("#viewer, .compare, .plates")) { tx = null; return; } tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  $("#deck").addEventListener("touchend", e => {
+    if (tx === null || flowMode()) return;
+    const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) go(cur + (dx < 0 ? 1 : -1));
+    tx = null;
+  }, { passive: true });
+  $("#fsBtn").addEventListener("click", () => {
+    const d = document;
+    try {
+      if (d.fullscreenElement) d.exitFullscreen().catch(() => {});
+      else d.documentElement.requestFullscreen().catch(() => {});
+    } catch (e) {}
+  });
+  document.addEventListener("fullscreenchange", () => { $("#fsBtn").textContent = document.fullscreenElement ? NAVTXT.exit : NAVTXT.full; });
+
+  /* ---------------- plates table, sheets ---------------- */
+  $("#platesBody").innerHTML = PLATES.map(p => `<tr><td>${+p[0]}</td><td>${p[1]}</td><td>${MATL[p[2]][0]}</td><td class="r">${p[3]}</td></tr>`).join("");
+  $("#sheets").innerHTML = SHEETS.map((s, i) => `<button class="sheet" type="button" data-i="${i}"><img src="/portfolio/stas/img/a${i + 1}.jpg" alt="Arkusz ${i + 1}: ${s[0]}" loading="lazy"><span>${SHEET_CAP(i)}</span></button>`).join("");
+  const lb = $("#lb"), lbWrap = $("#lbWrap");
+  $$(".sheet[data-i]").forEach(b => b.addEventListener("click", () => {
+    const i = +b.dataset.i;
+    $("#lbImg").src = "/portfolio/stas/img/a" + (i + 1) + ".jpg"; $("#lbImg").alt = "Arkusz " + (i + 1) + ": " + SHEETS[i][0];
+    $("#lbTitle").textContent = SHEET_CAP(i);
+    lbWrap.classList.remove("zoom"); $("#lbZoom").textContent = LB.zoom;
+    try { lb.showModal(); } catch (e) { lb.setAttribute("open", ""); }
+  }));
+  const toggleZoom = () => { const z = lbWrap.classList.toggle("zoom"); $("#lbZoom").textContent = z ? LB.fit : LB.zoom; };
+  $("#lbZoom").addEventListener("click", toggleZoom);
+  $("#lbImg").addEventListener("click", toggleZoom);
+  $("#lbClose").addEventListener("click", () => lb.close());
+  let drag = null;
+  lbWrap.addEventListener("pointerdown", e => { if (!lbWrap.classList.contains("zoom")) return; drag = { x: e.clientX, y: e.clientY, l: lbWrap.scrollLeft, t: lbWrap.scrollTop, moved: false }; });
+  lbWrap.addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true; lbWrap.scrollLeft = drag.l - dx; lbWrap.scrollTop = drag.t - dy; });
+  window.addEventListener("pointerup", () => { if (drag && drag.moved) { const img = $("#lbImg"); img.style.pointerEvents = "none"; setTimeout(() => img.style.pointerEvents = "", 0); } drag = null; });
+
+  /* ---------------- compare ---------------- */
+
+  /* ---------------- 3D viewer ---------------- */
+  const V = { active: false, setActive(a) { this.active = a; if (a) this.start && this.start(); else { this.wantTour = false; if (this.tourStop) this.tourStop(); } } };
+  window.__V = V;
+  $("#goAir").addEventListener("click", () => { go(slides.findIndex(s => s.id === "s-model")); V.wantAir = true; V.applyAir && V.applyAir(true); });
+  $("#goTour").addEventListener("click", () => { go(slides.findIndex(s => s.id === "s-model")); if (V.tourStart) V.tourStart(); else V.wantTour = true; });
+
+  function initViewer() {
+    const canvas = $("#v3d");
+    if (!window.THREE || !THREE.GLTFLoader || !THREE.OrbitControls) return fail();
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" }); }
+    catch (e) { return fail(); }
+    function fail() { $("#vLoading").hidden = true; $("#vFallback").hidden = false; V.start = null; }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.78;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 30);
+    const controls = new THREE.OrbitControls(camera, canvas);
+    controls.enableDamping = true; controls.dampingFactor = 0.08; controls.minDistance = 0.12; controls.maxDistance = 4.0;
+    controls.autoRotateSpeed = 0.8;
+    const key = new THREE.DirectionalLight(0xfff3e4, 1.05); key.position.set(0.7, 1.4, 0.9); key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -0.45, right: 0.45, top: 0.45, bottom: -0.45, near: 0.1, far: 5 });
+    key.shadow.bias = -0.0005; key.shadow.normalBias = 0.002; scene.add(key);
+    const rim = new THREE.DirectionalLight(0xe6eaec, 0.35); rim.position.set(-0.9, 0.6, -1.0); scene.add(rim);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x6f6f6a, 0.2));
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMaterial({ opacity: 0.2 }));
+    ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+    const root = new THREE.Group(); scene.add(root);
+
+    const parts = []; let sel = null; let explodeT = 0, doorClosed = false, xray = false, ledOn = true, air = false, distAt0 = 0.95;
+    const byName = {};
+    const hotEls = [];
+    const flowGroup = new THREE.Group();
+
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      const w = Math.max(1, r.width), h = Math.max(1, r.height);
+      renderer.setSize(w, h, false); camera.aspect = w / h;
+      if (flowMode()) camera.setViewOffset(w, h, 0, -h * 0.1, w, h); else camera.setViewOffset(w, h, -w * 0.13, 0, w, h);
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener("resize", resize);
+
+    /* the model ships as base64 inside JSON, because artifacts do not serve .glb files */
+    function glbFromJson(text) {
+      const pkg = JSON.parse(text);
+      if (pkg.format !== "glb-base64" || typeof pkg.data !== "string") throw new Error("nieznany format modelu");
+      const bin = atob(pkg.data), n = bin.length, out = new Uint8Array(n);
+      for (let i = 0; i < n; i++) out[i] = bin.charCodeAt(i);
+      if (pkg.bytes && pkg.bytes !== n) throw new Error("model niekompletny");
+      return out.buffer;
+    }
+
+    function loadModel(urls, onDone) {
+      const url = urls[0];
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url); xhr.responseType = "text";
+      xhr.onprogress = e => { if (e.lengthComputable) { const p = Math.round(e.loaded / e.total * 100); $("#vPct").textContent = p + " %"; $("#vBar").style.width = p + "%"; } };
+      xhr.onload = () => {
+        let buf = null;
+        if (xhr.status >= 200 && xhr.status < 300 && xhr.response) {
+          try { buf = glbFromJson(xhr.response); } catch (err) { console.error(err); }
+        }
+        if (buf) new THREE.GLTFLoader().parse(buf, "", onDone, err => { console.error(err); if (urls.length > 1) loadModel(urls.slice(1), onDone); else fail(); });
+        else if (urls.length > 1) loadModel(urls.slice(1), onDone); else fail();
+      };
+      xhr.onerror = () => { if (urls.length > 1) loadModel(urls.slice(1), onDone); else fail(); };
+      xhr.send();
+    }
+
+    const tmpV = new THREE.Vector3();
+    function prettyMat(n) {
+      const m = {
+        STAS_PETG_bialy_mat_druk: "PETG mat (w podglądzie kolor kamienia, w wykazie druku biały)", STAS_PETG_grafit_mat_druk: "PETG grafitowy (druk)", STAS_PETG_naturalny_druk: "PETG naturalny (druk, tor oddechowy)",
+        STAS_PETG_mietowy_druk: "PETG miętowy (druk)", STAS_PETG_bursztynowy_druk: "PETG bursztynowy (druk)", STAS_TPU_85A_lesna_zielen_druk: "TPU leśna zieleń (druk)",
+        STAS_PETG_przezroczysty_krysztal_druk: "PETG przezroczysty (druk)", STAS_PETG_przezroczysty_dyfuzor_druk: "PETG przezroczysty (druk)", STAS_TPU_95A_podkladka_druk: "TPU 95A (druk)",
+        STAS_TPU_95A_naturalny_druk: "TPU 95A (druk)", STAS_Stal_nierdzewna_szczotkowana: "stal nierdzewna", STAS_Elektronika_czarna: "elektronika", STAS_EPDM_czarny: "EPDM",
+        STAS_Silikon_koncowki_miekki: "silikon medyczny", STAS_Silikon_rurki_polprzezroczysty: "silikon platynowy", STAS_PTFE_bialy: "PTFE", STAS_PCB_FR4_zielony: "laminat FR4",
+        STAS_Serwo_obudowa_czarna: "serwo (kupne)", STAS_Wklad_chlonny_mech: "włóknina", STAS_Filtr_wloknina_wegiel: "włóknina HEPA z węglem", STAS_Aluminium_anodowane: "aluminium",
+        STAS_Akumulator_folia_alu: "ogniwo LiPo", STAS_Metal_zlacze_USB: "metal", STAS_Siatka_stal: "siatka stalowa", STAS_Przewod_czarny: "przewód", STAS_Przewod_serwa_brazowy: "przewód serwa"
+      };
+      return m[n] || (n || "").replace(/^STAS_/, "").replace(/_/g, " ");
+    }
+
+    function setInfo(p) {
+      const box = $("#vInfo");
+      $("#viewer").classList.toggle("picked", !!p);
+      if (!p) { box.hidden = true; return; }
+      const u = p.userData, pos = u.poz | 0;
+      const d = DESC[pos];
+      const title = d ? d[0] : (u.nazwa || p.name);
+      const text = d ? d[1] : ((u.nazwa || "") + ".");
+      const q = QUOTES[pos];
+      const mf = /\/(\d+)_.*_(PETG|TPU)-([A-Za-z0-9_]+)\.stl$/.exec(u.stl || "");
+      const MATS = { "PETG-naturalny": "PETG naturalny, bez barwnika", "PETG-bialy": "PETG biały", "PETG-grafit": "PETG grafitowy", "PETG-przezroczysty": "PETG przezroczysty", "TPU-95A": "TPU 95A", "TPU-85A": "TPU 85A", "TPU-85A_lub_95A": "TPU 85A lub 95A" };
+      const SRC = { "kupne": "Część kupna", "kupne - wyciac z arkusza": "Wycina się z kupnego arkusza", "elektronika - zalozenie robocze": "Elektronika, na razie jako założenie robocze", "w komplecie z serwem": "Jest w komplecie z serwem" };
+      const mat = prettyMat(u.material);
+      let made = mf ? `Część drukowana, plik nr ${+mf[1]}, ${MATS[mf[2] + "-" + mf[3]] || mf[2]}.` : (SRC[u.zrodlo] ? SRC[u.zrodlo] + (mat && mat !== "elektronika" && mat.indexOf("(") < 0 ? ` (${mat})` : "") + "." : "");
+      if (/PETG_bialy/.test(u.material || "")) made += " W podglądzie ma kolor kamienia. Kolor nie jest jeszcze ustalony.";
+      box.innerHTML = `<p>${pos ? "Poz. " + pos + ". " : ""}${title}.</p><p>${text}</p>${q ? `<p>${q}</p>` : ""}${made ? `<p>${made}</p>` : ""}
+        <p><button class="ln close" type="button">${INFO.close}</button></p>`;
+      box.hidden = false;
+      $(".close", box).addEventListener("click", () => select(null));
+    }
+
+    function tint(p, on) {
+      if (!tour) { ghostSet = on ? new Set([p]) : null; applyXray(); }
+    }
+    function select(p, fly) {
+      if (sel) tint(sel, false);
+      sel = p;
+      hotEls.forEach(h => h.el.classList.toggle("on", !!p && h.mesh === p));
+      if (p) { tint(p, true); if (fly) flyTo(p); }
+      setInfo(p);
+    }
+
+    let flight = null;
+    function flyTo(p, dist) {
+      const c = new THREE.Box3().setFromObject(p).getCenter(new THREE.Vector3());
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      const d = dist || Math.max(0.28, Math.min(0.6, camera.position.distanceTo(controls.target)));
+      flight = { t: 0, fromP: camera.position.clone(), fromT: controls.target.clone(), toT: c, toP: c.clone().add(dir.multiplyScalar(d)) };
+    }
+    function viewPreset(name) {
+      const t = new THREE.Vector3(-0.04, 0.05, 0);
+      const f = 1 + 0.9 * explodeT;
+      const P = ({ iso: [-0.56, 0.44, 0.66], front: [-0.04, 0.13, 0.9], side: [-0.92, 0.16, 0.02], top: [-0.04, 0.98, 0.07], back: [0.08, 0.25, -0.9] }[name] || [-0.56, 0.44, 0.66]).map(v => v * f);
+      flight = { t: 0, fromP: camera.position.clone(), fromT: controls.target.clone(), toT: t, toP: new THREE.Vector3(P[0], P[1], P[2]).add(t) }; distAt0 = Math.hypot(P[0], P[1], P[2]) / f;
+    }
+
+    function applyExplode() {
+      parts.forEach(p => { const e = p.userData.explode; p.position.set(e[0] * explodeT, e[1] * explodeT, e[2] * explodeT); });
+      flowGroup.visible = air && explodeT < 0.02;
+      $("#vLegend").hidden = !(air && explodeT < 0.02);
+    }
+    function applyDoor() {
+      parts.forEach(p => {
+        if (/ZAMKNIETA/.test(p.name)) p.visible = doorClosed && groupOn(p);
+        if (/OTWARTA/.test(p.name)) p.visible = !doorClosed && groupOn(p);
+      });
+      const b = $("#vDoor"); b.textContent = doorClosed ? CTRL.doorClosed : CTRL.doorOpen; b.setAttribute("aria-pressed", doorClosed ? "true" : "false");
+    }
+    const groupState = {};
+    function groupOn(p) { return groupState[p.userData.grupa] !== false; }
+    function applyGroups() {
+      parts.forEach(p => {
+        let v = groupOn(p);
+        if (/ZAMKNIETA/.test(p.name)) v = v && doorClosed;
+        if (/OTWARTA/.test(p.name)) v = v && !doorClosed;
+        p.visible = v;
+      });
+    }
+    function isShell(p) { return p.userData.grupa === "Obudowa" || /^Wieza_|^Tuleja_wkretu|^Slupek_/.test(p.name); }
+    let ghostSet = null; /* during the tour, parts outside the current step fade back */
+    function applyXray() {
+      parts.forEach(p => {
+        const m = p.material, b = p.userData.base;
+        let tr = b.transparent, op = b.opacity, dw = b.depthWrite;
+        if (xray && isShell(p)) { tr = true; op = 0.14; dw = false; }
+        if (ghostSet && !ghostSet.has(p)) { tr = true; op = Math.min(op, isShell(p) ? 0.05 : 0.09); dw = false; }
+        if (m.transparent !== tr || m.opacity !== op || m.depthWrite !== dw) { m.transparent = tr; m.opacity = op; m.depthWrite = dw; m.needsUpdate = true; }
+      });
+      $("#vXray").setAttribute("aria-pressed", xray ? "true" : "false");
+      ground.visible = !ghostSet && !xray;
+    }
+    function applyLed() {
+      parts.forEach(p => { if (p.userData.led) { p.userData.baseEmissiveI = ledOn ? p.userData.ledI : 0; if (p !== sel) p.material.emissiveIntensity = p.userData.baseEmissiveI; } });
+      $("#vLed").setAttribute("aria-pressed", ledOn ? "true" : "false");
+    }
+    V.applyAir = function (on) {
+      air = on; if (on) { if (explodeT > 0 || explodeAnim) { explodeT = 0; explodeAnim = null; $("#vExplode").setAttribute("aria-pressed", "false"); } if (!xray) { xray = true; applyXray(); } }
+      $("#vAir").setAttribute("aria-pressed", on ? "true" : "false"); applyExplode();
+    };
+
+    /* particles along the air path */
+    function buildFlow() {
+      const toV = a => new THREE.Vector3(a[0], a[1], a[2]);
+      const trunk = FLOW.trunk.map(toV);
+      const routes = ["galaz_L", "galaz_P"].map(k => new THREE.CatmullRomCurve3(trunk.concat(FLOW[k].slice(1).map(toV)), false, "centripetal"));
+      const trunkLen = new THREE.CatmullRomCurve3(trunk, false, "centripetal").getLength();
+      const N = 420, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), meta = [];
+      for (let i = 0; i < N; i++) meta.push({ r: i % 2, ph: Math.random(), sp: 0.07 + Math.random() * 0.03, j: [(Math.random() - .5) * 0.004, (Math.random() - .5) * 0.004, (Math.random() - .5) * 0.004] });
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+      const c = document.createElement("canvas"); c.width = c.height = 64; const g = c.getContext("2d");
+      const rg = g.createRadialGradient(32, 32, 0, 32, 32, 32); rg.addColorStop(0, "rgba(255,255,255,1)"); rg.addColorStop(0.35, "rgba(255,255,255,.6)"); rg.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = rg; g.fillRect(0, 0, 64, 64);
+      const mat = new THREE.PointsMaterial({ size: 0.0072, map: new THREE.CanvasTexture(c), vertexColors: true, transparent: true, depthWrite: false, depthTest: false, blending: THREE.NormalBlending });
+      const pts = new THREE.Points(geo, mat); pts.renderOrder = 10; pts.frustumCulled = false; flowGroup.add(pts);
+      const mint = new THREE.Color(0x1c1c1c), resin = new THREE.Color(0x9a5f12);
+      const lens = routes.map(r => r.getLength());
+      flowGroup.userData.update = (time) => {
+        for (let i = 0; i < N; i++) {
+          const m = meta[i], R = routes[m.r];
+          const t = (m.ph + time * m.sp) % 1;
+          R.getPointAt(t, tmpV);
+          pos[i * 3] = tmpV.x + m.j[0]; pos[i * 3 + 1] = tmpV.y + m.j[1]; pos[i * 3 + 2] = tmpV.z + m.j[2];
+          const along = t * lens[m.r], k = Math.min(1, Math.max(0, (along - trunkLen * 0.5) / (trunkLen * 0.25)));
+          const cc = mint.clone().lerp(resin, k);
+          col[i * 3] = cc.r; col[i * 3 + 1] = cc.g; col[i * 3 + 2] = cc.b;
+        }
+        geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
+      };
+      root.add(flowGroup); flowGroup.visible = false;
+    }
+
+    loadModel(["/portfolio/stas/model/stas.json"], gltf => {
+      const model = gltf.scene;
+      model.traverse(o => {
+        if (!o.isMesh) return;
+        o.castShadow = true; o.receiveShadow = true;
+        const mname = (o.material && o.material.name) || "";
+        const m = o.material.clone(); o.material = m;
+        m.color.convertSRGBToLinear();
+        if (/PETG_naturalny/.test(mname)) { m.transparent = false; m.opacity = 1; }
+        if (/PETG_bialy/.test(mname)) { m.color.set(STONE).convertSRGBToLinear(); m.roughness = 0.88; m.metalness = 0; }
+        m.envMapIntensity = 0.6;
+        if (m.transparent) { m.depthWrite = false; m.side = THREE.DoubleSide; }
+        if (o.userData.fasety) m.flatShading = true;
+        m.emissive = m.emissive || new THREE.Color(0);
+        const led = /^LED_|Dyfuzor|Krysztal_swietlny/.test(o.name);
+        o.userData.led = led;
+        if (led) { m.emissive = new THREE.Color(0x7ff0c8); o.userData.ledI = /^LED_/.test(o.name) ? 1.6 : 0.55; }
+        o.userData.baseEmissive = m.emissive.clone(); o.userData.baseEmissiveI = led ? o.userData.ledI : 0;
+        m.emissiveIntensity = o.userData.baseEmissiveI;
+        o.userData.base = { transparent: m.transparent, opacity: m.opacity, depthWrite: m.depthWrite };
+        m.needsUpdate = true;
+        parts.push(o); byName[o.name] = o;
+      });
+      root.add(model);
+      const box = new THREE.Box3().setFromObject(model);
+      const c = box.getCenter(new THREE.Vector3());
+      root.position.set(-c.x, -box.min.y + 0.0005, -c.z);
+      buildFlow();
+      // groups panel
+      const counts = {}; parts.forEach(p => { const g = p.userData.grupa || "Inne"; counts[g] = (counts[g] || 0) + (/ZAMKNIETA/.test(p.name) ? 0 : 1); });
+      const gp = $("#vGroups");
+      GROUPS.forEach(([g, col]) => {
+        if (!counts[g]) return;
+        groupState[g] = true;
+        const id = "grp-" + g.replace(/\W+/g, "-");
+        const lab = document.createElement("label"); lab.className = "grp"; lab.htmlFor = id;
+        lab.innerHTML = `<input type="checkbox" id="${id}" checked>${GLABEL[g] || g}`;
+        $("input", lab).addEventListener("change", e => { groupState[g] = e.target.checked; applyGroups(); if (sel && !sel.visible) select(null); });
+        gp.appendChild(lab);
+      });
+      // hotspots
+      const hw = $("#vHots");
+      HOTSPOTS.forEach(([name, label], i) => {
+        const mesh = byName[name]; if (!mesh) return;
+        const el = document.createElement("button"); el.type = "button"; el.className = "hot";
+        el.innerHTML = `<span>${label}</span>`; el.title = label;
+        el.addEventListener("click", ev => { ev.stopPropagation(); select(mesh, true); });
+        hw.appendChild(el);
+        mesh.geometry.computeBoundingBox();
+        hotEls.push({ el, mesh, local: mesh.geometry.boundingBox.getCenter(new THREE.Vector3()) });
+      });
+      applyGroups(); applyLed();
+      $("#vLoading").hidden = true;
+      camera.position.set(-0.47, 0.38, 0.56); controls.target.set(-0.05, 0.045, 0.02); controls.update(); distAt0 = camera.position.distanceTo(controls.target);
+      resize();
+      if (V.wantAir) V.applyAir(true);
+      V.ready = true;
+      if (V.wantTour) { V.wantTour = false; if (V.active || V.inView) tourStart(); }
+    });
+
+    /* ---------- tour: the camera moves from part to part along the air path ---------- */
+    let tour = null, explodeAnim = null;
+    const viewerEl = $("#viewer"), tourBox = $("#vTour");
+    const qRot = new THREE.Quaternion(), qK = new THREE.Quaternion(), oA = new THREE.Vector3(), oB = new THREE.Vector3();
+    /* camera position on an arc around the moving target, so flights go around the model, not through it */
+    function arcTo(f, k, out) {
+      oA.copy(f.fromP).sub(f.fromT); oB.copy(f.toP).sub(f.toT);
+      const la = oA.length() || 1e-6, lb = oB.length() || 1e-6;
+      oA.divideScalar(la); oB.divideScalar(lb);
+      qRot.setFromUnitVectors(oA, oB); qK.identity().slerp(qRot, k);
+      out.copy(oA).applyQuaternion(qK).multiplyScalar(la + (lb - la) * k).add(controls.target);
+    }
+    function partsFor(step) {
+      if (step.all || !step.parts.length) return null;
+      return new Set(parts.filter(p => step.parts.some(n => p.name.indexOf(n) === 0)));
+    }
+    function frameStep(step, set) {
+      /* measure with the parts where they will be at the end of the step */
+      const ex = step.explode || 0;
+      parts.forEach(p => { const e = p.userData.explode; p.position.set(e[0] * ex, e[1] * ex, e[2] * ex); });
+      root.updateMatrixWorld(true);
+      const box = new THREE.Box3();
+      (set ? [...set] : parts).forEach(p => box.expandByObject(p));
+      applyExplode();
+      root.updateMatrixWorld(true);
+      const c = box.getCenter(new THREE.Vector3());
+      const r = Math.max(0.025, box.getSize(new THREE.Vector3()).length() / 2);
+      /* the narrower of the two view angles decides, so tall phone screens do not cut parts off */
+      const hv = THREE.MathUtils.degToRad(camera.fov / 2), half = Math.min(hv, Math.atan(Math.tan(hv) * camera.aspect));
+      const fit = r / Math.sin(half) * (set ? 1.6 : 0.95) * (step.zoom || 1);
+      const d = Math.min(1.9, Math.max(set ? 0.4 : 0.3, fit));
+      const dir = new THREE.Vector3().fromArray(step.dir).normalize();
+      flight = { t: 0, dur: 1.9, fromP: camera.position.clone(), fromT: controls.target.clone(), toT: c, toP: c.clone().add(dir.multiplyScalar(d)) };
+      distAt0 = d / (1 + 0.9 * ex);
+    }
+    function dwell(step) {
+      const words = (step.q + " " + step.t).trim().split(/\s+/).length;
+      return 1900 + Math.min(16000, Math.max(7000, words * 330));
+    }
+    function tourRender() {
+      const i = tour.i, n = TOUR.steps.length, st = TOUR.steps[i], L = TOUR.labels;
+      $("#vTourBody").innerHTML = (st.q ? `<p>„${st.q}”</p>` : "") + `<p>${st.t}</p>` + (st.air ? `<p>${L.legend}</p>` : "");
+      $("#vTourN").textContent = L.count.replace("{n}", i + 1).replace("{total}", n);
+      $("#vTourPrev").hidden = i === 0;
+      $("#vTourNext").textContent = i === n - 1 ? L.again : L.next;
+      $("#vTourPlay").textContent = tour.playing ? L.pause : L.play;
+      $("#vTourPlay").hidden = i === n - 1;
+    }
+    function tourShow(i) {
+      const n = TOUR.steps.length;
+      i = Math.max(0, Math.min(n - 1, i));
+      clearTimeout(tour.timer); clearInterval(tour.door);
+      if (sel) select(null);
+      const st = TOUR.steps[i], set = partsFor(st);
+      tour.i = i; tour.set = set; ghostSet = set;
+      V.applyAir(!!st.air);
+      xray = !!(st.xray || st.air); applyXray();
+      doorClosed = false; applyGroups(); applyDoor();
+      if (st.door === "cycle") tour.door = setInterval(() => { doorClosed = !doorClosed; applyGroups(); applyDoor(); }, 1700);
+      const ex = st.explode || 0;
+      explodeAnim = Math.abs(explodeT - ex) > 0.001 ? { t: 0, from: explodeT, to: ex } : null;
+      controls.autoRotate = false;
+      frameStep(st, set);
+      tourRender();
+      if (tour.playing && i < n - 1) tour.timer = setTimeout(() => tourShow(i + 1), dwell(st));
+    }
+    function tourStart() {
+      V.wantTour = false;
+      if (!V.ready) { V.wantTour = true; return; }
+      if (tour) return tourShow(0);
+      Object.keys(groupState).forEach(g => { groupState[g] = true; });
+      $$("#vGroups input").forEach(c => { c.checked = true; });
+      tour = { i: 0, set: null, playing: true, timer: 0, door: 0, led: ledOn };
+      ledOn = true; applyLed();
+      viewerEl.classList.add("touring"); tourBox.hidden = false;
+      if (document.activeElement === $("#vTourBtn")) $("#vTourNext").focus({ preventScroll: true });
+      tourShow(0);
+    }
+    function tourPause() {
+      if (!tour || !tour.playing) return;
+      tour.playing = false; clearTimeout(tour.timer); tourRender();
+    }
+    function tourPlay() {
+      if (!tour || tour.playing) return;
+      tour.playing = true; tourRender();
+      if (tour.i < TOUR.steps.length - 1) tour.timer = setTimeout(() => tourShow(tour.i + 1), 4500);
+    }
+    function tourStop() {
+      if (!tour) return;
+      clearTimeout(tour.timer); clearInterval(tour.door);
+      ledOn = tour.led; applyLed();
+      tour = null; ghostSet = null;
+      V.applyAir(false); xray = false; applyXray();
+      doorClosed = false; applyGroups(); applyDoor();
+      explodeAnim = explodeT > 0 ? { t: 0, from: explodeT, to: 0 } : null;
+      viewerEl.classList.remove("touring"); tourBox.hidden = true;
+      $("#vSpin").setAttribute("aria-pressed", "false");
+      /* frame the assembled model, not the exploded one that is still collapsing */
+      const ex = explodeT; explodeT = 0; viewPreset("iso"); explodeT = ex;
+    }
+    $("#vTourBtn").addEventListener("click", tourStart);
+    $("#vTourPrev").addEventListener("click", () => tour && tourShow(tour.i - 1));
+    $("#vTourNext").addEventListener("click", () => tour && tourShow(tour.i === TOUR.steps.length - 1 ? 0 : tour.i + 1));
+    $("#vTourPlay").addEventListener("click", () => tour && (tour.playing ? tourPause() : tourPlay()));
+    $("#vTourEnd").addEventListener("click", tourStop);
+    V.tourStart = tourStart; V.tourStop = tourStop;
+    V.tourKey = e => {
+      /* on the long phone page the buttons are enough; keys keep scrolling the page */
+      if (!tour || flowMode()) return false;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return false;
+      if ($("#lb").open) return false;
+      if (e.key === " " && t && t.tagName === "BUTTON") return true; /* let Space press the focused button */
+      const next = ["ArrowRight", "PageDown", " "].includes(e.key), prev = ["ArrowLeft", "PageUp"].includes(e.key);
+      /* past either end the tour closes and the deck takes the key, so a clicker never gets stuck */
+      if ((next && tour.i === TOUR.steps.length - 1) || (prev && tour.i === 0)) { tourStop(); return false; }
+      if (next) { e.preventDefault(); tourShow(tour.i + 1); return true; }
+      if (prev) { e.preventDefault(); tourShow(tour.i - 1); return true; }
+      if (e.key === "Escape") { e.preventDefault(); tourStop(); return true; }
+      return false;
+    };
+    V.dbg = { parts, camera, controls, show: i => tourShow(i), flight: () => flight, setOf: i => partsFor(TOUR.steps[i]) };
+
+    /* picking */
+    const ray = new THREE.Raycaster(); const ndc = new THREE.Vector2(); let down = null;
+    canvas.addEventListener("pointerdown", e => { down = { x: e.clientX, y: e.clientY }; if (tour) { tourPause(); flight = null; } controls.autoRotate = false; $("#vSpin").setAttribute("aria-pressed", "false"); });
+    canvas.addEventListener("pointerup", e => {
+      if (tour) { down = null; return; }
+      if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5) { down = null; return; }
+      down = null;
+      const r = canvas.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const vis = parts.filter(p => p.visible && !(xray && isShell(p)));
+      const hit = ray.intersectObjects(vis, false)[0];
+      select(hit ? hit.object : null, false);
+    });
+
+    /* controls */
+    controls.addEventListener("end", () => { distAt0 = camera.position.distanceTo(controls.target) / (1 + 0.9 * explodeT); });
+    $("#vExplode").addEventListener("click", () => {
+      const to = explodeT > 0.01 ? 0 : 0.65;
+      if (to > 0 && air) { air = false; $("#vAir").setAttribute("aria-pressed", "false"); }
+      explodeAnim = { t: 0, from: explodeT, to };
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      flight = { t: 0, dur: 1.4, fromP: camera.position.clone(), fromT: controls.target.clone(), toT: controls.target.clone(), toP: controls.target.clone().add(dir.multiplyScalar(distAt0 * (1 + 0.9 * to))) };
+      $("#vExplode").setAttribute("aria-pressed", to > 0 ? "true" : "false");
+    });
+    $("#vAir").addEventListener("click", () => V.applyAir(!air));
+    $("#vXray").addEventListener("click", () => { xray = !xray; applyXray(); });
+    $("#vLed").addEventListener("click", () => { ledOn = !ledOn; applyLed(); });
+    $("#vDoor").addEventListener("click", () => { doorClosed = !doorClosed; applyGroups(); applyDoor(); if (sel && !sel.visible) select(null); });
+    $$("[data-view]").forEach(b => b.addEventListener("click", () => viewPreset(b.dataset.view)));
+    $("#vSpin").addEventListener("click", () => { controls.autoRotate = !controls.autoRotate; $("#vSpin").setAttribute("aria-pressed", controls.autoRotate ? "true" : "false"); });
+    $("#vPins").addEventListener("click", e => { const on = $("#vHots").classList.toggle("off"); e.currentTarget.setAttribute("aria-pressed", on ? "false" : "true"); });
+
+    /* loop */
+    let raf = 0, last = performance.now(), clock = 0;
+    const proj = new THREE.Vector3();
+    function frame(now) {
+      raf = 0;
+      if (!V.active && !V.inView) return;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now; clock += dt;
+      if (flight) {
+        flight.t = Math.min(1, flight.t + dt / (flight.dur || 0.7));
+        const t = flight.t, k = t * t * t * (t * (t * 6 - 15) + 10);
+        controls.target.lerpVectors(flight.fromT, flight.toT, k);
+        arcTo(flight, k, camera.position);
+        if (flight.t >= 1) flight = null;
+      }
+      if (explodeAnim) {
+        explodeAnim.t = Math.min(1, explodeAnim.t + dt / 1.4);
+        const e = explodeAnim.t, ke = e * e * (3 - 2 * e);
+        explodeT = explodeAnim.from + (explodeAnim.to - explodeAnim.from) * ke; $("#vExplode").setAttribute("aria-pressed", explodeAnim.to > 0.01 ? "true" : "false"); applyExplode();
+        if (explodeAnim.t >= 1) explodeAnim = null;
+      }
+      controls.update();
+      if (flowGroup.visible && flowGroup.userData.update) flowGroup.userData.update(clock);
+      renderer.render(scene, camera);
+      // hotspots
+      const r = canvas.getBoundingClientRect();
+      hotEls.forEach(h => {
+        if (!h.mesh.visible) { h.el.hidden = true; return; }
+        proj.copy(h.local).add(h.mesh.position); root.localToWorld(proj); proj.project(camera);
+        if (proj.z > 1) { h.el.hidden = true; return; }
+        h.el.hidden = false;
+        h.sx = (proj.x * 0.5 + 0.5) * r.width; h.sy = (-proj.y * 0.5 + 0.5) * r.height;
+        h.el.style.transform = `translate(${h.sx}px, ${h.sy}px) translate(-50%, -50%)`;
+      });
+      const placed = [];
+      hotEls.filter(h => !h.el.hidden).sort((a, b) => a.sy - b.sy).forEach(h => {
+        const w = h.full || (h.el.offsetWidth ? (h.full = h.el.offsetWidth) : 120), hh = 22;
+        const clash = placed.some(p => Math.abs(p.x - h.sx) < (p.w + w) / 2 + 4 && Math.abs(p.y - h.sy) < hh);
+        const compact = clash && !h.el.classList.contains("on");
+        h.el.classList.toggle("compact", compact);
+        placed.push({ x: h.sx, y: h.sy, w: compact ? 24 : w });
+      });
+      raf = requestAnimationFrame(frame);
+    }
+    V.start = () => { resize(); last = performance.now(); if (!raf) raf = requestAnimationFrame(frame); };
+    if (V.active || V.inView) V.start();
+  }
+
+  /* start: flow mode renders the viewer while it is on screen */
+  try {
+    const io = new IntersectionObserver(es => es.forEach(en => { V.inView = flowMode() && en.isIntersecting; if (V.inView && V.start) V.start(); else if (!V.inView && V.tourStop) V.tourStop(); }), { threshold: 0.15 });
+    io.observe($("#s-model"));
+  } catch (e) {}
+  initViewer();
+  const fromHash = slides.findIndex(s => "#" + s.id === location.hash);
+  go(fromHash >= 0 ? fromHash : 0, true);
+})();
+</script>
+</body></html>
