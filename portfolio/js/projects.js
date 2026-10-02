@@ -639,10 +639,10 @@ const PROJECTS = [
 /* projekty poza zajęciami pierwszego roku; otwierają się jako osobna strona */
 const FEATURED = [
  {
-  "slug": "stas",
-  "title": "staś",
+  "slug": "bor",
+  "title": "bór",
   "course": "warsztaty mistrzowskie",
-  "kind": "prezentacja + model 3d",
-  "href": "/portfolio/stas/"
+  "kind": "projekt spekulatywny + model 3d",
+  "href": "/portfolio/bor/"
  }
 ];

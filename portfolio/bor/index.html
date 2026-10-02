@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Bór — oczyszczacz noszony na szyi · staś szpineta</title>
+<meta name="description" content="Bór, oczyszczacz powietrza noszony na szyi. Projekt spekulatywny z warsztatów mistrzowskich: model 3D, który składa się podczas przewijania.">
+<script>
+/* ?step=N (debug): headless Chrome does not paint a page that scrolled itself, so the top window only
+   hosts a frame with the same page, and the frame scrolls to section N. ?w=390 narrows the frame. */
+(function () {
+  var q = new URLSearchParams(location.search);
+  if (!q.has("step") || q.has("inner") || window !== window.top) return;
+  q.set("inner", "1");
+  window.__STEP_FRAME__ = { src: location.pathname + "?" + q.toString(), w: q.get("w") };
+  document.documentElement.className += " step-host";
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+:root {
+  --ink: #111;
+  --paper: #fff;
+  --back: rgba(255, 255, 255, 0.9);
+  --night-ink: #ecebe6;
+  --night-back: rgba(11, 13, 12, 0.86);
+  --serif: Times, "Times New Roman", Tinos, serif;
+  --fs: clamp(17px, 0.95rem + 0.3vw, 20px);
+  --gut: max(16px, 5.5vw);
+  --col: min(32em, 42vw);
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: var(--fs); line-height: 1.36; font-kerning: normal; overflow-x: hidden; }
+p, ul, blockquote, figure, h1, h2 { margin: 0; }
+img { display: block; max-width: 100%; }
+a, .ln { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.14em; }
+.ln { background: none; border: 0; padding: 0; margin: 0; font: inherit; cursor: pointer; }
+:focus-visible { outline: 1px dotted currentColor; outline-offset: 2px; }
+
+/* the model: one canvas behind everything */
+#stage { position: fixed; inset: 0; z-index: 0; background: var(--paper); }
+#stage canvas { display: block; width: 100%; height: 100%; }
+#fallback { position: absolute; top: 50%; right: var(--gut); width: min(52vw, 900px); transform: translateY(-50%); }
+#orbit { position: fixed; z-index: 1; top: 0; bottom: 0; right: 0; left: calc(var(--gut) + var(--col) + 2em); pointer-events: none; }
+body.orbit-on #orbit { pointer-events: auto; cursor: grab; }
+body.orbit-on #orbit:active { cursor: grabbing; }
+#status { position: fixed; z-index: 3; right: var(--gut); bottom: 14px; font-size: 0.85em; margin: 0; }
+
+/* the text: plain paragraphs in a left column, on a white backing */
+main { position: relative; z-index: 2; pointer-events: none; }
+.s { min-height: 120vh; display: flex; align-items: center; padding: 14vh var(--gut); }
+.tx { pointer-events: auto; width: var(--col); max-width: 100%; margin-left: -1.2em; padding: 1em 1.2em; background: var(--back); box-shadow: 0 0 28px 22px var(--back); }
+.nw { white-space: nowrap; }
+.tx > * + * { margin-top: 0.75em; }
+.tx h2 { font-size: 1em; font-weight: 700; }
+.tx .q { font-style: italic; }
+.tx .small { font-size: 0.86em; }
+.tx blockquote { padding-left: 1.2em; }
+.tx blockquote p + p { margin-top: 0.6em; }
+.tx ul.facts { list-style: none; padding: 0; }
+.tx ul.facts li + li { margin-top: 0.6em; }
+.s.night .tx { background: var(--night-back); color: var(--night-ink); box-shadow: 0 0 28px 22px var(--night-back); }
+
+.hero { min-height: 100vh; }
+.hero h1 { font-weight: 400; font-size: clamp(88px, 13vw, 210px); line-height: 0.86; letter-spacing: -0.01em; margin-bottom: 0.12em; }
+.hero .tx > h1 + p { margin-top: 0.35em; }
+.assembly { min-height: 170vh; align-items: flex-start; padding-top: 18vh; }
+.assembly .tx { position: sticky; top: 36vh; }
+.final { min-height: 100vh; }
+
+.thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.thumbs a { display: block; }
+.thumbs img { height: 66px; width: auto; border: 1px solid #b5b5b5; background: #fff; }
+
+/* full-size view of a sheet or a page */
+#lb { padding: 0; border: 0; max-width: 96vw; max-height: 96vh; background: var(--paper); color: var(--ink); }
+#lb::backdrop { background: rgba(0, 0, 0, 0.62); }
+#lb figure { padding: 12px; }
+#lb img { max-width: calc(96vw - 24px); max-height: calc(96vh - 70px); width: auto; height: auto; margin: 0 auto; }
+#lb figcaption { margin-top: 0.5em; display: flex; gap: 1.2em; justify-content: space-between; align-items: baseline; font-size: 0.9em; }
+
+/* phones: the model in the upper part, the text in the lower part */
+@media (max-width: 859px) {
+  :root { --gut: 16px; }
+  .s { min-height: 112vh; align-items: flex-end; padding: 54vh 16px 5vh; }
+  .hero { min-height: 100vh; padding-top: 50vh; }
+  .assembly { min-height: 150vh; align-items: flex-start; padding-top: 60vh; }
+  .assembly .tx { top: 62vh; }
+  .final { min-height: 100vh; }
+  .tx { width: 100%; margin-left: 0; padding: 0.85em 1em; background: rgba(255, 255, 255, 0.86); box-shadow: 0 0 16px 10px rgba(255, 255, 255, 0.86); }
+  .s.night .tx { background: rgba(11, 13, 12, 0.8); box-shadow: 0 0 16px 10px rgba(11, 13, 12, 0.8); }
+  .hero h1 { font-size: clamp(72px, 24vw, 132px); }
+  #orbit { left: 0; right: 0; bottom: auto; height: 48vh; }
+  #fallback { top: 4vh; right: 16px; left: 16px; width: auto; transform: none; }
+  #status { left: 16px; right: auto; top: 12px; bottom: auto; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html.step-host, html.step-host body { height: 100%; overflow: hidden; background: #888; }
+html.step-host body > * { display: none !important; }
+html.step-host body > #stepFrame { display: block !important; border: 0; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<div id="stage" aria-hidden="true"><canvas id="c"></canvas><img id="fallback" alt="" hidden></div>
+<div id="orbit" aria-hidden="true"></div>
+<p id="status" role="status">Ładowanie modelu 3D…</p>
+
+<main id="main">
+  <section class="s hero" data-state="hero" aria-label="Bór">
+    <div class="tx">
+      <h1>Bór</h1>
+      <p>oczyszczacz powietrza noszony na szyi</p>
+      <p>projekt spekulatywny · warsztaty mistrzowskie</p>
+      <p class="small">Przewiń w dół, a części złożą się w całość.</p>
+    </div>
+  </section>
+
+  <section class="s assembly" data-state="assembly" aria-label="Całość">
+    <div class="tx">
+      <p>Bór to kołnierz, który leży na barkach i zakłada się go od przodu. Model 3D ma <span data-count>155</span> części.</p>
+      <p>Obudowę, groty i spód drukuje się w 3D: twarde części z PETG, miękki spód z TPU.</p>
+      <p>Całość jest biała: pokrywa, dolna obudowa i spód. Groty i dysze z PETG bez barwnika są mleczne i przepuszczają światło.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="smell" aria-label="Dlaczego zapach">
+    <div class="tx">
+      <p>Bór jest przede wszystkim urządzeniem do zapachu. Badania pokazują, dlaczego zapach ma znaczenie.</p>
+      <ul class="facts">
+        <li>Sygnał z opuszki węchowej trafia do kory gruszkowatej i ciała migdałowatego bez przekaźnika we wzgórzu, a stamtąd dalej, do obszarów związanych z emocjami i pamięcią. Wzgórze włącza się dopiero później. (<a href="https://doi.org/10.3389/fnsys.2013.00066" target="_blank" rel="noopener">Kadohisa 2013</a>)</li>
+        <li>W badaniu 93 starszych osób wspomnienia przywołane zapachem pochodziły najczęściej z pierwszych dziesięciu lat życia, a przywołane słowem lub obrazem z lat <span class="nw">11–20</span>. Zapach dawał też silniejsze poczucie powrotu do przeszłości. (<a href="https://doi.org/10.3758/bf03193837" target="_blank" rel="noopener">Willander i Larsson 2006</a>)</li>
+        <li>Około jednej trzeciej osób, które szukają pomocy z powodu zaburzeń węchu, zgłasza wyraźnie gorszą jakość życia. (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7835667/" target="_blank" rel="noopener">Schäfer, Schriever i Croy 2021</a>)</li>
+        <li>Wśród pacjentów kliniki węchu co najmniej jedno groźne zdarzenie związane z zapachem, na przykład przypalone lub zepsute jedzenie albo niewyczuty gaz, zgłosiło 45&nbsp;% osób bez węchu i 19&nbsp;% osób z prawidłowym węchem. (<a href="https://doi.org/10.1001/archotol.130.3.317" target="_blank" rel="noopener">Santos i in. 2004</a>)</li>
+        <li>Po dwóch tygodniach stałego kontaktu z jednym zapachem w domu wrażliwość na ten zapach spadła i u większości osób była obniżona jeszcze do dwóch tygodni później. (<a href="https://doi.org/10.3758/bf03213109" target="_blank" rel="noopener">Dalton i Wysocki 1996</a>)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="s" data-state="world" aria-label="Świat z eseju">
+    <div class="tx">
+      <blockquote class="essay">
+        <p>Jest rok 2400. Mieszkam sto osiemdziesiąt metrów pod powierzchnią Ziemi, w pomieszczeniu, którego szerokość mogę zmierzyć trzema krokami.</p>
+        <p>Powietrze jest stale filtrowane. Instalacja usuwa pył i utrzymuje parametry niezbędne do życia. Na ekranie przy drzwiach prawie zawsze świeci się zielony komunikat.</p>
+        <p>A jednak śmierdzi.</p>
+        <p>Inni mówią, że po pewnym czasie przestają go zauważać. Ja zauważam go zawsze.</p>
+        <p>Dopiero zapach lasu pozwala mi swobodnie odetchnąć.</p>
+      </blockquote>
+      <p>To fragmenty eseju, od którego zaczął się projekt. Esej opisuje wyobrażony świat, a Bór jest przedmiotem, którego ten świat potrzebuje. Tak działa tu projekt spekulatywny: fikcja stawia potrzebę, a prototyp sprawdza, jak mogłaby wyglądać odpowiedź.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="filter" aria-label="Wlot i filtr">
+    <div class="tx">
+      <h2>Wlot i filtr</h2>
+      <p>Powietrze wchodzi przez kratkę w pokrywie. Pod kratką stoi osłona wlotu z kominem, a w kominie leży filtr HEPA H13 z węglem aktywnym, 42&nbsp;×&nbsp;42&nbsp;×&nbsp;6&nbsp;mm. Zatrzymuje pył i część zapachów.</p>
+      <p>Wymiana filtra to znane ograniczenie prototypu: trzeba wysunąć groty, zdjąć piankę, odkręcić sześć wkrętów i unieść pokrywę.</p>
+      <p class="small">Punkty pokazują drogę powietrza. Czarne to powietrze bez esencji, brązowe to powietrze z esencją.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="blower" aria-label="Dmuchawa">
+    <div class="tx">
+      <h2>Dmuchawa</h2>
+      <p>Dmuchawa promieniowa 40&nbsp;×&nbsp;40&nbsp;×&nbsp;7&nbsp;mm, zasilana napięciem 5&nbsp;V, ciągnie powietrze przez filtr i tłoczy je kanałem do modułu zapachu. Ma dawać <span class="nw">2–6&nbsp;l/min</span>. Prędkość ma ustawiać oprogramowanie, którego jeszcze nie ma.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="flap" aria-label="Klapka zapachu">
+    <div class="tx">
+      <h2>Klapka zapachu</h2>
+      <p class="q">„Esencja jest podawana w bardzo małych porcjach do oczyszczonego strumienia.”</p>
+      <p>Klapka na serwie <span class="nw">MG996R</span> dzieli strumień na dwie drogi: przez kasetę z esencją albo obejściem. Przy 0° całe powietrze idzie obejściem i nie niesie zapachu, a przy 64,4° zapachu jest najwięcej. Bez zasilania przekładnia serwa stoi w miejscu, więc zamknięcie klapki ma zapewnić oprogramowanie.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="cartridge" aria-label="Kaseta z esencją">
+    <div class="tx">
+      <h2>Kaseta z esencją</h2>
+      <p>Kaseta wsuwa się od góry do komina modułu, więc wymienia się ją bez rozkręcania obudowy. W środku jest wkład z włókniny nasączany esencją, a klapka zwrotna ma nie wypuszczać esencji wstecz. Dawki jeszcze nie ustalono.</p>
+      <p>Kasetę drukuje się z PETG naturalnego, bez barwnika; bursztynowa jest tylko w podglądzie 3D.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="split" aria-label="Mieszanie i rozdział">
+    <div class="tx">
+      <h2>Mieszanie i rozdział</h2>
+      <p>Za klapką oba strumienie mieszają się na siatce. Kanał zbiorczy prowadzi powietrze do rozdzielacza Y, który dzieli je na lewą i prawą stronę.</p>
+      <p>W ramionach biegną rurki FEP, które w przeciwieństwie do silikonu nie chłoną olejku. Kryzy <span class="nw">Ø2,2&nbsp;mm</span> w grotach mają wyrównywać przepływ między stronami.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="outlets" aria-label="Wyloty">
+    <div class="tx">
+      <h2>Wyloty</h2>
+      <p class="q">„Wylot kieruje łagodny strumień w stronę nosa.”</p>
+      <p>Na każdym grocie siedzi dysza grzebieniowa: kryształowy grzebień z PETG bez barwnika. Powietrze za kryzą idzie kanałem <span class="nw">Ø3&nbsp;mm</span> przez trzon i grzebień i wychodzi szczeliną <span class="nw">19&nbsp;×&nbsp;3&nbsp;mm</span> na grzbiecie, około 12&nbsp;cm od nosa. Na twarzy nie ma rurek.</p>
+      <p>Dysza wpina się w gniazdo grota tak jak wcześniej złączka rurki, więc mechanizm w środku się nie zmienia.</p>
+      <p>Przy <span class="nw">2–6&nbsp;l/min</span> taki strumień może nieść zapach, ale nie da przy nosie wyraźnie czystszego powietrza. Dla porównania: noszony oczyszczacz Respiray Wear A+ pracuje przy 70 albo 120&nbsp;l/min (<a href="https://respiray.com/wp-content/uploads/2024/10/Respiray-Wear-A-User-Manual-v1.5-update.pdf" target="_blank" rel="noopener">instrukcja Respiray</a>), a osłona z kurtyną powietrzną z badania Kwaka i współpracowników przy ponad 241&nbsp;l/min (<a href="https://doi.org/10.1155/ina/1446884" target="_blank" rel="noopener">Kwak i in. 2026</a>).</p>
+      <p class="small" id="tubeNote" hidden>Model 3D na tej stronie pochodzi jeszcze z wersji z rurkami nosowymi.</p>
+    </div>
+  </section>
+
+  <section class="s night" data-state="light" aria-label="Światło">
+    <div class="tx">
+      <h2>Światło</h2>
+      <p>Na lewym barku siedzi kryształ z przezroczystego PETG albo żywicy, a w nim trzy diody RGB. Ma pokazywać stan baterii i siłę zapachu.</p>
+      <p>W każdym grocie jest pierścień sześciu diod pod dyfuzorem, a mleczny trzon dyszy przed nim też łapie światło. Znaczenie kolorów trzeba jeszcze zaprojektować.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="electronics" aria-label="Elektronika">
+    <div class="tx">
+      <h2>Elektronika</h2>
+      <p>Sterownikiem ma być <span class="nw">ESP32-C3</span> na płytce z ładowarką i przetwornicą 5&nbsp;V. Zasilać całość ma akumulator LiPo 1800&nbsp;mAh ładowany przez <span class="nw">USB-C</span>.</p>
+      <p>Płytki i oprogramowania jeszcze nie ma. Nie ma też funkcji z eseju: regulacji palcem po krawędzi ani odczytu oddechu i pulsu.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="foam" aria-label="Spód">
+    <div class="tx">
+      <h2>Spód</h2>
+      <p class="q">„Od spodu obudowa jest lekko wklęsła, żeby przylegała do ciała.”</p>
+      <p>Spód kołnierza jest z TPU drukowanego z wypełnieniem gyroid <span class="nw">12–25&nbsp;%</span>. Ugina się jak pianka i ma przylegać do barków.</p>
+    </div>
+  </section>
+
+  <section class="s" data-state="print" aria-label="Druk">
+    <div class="tx">
+      <h2>Druk</h2>
+      <p>Prototyp drukuje się w częściach na Bambu Lab A1: twarde części z PETG, spód z TPU. Skorupy i spód podzielono na połówki, lewą i prawą, żeby zmieściły się na stole 256&nbsp;mm. Części toru powietrza drukuje się z PETG naturalnego, bez barwnika.</p>
+      <p>Wszystko mieści się na 13 płytach, ułożonych filamentami: PETG naturalny, biały, przezroczysty i TPU. Według OrcaSlicera to około 61&nbsp;h druku i 870&nbsp;g filamentu, jeszcze bez poprawek ręcznych. Prototypu nikt jeszcze nie wydrukował ani nie zmierzył.</p>
+    </div>
+  </section>
+
+  <section class="s final" data-state="final" aria-label="Model i dokumenty">
+    <div class="tx">
+      <p>Bór to koncepcja i prototyp do druku, nie gotowy produkt. Model można teraz obracać, przeciągając go.</p>
+      <p>Rysunki techniczne, siedem arkuszy A3:</p>
+      <div class="thumbs" id="sheets"></div>
+      <p>Instrukcja druku, montażu i obsługi, strony 3, 27 i 46:</p>
+      <div class="thumbs" id="manual"></div>
+      <p class="small">Rysunki i instrukcja pokazują jeszcze wersję z rurkami nosowymi. Opisano je jako koncepcję i prototyp, nie do produkcji.</p>
+      <p>Esej, od którego zaczął się projekt: <span id="essay"></span>.</p>
+      <p><a href="/portfolio/#projekty">← portfolio</a></p>
+    </div>
+  </section>
+</main>
+
+<dialog id="lb" aria-label="Powiększenie">
+  <figure>
+    <img id="lbImg" alt="">
+    <figcaption><span id="lbCap"></span><button type="button" class="ln" id="lbClose">zamknij</button></figcaption>
+  </figure>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  "use strict";
+  if (window.__STEP_FRAME__) {
+    const fr = document.createElement("iframe");
+    fr.id = "stepFrame"; fr.src = window.__STEP_FRAME__.src; fr.title = "Bór";
+    if (window.__STEP_FRAME__.w) fr.style.width = parseInt(window.__STEP_FRAME__.w, 10) + "px";
+    document.body.appendChild(fr);
+    return;
+  }
+
+  /* ================= every file the page loads, in one place ================= */
+  const PATHS = {
+    model: "/portfolio/bor/model/bor.json",   /* JSON-wrapped base64 GLB: {format: "glb-base64", bytes, data} */
+    img: "/portfolio/bor/img/",               /* full-size sheets, manual pages, essay pages, fallback render */
+    thumbs: "/portfolio/bor/img/th/"          /* small versions of the sheets and manual pages */
+  };
+  const FIGS = {
+    sheets: [
+      ["a1.jpg", "Arkusz 1. Zespół, rzuty i gabaryty, skala 1:2."],
+      ["a2.jpg", "Arkusz 2. Rozstrzał i wykaz pozycji, skala ok. 1:2,3."],
+      ["a3.jpg", "Arkusz 3. Przekrój A–A i mechanizm klapki, skala 2:1 i 5:1."],
+      ["a4.jpg", "Arkusz 4. Dolna obudowa L i P, skala 1:2."],
+      ["a5.jpg", "Arkusz 5. Pokrywa L i P, groty, skala 1:2 i 1:1."],
+      ["a6.jpg", "Arkusz 6. Moduł zaworu, skala 1:1."],
+      ["a7.jpg", "Arkusz 7. Pianka TPU i ciąg dalszy wykazu, skala 1:2."]
+    ],
+    manual: [["m3.jpg", "Instrukcja, strona 3."], ["m27.jpg", "Instrukcja, strona 27."], ["m46.jpg", "Instrukcja, strona 46."]],
+    essay: ["esej-1.png", "esej-2.png", "esej-3.png", "esej-4.png", "esej-5.png"],
+    fallback: "r01.jpg"
+  };
+  /* air path from the inlet grille to the nose, in model metres: trunk, then the two branches */
+  const FLOW = {"trunk":[[0.08407,0.10846,-0.07383],[0.08407,0.08646,-0.07383],[0.08398,0.048,-0.07561],[0.08398,0.038,-0.07561],[0.06972,0.038,-0.10288],[0.02454,0.0533,-0.09904],[0.0348,0.0228,-0.0778],[0.0348,0.0228,-0.0778],[0.0348,0.01995,-0.0778],[0.03464,0.01711,-0.07783],[0.03351,0.01452,-0.07804],[0.03146,0.0126,-0.07842],[0.02883,0.01166,-0.0789],[0.02603,0.0116,-0.07942],[0.02322,0.0116,-0.07993],[0.02042,0.0116,-0.08045],[0.01761,0.0116,-0.08097],[0.01481,0.0116,-0.08148],[0.012,0.0116,-0.082],[0.012,0.0116,-0.082],[0.01049,0.0116,-0.08238],[0.00899,0.0116,-0.08275],[0.00749,0.0116,-0.08313],[0.00598,0.0116,-0.0835],[0.00449,0.0116,-0.08393],[0.00311,0.0116,-0.08464],[0.00193,0.0116,-0.08564],[0.00099,0.0116,-0.08687],[0.00035,0.0116,-0.08828],[3e-05,0.0116,-0.0898],[0,0.0116,-0.09135],[0,0.0116,-0.0929],[0,0.0116,-0.09445],[0,0.0116,-0.096],[0,0.0104,-0.1039]],"galaz_L":[[0,0.0104,-0.1039],[-0.00819,0.0116,-0.10874],[-0.0086,0.0116,-0.10902],[-0.00901,0.0116,-0.10931],[-0.00942,0.0116,-0.1096],[-0.00983,0.0116,-0.10988],[-0.01024,0.0116,-0.11017],[-0.01065,0.0116,-0.11046],[-0.01106,0.0116,-0.11074],[-0.01147,0.0116,-0.11103],[-0.01188,0.0116,-0.11132],[-0.01229,0.0116,-0.1116],[-0.0127,0.0116,-0.11189],[-0.01311,0.0116,-0.11218],[-0.01311,0.0116,-0.11218],[-0.0168,0.0116,-0.1096],[-0.0205,0.0116,-0.10702],[-0.0242,0.0116,-0.10444],[-0.0279,0.0116,-0.10186],[-0.03159,0.0116,-0.09928],[-0.03529,0.0116,-0.0967],[-0.03899,0.0116,-0.09412],[-0.04268,0.0116,-0.09154],[-0.04268,0.0116,-0.09154],[-0.0479,0.012,-0.08774],[-0.05313,0.0124,-0.08395],[-0.05835,0.01281,-0.08016],[-0.06357,0.01321,-0.07637],[-0.06879,0.01361,-0.07257],[-0.07399,0.01403,-0.06876],[-0.07875,0.01483,-0.06446],[-0.08351,0.01564,-0.06016],[-0.08827,0.01645,-0.05585],[-0.09301,0.01725,-0.05153],[-0.09567,0.01774,-0.04576],[-0.09735,0.01808,-0.03952],[-0.09902,0.01841,-0.03328],[-0.10069,0.01875,-0.02705],[-0.10236,0.01908,-0.02081],[-0.10403,0.01942,-0.01457],[-0.1057,0.01975,-0.00834],[-0.10667,0.02042,-0.00204],[-0.10572,0.02192,0.00418],[-0.10477,0.02343,0.01039],[-0.10382,0.02494,0.01661],[-0.10287,0.02645,0.02282],[-0.10214,0.02819,0.02898],[-0.10338,0.0318,0.03417],[-0.10385,0.03544,0.03938],[-0.10042,0.03761,0.04427],[-0.09585,0.03903,0.04862],[-0.09128,0.04046,0.05297],[-0.08403,0.04272,0.05987],[-0.08219,0.04329,0.06162],[-0.08007,0.04395,0.06363],[-0.07795,0.04461,0.06565],[-0.07621,0.04529,0.0673],[-0.07533,0.04735,0.06813],[-0.07568,0.0498,0.06781],[-0.07608,0.05224,0.06743],[-0.07648,0.05468,0.06705],[-0.07687,0.05712,0.06667],[-0.07727,0.05956,0.06629],[-0.07767,0.062,0.06591],[-0.07872,0.06393,0.06491],[-0.08021,0.06537,0.0635],[-0.08169,0.0668,0.06209],[-0.08318,0.06823,0.06068],[-0.08466,0.06966,0.05926],[-0.08577,0.07174,0.05858],[-0.08671,0.07403,0.05819],[-0.08764,0.07631,0.0578],[-0.08858,0.0786,0.05741],[-0.08952,0.08088,0.05702],[-0.09046,0.08317,0.05663],[-0.09139,0.08545,0.05624],[-0.09233,0.08774,0.05585],[-0.09269,0.08862,0.0557],[-0.09142,0.08941,0.05566],[-0.08886,0.09098,0.05557],[0.01335,0.15374,0.05198]],"galaz_P":[[0,0.0104,-0.1039],[0.00819,0.0116,-0.10874],[0.03902,0.0116,-0.10077],[0.06795,0.01191,-0.08407],[0.09166,0.01336,-0.06112],[0.10374,0.01616,-0.03093],[0.10409,0.02135,0.00182],[0.10322,0.03093,0.03332],[0.08432,0.04226,0.06002],[0.08248,0.04283,0.06177],[0.08036,0.04349,0.06379],[0.07824,0.04416,0.06581],[0.07651,0.04483,0.06746],[0.07563,0.0469,0.06829],[0.07597,0.04935,0.06797],[0.07637,0.05179,0.06759],[0.07677,0.05422,0.06721],[0.07717,0.05666,0.06683],[0.07757,0.0591,0.06645],[0.07797,0.06154,0.06607],[0.07902,0.06348,0.06507],[0.0805,0.06491,0.06366],[0.08199,0.06634,0.06225],[0.08347,0.06777,0.06083],[0.08496,0.06921,0.05943],[0.08608,0.07134,0.059],[0.08701,0.07366,0.05897],[0.08794,0.07598,0.05894],[0.08888,0.0783,0.05891],[0.08981,0.08062,0.05888],[0.09075,0.08293,0.05885],[0.09168,0.08525,0.05882],[0.09261,0.08757,0.05879],[0.09355,0.08989,0.05876],[0.0939,0.09075,0.05875],[0.09262,0.09154,0.0587],[0.09006,0.09311,0.05861],[-0.01215,0.15587,0.05503]]};
+  /* where each branch leaves the arm tip, if the tip geometry cannot be found */
+  const OUTLET_FALLBACK = { galaz_L: 54, galaz_P: 10 };
+
+  /* ================= what the model shows for each section =================
+     parts: name prefixes kept solid, the rest fades back; dir: camera direction from the target;
+     explode: 0 assembled, 1.4 apart; xray: shells see-through; air: particles on the air path;
+     door: the scent flap moves; night: dark background; below: view from underneath;
+     spin: "turn" slow full turn, "sway" small slow rotation; orbit: the visitor rotates the model;
+     frame: prefixes the camera frames, if not the highlighted parts */
+  const STATES = {
+    hero: { explode: 1.4, dir: [-0.62, 0.34, 0.7], zoom: 0.88, spin: "turn" },
+    assembly: { dir: [-0.56, 0.44, 0.66], ease: "smooth" },
+    smell: { dir: [-0.42, 0.42, 0.8], zoom: 1.15, spin: "sway" },
+    world: { dir: [0.04, 0.3, 1], zoom: 1.3 },
+    filter: { parts: ["Oslona_wlotu", "Filtr_wlotowy", "Uszczelka_komina_wlotu"], dir: [-0.3, 0.9, 0.3], xray: 1, air: 1 },
+    blower: { parts: ["Dmuchawa_", "Kanal_dmuchawa", "Uszczelka_kanalu_dmuchawy"], dir: [-0.5, 0.75, 0.45], xray: 1, air: 1 },
+    flap: { parts: ["Korpus_modulu_zaworu", "Plytka_czolowa_modulu", "Klapka_mieszajaca", "Warga_klapki", "Walek_klapki", "Serwo_MG996R", "Orczyk_", "Kolnierz_walka", "Sprezyna_skretna", "Tuleja_labiryntowa", "Gniazdo_slepe", "Podkladka_podatna", "Tulejka_gumowa"], dir: [-0.45, 0.6, 0.65], xray: 1, air: 1, door: 1 },
+    cartridge: { parts: ["Wklad_esencji", "Oring_szyjki_wkladu", "Uszczelka_komina_wkladu"], dir: [-0.4, 0.8, 0.45], xray: 1, air: 1 },
+    split: { parts: ["Siatka_mieszajaca", "Kanal_zbiorczy", "Rozdzielacz_Y", "Tuleja_laczaca", "Kanal_galaz_"], dir: [-0.3, 0.75, 0.6], zoom: 0.62, xray: 1, air: 1 },
+    outlets: { parts: ["Koncowka_ramienia_", "Kryza_dlawiaca", "Dysza_grzebieniowa_", "Oring_zlaczki_rurki", "Dyfuzor_LED", "LED_2020", "Plytka_LED_szesciokat"], frame: ["Koncowka_ramienia_L", "Dysza_grzebieniowa_L"], dir: [-0.05, 0.28, 1], xray: 1, air: 1, aim: [0.03, 0.045, 0.012], zoom: 1 },
+    light: { parts: ["Krysztal_swietlny", "Pierscien_ustalajacy_krysztalu", "Plytka_LED_krysztalu", "LED_RGB_krysztalu", "Dyfuzor_LED", "Plytka_LED_szesciokat", "LED_2020"], dir: [-0.62, 0.5, 0.62], night: 1, ghost: 0.3, zoom: 0.62 },
+    electronics: { parts: ["PCB_", "Akumulator_", "Przewod_akumulatora", "Tacka_akumulatora", "Plytka_USB-C", "Gniazdo_USB-C", "Tasma_FFC", "Zaslepka_USB-C"], dir: [-0.5, 0.8, 0.35], xray: 1 },
+    foam: { parts: ["Pianka_TPU"], dir: [-0.45, -0.55, 0.7], zoom: 0.62, below: 1 },
+    print: { explode: 1.15, dir: [-0.5, 0.5, 0.72], spin: "sway" },
+    final: { dir: [-0.56, 0.44, 0.66], orbit: 1 }
+  };
+  const TUBES = /^(Rurka_silikonowa|Koncowka_nosowa|Spinka_rurek)/;
+  const LED_RE = /^LED_|Dyfuzor|Krysztal_swietlny/;
+  const WHITE = "#efece6";                  /* cover and shells, warm white */
+  const FOAM = "#e4e0d6";                   /* TPU underside, milky natural */
+  const GHOST = 0.08, GHOST_SHELL = 0.05;   /* opacity of parts outside the highlight */
+  const XRAY = 0.14, XRAY_SET = 0.4;        /* shells in x-ray; shells that are themselves highlighted */
+  const LED_FLOOR = 0.55;                   /* diodes keep glowing even when faded */
+  const DOOR_ANGLE = 64.4 * Math.PI / 180;
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const params = new URLSearchParams(location.search);
+  const DEBUG_STEP = params.has("step") ? parseFloat(params.get("step")) : null;
+  const DEBUG = params.has("debug");
+  const reduceQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const phoneQ = window.matchMedia("(max-width: 859px)");
+  const motion = () => !reduceQ.matches;
+  if (DEBUG_STEP !== null && "scrollRestoration" in history) history.scrollRestoration = "manual";
+
+  /* ---------- Polish typesetting: single-letter words stay with the next word ---------- */
+  function nbsp(root) {
+    const re = /(^|[\s(„])([aiouwzAIOUWZ])\s+/g;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let n = w.nextNode(); n; n = w.nextNode()) {
+      const s = n.nodeValue, r = s.replace(re, "$1$2 ").replace(re, "$1$2 ");
+      if (r !== s) n.nodeValue = r;
+    }
+  }
+  nbsp($("#main"));
+
+  /* ---------- sheets, manual pages, essay pages ---------- */
+  const lb = $("#lb");
+  function openFull(src, cap) {
+    $("#lbImg").src = src; $("#lbImg").alt = cap; $("#lbCap").textContent = cap;
+    if (typeof lb.showModal === "function") lb.showModal(); else window.open(src, "_blank", "noopener");
+  }
+  function thumbLinks(list, box) {
+    list.forEach(([file, cap]) => {
+      const a = document.createElement("a");
+      a.href = PATHS.img + file; a.title = cap;
+      const img = document.createElement("img");
+      img.src = PATHS.thumbs + file; img.alt = cap; img.loading = "lazy"; img.decoding = "async";
+      a.appendChild(img);
+      a.addEventListener("click", e => { e.preventDefault(); openFull(a.href, cap); });
+      box.appendChild(a);
+    });
+  }
+  thumbLinks(FIGS.sheets, $("#sheets"));
+  thumbLinks(FIGS.manual, $("#manual"));
+  const essayBox = $("#essay");
+  essayBox.append("strona ");
+  FIGS.essay.forEach((file, i) => {
+    const a = document.createElement("a");
+    a.href = PATHS.img + file; a.textContent = String(i + 1);
+    const cap = "Esej, strona " + (i + 1) + " z " + FIGS.essay.length + ".";
+    a.addEventListener("click", e => { e.preventDefault(); openFull(a.href, cap); });
+    if (i) essayBox.append(", ");
+    essayBox.appendChild(a);
+  });
+  $("#lbClose").addEventListener("click", () => lb.close());
+  lb.addEventListener("click", e => { if (e.target === lb) lb.close(); });
+
+  /* ---------- sections and their scroll positions ---------- */
+  const sections = $$("[data-state]");
+  const SEQ = sections.map(el => Object.assign({ name: el.dataset.state, el }, STATES[el.dataset.state] || {}));
+  let keys = sections.map((_, i) => i * window.innerHeight), maxScroll = 0;
+
+  function measure() {
+    const vh = window.innerHeight;
+    maxScroll = Math.max(0, document.documentElement.scrollHeight - vh);
+    let prev = -Infinity;
+    keys = sections.map(el => {
+      const r = el.getBoundingClientRect();
+      let k = r.top + window.scrollY + r.height / 2 - vh / 2;
+      k = clamp(k, 0, maxScroll);
+      if (k <= prev) k = prev + 1;
+      prev = k;
+      return k;
+    });
+    if (DEBUG_STEP !== null) window.scrollTo(0, posOf(DEBUG_STEP));
+    V.dirty = true;
+  }
+  function posOf(step) {
+    const i = clamp(Math.floor(step), 0, keys.length - 1), f = step - i;
+    return i < keys.length - 1 ? lerp(keys[i], keys[i + 1], f) : keys[i];
+  }
+  function where(y) {
+    const n = keys.length;
+    if (n < 2 || y <= keys[0]) return [0, 0];
+    for (let i = 0; i < n - 1; i++) if (y < keys[i + 1]) return [i, (y - keys[i]) / (keys[i + 1] - keys[i])];
+    return [n - 2, 1];
+  }
+  /* each change holds still near the middle of its section and moves in between */
+  function shape(t, to) {
+    if (!motion()) return t < 0.5 ? 0 : 1;
+    if (to.ease === "smooth") return t * t * (3 - 2 * t);
+    const u = clamp((t - 0.18) / 0.64, 0, 1);
+    return u * u * u * (u * (u * 6 - 15) + 10);
+  }
+
+  /* ---------- 3D ---------- */
+  const V = { ready: false, dirty: true };
+  window.__bor = V;
+  const status = $("#status");
+  function fail(why) {
+    if (why) console.warn(why);
+    status.textContent = "Ta przeglądarka nie wyświetla grafiki 3D. Zamiast modelu jest render.";
+    const fb = $("#fallback");
+    fb.src = PATHS.img + FIGS.fallback; fb.alt = "Render: Bór od przodu, ze świecącymi grotami i kryształem.";
+    fb.hidden = false;
+    $("#c").hidden = true;
+  }
+
+  function start() {
+    if (!window.THREE || !THREE.GLTFLoader || !THREE.OrbitControls || !THREE.RoomEnvironment) return fail("three.js nie wczytał się");
+    const canvas = $("#c");
+    let renderer;
+    try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: "high-performance" }); }
+    catch (e) { return fail(e); }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.92;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    const BG_DAY = new THREE.Color(0xffffff), BG_NIGHT = new THREE.Color(0x0b0d0c), bg = new THREE.Color();
+    renderer.setClearColor(BG_DAY, 1);
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.01, 30);
+    const key = new THREE.DirectionalLight(0xfff3e4, 1.05);
+    key.position.set(0.7, 1.4, 0.9); key.castShadow = true;
+    const sm = phoneQ.matches ? 1024 : 2048;
+    key.shadow.mapSize.set(sm, sm);
+    Object.assign(key.shadow.camera, { left: -0.5, right: 0.5, top: 0.5, bottom: -0.5, near: 0.1, far: 5 });
+    key.shadow.bias = -0.0005; key.shadow.normalBias = 0.002;
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0xe6eaec, 0.35); rim.position.set(-0.9, 0.6, -1.0); scene.add(rim);
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x6f6f6a, 0.2); scene.add(hemi);
+    const under = new THREE.DirectionalLight(0xffffff, 0); under.position.set(-0.4, -1.2, 0.6); scene.add(under);
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), new THREE.ShadowMaterial({ opacity: 0.2 }));
+    ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+    const root = new THREE.Group(); scene.add(root);
+
+    const controls = new THREE.OrbitControls(camera, $("#orbit"));
+    Object.assign(controls, { enabled: false, enableZoom: false, enablePan: false, enableDamping: true, dampingFactor: 0.08, rotateSpeed: 0.7 });
+    controls.addEventListener("start", () => { if (controls.enabled) userOrbit = true; });
+
+    const parts = [], halos = [], ledLights = [];
+    const flowGroup = new THREE.Group();
+    const door = { mode: "none", open: [], closed: [], f: 0, phase: 0, closedNow: false, timer: 0 };
+    const tmpV = new THREE.Vector3(), tmpBox = new THREE.Box3(), tmpQ = new THREE.Quaternion();
+    const L = { fw: 0.5, fh: 0.86 };   /* share of the screen the model may use */
+    let cam = null;                    /* damped camera: target, unit direction, distance */
+
+    function isShell(p) { return p.userData.grupa === "Obudowa" || /^Wieza_|^Tuleja_wkretu|^Slupek_/.test(p.name); }
+    function explodeOf(p) { const e = p.userData.explode; return Array.isArray(e) && e.length === 3 ? e : [0, 0, 0]; }
+
+    /* the text column is on the left (on phones at the bottom), so the model is drawn beside it */
+    function layout() {
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      if (phoneQ.matches) {
+        L.fw = 0.92; L.fh = 0.44;
+        camera.setViewOffset(w, h, 0, h * 0.25, w, h);
+      } else {
+        const tx = sections[0].querySelector(".tx");
+        const right = tx ? tx.getBoundingClientRect().right : w * 0.45;
+        const avail = Math.max(w * 0.3, w - right);
+        L.fw = (avail * 0.9) / w; L.fh = 0.84;
+        camera.setViewOffset(w, h, -((right + avail / 2) - w / 2), 0, w, h);
+      }
+      camera.updateProjectionMatrix();
+    }
+
+    /* ---------- model ---------- */
+    function glbFromJson(text) {
+      const pkg = JSON.parse(text);
+      if (pkg.format !== "glb-base64" || typeof pkg.data !== "string") throw new Error("nieznany format modelu");
+      const bin = atob(pkg.data), n = bin.length, out = new Uint8Array(n);
+      for (let i = 0; i < n; i++) out[i] = bin.charCodeAt(i);
+      if (pkg.bytes && pkg.bytes !== n) throw new Error("model niekompletny");
+      return out.buffer;
+    }
+    function loadModel(url, done) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url); xhr.responseType = "text";
+      xhr.onprogress = e => { if (e.lengthComputable) status.textContent = "Ładowanie modelu 3D, " + Math.round(e.loaded / e.total * 100) + " %"; };
+      xhr.onload = () => {
+        if (xhr.status < 200 || xhr.status >= 300) return fail("model: HTTP " + xhr.status);
+        let buf;
+        try { buf = glbFromJson(xhr.response); } catch (err) { return fail(err); }
+        new THREE.GLTFLoader().parse(buf, "", done, err => fail(err));
+      };
+      xhr.onerror = () => fail("model: błąd sieci");
+      xhr.send();
+    }
+
+    function prepare(model) {
+      model.traverse(o => {
+        if (!o.isMesh) return;
+        o.castShadow = true; o.receiveShadow = true;
+        const mname = (o.material && o.material.name) || "";
+        const m = o.material.clone(); o.material = m;
+        m.color.convertSRGBToLinear();
+        if (/PETG_naturalny/.test(mname)) { m.transparent = false; m.opacity = 1; }
+        if (/PETG_bialy/.test(mname)) { m.color.set(WHITE).convertSRGBToLinear(); m.roughness = 0.75; m.metalness = 0; }
+        if (/TPU_85A_lesna_zielen/.test(mname)) { m.color.set(FOAM).convertSRGBToLinear(); m.roughness = 0.92; m.metalness = 0; }   /* natural, undyed TPU */
+        m.envMapIntensity = 0.6;
+        if (m.transparent) { m.depthWrite = false; m.side = THREE.DoubleSide; }
+        if (o.userData.fasety) m.flatShading = true;
+        if (!m.emissive) m.emissive = new THREE.Color(0);
+        const led = LED_RE.test(o.name);
+        o.userData.led = led;
+        o.userData.ledI = led ? (/^LED_/.test(o.name) ? 1.6 : 0.55) : 0;
+        if (led) m.emissive = new THREE.Color(0x7ff0c8);
+        m.emissiveIntensity = o.userData.ledI;
+        o.userData.base = { transparent: m.transparent, opacity: m.opacity, depthWrite: m.depthWrite };
+        o.geometry.computeBoundingBox();
+        m.needsUpdate = true;
+        parts.push(o);
+      });
+    }
+
+    function partsMatching(prefixes) {
+      if (!prefixes || !prefixes.length) return null;
+      const set = new Set(parts.filter(p => prefixes.some(n => p.name.indexOf(n) === 0)));
+      return set.size ? set : null;   /* nothing matches: no highlight, the whole model stays */
+    }
+
+    /* opacity of every part in every state, built once */
+    function buildTables() {
+      SEQ.forEach(st => {
+        st.set = partsMatching(st.parts);
+        st.matched = st.set ? st.set.size : 0;
+        const g = st.ghost != null ? st.ghost : GHOST, gs = st.ghost != null ? st.ghost * 0.75 : GHOST_SHELL;
+        st.G = new Float32Array(parts.length);
+        parts.forEach((p, j) => {
+          const shell = isShell(p), inSet = !st.set || st.set.has(p);
+          let f = 1;
+          if (st.xray && shell) f = st.set && inSet ? XRAY_SET : XRAY;
+          if (!inSet) f = Math.min(f, shell ? gs : g);
+          if (p.userData.led) f = Math.max(f, LED_FLOOR);
+          st.G[j] = f;
+        });
+      });
+      if (DEBUG) console.info("dopasowane części:", SEQ.map(s => s.name + " " + (s.parts ? s.matched + "/" + s.parts.length + " prefiksów" : "całość")).join(", "));
+    }
+
+    function setExplode(ex) {
+      parts.forEach(p => { const e = explodeOf(p); p.position.set(e[0] * ex, e[1] * ex, e[2] * ex); });
+    }
+    function boxAt(list, ex) {
+      setExplode(ex);
+      root.updateMatrixWorld(true);
+      const b = new THREE.Box3();
+      list.forEach(p => { tmpBox.copy(p.geometry.boundingBox).applyMatrix4(p.matrixWorld); b.union(tmpBox); });
+      return b;
+    }
+    /* camera pose of each state: the distance at which every corner of its box fits the free part of the screen */
+    function fitDistance(box, t, dir, tanH, tanV) {
+      const f = dir.clone().negate(), r = new THREE.Vector3().crossVectors(f, new THREE.Vector3(0, 1, 0));
+      if (r.lengthSq() < 1e-8) r.set(1, 0, 0);
+      r.normalize();
+      const u = new THREE.Vector3().crossVectors(r, f).normalize();
+      let d = 0;
+      for (let n = 0; n < 8; n++) {
+        tmpV.set(n & 1 ? box.max.x : box.min.x, n & 2 ? box.max.y : box.min.y, n & 4 ? box.max.z : box.min.z).sub(t);
+        const z = tmpV.dot(dir);
+        d = Math.max(d, z + Math.abs(tmpV.dot(r)) / tanH, z + Math.abs(tmpV.dot(u)) / tanV);
+      }
+      return d;
+    }
+    function computePoses() {
+      const all = parts.filter(p => !/ZAMKNIETA/.test(p.name));
+      const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const tanV = tv * L.fh, tanH = tv * camera.aspect * L.fw;
+      SEQ.forEach(st => {
+        const fset = partsMatching(st.frame) || st.set;
+        const box = boxAt(fset ? [...fset] : all, st.explode || 0);
+        const t = box.getCenter(new THREE.Vector3());
+        if (st.aim) t.add(new THREE.Vector3().fromArray(st.aim));
+        const dir = new THREE.Vector3().fromArray(st.dir || [-0.56, 0.44, 0.66]).normalize();
+        /* a turning model has to fit from every side it shows */
+        const yaws = st.spin === "turn" ? [0, 1, 2, 3, 4, 5, 6, 7].map(n => n * Math.PI / 4) : st.spin === "sway" ? [-0.35, 0, 0.35] : [0];
+        let d = 0;
+        yaws.forEach(a => { d = Math.max(d, fitDistance(box, t, dir.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), a), tanH, tanV)); });
+        d *= (fset ? 1.9 : 1.1) * (st.zoom || 1);
+        st.pose = { t, dir, d: clamp(d, 0.12, 3) };
+      });
+      setExplode(V.explode || 0);
+      V.dirty = true;
+    }
+
+    /* ---------- scent flap: turn the open flap about its shaft, or swap the two variants ---------- */
+    function setupDoor() {
+      door.open = parts.filter(p => /OTWARTA/.test(p.name));
+      door.closed = parts.filter(p => /ZAMKNIETA/.test(p.name));
+      if (!door.open.length || !door.closed.length) return;
+      door.mode = "toggle";
+      const fo = door.open.find(p => /^Klapka/.test(p.name)), fc = door.closed.find(p => /^Klapka/.test(p.name));
+      if (!fo || !fc) return;
+      const centre = re => { const p = parts.find(q => re.test(q.name)); return p ? p.geometry.boundingBox.getCenter(new THREE.Vector3()) : null; };
+      /* the shaft axis: bushing to blind socket; else the long side of the shaft itself */
+      const axes = [];
+      const a1 = centre(/^Tuleja_labiryntowa/), a2 = centre(/^Gniazdo_slepe/);
+      if (a1 && a2) axes.push({ axis: a2.clone().sub(a1).normalize(), P: a1 });
+      const shaft = parts.find(p => /^Walek_klapki/.test(p.name));
+      if (shaft) {
+        const sb = shaft.geometry.boundingBox, size = sb.getSize(new THREE.Vector3());
+        axes.push({ axis: size.x >= size.y && size.x >= size.z ? new THREE.Vector3(1, 0, 0) : size.y >= size.z ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(0, 0, 1), P: sb.getCenter(new THREE.Vector3()) });
+      }
+      const want = fc.geometry.boundingBox, pos = fo.geometry.attributes.position;
+      let best = null;
+      axes.forEach(({ axis, P }) => [1, -1].forEach(sign => {
+        tmpQ.setFromAxisAngle(axis, sign * DOOR_ANGLE);
+        const b = new THREE.Box3();
+        for (let i = 0; i < pos.count; i++) { tmpV.fromBufferAttribute(pos, i).sub(P).applyQuaternion(tmpQ).add(P); b.expandByPoint(tmpV); }
+        const err = Math.max(Math.abs(b.min.x - want.min.x), Math.abs(b.min.y - want.min.y), Math.abs(b.min.z - want.min.z),
+          Math.abs(b.max.x - want.max.x), Math.abs(b.max.y - want.max.y), Math.abs(b.max.z - want.max.z));
+        if (!best || err < best.err) best = { axis, P, sign, err };
+      }));
+      if (!best) return;
+      door.err = best.err;
+      /* the two variants are separate meshes; 1.5 mm on the bounding box is close enough to turn one into the other */
+      if (best.err < 0.0015) Object.assign(door, { mode: "rotate", axis: best.axis, P: best.P, sign: best.sign });
+    }
+    function variantVisible(p) {
+      if (/ZAMKNIETA/.test(p.name)) return door.mode === "toggle" && door.closedNow;
+      if (/OTWARTA/.test(p.name)) return door.mode !== "toggle" || !door.closedNow;
+      return true;
+    }
+    function applyDoor(ex) {
+      if (door.mode === "rotate") {
+        tmpQ.setFromAxisAngle(door.axis, door.sign * DOOR_ANGLE * door.f);
+        door.open.forEach(p => {
+          const e = explodeOf(p);
+          tmpV.copy(door.P).applyQuaternion(tmpQ);
+          p.quaternion.copy(tmpQ);
+          p.position.set(e[0] * ex + door.P.x - tmpV.x, e[1] * ex + door.P.y - tmpV.y, e[2] * ex + door.P.z - tmpV.z);
+        });
+      }
+      door.open.concat(door.closed).forEach(p => { p.visible = p.userData.op > 0.004 && variantVisible(p); });
+    }
+    /* closed fraction over one cycle: hold open, close, hold closed, open */
+    function doorCycle(ph) {
+      const t = ph % 4.4, ss = u => u * u * (3 - 2 * u);
+      if (t < 1.3) return 0;
+      if (t < 2.2) return ss((t - 1.3) / 0.9);
+      if (t < 3.5) return 1;
+      return 1 - ss((t - 3.5) / 0.9);
+    }
+
+    /* ---------- air particles ---------- */
+    let flow = null;
+    function buildFlow() {
+      const toV = a => new THREE.Vector3(a[0], a[1], a[2]);
+      const trunk = FLOW.trunk.map(toV);
+      const trunkLen = new THREE.CatmullRomCurve3(trunk, false, "centripetal").getLength();
+      const tipBoxes = parts.filter(p => /^Koncowka_ramienia_|^Dysza_grzebieniowa_/.test(p.name)).map(p => p.geometry.boundingBox.clone().expandByScalar(0.003));
+      const PLUME = 0.09, PLUME_SLOW = 3.2;   /* the jet above the outlet, travelled more slowly */
+      const routes = ["galaz_L", "galaz_P"].map(k => {
+        const pts = FLOW[k].map(toV);
+        let cut = -1;
+        pts.forEach((q, i) => { if (tipBoxes.some(b => b.containsPoint(q))) cut = i; });
+        const found = cut >= 2;
+        if (!found) cut = OUTLET_FALLBACK[k];
+        const curve = new THREE.CatmullRomCurve3(trunk.concat(pts.slice(1, cut + 1)), false, "centripetal");
+        const outlet = pts[cut].clone(), dir = pts[pts.length - 1].clone().sub(outlet).normalize();
+        const u = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 0, 1)).normalize();
+        const w = new THREE.Vector3().crossVectors(dir, u).normalize();
+        const len = curve.getLength();
+        return { curve, len, total: len + PLUME * PLUME_SLOW, outlet, dir, u, w, found, cut };
+      });
+      const N = 560, pos = new Float32Array(N * 3), col = new Float32Array(N * 4), meta = [];
+      for (let i = 0; i < N; i++) meta.push({ r: i % 2, ph: Math.random(), sp: 0.075 + Math.random() * 0.03, a: Math.random() * Math.PI * 2, rad: Math.sqrt(Math.random()), j: [(Math.random() - 0.5) * 0.004, (Math.random() - 0.5) * 0.004, (Math.random() - 0.5) * 0.004] });
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      geo.setAttribute("color", new THREE.BufferAttribute(col, 4));
+      const c = document.createElement("canvas"); c.width = c.height = 64;
+      const g = c.getContext("2d"), rg = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+      rg.addColorStop(0, "rgba(255,255,255,1)"); rg.addColorStop(0.45, "rgba(255,255,255,.75)"); rg.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = rg; g.fillRect(0, 0, 64, 64);
+      const mat = new THREE.PointsMaterial({ size: 0.0068, map: new THREE.CanvasTexture(c), vertexColors: true, transparent: true, depthWrite: false, depthTest: false });
+      const pts = new THREE.Points(geo, mat);
+      pts.renderOrder = 10; pts.frustumCulled = false;
+      flowGroup.add(pts); flowGroup.visible = false; root.add(flowGroup);
+      const cClean = new THREE.Color(), cScent = new THREE.Color(), cc = new THREE.Color();
+      const DAY = [new THREE.Color(0x1c1c1c), new THREE.Color(0x7a4510)], NIGHT = [new THREE.Color(0xa8f2d6), new THREE.Color(0xf2b35a)];
+      flow = {
+        routes, mat,
+        update(time, night) {
+          cClean.copy(DAY[0]).lerp(NIGHT[0], night); cScent.copy(DAY[1]).lerp(NIGHT[1], night);
+          for (let i = 0; i < N; i++) {
+            const m = meta[i], R = routes[m.r];
+            const along = ((m.ph + time * m.sp) % 1) * R.total;
+            let alpha = Math.min(1, along / 0.01);
+            if (along < R.len) {
+              R.curve.getPointAt(along / R.len, tmpV);
+              tmpV.x += m.j[0]; tmpV.y += m.j[1]; tmpV.z += m.j[2];
+            } else {
+              const s = (along - R.len) / (R.total - R.len), spread = s * PLUME * 0.24 * m.rad;
+              tmpV.copy(R.outlet).addScaledVector(R.dir, s * PLUME)
+                .addScaledVector(R.u, Math.cos(m.a) * spread).addScaledVector(R.w, Math.sin(m.a) * spread);
+              alpha = Math.pow(1 - s, 0.6);
+            }
+            pos[i * 3] = tmpV.x; pos[i * 3 + 1] = tmpV.y; pos[i * 3 + 2] = tmpV.z;
+            const k = clamp((along - trunkLen * 0.5) / (trunkLen * 0.25), 0, 1);
+            cc.copy(cClean).lerp(cScent, k);
+            col[i * 4] = cc.r; col[i * 4 + 1] = cc.g; col[i * 4 + 2] = cc.b; col[i * 4 + 3] = alpha;
+          }
+          geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
+        }
+      };
+    }
+
+    /* ---------- soft glow around the crystal and the arm tips ---------- */
+    function buildHalos() {
+      const c = document.createElement("canvas"); c.width = c.height = 128;
+      const g = c.getContext("2d"), rg = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+      rg.addColorStop(0, "rgba(255,255,255,1)"); rg.addColorStop(0.3, "rgba(255,255,255,.55)"); rg.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = rg; g.fillRect(0, 0, 128, 128);
+      const tex = new THREE.CanvasTexture(c);
+      parts.filter(p => /^Krysztal_swietlny|^Dyfuzor_LED/.test(p.name)).forEach(p => {
+        const size = /^Krysztal/.test(p.name) ? 0.065 : 0.045;
+        const ctr = p.geometry.boundingBox.getCenter(new THREE.Vector3());
+        const day = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: 0x34cf9b, transparent: true, depthWrite: false, opacity: 0.32 }));
+        const night = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: 0x7ff0c8, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+        day.position.copy(ctr); day.scale.setScalar(size);
+        night.position.copy(ctr); night.scale.setScalar(size * 1.9);
+        p.add(day, night);
+        const light = new THREE.PointLight(0x7ff0c8, 0, 0.3, 2);
+        light.position.copy(ctr); p.add(light);
+        halos.push({ day, night }); ledLights.push(light);
+      });
+    }
+
+    /* ---------- per-frame state ---------- */
+    let lastI = -1, lastK = -1, lastNight = -1, lastEx = -1;
+    const spinAcc = SEQ.map(() => 0);
+    function yawOf(idx) {
+      const st = SEQ[idx];
+      if (st.spin === "turn") { const a = spinAcc[idx] * 0.16; return Math.atan2(Math.sin(a), Math.cos(a)); }
+      if (st.spin === "sway") return 0.35 * Math.sin(spinAcc[idx] * 0.25);
+      return 0;
+    }
+    const dA = new THREE.Vector3(), dB = new THREE.Vector3(), qAB = new THREE.Quaternion(), qK = new THREE.Quaternion(), yAxis = new THREE.Vector3(0, 1, 0);
+    const want = { t: new THREE.Vector3(), dir: new THREE.Vector3(), d: 1 };
+    function blendCamera(i, k) {
+      const A = SEQ[i].pose, B = SEQ[i + 1] ? SEQ[i + 1].pose : A;
+      dA.copy(A.dir).applyAxisAngle(yAxis, yawOf(i));
+      dB.copy(B.dir).applyAxisAngle(yAxis, SEQ[i + 1] ? yawOf(i + 1) : yawOf(i));
+      qAB.setFromUnitVectors(dA, dB); qK.identity().slerp(qAB, k);
+      want.dir.copy(dA).applyQuaternion(qK);
+      want.t.lerpVectors(A.t, B.t, k);
+      want.d = lerp(A.d, B.d, k);
+    }
+    function setOpacity(p, f) {
+      const m = p.material, b = p.userData.base;
+      const op = b.opacity * f, tr = b.transparent || f < 0.995;
+      m.opacity = op;
+      if (m.transparent !== tr) { m.transparent = tr; m.depthWrite = tr ? false : b.depthWrite; m.needsUpdate = true; }
+      p.userData.op = op;
+      p.visible = op > 0.004 && variantVisible(p);
+      p.castShadow = f > 0.5;
+    }
+
+    let orbitOn = false, userOrbit = false, snap = true, clock = 0, last = performance.now(), idle = 0;
+    function frame(now) {
+      requestAnimationFrame(frame);
+      const dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+      if (!V.ready || document.hidden) return;
+      step(dt);
+    }
+    function step(dt) {
+      clock += dt;
+      const anim = motion();
+      const [i, t] = where(window.scrollY);
+      const A = SEQ[i], B = SEQ[i + 1] || A;
+      const k = shape(t, B);
+      const mix = (key, def) => lerp(A[key] != null ? A[key] : def, B[key] != null ? B[key] : def, k);
+      let changed = V.dirty || i !== lastI || Math.abs(k - lastK) > 1e-5;
+      V.dirty = false;
+
+      /* slow turning, only while a section that turns is held */
+      if (anim && !orbitOn) {
+        if (k < 0.02 && A.spin) { spinAcc[i] += dt; changed = true; }
+        if (k > 0.98 && B.spin && B !== A) { spinAcc[i + 1] += dt; changed = true; }
+      }
+
+      const ex = mix("explode", 0), xr = mix("xray", 0), air = mix("air", 0), doorW = mix("door", 0);
+      const night = mix("night", 0), below = mix("below", 0), ghostW = lerp(A.set ? 1 : 0, B.set ? 1 : 0, k);
+      V.explode = ex;
+
+      if (changed) {
+        if (Math.abs(ex - lastEx) > 1e-6) { setExplode(ex); lastEx = ex; }
+        const GA = A.G, GB = B.G;
+        parts.forEach((p, j) => setOpacity(p, lerp(GA[j], GB[j], k)));
+        lastI = i; lastK = k;
+      }
+
+      /* the scent flap */
+      if (door.mode !== "none") {
+        let target = 0;
+        if (doorW > 0.5 && anim) { door.phase += dt; target = doorCycle(door.phase); }
+        else door.phase = 0;
+        const nf = doorW > 0.5 && anim ? target : door.f * Math.exp(-dt * 6);
+        const moved = Math.abs(nf - door.f) > 1e-5 || changed;
+        door.f = nf < 1e-4 ? 0 : nf;
+        door.closedNow = door.f > 0.5;
+        if (moved) { applyDoor(ex); changed = true; }
+      }
+
+      /* air */
+      const showAir = air > 0.01 && ex < 0.03;
+      flowGroup.visible = showAir;
+      if (showAir && flow) {
+        flow.mat.opacity = air * (1 - ex / 0.03);
+        flow.update(anim ? clock : 0, night);
+        changed = true;
+      }
+
+      /* day and night */
+      if (Math.abs(night - lastNight) > 1e-4) {
+        bg.copy(BG_DAY).lerp(BG_NIGHT, night);
+        renderer.setClearColor(bg, 1);
+        $("#stage").style.background = "#" + bg.getHexString();
+        key.intensity = lerp(1.05, 0.12, night); rim.intensity = lerp(0.35, 0.04, night); hemi.intensity = lerp(0.2, 0.03, night);
+        const env = lerp(0.6, 0.08, night);
+        parts.forEach(p => {
+          p.material.envMapIntensity = env;
+          if (p.userData.led) p.material.emissiveIntensity = p.userData.ledI * (1 + 1.6 * night);
+        });
+        halos.forEach(h => { h.day.material.opacity = 0.32 * (1 - night); h.night.material.opacity = 0.85 * night; });
+        ledLights.forEach(l => { l.intensity = 0.9 * night; });
+        lastNight = night; changed = true;
+      }
+      under.intensity = 0.9 * below;
+      ground.material.opacity = 0.2 * (1 - ghostW) * (1 - xr) * (1 - night) * (1 - below) * clamp(1 - ex * 1.4, 0, 1);
+      ground.visible = ground.material.opacity > 0.005;
+      ground.position.y = -0.095 * ex;
+
+      /* camera: scroll decides the pose; in the last section the visitor may take over by dragging */
+      blendCamera(i, k);
+      const atEnd = !!SEQ[SEQ.length - 1].orbit && i === SEQ.length - 2 && k > 0.98;
+      if (atEnd !== orbitOn) {
+        orbitOn = atEnd;
+        document.body.classList.toggle("orbit-on", orbitOn);
+        controls.enabled = orbitOn;
+        if (!orbitOn && userOrbit) {
+          /* continue from where the visitor left the camera */
+          cam.t.copy(controls.target);
+          cam.dir.copy(camera.position).sub(controls.target);
+          cam.d = cam.dir.length(); cam.dir.normalize();
+        }
+        userOrbit = false;
+      }
+      if (userOrbit) {
+        controls.update();
+        changed = true;
+      } else {
+        const a = snap || !anim ? 1 : 1 - Math.exp(-dt * 7);
+        const before = cam.d + cam.t.x + cam.t.y + cam.t.z + cam.dir.x + cam.dir.y;
+        cam.t.lerp(want.t, a);
+        qAB.setFromUnitVectors(cam.dir, want.dir); qK.identity().slerp(qAB, a);
+        cam.dir.applyQuaternion(qK).normalize();
+        cam.d = lerp(cam.d, want.d, a);
+        camera.position.copy(cam.t).addScaledVector(cam.dir, cam.d);
+        camera.lookAt(cam.t);
+        if (orbitOn) controls.target.copy(cam.t);
+        if (Math.abs(before - (cam.d + cam.t.x + cam.t.y + cam.t.z + cam.dir.x + cam.dir.y)) > 1e-7) changed = true;
+        snap = false;
+      }
+
+      idle = changed ? 0 : idle + 1;
+      if (idle < 3) renderer.render(scene, camera);
+    }
+
+    /* ---------- go ---------- */
+    layout();
+    loadModel(PATHS.model, gltf => {
+      const model = gltf.scene;
+      prepare(model);
+      root.add(model);
+      const box = new THREE.Box3().setFromObject(model), c = box.getCenter(new THREE.Vector3());
+      root.position.set(-c.x, -box.min.y + 0.0005, -c.z);
+      buildTables();
+      setupDoor();
+      buildFlow();
+      buildHalos();
+      $$("[data-count]").forEach(el => { el.textContent = String(parts.length); });
+      $("#tubeNote").hidden = !parts.some(p => TUBES.test(p.name));
+      computePoses();
+      cam = { t: SEQ[0].pose.t.clone(), dir: SEQ[0].pose.dir.clone(), d: SEQ[0].pose.d };
+      status.textContent = ""; status.hidden = true;
+      V.ready = true; snap = true;
+      Object.assign(V, { parts, states: SEQ, door, flow, camera, keys: () => keys, goto: s => { window.scrollTo(0, posOf(s)); snap = true; } });
+      if (DEBUG) V.step = (dt, n) => { for (let j = 0; j < (n || 1); j++) step(dt || 1 / 60); };
+      if (DEBUG) console.info("klapka:", door.mode, door.err, "wyloty:", flow.routes.map(r => (r.found ? "z grotu " : "zapasowy ") + r.cut).join(", "));
+      measure();
+      requestAnimationFrame(frame);
+    });
+
+    let resizeRaf = 0;
+    function onResize() {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => { layout(); if (V.ready) computePoses(); measure(); if (DEBUG_STEP !== null) snap = true; });
+    }
+    window.addEventListener("resize", onResize);
+    V.relayout = onResize;
+  }
+
+  /* section heights change when fonts and pictures arrive, so measure again then */
+  window.addEventListener("load", () => V.relayout ? V.relayout() : measure());
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => V.relayout ? V.relayout() : measure());
+  if ("ResizeObserver" in window) {
+    let first = true;
+    new ResizeObserver(() => { if (first) { first = false; return; } if (V.relayout) V.relayout(); else measure(); }).observe($("#main"));
+  }
+  document.addEventListener("visibilitychange", () => { V.dirty = true; });
+  measure();
+  start();
+})();
+</script>
+</body>
+</html>
