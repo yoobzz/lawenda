@@ -1,0 +1,966 @@
+<!doctype html><html><head><meta name="robots" content="noindex, nofollow, noarchive"><title>klawisz po klawiszu · staś szpineta</title><meta name="description" content="Trener skrótów klawiszowych na Maca: nauka, ćwiczenia i test."><link rel="icon" href="/favicon.ico"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+
+<style>
+:root{
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;
+  --bg:#FFFFFF; --soft:#F5F5F7; --sunk:#EBEBED;
+  --ink:#1D1D1F; --ink2:#6E6E73; --ink3:#AEAEB2;
+  --line:rgba(0,0,0,.10); --hair:rgba(0,0,0,.06);
+  --blue:#0071E3; --bluesoft:rgba(0,113,227,.10);
+  --green:#1D8A4E; --greensoft:rgba(29,138,78,.11);
+  --amber:#9A5B00; --ambersoft:rgba(255,149,0,.14);
+  --red:#C9302C; --redsoft:rgba(201,48,44,.10);
+  --selbg:rgba(0,113,227,.22); --winbg:#FFFFFF;
+  --keybg:#FFFFFF; --keyline:rgba(0,0,0,.13); --keysh:0 1px 1.5px rgba(0,0,0,.07);
+  --deskbg:linear-gradient(160deg,#6E9AC4,#3D6389);
+}
+:root[data-theme="dark"]{
+  --bg:#141416; --soft:#1E1E20; --sunk:#2A2A2D;
+  --ink:#F5F5F7; --ink2:#9B9BA1; --ink3:#5E5E63;
+  --line:rgba(255,255,255,.13); --hair:rgba(255,255,255,.07);
+  --blue:#4DA2FF; --bluesoft:rgba(77,162,255,.16);
+  --green:#4ECB83; --greensoft:rgba(78,203,131,.15);
+  --amber:#FFB340; --ambersoft:rgba(255,179,64,.15);
+  --red:#FF6B5E; --redsoft:rgba(255,107,94,.15);
+  --selbg:rgba(77,162,255,.34); --winbg:#1E1E20;
+  --keybg:#2C2C2F; --keyline:rgba(255,255,255,.15); --keysh:none;
+  --deskbg:linear-gradient(160deg,#2E4A68,#1B2E44);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;
+  letter-spacing:-.011em;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;letter-spacing:inherit;color:inherit;cursor:pointer;border:none;background:none}
+:focus-visible{outline:2.5px solid var(--blue);outline-offset:3px;border-radius:8px}
+
+header{flex:none;display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  padding:13px 20px;border-bottom:1px solid var(--hair)}
+.brand{margin-right:auto;display:flex;align-items:baseline;gap:8px;min-width:0}
+.brand b{font-size:15px;font-weight:600;letter-spacing:-.017em}
+.brand small{font-size:12px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg{display:inline-flex;background:var(--soft);border-radius:9px;padding:2px}
+.seg button{border-radius:7px;padding:5px 14px;font-size:13px;color:var(--ink2)}
+.seg button.on{background:var(--bg);color:var(--ink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+select{appearance:none;-webkit-appearance:none;font:inherit;font-size:13px;color:var(--ink2);
+  padding:5px 24px 5px 10px;border-radius:8px;background:var(--soft);border:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3.2 4.7L6 7.4l2.8-2.7' fill='none' stroke='%23AEAEB2' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 7px center;background-size:12px}
+.ghost{padding:5px 11px;border-radius:8px;font-size:13px;color:var(--ink2)}
+.ghost:hover{background:var(--soft);color:var(--ink)}
+.linkbtn{font-size:13px;color:var(--blue);padding:5px 4px}
+.linkbtn:hover{text-decoration:underline}
+
+main{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:20px;padding:30px 20px;text-align:center}
+.eyebrow{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;
+  font-size:12.5px;color:var(--ink3)}
+.tag{padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:500;background:var(--bluesoft);color:var(--blue)}
+.tag.recall{background:var(--sunk);color:var(--ink2)}
+.box-dots{display:inline-flex;gap:3.5px}
+.box-dots i{width:4.5px;height:4.5px;border-radius:50%;background:var(--sunk)}
+.box-dots i.on{background:var(--blue)}
+
+/* opis — teraz główny tekst karty */
+.prompt{font-size:clamp(19px,3.6vw,25px);font-weight:600;line-height:1.24;letter-spacing:-.021em;
+  max-width:010ch;max-width:21ch;text-wrap:balance;margin:0;color:var(--ink)}
+body.nocap .prompt{visibility:hidden}
+.sub{font-size:14px;color:var(--ink2);max-width:44ch;margin:0;line-height:1.45}
+
+/* scena */
+.stage{width:100%;max-width:540px;position:relative;cursor:pointer}
+.stage::after{content:"↻";position:absolute;top:9px;right:12px;font-size:14px;color:var(--ink3);
+  opacity:0;transition:opacity .18s}
+.stage:hover::after{opacity:1}
+.doc{width:100%;background:var(--soft);border-radius:14px;padding:19px 21px;text-align:left;
+  font-size:15px;line-height:1.66;white-space:pre-wrap;word-break:break-word;min-height:118px}
+.caret{display:inline-block;width:2px;height:1.02em;vertical-align:-.16em;margin:0 -1px;
+  background:var(--blue);animation:blink 1.06s step-end infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.sel{background:var(--selbg);border-radius:2.5px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.fl{animation:fl .5s ease-out}
+@keyframes fl{from{background:var(--blue)}to{background:var(--selbg)}}
+.sb-b{font-weight:700}.sb-i{font-style:italic}.sb-u{text-decoration:underline}
+.sb-l{color:var(--blue);text-decoration:underline}.sb-s{font-size:.76em}.sb-g{font-size:1.3em}
+.sb-sp{text-decoration:underline wavy var(--red);text-underline-offset:3px}
+.doc.al-r{text-align:right}.doc.al-l{text-align:left}
+.clip{display:flex;align-items:center;gap:7px;margin-top:13px;padding-top:11px;
+  border-top:1px solid var(--line);font-size:12.5px;color:var(--ink2)}
+.clip b{font-weight:400;color:var(--ink);background:var(--bg);padding:2.5px 9px;border-radius:6px;font-size:12.5px}
+.scroller{height:118px;overflow:hidden;border-radius:8px}
+.scroller ul{margin:0;padding:0;list-style:none;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.scroller li{height:22px;line-height:22px;font-size:13.5px;color:var(--ink3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scroller li.hi{color:var(--ink)}
+
+/* klawisze */
+.caps{display:flex;gap:9px;justify-content:center;align-items:center;flex-wrap:wrap}
+.cap{min-width:46px;height:46px;padding:0 13px;border-radius:10px;background:var(--keybg);
+  border:1px solid var(--keyline);box-shadow:var(--keysh);display:flex;align-items:center;
+  justify-content:center;font-size:18px;color:var(--ink);
+  transition:background .1s,color .1s,border-color .1s,transform .1s}
+.cap.word{font-size:12.5px}
+.cap.lit{background:var(--blue);border-color:var(--blue);color:#fff;transform:translateY(1px)}
+.plus{color:var(--ink3);font-size:14px}
+#teach{display:flex;flex-direction:column;align-items:center;gap:9px}
+#teach .cap{min-width:58px;height:58px;font-size:23px;border-radius:12px}
+#teach .cap.word{font-size:15px}
+.teachlbl{font-size:12.5px;color:var(--ink3)}
+.rail{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.mod{width:56px;height:50px;border-radius:10px;background:var(--keybg);border:1px solid var(--keyline);
+  box-shadow:var(--keysh);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;color:var(--ink3);transition:all .1s}
+.mod .g{font-size:17px;line-height:1}
+.mod .n{font-size:9.5px}
+.mod.held{background:var(--blue);border-color:var(--blue);color:#fff;transform:translateY(1px)}
+.mod.need{border-color:var(--blue);box-shadow:0 0 0 2.5px var(--bluesoft)}
+.rail.pickable .mod{cursor:pointer}
+.rail.pickable .mod:hover:not(.held){background:var(--soft)}
+
+/* werdykt */
+.verdict{min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:11px;width:100%;max-width:540px}
+.badge{font-size:13px;font-weight:590;padding:5px 13px;border-radius:999px}
+.badge.ok{background:var(--greensoft);color:var(--green)}
+.badge.slow{background:var(--ambersoft);color:var(--amber)}
+.badge.bad{background:var(--redsoft);color:var(--red)}
+.hint{font-size:13px;color:var(--ink2)}
+.waiting{font-size:13.5px;color:var(--ink3);display:flex;align-items:center;gap:8px}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:p 1.5s ease-in-out infinite}
+@keyframes p{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.try{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap}
+.try .cap{height:36px;min-width:36px;font-size:15px}
+.askcap{border-style:dashed!important;color:var(--ink3)!important;background:none!important}
+
+/* tryb z pamięci */
+.recall-row{display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap}
+.keyin{width:118px;height:44px;text-align:center;font:inherit;font-size:16px;border-radius:10px;
+  border:1px solid var(--keyline);background:var(--bg);color:var(--ink);padding:0 10px}
+.keyin::placeholder{color:var(--ink3);font-size:14px}
+.keyin:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3.5px var(--bluesoft)}
+.specials{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:11px}
+.spec{height:30px;padding:0 11px;border-radius:999px;background:var(--soft);font-size:12.5px;color:var(--ink2)}
+.spec:hover{background:var(--sunk)}
+.spec.on{background:var(--blue);color:#fff}
+.primary{height:44px;padding:0 22px;border-radius:999px;background:var(--blue);color:#fff;
+  font-weight:500;font-size:15px}
+.primary:hover{filter:brightness(1.08)}
+
+/* makiety */
+.win{width:100%;border-radius:12px;overflow:hidden;background:var(--winbg);
+  border:1px solid var(--line);text-align:left}
+.tb{display:flex;align-items:center;gap:6px;padding:9px 12px;background:var(--soft);
+  border-bottom:1px solid var(--hair)}
+.tl{width:10px;height:10px;border-radius:50%;background:#FF5F57}
+.tl.y{background:#FEBC2E}.tl.g{background:#28C840}
+.tb b{margin-left:7px;font-size:12.5px;font-weight:500}
+.tbar{display:flex;gap:5px;padding:6px 10px;background:var(--soft);border-bottom:1px solid var(--hair)}
+.tbar i{display:block;width:23px;height:14px;border-radius:5px;background:var(--bg)}
+.wbody{display:flex;min-height:100px}
+.sbar{width:86px;flex:none;padding:9px 8px;background:var(--soft);font-size:11.5px;color:var(--ink2);
+  border-right:1px solid var(--hair)}
+.sbar div{padding:3px 6px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbar div.on{background:var(--blue);color:#fff}
+.files{flex:1;min-width:0;padding:11px;display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+.files.list{flex-direction:column;flex-wrap:nowrap;gap:2px}
+.fi{width:52px;text-align:center;font-size:10.5px;color:var(--ink2);transition:all .35s}
+.fi u{display:block;width:34px;height:42px;margin:0 auto 3px;border-radius:5px;background:var(--sunk)}
+.fi.sel2 u{background:var(--blue)}
+.fi.sel2{color:var(--ink)}
+.files.list .fi{width:auto;display:flex;align-items:center;gap:7px;text-align:left;padding:3px 6px;
+  border-radius:5px;font-size:12px}
+.files.list .fi u{width:13px;height:16px;margin:0}
+.files.list .fi.sel2{background:var(--blue);color:#fff}
+.fi.away{opacity:0;transform:translateY(16px) scale(.8)}
+.pv{width:72px;flex:none;padding:10px 8px;background:var(--soft);font-size:10.5px;color:var(--ink2);
+  border-left:1px solid var(--hair)}
+.pv u{display:block;width:100%;height:46px;border-radius:5px;background:var(--sunk);margin-bottom:5px}
+.strip{padding:5px 12px;font-size:11px;color:var(--ink2);background:var(--soft);border-top:1px solid var(--hair)}
+.sheet{margin:0 auto;width:82%;background:var(--winbg);border-radius:11px;padding:13px 15px;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);border:1px solid var(--line);font-size:12.5px}
+.sheet h4{margin:0 0 6px;font-size:13px;font-weight:600}
+.sheet p{margin:0;color:var(--ink2);font-size:12px}
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:14px}
+.desk{width:100%;aspect-ratio:16/10;max-height:205px;border-radius:12px;overflow:hidden;
+  position:relative;background:var(--deskbg)}
+.mbar{height:17px;background:rgba(255,255,255,.32);display:flex;align-items:center;gap:9px;
+  padding:0 9px;font-size:9px;color:#fff}
+.dock{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);display:flex;gap:5px;
+  padding:4px 7px;border-radius:12px;background:rgba(255,255,255,.3)}
+.dock i{width:17px;height:17px;border-radius:5px;background:#fff;display:block}
+.dock i.act{background:linear-gradient(#5AC8FA,#0071E3)}
+.dwin{position:absolute;left:14%;top:26%;width:60%;border-radius:9px;overflow:hidden;
+  background:var(--winbg);box-shadow:0 8px 22px rgba(0,0,0,.3);transition:all .45s cubic-bezier(.4,0,.2,1)}
+.dwin .tb{padding:6px 8px}.dwin .tl{width:7px;height:7px}.dwin .tb b{font-size:10px}
+.dwin .fill{height:50px;background:var(--soft)}
+.dwin.mini{left:50%;top:92%;width:8%;opacity:.35;transform:scale(.5)}
+.dwin.hid{opacity:0;transform:scale(.94)}
+.dwin.full{left:0;top:17px;width:100%;border-radius:0}
+.dwin.two{left:30%;top:36%;opacity:.6}
+.spot{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:66%;
+  background:rgba(252,252,253,.94);border-radius:10px;padding:8px 11px;font-size:11px;color:#1D1D1F;
+  box-shadow:0 12px 30px rgba(0,0,0,.3);display:flex;align-items:center;gap:7px}
+.panel{position:absolute;top:20px;right:6px;width:36%;border-radius:10px;padding:8px;
+  background:rgba(252,252,253,.94);box-shadow:0 10px 26px rgba(0,0,0,.28);font-size:9.5px;color:#1D1D1F}
+.panel u{display:block;height:13px;border-radius:5px;background:rgba(0,0,0,.08);margin-bottom:4px}
+.mc{position:absolute;inset:17px 8% 22px;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.mc u{display:block;border-radius:6px;background:var(--winbg);box-shadow:0 4px 12px rgba(0,0,0,.26)}
+.shot{position:absolute;border:1.5px dashed rgba(255,255,255,.95);background:rgba(255,255,255,.2);
+  left:18%;top:28%;width:48%;height:42%;border-radius:2px}
+.flashwhite{position:absolute;inset:0;background:#fff;animation:fw .5s ease-out}
+@keyframes fw{from{opacity:.85}to{opacity:0}}
+.caplabel{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-size:9.5px;color:#fff;
+  background:rgba(0,0,0,.42);padding:2px 8px;border-radius:999px;white-space:nowrap}
+
+footer{flex:none;display:flex;flex-wrap:wrap;gap:26px;justify-content:center;padding:12px 20px;
+  border-top:1px solid var(--hair)}
+.stat{display:flex;align-items:baseline;gap:6px}
+.stat b{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.018em}
+.stat span{font-size:12px;color:var(--ink3)}
+.bar{flex:none;height:2px;background:var(--hair)}
+.bar i{display:block;height:100%;background:var(--blue);transition:width .45s cubic-bezier(.4,0,.2,1)}
+@media (prefers-reduced-motion:reduce){
+  .caret,.fl,.pulse,.flashwhite{animation:none}
+  .cap,.mod,.win,.dwin,.fi,.scroller ul,.bar i{transition:none}
+}
+@media (max-width:440px){
+  header{padding:11px 14px;gap:7px}
+  main{padding:20px 16px;gap:16px}
+  .doc{font-size:14px;padding:15px 16px}
+  .sbar{width:68px}.pv{display:none}
+  #teach .cap{min-width:50px;height:50px;font-size:20px}
+  .mod{width:48px;height:45px}
+  footer{gap:16px}
+  .stat span{font-size:11px}
+}
+</style>
+
+<header>
+  <div class="brand"><b>Klawisz po klawiszu</b><small id="deckcount"></small></div>
+  <div class="seg" id="modeseg" role="group" aria-label="Tryb">
+    <button data-m="learn">Nauka</button><button data-m="drill">Ćwiczenie</button><button data-m="test">Test</button>
+  </div>
+  <select id="cat" aria-label="Zakres ćwiczenia"></select>
+  <button class="ghost" id="theme" title="Jasny / ciemny">☾</button>
+  <button class="ghost" id="capt" title="Pokaż lub ukryj podpis">Podpis</button>
+  <button class="ghost" id="skip" title="Nie wiem — pokaż odpowiedź (Esc)">Nie wiem</button>
+  <button class="ghost" id="reset" title="Wyzeruj postępy">Reset</button>
+</header>
+
+<main>
+  <div class="eyebrow">
+    <span id="catlabel"></span>
+    <span class="tag" id="mode"></span>
+    <span class="box-dots" id="dots" title="Poziom opanowania"></span>
+  </div>
+  <div class="stage" id="stage"></div>
+  <p class="prompt" id="prompt">Ładowanie…</p>
+  <p class="sub" id="sub"></p>
+  <button class="linkbtn" id="cantpress" hidden>Nie mogę tego nacisnąć</button>
+
+  <div id="teach" hidden></div>
+  <div class="rail" id="rail"></div>
+
+
+  <div class="verdict" id="verdict"></div>
+</main>
+
+<div class="bar"><i id="barfill" style="width:0%"></i></div>
+<footer>
+  <div class="stat"><b id="st-mast">0</b><span id="lbl-mast">Opanowane</span></div>
+  <div class="stat"><b id="st-streak">0</b><span>Seria</span></div>
+  <div class="stat"><b id="st-acc">–</b><span>Trafność</span></div>
+</footer>
+
+<script>
+"use strict";
+/* ── Talia: każdy skrót zweryfikowany na support.apple.com/pl-pl/102650 i /102646 ──
+   [id, kategoria, opis PL, code, modyfikatory, tryb, wyświetlanie?]
+   mods: m=⌘  s=⇧  a=⌥  c=⌃  f=fn        tryb: 1=na żywo, 0=z pamięci          */
+const CATS={base:"Podstawy",nav:"Tekst · kursor",edit:"Tekst · edycja",
+  finder:"Finder",sys:"Okna i aplikacje",shot:"Zrzuty ekranu"};
+/* Selekcja: tylko skróty o realnej codziennej wartości, w kolejności nauki. */
+const PICK=[
+  ["base",  "e11 e12 e10 e9 s9 b1 b2 e15 y3 y4"],
+  ["nav",   "n1 n2 n3 n4 n5 n6 s1 s2 s5 s6"],
+  ["edit",  "e1 f7 f1 f2 f3 f4"],
+  ["finder","d7 d6 d2 d22 d1 d20 d9 d10 d25 y15"],
+  ["sys",   "y1 y2 y5 y6 y11 y10 y7 y8 y12 f14"],
+  ["shot",  "p1 p2 p3"]
+];
+const KEEP={},ORD={}; let _i=0;
+PICK.forEach(x=>x[1].split(" ").forEach(id=>{KEEP[id]=x[0];ORD[id]=_i++;}));
+
+const RAW=[
+// ── nawigacja w tekście
+["n1","nav","Kursor na początek poprzedniego słowa","ArrowLeft","a",1],
+["n2","nav","Kursor na koniec następnego słowa","ArrowRight","a",1],
+["n3","nav","Kursor na początek bieżącego wiersza","ArrowLeft","m",1],
+["n4","nav","Kursor na koniec bieżącego wiersza","ArrowRight","m",1],
+["n5","nav","Kursor na początek dokumentu","ArrowUp","m",1],
+["n6","nav","Kursor na koniec dokumentu","ArrowDown","m",1],
+["n7","nav","Na początek wiersza lub akapitu (styl Emacs)","KeyA","c",1],
+["n8","nav","Na koniec wiersza lub akapitu (styl Emacs)","KeyE","c",1],
+["n9","nav","Przewiń na początek dokumentu","Home","",1,["fn","←"]],
+["n10","nav","Przewiń na koniec dokumentu","End","",1,["fn","→"]],
+["n11","nav","Przewiń o stronę w górę","PageUp","",1,["fn","↑"]],
+["n12","nav","Przewiń o stronę w dół","PageDown","",1,["fn","↓"]],
+// ── zaznaczanie
+["s1","sel","Zaznacz do początku bieżącego słowa","ArrowLeft","as",1],
+["s2","sel","Zaznacz do końca bieżącego słowa","ArrowRight","as",1],
+["s3","sel","Rozszerz zaznaczenie do początku akapitu","ArrowUp","as",1],
+["s4","sel","Rozszerz zaznaczenie do końca akapitu","ArrowDown","as",1],
+["s5","sel","Zaznacz do początku bieżącego wiersza","ArrowLeft","ms",1],
+["s6","sel","Zaznacz do końca bieżącego wiersza","ArrowRight","ms",1],
+["s7","sel","Zaznacz do początku dokumentu","ArrowUp","ms",1],
+["s8","sel","Zaznacz do końca dokumentu","ArrowDown","ms",1],
+["s9","sel","Zaznacz wszystko","KeyA","m",1],
+// ── edycja
+["e1","edit","Usuń słowo na lewo od kursora","Backspace","a",1],
+["e2","edit","Usuń znak na prawo od kursora","KeyD","c",1],
+["e3","edit","Usuń znak na lewo od kursora","KeyH","c",1],
+["e4","edit","Wytnij tekst od kursora do końca wiersza","KeyK","c",1],
+["e5","edit","Wstaw nowy wiersz za kursorem","KeyO","c",1],
+["e6","edit","Zamień znak przed kursorem z następnym","KeyT","c",1],
+["e7","edit","Wyśrodkuj kursor w widocznym obszarze","KeyL","c",1],
+["e8","edit","Usuń znak w przód (klawiatury bez ⌦)","Delete","",1,["fn","⌫"]],
+["e9","edit","Cofnij ostatnie polecenie","KeyZ","m",1],
+["e10","edit","Wytnij zaznaczenie do schowka","KeyX","m",1],
+["e11","edit","Kopiuj zaznaczenie do schowka","KeyC","m",1],
+["e12","edit","Wklej zawartość schowka","KeyV","m",1],
+["e13","edit","Znajdź błędnie napisane słowa w dokumencie","Semicolon","m",1],
+["e14","edit","Pokaż okno Pisownia i gramatyka","Semicolon","ms",1,["⌘","⇧",":"]],
+["e15","edit","Znajdź elementy w dokumencie","KeyF","m",1],
+["b1","edit","Zapisz bieżący dokument","KeyS","m",1],
+["b2","edit","Otwórz okno drukowania","KeyP","m",1],
+["e16","edit","Znajdź następne wystąpienie","KeyG","m",1],
+// ── formatowanie
+["f1","fmt","Pogrubienie","KeyB","m",1],
+["f2","fmt","Kursywa","KeyI","m",1],
+["f3","fmt","Podkreślenie","KeyU","m",1],
+["f4","fmt","Dodaj odnośnik (link)","KeyK","m",1],
+["f5","fmt","Kopiuj styl — skopiuj formatowanie do schowka","KeyC","ma",0],
+["f6","fmt","Wklej styl — zastosuj skopiowane formatowanie","KeyV","ma",1],
+["f7","fmt","Wklej i dopasuj styl otoczenia","KeyV","mas",1],
+["f8","fmt","Przejdź do pola wyszukiwania","KeyF","ma",1],
+["f9","fmt","Pokaż lub ukryj pasek narzędzi","KeyT","ma",1],
+["f10","fmt","Zmniejsz rozmiar zaznaczonego elementu","Minus","ms",1,["⌘","⇧","−"]],
+["f11","fmt","Zwiększ rozmiar zaznaczonego elementu","Equal","ms",1,["⌘","⇧","+"]],
+["f12","fmt","Wyrównaj do lewej","BracketLeft","ms",0,["⌘","{"]],
+["f13","fmt","Wyrównaj do prawej","BracketRight","ms",0,["⌘","}"]],
+["f14","fmt","Otwórz ustawienia bieżącej aplikacji","Comma","m",0],
+["f15","fmt","Otwórz menu Pomoc","Slash","ms",0,["⌘","⇧","?"]],
+["f16","fmt","Pokaż okno Zachowaj jako / duplikuj dokument","KeyS","ms",1],
+// ── Finder
+["d1","finder","Duplikuj zaznaczone pliki","KeyD","m",1],
+["d2","finder","Pokaż okno Informacje o pliku","KeyI","m",1],
+["d3","finder","Wysuń zaznaczony dysk lub wolumin","KeyE","m",1],
+["d4","finder","Pokaż opcje widoku","KeyJ","m",1],
+["d5","finder","Otwórz okno Połącz z serwerem","KeyK","m",1],
+["d6","finder","Przenieś zaznaczony element do Kosza","Backspace","m",1],
+["d7","finder","Otwórz okno Przejdź do folderu","KeyG","ms",1],
+["d8","finder","Otwórz folder Biurko","KeyD","ms",0],
+["d9","finder","Otwórz folder domowy użytkownika","KeyH","ms",1],
+["d10","finder","Otwórz folder Dokumenty","KeyO","ms",1],
+["d11","finder","Otwórz folder Narzędzia","KeyU","ms",1],
+["d12","finder","Otwórz folder Pobrane","KeyL","ma",1],
+["d13","finder","Pokaż lub ukryj panel podglądu","KeyP","ms",1],
+["d14","finder","Pokaż lub ukryj pasek boczny","KeyS","ma",1],
+["d15","finder","Pokaż lub ukryj pasek ścieżki","KeyP","ma",1],
+["d16","finder","Pokaż lub ukryj Dock","KeyD","ma",0],
+["d17","finder","Pokaż lub ukryj pasek stanu","Slash","m",1],
+["d18","finder","Przejdź do poprzedniego folderu","BracketLeft","m",0],
+["d19","finder","Przejdź do następnego folderu","BracketRight","m",0],
+["d20","finder","Otwórz folder nadrzędny","ArrowUp","m",1],
+["d21","finder","Utwórz alias zaznaczonego elementu","KeyA","mc",1],
+["d22","finder","Podgląd zaznaczonego elementu (Quick Look)","Space","",1,["␣"]],
+["d23","finder","Nowy folder z zaznaczonych elementów","KeyN","mc",1],
+["d24","finder","Dodaj zaznaczony element do paska bocznego","KeyT","mc",1],
+["d25","finder","Utwórz nowy pusty folder","KeyN","ms",0],
+["d26","finder","Opróżnij Kosz","Backspace","ms",0],
+["d27","finder","Otwórz okno AirDrop","KeyR","ms",0],
+// ── okna i system
+["y1","sys","Pokaż lub ukryj pole wyszukiwania Spotlight","Space","m",0,["⌘","␣"]],
+["y2","sys","Przełącz na ostatnio używaną aplikację","Tab","m",0,["⌘","⇥"]],
+["y3","sys","Zamknij przednie okno","KeyW","m",0],
+["y4","sys","Zakończ bieżącą aplikację","KeyQ","m",0],
+["y5","sys","Zminimalizuj przednie okno do Docka","KeyM","m",0],
+["y6","sys","Ukryj okna przedniej aplikacji","KeyH","m",0],
+["y7","sys","Wymuś zamknięcie aplikacji","Escape","ma",0,["⌥","⌘","esc"]],
+["y8","sys","Zablokuj ekran","KeyQ","mc",0],
+["y9","sys","Wyloguj się z konta użytkownika","KeyQ","ms",0],
+["y10","sys","Włącz lub wyłącz tryb pełnoekranowy","KeyF","mc",0],
+["y11","sys","Przełącz między oknami tej samej aplikacji","Backquote","m",0,["⌘","`"]],
+["y12","sys","Otwórz Mission Control","ArrowUp","c",0],
+["y13","sys","Pokaż wszystkie okna przedniej aplikacji","ArrowDown","c",0],
+["y14","sys","Otwórz nową kartę","KeyT","m",0],
+["y15","sys","Otwórz nowe okno Findera","KeyN","m",0],
+["y16","sys","Pokaż lub ukryj Centrum sterowania","KeyC","f",0],
+["y17","sys","Pokaż lub ukryj Centrum powiadomień","KeyN","f",0],
+["y18","sys","Rozpocznij lub zakończ dyktowanie","KeyD","f",0],
+["y19","sys","Pokaż Podgląd znaków","KeyE","f",0],
+["y20","sys","Utwórz Szybką notatkę","KeyQ","f",0],
+// ── zrzuty ekranu
+["p1","shot","Zrób zrzut całego ekranu","Digit3","ms",0],
+["p2","shot","Zrób zrzut fragmentu ekranu","Digit4","ms",0],
+["p3","shot","Otwórz aplikację Zrzut ekranu (zrzuty i nagrywanie)","Digit5","ms",0],
+["p4","shot","Zrzut całego ekranu do schowka, nie na biurko","Digit3","msc",0]
+];
+
+const DECK=RAW.filter(r=>KEEP[r[0]]).map(r=>({id:r[0],cat:KEEP[r[0]],act:r[2],code:r[3],
+  m:r[4].includes("m"),s:r[4].includes("s"),a:r[4].includes("a"),
+  c:r[4].includes("c"),f:r[4].includes("f"),live:r[5]===1,disp:r[6]||null}))
+  .sort((x,y)=>ORD[x.id]-ORD[y.id]);
+
+/* ── etykiety klawiszy ── */
+const LBL={ArrowLeft:"←",ArrowRight:"→",ArrowUp:"↑",ArrowDown:"↓",Space:"␣",
+  Backspace:"⌫",Delete:"⌦",Escape:"esc",Tab:"⇥",Enter:"↩",Comma:",",Period:".",
+  Semicolon:";",Slash:"/",Backslash:"\\",Quote:"'",Backquote:"`",Minus:"−",Equal:"=",
+  BracketLeft:"[",BracketRight:"]",Home:"↖",End:"↘",PageUp:"⇞",PageDown:"⇟"};
+const WORDY=new Set(["esc","⇥","↩"]);
+function codeLabel(code){
+  if(LBL[code])return LBL[code];
+  if(code.startsWith("Key"))return code.slice(3);
+  if(code.startsWith("Digit"))return code.slice(5);
+  return code;
+}
+function capsFor(card){
+  if(card.disp)return card.disp.slice();
+  const out=[];
+  if(card.f)out.push("fn");
+  if(card.c)out.push("⌃");
+  if(card.a)out.push("⌥");
+  if(card.s)out.push("⇧");
+  if(card.m)out.push("⌘");
+  out.push(codeLabel(card.code));
+  return out;
+}
+function renderCaps(list){
+  return list.map((k,i)=>{
+    const w=WORDY.has(k)||k==="fn"||k.length>2?" word":"";
+    const sep=i?'<span class="plus">+</span>':'';
+    return sep+'<span class="cap'+w+'">'+esc(k)+'</span>';
+  }).join("");
+}
+function esc(t){return String(t).replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));}
+
+/* ── trwały stan ── */
+const KEY="klawisz-po-klawiszu-v1", FAST=1500, GAP=[0,1,3,7,14,28];
+let S={p:{},n:0,day:"",today:0,hist:[]};
+(function load(){
+  try{const r=localStorage.getItem(KEY); if(r){const d=JSON.parse(r); if(d&&d.p)S=Object.assign(S,d);}}catch(_){}
+  const t=new Date().toISOString().slice(0,10);
+  if(S.day!==t){S.day=t;S.today=0;}
+  if(!Array.isArray(S.hist))S.hist=[];
+})();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(_){}}
+function pr(id){return S.p[id]||(S.p[id]={box:1,due:0,seen:0,hit:0,best:null});}
+
+/* ── planista (Leitner + czas reakcji) ── */
+let liveNow=true;
+const isLive=c=>c.live&&!(S.force&&S.force[c.id]);
+let filter="all", mode="learn", card=null, shown=0, lastId=null, answered=false, streak=0;
+function pool(){
+  const P=(filter==="all")?DECK:DECK.filter(c=>c.cat===filter);
+  return mode==="learn"?P:P.filter(isLive);   // ćwiczyć da się tylko to, co da się nacisnąć
+}
+function next(){
+  const P=pool(); if(!P.length)return null;
+  if(mode==="learn"){                          // uporządkowany przegląd, nie losowanie
+    const fresh=P.filter(c=>!(S.p[c.id]&&S.p[c.id].intro));
+    if(fresh.length)return fresh[0];
+  }
+  let best=Infinity,ties=[];
+  for(const c of P){const d=pr(c.id).due||0;
+    if(d<best){best=d;ties=[c];}else if(d===best)ties.push(c);}
+  let cs=ties.length>1?ties.filter(c=>c.id!==lastId):ties;
+  if(!cs.length)cs=ties;
+  return cs[Math.random()*cs.length|0];
+}
+
+/* ── elementy ── */
+const $=id=>document.getElementById(id);
+const elPrompt=$("prompt"),elSub=$("sub"),elRail=$("rail"),elVerdict=$("verdict"),
+  elMode=$("mode"),elCat=$("catlabel"),elDots=$("dots");
+
+const MODS=[["c","⌃","control"],["a","⌥","option"],["s","⇧","shift"],["m","⌘","command"],["f","fn","fn"]];
+
+function drawRail(held){
+  const teach=(mode==="learn");
+  elRail.className="rail";
+  elRail.innerHTML=MODS.filter(m=>m[0]!=="f").map(m=>{
+    const on=!!(held&&held[m[0]]);
+    const need=teach&&card&&card[m[0]]&&!on;
+    return '<button class="mod'+(on?" held":"")+(need?" need":"")+'" tabindex="-1" aria-hidden="true">'+
+      '<span class="g">'+m[1]+'</span><span class="n">'+m[2]+'</span></button>';
+  }).join("");
+}
+const TYPED={",":"Comma",".":"Period",";":"Semicolon",":":"Semicolon","/":"Slash","?":"Slash",
+  "\\":"Backslash","'":"Quote","`":"Backquote","~":"Backquote","-":"Minus","_":"Minus",
+  "=":"Equal","+":"Equal","[":"BracketLeft","{":"BracketLeft","]":"BracketRight","}":"BracketRight"};
+function parseTyped(v){
+  v=v.trim(); if(!v)return null;
+  const low=v.toLowerCase();
+  if(low==="spacja"||low==="space")return "Space";
+  if(low==="esc"||low==="escape")return "Escape";
+  if(low==="tab")return "Tab";
+  if(low==="enter"||low==="return")return "Enter";
+  if(low==="delete"||low==="backspace")return "Backspace";
+  if(v.length===1){
+    if(/[a-z]/i.test(v))return "Key"+v.toUpperCase();
+    if(/[0-9]/.test(v))return "Digit"+v;
+    if(TYPED[v])return TYPED[v];
+  }
+  return null;
+}
+
+
+/* ══════ Demonstracje: widać efekt, nie opis ══════ */
+const DOC="Poranna mgła osiadła na dachach.\nMiasto budziło się powoli,\njeszcze zanim wstało słońce.";
+const CW=47, CL=44, WORD={a:52,c:58};        // 47 = za „budziło”, 44 = w środku słowa
+const isW=ch=>ch!==undefined&&/[\p{L}\p{N}]/u.test(ch);
+const MV={
+  wordLeft:(t,c)=>{let i=c;while(i>0&&!isW(t[i-1]))i--;while(i>0&&isW(t[i-1]))i--;return i;},
+  wordRight:(t,c)=>{let i=c;while(i<t.length&&!isW(t[i]))i++;while(i<t.length&&isW(t[i]))i++;return i;},
+  lineStart:(t,c)=>t.lastIndexOf("\n",c-1)+1,
+  lineEnd:(t,c)=>{const i=t.indexOf("\n",c);return i<0?t.length:i;},
+  docStart:()=>0, docEnd:t=>t.length,
+  charLeft:(t,c)=>Math.max(0,c-1), charRight:(t,c)=>Math.min(t.length,c+1)
+};
+function docHTML(t,a,c,cls,fx){
+  const lo=Math.min(a,c),hi=Math.max(a,c),E=esc;
+  if(lo===hi)return E(t.slice(0,c))+'<i class="caret"></i>'+E(t.slice(c));
+  const k=("sel "+(cls||"")+" "+(fx||"")).replace(/\s+/g," ").trim(), first=(c===lo);
+  return E(t.slice(0,lo))+(first?'<i class="caret"></i>':'')+
+    '<span class="'+k+'">'+E(t.slice(lo,hi))+'</span>'+
+    (first?'':'<i class="caret"></i>')+E(t.slice(hi));
+}
+const wrapDoc=(inner,cls)=>'<div class="doc'+(cls?" "+cls:"")+'">'+inner+'</div>';
+const clipRow=v=>'<div class="clip">Schowek <b>'+esc(v)+'</b></div>';
+
+const LINES=["Poranna mgła osiadła na dachach.","Miasto budziło się powoli,",
+ "jeszcze zanim wstało słońce.","Na moście stał samotny tramwaj.","Woda pod nim była nieruchoma.",
+ "Ktoś otworzył okno na piętrze.","Z kuchni pachniało kawą.","Pierwszy autobus ruszył z pętli.",
+ "Gołębie zerwały się z dachu.","Światła zgasły jedno po drugim.","Dzień zaczynał się naprawdę.",
+ "A miasto wciąż udawało sen."];
+function scrollHTML(off,hi){
+  return wrapDoc('<div class="scroller"><ul style="transform:translateY('+(-off*22)+'px)">'+
+    LINES.map((l,i)=>'<li'+(i===hi?' class="hi"':'')+'>'+esc(l)+'</li>').join("")+'</ul></div>');
+}
+
+/* ── okno Findera ── */
+const FD={title:"Dokumenty",tbar:1,side:1,path:0,status:0,prev:0,view:"icon",sel:2,away:-1,ov:null,sideOn:"Dokumenty"};
+function winHTML(o){
+  const st=Object.assign({},FD,o);
+  const files=["Raport","Notatki","Zdjęcia","Budżet"].concat(st.extra||[]);
+  let h='<div class="win"><div class="tb"><i class="tl"></i><i class="tl y"></i><i class="tl g"></i><b>'+
+    esc(st.title)+'</b></div>';
+  if(st.tbar)h+='<div class="tbar"><i></i><i></i><i></i></div>';
+  h+='<div class="wbody" style="position:relative">';
+  if(st.side)h+='<div class="sbar">'+["Dom","Biurko","Dokumenty","Pobrane","Narzędzia","AirDrop"]
+    .map(x=>'<div'+(x===st.sideOn?' class="on"':'')+'>'+x+'</div>').join("")+'</div>';
+  h+='<div class="files'+(st.view==="list"?" list":"")+'">'+files.map((f,i)=>
+    '<div class="fi'+(i===st.sel?" sel2":"")+(i===st.away?" away":"")+'"><u></u>'+esc(f)+'</div>').join("")+'</div>';
+  if(st.prev)h+='<div class="pv"><u></u>Raport.pages<br>248 KB</div>';
+  if(st.ov)h+='<div class="ov"><div class="sheet"><h4>'+esc(st.ov[0])+'</h4><p>'+esc(st.ov[1])+'</p></div></div>';
+  h+='</div>';
+  if(st.path)h+='<div class="strip">Dom › Dokumenty</div>';
+  if(st.status)h+='<div class="strip">'+files.length+' elementów, 84 GB wolne</div>';
+  return h+'</div>';
+}
+/* ── pulpit ── */
+function deskHTML(o){
+  const st=Object.assign({win:"",ov:null,label:"",dock:1},o);
+  let h='<div class="desk"><div class="mbar"><span>&#63743;</span><span>Finder</span><span>Plik</span><span>Edycja</span></div>';
+  if(st.win!=="none")h+='<div class="dwin '+st.win+'"><div class="tb"><i class="tl"></i><i class="tl y"></i>'+
+    '<i class="tl g"></i><b>Notatki</b></div><div class="fill"></div></div>';
+  if(st.ov==="spot")h+='<div class="spot"><span>&#9906;</span><span>term</span></div>';
+  if(st.ov==="switch")h+='<div class="spot" style="gap:9px"><i class="dw"></i>'+
+    '<span style="width:20px;height:20px;border-radius:6px;background:linear-gradient(#5AC8FA,#007AFF);display:inline-block"></span>'+
+    '<span style="width:20px;height:20px;border-radius:6px;background:linear-gradient(#FFD60A,#FF9500);display:inline-block;outline:2px solid #fff;outline-offset:2px"></span>'+
+    '<span style="width:20px;height:20px;border-radius:6px;background:linear-gradient(#FF6482,#FF375F);display:inline-block"></span></div>';
+  if(st.ov==="mission")h+='<div class="mc"><u></u><u></u><u></u><u></u></div>';
+  if(st.ov==="panel")h+='<div class="panel"><u></u><u></u><u></u></div>';
+  if(st.ov==="area")h+='<div class="shot"></div>';
+  if(st.ov==="flash")h+='<div class="flashwhite"></div>';
+  if(st.ov==="lock")h+='<div class="ov" style="background:rgba(0,0,0,.82);color:#fff;font-size:11px">Zablokowano</div>';
+  if(st.dock)h+='<div class="dock"><i></i><i class="act"></i><i></i><i></i></div>';
+  if(st.label)h+='<div class="caplabel">'+esc(st.label)+'</div>';
+  return h+'</div>';
+}
+
+/* ── opisy demonstracji per karta ── */
+const D={};
+const setD=(ids,v)=>ids.split(" ").forEach(i=>D[i]=v);
+setD("n1",["t","move","wordLeft"]);   setD("n2",["t","move","wordRight"]);
+setD("n3 n7",["t","move","lineStart"]);setD("n4 n8",["t","move","lineEnd"]);
+setD("n5",["t","move","docStart"]);   setD("n6",["t","move","docEnd"]);
+setD("n9",["t","scroll","top"]);      setD("n10",["t","scroll","bot"]);
+setD("n11",["t","scroll","up"]);      setD("n12",["t","scroll","down"]);
+setD("s1",["t","sel","wordLeft"]);    setD("s2",["t","sel","wordRight"]);
+setD("s3 s5",["t","sel","lineStart"]);setD("s4 s6",["t","sel","lineEnd"]);
+setD("s7",["t","sel","docStart"]);    setD("s8",["t","sel","docEnd"]);
+setD("s9",["t","all"]);
+setD("e1",["t","del","wordLeft"]);    setD("e2 e8",["t","del","charRight"]);
+setD("e3",["t","del","charLeft"]);    setD("e4",["t","del","lineEnd"]);
+setD("e5",["t","insline"]);           setD("e6",["t","swap"]);
+setD("e7",["t","scroll","center"]);   setD("e9",["t","undo"]);
+setD("e10",["t","cut"]);              setD("e11",["t","copy"]);
+setD("e12",["t","paste"]);            setD("e13",["t","spell"]);
+setD("e14",["w",{ov:["Pisownia i gramatyka","Sprawdzanie całego dokumentu"]}]);
+setD("e15",["w",{ov:["Znajdź","Podświetlono 3 dopasowania"]}]);
+setD("b1",["w",{ov:["Zapisano","Dokument zapisany na dysku"]}]);
+setD("b2",["w",{ov:["Drukowanie","Wybierz drukarkę i liczbę kopii"]}]);
+setD("e16",["w",{ov:["Znajdź ponownie","Skok do 2 z 3"]}]);
+setD("f1",["t","style","sb-b"]);      setD("f2",["t","style","sb-i"]);
+setD("f3",["t","style","sb-u"]);      setD("f4",["t","style","sb-l"]);
+setD("f5",["t","copystyle"]);         setD("f6",["t","pastestyle"]);
+setD("f7",["t","pastematch"]);
+setD("f8",["w",{ov:["Pole wyszukiwania","Kursor w polu szukania"]}]);
+setD("f9",["w",{tbar:0}]);
+setD("f10",["t","size","sb-s"]);      setD("f11",["t","size","sb-g"]);
+setD("f12",["t","align","al-l"]);     setD("f13",["t","align","al-r"]);
+setD("f14",["w",{ov:["Ustawienia","Preferencje aplikacji"]}]);
+setD("f15",["w",{ov:["Pomoc","Menu pomocy aplikacji"]}]);
+setD("f16",["w",{ov:["Zachowaj jako…","Nazwa i lokalizacja pliku"]}]);
+setD("d1",["w",{extra:["Raport kopia"]}]);
+setD("d2",["w",{ov:["Informacje","Raport.pages — 248 KB"]}]);
+setD("d3",["w",{ov:["Wysunięto","Dysk można odłączyć"]}]);
+setD("d4",["w",{ov:["Opcje widoku","Sortowanie, rozmiar ikon"]}]);
+setD("d5",["w",{ov:["Połącz z serwerem","smb://"]}]);
+setD("d6",["w",{away:2}]);
+setD("d7",["w",{ov:["Przejdź do folderu","/Users/ja/"]}]);
+setD("d8",["w",{title:"Biurko",sideOn:"Biurko"}]);
+setD("d9",["w",{title:"Dom",sideOn:"Dom"}]);
+setD("d10",["w",{title:"Dokumenty",sideOn:"Dokumenty"},{title:"Dom",sideOn:"Dom"}]);
+setD("d11",["w",{title:"Narzędzia",sideOn:"Narzędzia"}]);
+setD("d12",["w",{title:"Pobrane",sideOn:"Pobrane"}]);
+setD("d13",["w",{prev:1}]);           setD("d14",["w",{side:0}]);
+setD("d15",["w",{path:1}]);           setD("d17",["w",{status:1}]);
+setD("d16",["d",{dock:0,label:"Dock ukryty"}]);
+setD("d18",["w",{title:"Dom",sideOn:"Dom"}]);
+setD("d19",["w",{title:"Raporty",sideOn:"Dokumenty"}]);
+setD("d20",["w",{title:"Dom",sideOn:"Dom"}]);
+setD("d21",["w",{extra:["Raport alias"]}]);
+setD("d22",["w",{ov:["Podgląd","Raport.pages"]}]);
+setD("d23",["w",{extra:["Nowy folder"]}]);
+setD("d24",["w",{ov:["Dodano do paska","Skrót w pasku bocznym"]}]);
+setD("d25",["w",{extra:["folder bez tytułu"]}]);
+setD("d26",["w",{ov:["Kosz opróżniony","0 elementów"]}]);
+setD("d27",["w",{ov:["AirDrop","Szukanie urządzeń…"]}]);
+setD("y1",["d",{ov:"spot",label:"Spotlight"}]);
+setD("y2",["d",{ov:"switch",label:"Przełącznik aplikacji"}]);
+setD("y3",["d",{win:"hid",label:"Okno zamknięte"}]);
+setD("y4",["d",{win:"none",label:"Aplikacja zakończona"}]);
+setD("y5",["d",{win:"mini",label:"Zminimalizowane do Docka"}]);
+setD("y6",["d",{win:"hid",label:"Aplikacja ukryta"}]);
+setD("y7",["d",{ov:"panel",label:"Wymuś zamknięcie"}]);
+setD("y8",["d",{ov:"lock"}]);
+setD("y9",["d",{ov:"lock",win:"none"}]);
+setD("y10",["d",{win:"full",dock:0,label:"Pełny ekran"}]);
+setD("y11",["d",{win:"two",label:"Inne okno tej samej aplikacji"}]);
+setD("y12",["d",{ov:"mission",win:"none",label:"Mission Control"}]);
+setD("y13",["d",{ov:"mission",win:"none",label:"Wszystkie okna aplikacji"}]);
+setD("y14",["w",{ov:["Nowa karta","Druga karta w oknie"]}]);
+setD("y15",["d",{win:"two",label:"Nowe okno"}]);
+setD("y16",["d",{ov:"panel",label:"Centrum sterowania"}]);
+setD("y17",["d",{ov:"panel",label:"Centrum powiadomień"}]);
+setD("y18",["d",{ov:"spot",label:"Dyktowanie"}]);
+setD("y19",["d",{ov:"panel",label:"Podgląd znaków"}]);
+setD("y20",["d",{ov:"panel",label:"Szybka notatka"}]);
+setD("p1",["d",{ov:"flash",label:"Cały ekran na biurko"}]);
+setD("p2",["d",{ov:"area",label:"Zaznacz fragment"}]);
+setD("p3",["d",{ov:"panel",label:"Pasek narzędzi zrzutów"}]);
+setD("p4",["d",{ov:"flash",label:"Cały ekran do schowka"}]);
+
+/* ── budowa dwóch klatek ── */
+function frames(c){
+  const d=D[c.id]; if(!d)return null;
+  if(d[0]==="t"){
+    const k=d[1],arg=d[2],t=DOC;
+    if(k==="move"){const n=MV[arg](t,CW);
+      return [wrapDoc(docHTML(t,CW,CW)),wrapDoc(docHTML(t,n,n))];}
+    if(k==="sel"){const n=MV[arg](t,CW);
+      return [wrapDoc(docHTML(t,CW,CW)),wrapDoc(docHTML(t,CW,n,"","fl"))];}
+    if(k==="all")return [wrapDoc(docHTML(t,CW,CW)),wrapDoc(docHTML(t,0,t.length,"","fl"))];
+    if(k==="del"){const st=(arg==="charLeft"||arg==="charRight")?CL:CW,n=MV[arg](t,st),
+      lo=Math.min(n,st),hi=Math.max(n,st);
+      return [wrapDoc(docHTML(t,st,st)+ (lo!==hi?"":"")),
+              wrapDoc(docHTML(t.slice(0,lo)+t.slice(hi),lo,lo))];}
+    if(k==="insline")return [wrapDoc(docHTML(t,CW,CW)),
+      wrapDoc(docHTML(t.slice(0,CW)+"\n"+t.slice(CW),CW,CW))];
+    if(k==="swap")return [wrapDoc(docHTML(t,CL,CL)),
+      wrapDoc(docHTML(t.slice(0,CL-1)+t[CL]+t[CL-1]+t.slice(CL+1),CL,CL,"","fl"))];
+    if(k==="cut")return [wrapDoc(docHTML(t,WORD.a,WORD.c)),
+      wrapDoc(docHTML(t.slice(0,WORD.a)+t.slice(WORD.c),WORD.a,WORD.a))+clipRow("powoli")];
+    if(k==="copy")return [wrapDoc(docHTML(t,WORD.a,WORD.c)),
+      wrapDoc(docHTML(t,WORD.a,WORD.c,"","fl"))+clipRow("powoli")];
+    if(k==="paste"){const e=t.length;
+      return [wrapDoc(docHTML(t,e,e))+clipRow("powoli"),
+              wrapDoc(docHTML(t+" powoli",e,e+7,"","fl"))+clipRow("powoli")];}
+    if(k==="undo"){const cut=t.slice(0,WORD.a)+t.slice(WORD.c);
+      return [wrapDoc(docHTML(cut,WORD.a,WORD.a)),wrapDoc(docHTML(t,WORD.a,WORD.c,"","fl"))];}
+    if(k==="style"||k==="size")return [wrapDoc(docHTML(t,WORD.a,WORD.c)),
+      wrapDoc(docHTML(t,WORD.a,WORD.c,arg,"fl"))];
+    if(k==="align")return [wrapDoc(docHTML(t,CW,CW)),wrapDoc(docHTML(t,CW,CW),arg)];
+    if(k==="copystyle")return [wrapDoc(docHTML(t,WORD.a,WORD.c,"sb-b")),
+      wrapDoc(docHTML(t,WORD.a,WORD.c,"sb-b"))+clipRow("styl: pogrubienie")];
+    if(k==="pastestyle")return [wrapDoc(docHTML(t,20,23))+clipRow("styl: pogrubienie"),
+      wrapDoc(docHTML(t,20,23,"sb-b","fl"))+clipRow("styl: pogrubienie")];
+    if(k==="pastematch")return [wrapDoc(docHTML(t,WORD.a,WORD.c,"sb-g"))+clipRow("tekst z innego źródła"),
+      wrapDoc(docHTML(t,WORD.a,WORD.c,"","fl"))+clipRow("tekst z innego źródła")];
+    if(k==="spell"){const bad=t.replace("powoli","powolli");
+      return [wrapDoc(docHTML(bad,CW,CW)),wrapDoc(docHTML(bad,52,59,"sb-sp","fl"))];}
+    if(k==="scroll"){const m={top:[6,0],bot:[0,11],up:[6,0],down:[0,6],center:[0,3]};
+      const v=m[arg]||[0,4];
+      return [scrollHTML(v[0],arg==="center"?9:-1),scrollHTML(v[1],arg==="center"?9:-1)];}
+  }
+  if(d[0]==="w")return [winHTML(d[2]||{}),winHTML(d[1])];
+  if(d[0]==="d")return [deskHTML(d[2]||{}),deskHTML(d[1])];
+  return null;
+}
+
+/* ── pętla odtwarzania ── */
+let demoT=null, clockSet=false;
+function runDemo(c){
+  clearTimeout(demoT);
+  const f=frames(c), st=$("stage");
+  if(!f){st.innerHTML=wrapDoc('<span style="color:var(--label-2)">'+esc(c.act)+'</span>');return;}
+  let ph=0,first=true;
+  const tick=()=>{
+    st.innerHTML=f[ph];
+    // zegar rusza dopiero, gdy efekt został raz pokazany — inaczej każda karta byłaby „wolna”
+    if(ph===1&&first){first=false;if(!answered&&!clockSet){clockSet=true;shown=performance.now();}}
+    demoT=setTimeout(()=>{ph^=1;tick();}, ph?2000:1150);
+  };
+  tick();
+}
+
+/* ── renderowanie karty ── */
+function show(c){
+  if(!c)return;
+  clearTimeout(nextT); card=c; liveNow=isLive(c); answered=false; clockSet=false; attempts=0; scored=false; shown=performance.now();
+  elCat.textContent=CATS[c.cat];
+  elMode.textContent=liveNow?"Na żywo":"Tylko podgląd";
+  elMode.className="tag"+(liveNow?"":" recall");
+  elMode.title=liveNow?"Naciśnij prawdziwe klawisze":"Tego nie przechwyci przeglądarka — tutaj tylko go poznajesz";
+  const b=pr(c.id).box;
+  elDots.innerHTML=[1,2,3,4,5].map(i=>'<i class="'+(i<=b?"on":"")+'"></i>').join("");
+  elPrompt.textContent=c.act;
+  runDemo(c);
+  elSub.textContent= !liveNow
+      ? "Tego skrótu przeglądarka nie przechwyci — zapamiętaj go i wypróbuj w Finderze."
+    : mode==="learn" ? "Naciśnij go — tak zapamiętasz go palcami."
+    : mode==="drill" ? "Naciśnij skrót, który to robi. Czekam, aż trafisz."
+    : "Naciśnij skrót, który to robi.";
+  const tz=$("teach");
+  if(mode==="learn"||!liveNow){tz.hidden=false;
+    tz.innerHTML='<div class="teachlbl">Ten skrót to</div><div class="caps">'+
+      capsFor(c).map((k,i)=>(i?'<span class="plus">+</span>':'')+
+        '<span class="cap'+(k.length>2||k==="fn"?" word":"")+'" data-k="'+esc(k)+'">'+esc(k)+'</span>').join("")+
+      '</div>';}
+  else tz.hidden=true;
+  elRail.hidden=(mode==="learn"||!liveNow);
+  $("cantpress").hidden=!liveNow;
+  drawRail(null);
+  elVerdict.innerHTML=liveNow
+    ? '<div class="waiting"><span class="pulse"></span>Czekam na klawisze…</div>'
+    : '<button class="primary" id="goon">Dalej</button><div class="hint">albo Return</div>';
+  if(!liveNow)$("goon").addEventListener("click",watchNext);
+  paintStats();
+}
+
+/* ── ocena ── */
+let attempts=0, scored=false, nextT=null;
+
+function record(ok,ms){                       // liczy się wyłącznie pierwsze podejście
+  const p=pr(card.id), timed=ms!==null, fast=!timed||ms<FAST;
+  p.seen++;
+  if(ok){ p.hit++; streak++;
+    if(timed&&(p.best===null||ms<p.best))p.best=ms;
+    if(fast&&p.box<5)p.box++;
+  } else { streak=0; p.box=1; }
+  S.n++; S.today++; p.due=S.n+GAP[p.box];
+  if(timed&&ok)S.hist.push(Math.round(ms));
+  if(S.hist.length>200)S.hist=S.hist.slice(-200);
+  save(); paintStats();
+  return {p,timed,fast};
+}
+const askCaps=c=>{const a=capsFor(c);
+  return a.slice(0,-1).concat(['?']).map((k,i)=>(i?'<span class="plus">+</span>':'')+
+    '<span class="cap'+(k==='?'?' askcap':'')+(k.length>2?' word':'')+'">'+esc(k)+'</span>').join('');};
+
+function showRetry(pc){                       // tryb Nauki: karta zostaje, podpowiedź rośnie
+  let h='<span class="badge slow">Jeszcze nie</span>';
+  if(pc)h+='<div class="try"><span class="hint">Nacisnąłeś</span><div class="caps">'+renderCaps(pc)+'</div></div>';
+  if(attempts===2)h+='<div class="try"><span class="hint">Podpowiedź</span><div class="caps">'+askCaps(card)+'</div></div>';
+  if(attempts>=3)h+='<div class="try"><span class="hint">Szukany skrót</span><div class="caps">'+renderCaps(capsFor(card))+'</div></div>';
+  h+='<div class="hint">'+(attempts>=3?'Naciśnij go, żeby przejść dalej':'Naciskaj dalej — czekam')+'</div>';
+  elVerdict.innerHTML=h;
+}
+function showOk(ms,p,timed,fast){
+  if(!scored2ok){                             // pierwsze podejście było błędne — czas nic nie mówi
+    elVerdict.innerHTML='<span class="badge slow">Trafione za '+(attempts+1)+'. podejściem</span>'+
+      '<div class="hint">Pierwsze podejście było błędne, więc karta wraca na poziom 1</div>'+
+      '<div class="hint">Return — dalej</div>';
+    return;
+  }
+  let badge,note;
+  if(!timed){badge='<span class="badge ok">Dobrze</span>';note='<div class="hint">Poziom '+p.box+' z 5</div>';}
+  else if(!fast){badge='<span class="badge slow">Dobrze, ale wolno · '+(ms/1000).toFixed(1)+' s</span>';
+    note='<div class="hint">Poniżej 1,5 s awansuje kartę wyżej</div>';}
+  else{badge='<span class="badge ok">✓ '+(ms/1000).toFixed(1)+' s</span>';
+    note='<div class="hint">Poziom '+p.box+' z 5</div>';}
+  const extra=(attempts||!scored2ok)?'<div class="hint">Podejścia: '+(attempts+1)+'</div>':'';
+  elVerdict.innerHTML=badge+note+extra+'<div class="hint">Return — dalej</div>';
+}
+let scored2ok=true;
+
+function grade(ok,ms,pc){
+  if(answered||!card)return;
+  if(mode==="learn"){                          // przepisywanie z podglądu — nic nie punktujemy
+    if(ok){ answered=true; lastId=card.id; clearTimeout(demoT);
+      const p=pr(card.id); p.intro=1; S.today++; save(); paintStats();
+      elVerdict.innerHTML='<span class="badge ok">Dobrze</span><div class="hint">Następny skrót…</div>';
+      clearTimeout(nextT); nextT=setTimeout(()=>show(next()),900);
+    } else { attempts++;
+      elVerdict.innerHTML='<span class="badge slow">Jeszcze nie</span>'+
+        (pc?'<div class="try"><span class="hint">Nacisnąłeś</span><div class="caps">'+renderCaps(pc)+'</div></div>':'')+
+        '<div class="hint">Skrót masz wypisany wyżej — naciśnij go dokładnie</div>';
+    }
+    return;
+  }
+  let r;
+  if(!scored){scored=true;scored2ok=ok;r=record(ok,ms);}
+  else r={p:pr(card.id),timed:ms!==null,fast:ms===null||ms<FAST};
+  if(ok){
+    answered=true; lastId=card.id; clearTimeout(demoT);
+    showOk(ms,r.p,r.timed,r.fast);
+    if(mode==="drill"){clearTimeout(nextT);nextT=setTimeout(()=>show(next()),1300);}
+    return;
+  }
+  if(mode==="test"){
+    answered=true; lastId=card.id;
+    elVerdict.innerHTML='<span class="badge bad">Nie ten skrót</span>'+
+      (pc?'<div class="try"><span class="hint">Nacisnąłeś</span><div class="caps">'+renderCaps(pc)+'</div></div>':'')+
+      '<div class="try"><span class="hint">Poprawnie</span><div class="caps">'+renderCaps(capsFor(card))+'</div></div>'+
+      '<div class="hint">Return — dalej</div>';
+    return;
+  }
+  attempts++; showRetry(pc);                  // Ćwiczenie: nie kończymy karty
+}
+function giveUp(){
+  if(!card||answered)return;
+  if(mode==="learn"){answered=true;clearTimeout(nextT);show(next());return;}
+  if(!scored){scored=true;scored2ok=false;record(false,null);}
+  if(mode==="test"){answered=true;lastId=card.id;
+    elVerdict.innerHTML='<span class="badge bad">Nie ten skrót</span><div class="try"><span class="hint">Poprawnie</span>'+
+      '<div class="caps">'+renderCaps(capsFor(card))+'</div></div><div class="hint">Return — dalej</div>';
+    return;}
+  attempts=Math.max(attempts,3); showRetry(null);
+}
+function watchNext(){
+  if(!card||liveNow||answered)return;
+  answered=true; const p=pr(card.id); p.intro=1; S.today++; save(); paintStats();
+  show(next());
+}
+function lightTeach(e){
+  if(!card||$("teach").hidden)return;
+  const M={"\u2303":!!(e&&e.ctrlKey),"\u2325":!!(e&&e.altKey),
+           "\u21e7":!!(e&&e.shiftKey),"\u2318":!!(e&&e.metaKey)};
+  const code=e?evCode(e):null;
+  document.querySelectorAll("#teach .cap").forEach(el=>{
+    const k=el.dataset.k;
+    el.classList.toggle("lit",(k in M)?M[k]:(!!code&&code===card.code));
+  });
+}
+const modCaps=(c,a,sh,m,f)=>{const o=[];if(f)o.push("fn");if(c)o.push("⌃");if(a)o.push("⌥");
+  if(sh)o.push("⇧");if(m)o.push("⌘");return o;};
+
+/* ── obsługa klawiatury (live) ── */
+const BARE=new Set(["MetaLeft","MetaRight","ShiftLeft","ShiftRight","AltLeft","AltRight",
+  "ControlLeft","ControlRight","CapsLock"]);
+// Niektóre źródła zdarzeń (pilot, zdalny pulpit) nie wypełniają e.code — odtwórz go z e.key.
+function evCode(e){
+  if(e.code)return e.code;
+  const k=e.key;
+  if(!k)return "";
+  if(k.length===1)return parseTyped(k)||"";
+  if(k==="Escape"||k==="Tab"||k==="Enter"||k==="Backspace"||k==="Delete"||k==="Home"||
+     k==="End"||k==="PageUp"||k==="PageDown"||k.startsWith("Arrow"))return k;
+  if(k===" ")return "Space";
+  return "";
+}
+window.addEventListener("keydown",e=>{
+  if(BARE.has(e.code)){ if(card&&liveNow){drawRail({m:e.metaKey,s:e.shiftKey,a:e.altKey,c:e.ctrlKey});lightTeach(e);} return; }
+  if(e.code==="Escape"){ e.preventDefault(); giveUp(); return; }
+  if(answered&&(e.code==="Enter"||e.code==="Space")&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+    e.preventDefault(); show(next()); return; }
+  if(!card)return;
+  if(!liveNow){
+    if(e.code==="Enter"||e.code==="Space"){e.preventDefault();watchNext();}
+    return;
+  }
+  if(answered)return;
+  e.preventDefault(); e.stopPropagation();
+  if(e.code==="Enter"&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!e.shiftKey)return;
+  drawRail({m:e.metaKey,s:e.shiftKey,a:e.altKey,c:e.ctrlKey}); lightTeach(e);
+  const hit=evCode(e)===card.code&&e.metaKey===card.m&&e.shiftKey===card.s&&
+            e.altKey===card.a&&e.ctrlKey===card.c;
+  const anyMod=e.metaKey||e.shiftKey||e.altKey||e.ctrlKey;
+  const needsMod=card.m||card.s||card.a||card.c;
+  if(!hit&&!anyMod&&needsMod)return;            // sam znak — nie karz
+  grade(hit,performance.now()-shown,
+    modCaps(e.ctrlKey,e.altKey,e.shiftKey,e.metaKey,false).concat([codeLabel(evCode(e))||"?"]));
+},true);
+window.addEventListener("keyup",()=>{ if(card&&liveNow&&!answered){drawRail(null);lightTeach(null);} },true);
+
+/* ── statystyki ── */
+function paintStats(){
+  const P=pool();
+  let mast=0,seen=0,hit=0,intro=0;
+  for(const c of P){const p=S.p[c.id]; if(!p)continue; if(p.box>=5)mast++; if(p.intro)intro++;
+    seen+=p.seen; hit+=p.hit;}
+  const lm=mode==="learn";
+  $("lbl-mast").textContent=lm?"Poznane":"Opanowane";
+  $("st-mast").textContent=(lm?intro:mast)+"/"+P.length;
+  $("st-streak").textContent=streak;
+  const h=S.hist.slice(-30);
+  $("st-acc").textContent=seen?Math.round(hit/seen*100)+"%":"–";
+  $("barfill").style.width=(P.length?(lm?intro:mast)/P.length*100:0)+"%";
+  $("deckcount").textContent=DECK.filter(isLive).length+" do ćwiczenia · "+DECK.filter(c=>!isLive(c)).length+" poglądowych";
+}
+
+/* ── filtr kategorii ── */
+const OPTS=[["all","Wszystko"],...Object.keys(CATS).map(k=>[k,CATS[k]])];
+$("cat").innerHTML=OPTS.map(o=>{
+  const n=(o[0]==="all")?DECK.length:DECK.filter(c=>c.cat===o[0]).length;
+  return '<option value="'+o[0]+'">'+esc(o[1])+' ('+n+')</option>';
+}).join("");
+$("cat").value=filter;
+$("cat").addEventListener("change",e=>{filter=e.target.value;streak=0;lastId=null;show(next());e.target.blur();});
+function paintTheme(){document.documentElement.dataset.theme=(S.theme==="dark")?"dark":"light";
+  $("theme").textContent=(S.theme==="dark")?"☀":"☾";}
+$("theme").addEventListener("click",()=>{S.theme=(S.theme==="dark")?"light":"dark";save();paintTheme();});
+paintTheme();
+mode=["learn","drill","test"].includes(S.mode)?S.mode:"learn";
+function paintMode(){[...$("modeseg").children].forEach(b=>b.classList.toggle("on",b.dataset.m===mode));}
+$("modeseg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  mode=b.dataset.m;S.mode=mode;save();paintMode();streak=0;show(next());});
+paintMode();
+$("stage").addEventListener("click",()=>{if(card)runDemo(card);});
+$("cantpress").addEventListener("click",()=>{
+  if(!card)return; S.force=S.force||{}; S.force[card.id]=1; save(); show(card);
+});
+$("capt").addEventListener("click",()=>{S.nocap=!S.nocap;document.body.classList.toggle("nocap",!!S.nocap);save();});
+document.body.classList.toggle("nocap",!!S.nocap);
+$("skip").addEventListener("click",()=>{ if(card&&!answered)giveUp(); else show(next()); });
+$("reset").addEventListener("click",()=>{
+  if(!confirm("Wyzerować wszystkie postępy?"))return;
+  S={p:{},n:0,day:new Date().toISOString().slice(0,10),today:0,hist:[]};
+  save(); streak=0; show(next());
+});
+
+show(next());
+</script>
+
+<a href="/portfolio/#poza" class="sz-back" style="position:fixed;left:12px;bottom:12px;z-index:2147483000;font:700 13px/1 'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;background:rgba(255,255,255,.92);border:1px solid #e5e5e5;padding:8px 12px;text-decoration:none;letter-spacing:.02em">&larr; portfolio <span style="color:#a88bd4">~||-_^+*.</span></a><script>(function () { if (window.top !== window.self) { var el = document.querySelector(".sz-back"); if (el) el.style.display = "none"; } })();</script></body></html>

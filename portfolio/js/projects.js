@@ -636,13 +636,44 @@ const PROJECTS = [
  }
 ];
 
-/* projekty poza zajęciami pierwszego roku; otwierają się jako osobna strona */
-const FEATURED = [
+/* 2 rok: warsztaty mistrzowskie; otwierają własną stronę */
+const YEAR2 = [
  {
   "slug": "bor",
   "title": "bór",
-  "course": "warsztaty mistrzowskie",
-  "kind": "projekt spekulatywny + model 3d",
+  "course": "warsztaty mistrzowskie z Alicją Wysocką",
+  "kind": "oczyszczacz powietrza noszony na szyi · projekt spekulatywny + model 3d",
+  "text": "urządzenie na kark, które czyści powietrze i pachnie sosną. wyszło z opowiadania o roku 2400, kiedy ludzie pracują pod ziemią w serwerowniach. model 3d składa się podczas przewijania.",
+  "video": "/portfolio/assets/bor-film/model.mp4",
+  "poster": "/portfolio/assets/bor-film/model.jpg",
   "href": "/portfolio/bor/"
+ }
+];
+
+/* poza school of form: projekty własne; strony albo przeglądarka z filmami */
+const PRIVATE = [
+ {
+  "slug": "yoobilizery",
+  "title": "yoobilizery",
+  "course": "wizualizacje dźwięku na żywo",
+  "pages": ["yblzrpro.mp4", "yoobilizer.mp4", "yblzr.mp4"]
+ },
+ {
+  "slug": "harmonograf",
+  "title": "harmonograf",
+  "course": "instrument rysunkowy · w przeglądarce",
+  "href": "/portfolio/harmonograf/"
+ },
+ {
+  "slug": "klawisz",
+  "title": "klawisz po klawiszu",
+  "course": "trener skrótów na maca · w przeglądarce",
+  "href": "/portfolio/klawisz/"
+ },
+ {
+  "slug": "lawenda",
+  "title": "lawenda",
+  "course": "strona z moimi wierszami",
+  "href": "/"
  }
 ];

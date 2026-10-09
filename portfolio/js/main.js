@@ -2,74 +2,129 @@
 
 const $ = (sel) => document.querySelector(sel);
 
-/* ---------- index projektów ---------- */
+/* ---------- index projektów: 1 rok / 2 rok / poza school of form ---------- */
 
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function projectLink(p, i, onOpen) {
+  const li = document.createElement('li');
+  li.style.setProperty('--i', i);
+  const a = document.createElement('a');
+  a.href = p.href || '#' + p.slug;
+  const meta = p.pages
+    ? '<b>' + p.pages.length + '</b> ' + (p.pages.some((f) => f.endsWith('.mp4')) ? 'film.' : 'str') + ' &middot; ' + p.course
+    : p.course + (p.href ? ' &middot; <b>otwórz</b>' : '');
+  a.innerHTML = '<span class="project-title">' + p.title + '</span><span class="project-meta">' + meta + '</span>';
+  if (!p.href) {
+    a.addEventListener('click', (e) => { e.preventDefault(); onOpen(); });
+  }
+  li.appendChild(a);
+  return li;
+}
+
+/* 1 rok: lista z podziałem na semestry */
 const listEl = $('#projectList');
-
-/* warsztaty mistrzowskie: na wierzchu, otwierają własną stronę */
-if (typeof FEATURED !== 'undefined' && FEATURED.length) {
-  const sep = document.createElement('li');
-  sep.className = 'sem-divider';
-  sep.innerHTML = '<span>[warsztaty mistrzowskie]</span>';
-  listEl.appendChild(sep);
-  FEATURED.forEach((p) => {
-    const li = document.createElement('li');
-    li.innerHTML =
-      '<a href="' + p.href + '"><span class="project-title">' + p.title + '</span>' +
-      '<span class="project-meta">' + p.kind + ' &middot; ' + p.course + '</span></a>';
-    listEl.appendChild(li);
-  });
-}
-
-/* 1 rok na studiach: chowane menu, domyślnie zwinięte */
-const yearLi = document.createElement('li');
-yearLi.className = 'year-group';
-const yearBtn = document.createElement('button');
-yearBtn.type = 'button';
-yearBtn.className = 'year-toggle';
-yearBtn.setAttribute('aria-expanded', 'false');
-yearBtn.setAttribute('aria-controls', 'yearList');
-yearBtn.innerHTML =
-  '<span class="year-sign" aria-hidden="true">+</span>' +
-  '<span class="project-title">1 rok na studiach</span>' +
-  '<span class="project-meta"><b>' + PROJECTS.length + '</b> projektów &middot; 2025/26</span>';
-const yearList = document.createElement('ol');
-yearList.className = 'year-list';
-yearList.id = 'yearList';
-yearList.hidden = true;
-yearLi.appendChild(yearBtn);
-yearLi.appendChild(yearList);
-listEl.appendChild(yearLi);
-
-function setYearOpen(open) {
-  yearList.hidden = !open;
-  yearBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  yearBtn.querySelector('.year-sign').textContent = open ? '\u2212' : '+';
-}
-yearBtn.addEventListener('click', () => setYearOpen(yearList.hidden));
-
 let lastSem = null;
+let n1 = 0;
 PROJECTS.forEach((p, i) => {
   if (p.sem && p.sem !== lastSem) {
     lastSem = p.sem;
     const sep = document.createElement('li');
     sep.className = 'sem-divider';
+    sep.style.setProperty('--i', n1++);
     sep.innerHTML = '<span>[' + p.sem + ']</span>';
-    yearList.appendChild(sep);
+    listEl.appendChild(sep);
   }
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  a.href = '#' + p.slug;
-  a.innerHTML =
-    '<span class="project-title">' + p.title + '</span>' +
-    '<span class="project-meta"><b>' + p.pages.length + '</b> str &middot; ' + p.course + '</span>';
-  a.addEventListener('click', (e) => {
-    e.preventDefault();
-    openViewer(i);
-  });
-  li.appendChild(a);
-  yearList.appendChild(li);
+  listEl.appendChild(projectLink(p, n1++, () => openViewer(PROJECTS, i)));
 });
+
+/* 2 rok: warsztaty mistrzowskie */
+const year2 = $('#year2');
+YEAR2.forEach((p, i) => {
+  const a = document.createElement('a');
+  a.className = 'feature';
+  a.href = p.href;
+  a.style.setProperty('--i', i);
+  a.innerHTML =
+    '<div class="feature-media">' +
+      (p.video
+        ? '<video src="' + p.video + '" poster="' + p.poster + '" muted loop playsinline autoplay preload="metadata" aria-label="' + p.title + ': model 3d"></video>'
+        : '<img src="' + p.poster + '" alt="">') +
+    '</div>' +
+    '<div class="feature-text">' +
+      '<p class="feature-kicker">[' + p.course + ']</p>' +
+      '<h3 class="feature-title">' + p.title + '</h3>' +
+      '<p class="feature-kind">' + p.kind + '</p>' +
+      '<p class="feature-desc">' + p.text + '</p>' +
+      '<span class="feature-go">otwórz projekt &rarr;</span>' +
+    '</div>';
+  year2.appendChild(a);
+});
+
+/* poza school of form */
+const privateEl = $('#privateList');
+PRIVATE.forEach((p, i) => {
+  privateEl.appendChild(projectLink(p, i, () => openViewer(PRIVATE, i)));
+});
+
+/* zakładki */
+const tabs = Array.from(document.querySelectorAll('.year-tab'));
+const ink = $('.years-ink');
+const SCRAMBLE = '~||-_^+*.';
+
+function scramble(el) {
+  const word = el.dataset.word;
+  if (reduceMotion) { el.textContent = word; return; }
+  let frame = 0;
+  const total = 9;
+  clearInterval(el._t);
+  el._t = setInterval(() => {
+    frame++;
+    el.textContent = word.split('').map((c, k) =>
+      c === ' ' || k < (frame / total) * word.length ? c : SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)]
+    ).join('');
+    if (frame >= total) { clearInterval(el._t); el.textContent = word; }
+  }, 38);
+}
+
+function moveInk(tab) {
+  if (!ink || !tab) return;
+  const box = tab.parentElement.getBoundingClientRect();
+  const r = tab.getBoundingClientRect();
+  ink.style.width = r.width + 'px';
+  /* pod wybraną zakładką, także gdy na telefonie zakładki łamią się na dwa rzędy */
+  ink.style.transform = 'translate(' + (r.left - box.left) + 'px,' + (r.bottom - box.top + 9) + 'px)';
+}
+
+function selectTab(key, opts) {
+  const tab = tabs.find((t) => t.dataset.key === key) || tabs[1];
+  tabs.forEach((t) => {
+    const on = t === tab;
+    t.setAttribute('aria-selected', on ? 'true' : 'false');
+    t.tabIndex = on ? 0 : -1;
+    const panel = document.getElementById(t.dataset.key);
+    panel.hidden = !on;
+    if (on) {
+      panel.classList.remove('enter');
+      void panel.offsetWidth;
+      panel.classList.add('enter');
+    }
+  });
+  moveInk(tab);
+  scramble(tab.querySelector('.yt-word'));
+  if (!opts || !opts.silent) history.replaceState(null, '', '#' + tab.dataset.key);
+}
+
+tabs.forEach((t, k) => {
+  t.addEventListener('click', () => selectTab(t.dataset.key));
+  t.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const next = tabs[(k + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+    next.focus();
+    selectTab(next.dataset.key);
+  });
+});
+window.addEventListener('resize', () => moveInk(tabs.find((t) => t.getAttribute('aria-selected') === 'true')));
 
 /* ---------- viewer ---------- */
 
@@ -79,19 +134,25 @@ const label = $('#viewerLabel');
 const countEl = $('#viewerCount');
 const pageEl = $('#viewerPage');
 
-let current = -1;
+let current = null;
 let slideCount = 0;
 let lastFocus = null;
 
-function openViewer(i) {
-  const p = PROJECTS[i];
-  current = i;
+function slideHTML(p, f, n) {
+  const src = '/portfolio/assets/' + p.slug + '/' + f;
+  if (f.endsWith('.mp4')) {
+    return '<div class="viewer-slide"><video src="' + src + '" poster="' + src.replace(/\.mp4$/, '.jpg') +
+      '" muted loop playsinline autoplay preload="metadata" aria-label="' + p.title + ' — film ' + (n + 1) + '"></video></div>';
+  }
+  return '<div class="viewer-slide"><img loading="' + (n < 2 ? 'eager' : 'lazy') +
+    '" src="' + src + '" alt="' + p.title + ' — strona ' + (n + 1) + '"></div>';
+}
+
+function openViewer(list, i) {
+  const p = list[i];
+  current = p;
   slideCount = p.pages.length;
-  track.innerHTML = p.pages
-    .map((f, n) =>
-      '<div class="viewer-slide"><img loading="' + (n < 2 ? 'eager' : 'lazy') +
-      '" src="/portfolio/assets/' + p.slug + '/' + f + '" alt="' + p.title + ' — strona ' + (n + 1) + '"></div>')
-    .join('');
+  track.innerHTML = p.pages.map((f, n) => slideHTML(p, f, n)).join('');
   label.innerHTML = '<b>' + p.title + '</b>&nbsp;<i>' + String(i + 1).padStart(2, '0') + '</i>';
   lastFocus = document.activeElement;
   viewer.hidden = false;
@@ -103,9 +164,12 @@ function openViewer(i) {
 }
 
 function closeViewer() {
+  track.querySelectorAll('video').forEach((v) => v.pause());
   viewer.hidden = true;
   document.body.style.overflow = '';
-  history.replaceState(null, '', '#projekty');
+  current = null;
+  const tab = tabs.find((t) => t.getAttribute('aria-selected') === 'true');
+  history.replaceState(null, '', '#' + (tab ? tab.dataset.key : 'projekty'));
   if (lastFocus) lastFocus.focus();
 }
 
@@ -124,7 +188,7 @@ function goTo(n) {
 }
 
 function updateCount(n) {
-  countEl.innerHTML = (n + 1) + ' / ' + slideCount;
+  countEl.innerHTML = (n + 1) + ' / ' + slideCount;
   pageEl.textContent = n + 1;
 }
 
@@ -140,14 +204,19 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') goTo(slideIndex() - 1);
 });
 
-/* deep-link: #slug otwiera projekt (przy wejściu i przy zmianie hasha) */
+/* deep-link: #rok-1 / #rok-2 / #poza wybiera zakładkę, #slug otwiera projekt */
 function openFromHash() {
-  const idx = PROJECTS.findIndex((p) => p.slug === location.hash.slice(1));
-  if (idx >= 0) setYearOpen(true);
-  if (idx >= 0 && idx !== current) openViewer(idx);
+  const h = location.hash.slice(1);
+  if (tabs.some((t) => t.dataset.key === h)) { selectTab(h, { silent: true }); return; }
+  const i1 = PROJECTS.findIndex((p) => p.slug === h);
+  if (i1 >= 0) { selectTab('rok-1', { silent: true }); if (!current || current.slug !== h) openViewer(PROJECTS, i1); return; }
+  const ip = PRIVATE.findIndex((p) => p.slug === h && p.pages);
+  if (ip >= 0) { selectTab('poza', { silent: true }); if (!current || current.slug !== h) openViewer(PRIVATE, ip); return; }
+  selectTab('rok-2', { silent: true });
 }
 window.addEventListener('hashchange', openFromHash);
 openFromHash();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moveInk(tabs.find((t) => t.getAttribute('aria-selected') === 'true')));
 
 /* ---------- scroll hint ---------- */
 

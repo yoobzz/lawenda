@@ -1,0 +1,946 @@
+<!doctype html><html><head><meta name="robots" content="noindex, nofollow, noarchive"><title>harmonograf · staś szpineta</title><meta name="description" content="Harmonograf: cztery wahadła i dwa pióra rysują plakat. Każdy rysunek ma swój kod."><link rel="icon" href="/favicon.ico"><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  :root {
+    --bg: #DFE2DC;
+    --panel: #EFF1EC;
+    --panel-2: #E6E9E2;
+    --ink: #191C19;
+    --muted: #5C625C;
+    --rule: #B9BEB6;
+    --rule-soft: #CBCFC7;
+    --accent: #2438C8;
+    --accent-ink: #FFFFFF;
+    --shadow: 0 24px 60px -30px rgba(20,26,20,.55);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0E100F;
+      --panel: #171A18;
+      --panel-2: #1E221F;
+      --ink: #E6E9E2;
+      --muted: #8B928A;
+      --rule: #2A2E2B;
+      --rule-soft: #232724;
+      --accent: #7C8BFF;
+      --accent-ink: #0E100F;
+      --shadow: 0 30px 70px -34px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E100F;
+    --panel: #171A18;
+    --panel-2: #1E221F;
+    --ink: #E6E9E2;
+    --muted: #8B928A;
+    --rule: #2A2E2B;
+    --rule-soft: #232724;
+    --accent: #7C8BFF;
+    --accent-ink: #0E100F;
+    --shadow: 0 30px 70px -34px rgba(0,0,0,.9);
+  }
+  :root[data-theme="light"] {
+    --bg: #DFE2DC;
+    --panel: #EFF1EC;
+    --panel-2: #E6E9E2;
+    --ink: #191C19;
+    --muted: #5C625C;
+    --rule: #B9BEB6;
+    --rule-soft: #CBCFC7;
+    --accent: #2438C8;
+    --accent-ink: #FFFFFF;
+    --shadow: 0 24px 60px -30px rgba(20,26,20,.55);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .mono {
+    font-family: "SF Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wrap {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 400px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ---------- sheet column ---------- */
+
+  .stage { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 14px; }
+
+  .sheet-frame {
+    position: relative;
+    background: transparent;
+    box-shadow: var(--shadow);
+    line-height: 0;
+    cursor: grab;
+    touch-action: pan-y;
+  }
+  .sheet-frame:active { cursor: grabbing; }
+  .sheet-frame canvas { width: 100%; height: auto; display: block; }
+  .sheet-frame:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+  .stage-bar {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .stage-bar b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- rail ---------- */
+
+  .rail { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+  .masthead { padding: 0 0 22px; border-bottom: 1px solid var(--rule); margin-bottom: 22px; }
+  .eyebrow {
+    font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 10px;
+  }
+  .masthead h1 {
+    margin: 0 0 10px;
+    font-size: 34px; font-weight: 700; letter-spacing: -.035em;
+    text-transform: uppercase; line-height: .92; text-wrap: balance;
+  }
+  .masthead p {
+    margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted);
+    max-width: 34em; font-weight: 300;
+  }
+
+  .group { border-top: 1px solid var(--rule-soft); padding: 16px 0 14px; }
+  .group:first-of-type { border-top: none; padding-top: 0; }
+  .group > h2 {
+    margin: 0 0 12px;
+    font-size: 10px; letter-spacing: .24em; text-transform: uppercase;
+    font-weight: 500; color: var(--muted);
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  }
+  .group > h2 span { letter-spacing: .06em; text-transform: none; font-size: 11px; opacity: .8; }
+
+  .ctl {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr) 54px;
+    align-items: center; gap: 12px;
+    padding: 3px 0;
+  }
+  .ctl label {
+    font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ctl output { font-size: 11px; text-align: right; color: var(--ink); }
+
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 18px; background: transparent; margin: 0; cursor: ew-resize;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 1px; background: var(--rule);
+  }
+  input[type="range"]::-moz-range-track { height: 1px; background: var(--rule); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 3px; height: 15px; margin-top: -7px;
+    background: var(--ink); border: none; border-radius: 0;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 3px; height: 15px; background: var(--ink); border: none; border-radius: 0;
+  }
+  input[type="range"]:hover::-webkit-slider-thumb,
+  input[type="range"]:focus-visible::-webkit-slider-thumb { background: var(--accent); width: 5px; }
+  input[type="range"]:hover::-moz-range-thumb,
+  input[type="range"]:focus-visible::-moz-range-thumb { background: var(--accent); width: 5px; }
+  input[type="range"]:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+
+  .seg { display: flex; gap: 0; border: 1px solid var(--rule); }
+  .seg button {
+    flex: 1; padding: 8px 4px; background: transparent; border: none;
+    border-right: 1px solid var(--rule); color: var(--muted); cursor: pointer;
+    font-family: inherit; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  }
+  .seg button:last-child { border-right: none; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; padding: 4px 0; }
+  .field span { font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .field input[type="text"] {
+    background: var(--panel); border: 1px solid var(--rule); color: var(--ink);
+    padding: 8px 10px; font-family: inherit; font-size: 13px; border-radius: 0; width: 100%;
+  }
+  .field input.mono { font-size: 11px; }
+  .field input[type="text"]:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 4px; }
+  .btn {
+    padding: 11px 10px; border: 1px solid var(--ink); background: transparent; color: var(--ink);
+    font-family: inherit; font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+    cursor: pointer; border-radius: 0; transition: background .12s, color .12s;
+  }
+  .btn:hover { background: var(--ink); color: var(--bg); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover { filter: brightness(1.12); }
+  .btn.wide { grid-column: 1 / -1; }
+
+  .slots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding-top: 4px; }
+  .slot {
+    position: relative; aspect-ratio: 1 / 1.414; padding: 0;
+    border: 1px solid var(--rule); background: var(--panel);
+    cursor: pointer; border-radius: 0; overflow: hidden; line-height: 0;
+  }
+  .slot canvas { width: 100%; height: 100%; display: block; }
+  .slot.empty::after {
+    content: "+"; position: absolute; inset: 0; display: grid; place-items: center;
+    color: var(--muted); font-size: 15px; line-height: 1;
+  }
+  .slot:hover { border-color: var(--accent); }
+  .slot:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .slot .kill {
+    position: absolute; top: 0; right: 0; width: 16px; height: 16px; padding: 0;
+    border: none; background: var(--ink); color: var(--bg); font-size: 10px; line-height: 16px;
+    cursor: pointer; opacity: 0; transition: opacity .12s;
+  }
+  .slot:hover .kill, .slot .kill:focus-visible { opacity: 1; }
+
+  .note { font-size: 11px; line-height: 1.55; color: var(--muted); font-weight: 300; padding-top: 10px; }
+  .note kbd {
+    font-family: "SF Mono", Menlo, monospace; font-size: 10px;
+    border: 1px solid var(--rule); padding: 1px 4px; color: var(--ink);
+  }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(14px);
+    background: var(--ink); color: var(--bg); padding: 10px 18px;
+    font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+    opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s; z-index: 40;
+  }
+  .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 980px) {
+    .wrap { grid-template-columns: minmax(0, 1fr); gap: 30px; padding: 20px 16px 60px; }
+    .stage { position: static; }
+    .sheet-frame { max-width: 560px; margin: 0 auto; }
+    .masthead h1 { font-size: 30px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: .01ms !important; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="stage">
+    <div class="stage-bar">
+      <span>Arkusz <b id="sheetName">Kość</b> · B-format 1:√2</span>
+      <span id="statLen">—</span>
+    </div>
+    <div class="sheet-frame" id="frame" tabindex="0" role="img"
+         aria-label="Podgląd plakatu z figurą harmonografu. Przeciągnij w poziomie, aby obrócić rysunek.">
+      <canvas id="poster"></canvas>
+    </div>
+    <div class="stage-bar">
+      <span>Przeciągnij arkusz w poziomie, aby obrócić figurę</span>
+      <span class="mono" id="statFps">—</span>
+    </div>
+  </div>
+
+  <div class="rail">
+    <div class="masthead">
+      <p class="eyebrow">Instrument rysunkowy</p>
+      <h1>Harmonograf</h1>
+      <p>Cztery wahadła, dwa pióra. Dwa wahadła prowadzą pióro w osi X, dwa w osi Y; każde ma własną
+        częstotliwość, fazę i tłumienie. Bliskie ilorazy całkowite dają figury zamknięte — rozstrojenie
+        o setne części rozwija je w rozetę. Każdy arkusz nosi swój kod, więc da się go odtworzyć.</p>
+    </div>
+
+    <div id="groups"></div>
+
+    <div class="group">
+      <h2>Napisy na arkuszu</h2>
+      <label class="field"><span>Tytuł</span>
+        <input type="text" id="inTitle" maxlength="28" autocomplete="off"></label>
+      <label class="field"><span>Podtytuł</span>
+        <input type="text" id="inSub" maxlength="60" autocomplete="off"></label>
+    </div>
+
+    <div class="group">
+      <h2>Arkusz</h2>
+      <div class="seg" id="sheetSeg" role="group" aria-label="Wybór arkusza"></div>
+    </div>
+
+    <div class="group">
+      <h2>Wykonanie</h2>
+      <div class="actions">
+        <button class="btn primary wide" id="btnRand">Losuj strojenie</button>
+        <button class="btn" id="btnExport">Zapisz PNG</button>
+        <button class="btn" id="btnCopy">Kopiuj kod</button>
+      </div>
+      <label class="field" style="padding-top:12px"><span>Kod arkusza — wklej i zatwierdź, aby wczytać</span>
+        <input type="text" id="inCode" class="mono" spellcheck="false" autocomplete="off"></label>
+    </div>
+
+    <div class="group">
+      <h2>Zapisane <span id="slotCount"></span></h2>
+      <div class="slots" id="slots"></div>
+      <p class="note">Puste pole zapisuje bieżące strojenie, zapełnione je wczytuje.
+        Skróty: <kbd>L</kbd> losuj · <kbd>E</kbd> eksport · <kbd>1</kbd>–<kbd>3</kbd> arkusz.</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var POSTER_W = 900, POSTER_H = 1273;
+  var DISPLAY = "\"Helvetica Neue\", Helvetica, Arial, sans-serif";
+  var MONO = "\"SF Mono\", \"SFMono-Regular\", Menlo, Consolas, monospace";
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var SHEETS = [
+    { name: "Kość",        paper: "#DEDFD8", penA: "#1F2ABF", penB: "#B8401D", type: "#14171A", blend: "multiply", grain: 0.055 },
+    { name: "Grafit",      paper: "#16191B", penA: "#7C8BFF", penB: "#FF6B3D", type: "#E9EBE4", blend: "lighter",  grain: 0.05 },
+    { name: "Ultramaryna", paper: "#1B247A", penA: "#EDE7D8", penB: "#FFB020", type: "#EDE7D8", blend: "lighter",  grain: 0.06 }
+  ];
+
+  var CONTROLS = [
+    { title: "Wahadło X", hint: "poziome", items: [
+      { k: "f0", l: "Częstotl. I",  min: 0.5,  max: 8,    step: 0.005,  dec: 3 },
+      { k: "p0", l: "Faza I",       min: 0,    max: 1,    step: 0.001,  dec: 3 },
+      { k: "d0", l: "Tłumienie I",  min: 0,    max: 0.03, step: 0.0002, dec: 4 },
+      { k: "f1", l: "Częstotl. II", min: 0.5,  max: 8,    step: 0.005,  dec: 3 },
+      { k: "p1", l: "Faza II",      min: 0,    max: 1,    step: 0.001,  dec: 3 },
+      { k: "d1", l: "Tłumienie II", min: 0,    max: 0.03, step: 0.0002, dec: 4 }
+    ]},
+    { title: "Wahadło Y", hint: "pionowe", items: [
+      { k: "f2", l: "Częstotl. I",  min: 0.5,  max: 8,    step: 0.005,  dec: 3 },
+      { k: "p2", l: "Faza I",       min: 0,    max: 1,    step: 0.001,  dec: 3 },
+      { k: "d2", l: "Tłumienie I",  min: 0,    max: 0.03, step: 0.0002, dec: 4 },
+      { k: "f3", l: "Częstotl. II", min: 0.5,  max: 8,    step: 0.005,  dec: 3 },
+      { k: "p3", l: "Faza II",      min: 0,    max: 1,    step: 0.001,  dec: 3 },
+      { k: "d3", l: "Tłumienie II", min: 0,    max: 0.03, step: 0.0002, dec: 4 }
+    ]},
+    { title: "Pióro", hint: "", items: [
+      { k: "pens",   l: "Liczba piór", min: 1,   max: 2,    step: 1,     dec: 0 },
+      { k: "offset", l: "Rozjazd",     min: 0,   max: 0.25, step: 0.001, dec: 3 },
+      { k: "width",  l: "Grubość",     min: 0.3, max: 3.2,  step: 0.05,  dec: 2 },
+      { k: "alpha",  l: "Krycie",      min: 0.1, max: 1,    step: 0.01,  dec: 2 }
+    ]},
+    { title: "Bieg", hint: "", items: [
+      { k: "tmax",  l: "Czas biegu", min: 20,  max: 320,   step: 1,    dec: 0 },
+      { k: "steps", l: "Gęstość",    min: 1500, max: 40000, step: 500,  dec: 0 },
+      { k: "rot",   l: "Obrót",      min: 0,   max: 1,     step: 0.002, dec: 3 },
+      { k: "scale", l: "Rozmiar",    min: 0.55, max: 1.15, step: 0.005, dec: 3 }
+    ]}
+  ];
+
+  var KEYS = ["f0","p0","d0","f1","p1","d1","f2","p2","d2","f3","p3","d3",
+              "pens","offset","width","alpha","tmax","steps","rot","scale"];
+
+  var st = {
+    f0: 3.005, p0: 0.000, d0: 0.0060, f1: 2.000, p1: 0.250, d1: 0.0042,
+    f2: 4.010, p2: 0.500, d2: 0.0058, f3: 3.000, p3: 0.000, d3: 0.0040,
+    pens: 2, offset: 0.028, width: 1.05, alpha: 0.72,
+    tmax: 150, steps: 16000, rot: 0.0, scale: 0.92,
+    sheet: 0, seed: 741205,
+    title: "Harmonograf", sub: "cztery wahadła, dwa pióra"
+  };
+
+  /* ---------- prng ---------- */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  /* ---------- geometry ---------- */
+  var TAU = Math.PI * 2;
+
+  function makePath(s, steps, phaseShift) {
+    var pts = new Float32Array(steps * 2);
+    var a0 = 1, a1 = 0.72, a2 = 1, a3 = 0.72;
+    var ps = phaseShift * TAU;
+    var dt = s.tmax / (steps - 1);
+    var norm = 1 / (a0 + a1);
+    for (var i = 0; i < steps; i++) {
+      var t = i * dt;
+      var x = a0 * Math.sin(s.f0 * t + s.p0 * TAU + ps) * Math.exp(-s.d0 * t)
+            + a1 * Math.sin(s.f1 * t + s.p1 * TAU + ps) * Math.exp(-s.d1 * t);
+      var y = a2 * Math.sin(s.f2 * t + s.p2 * TAU + ps) * Math.exp(-s.d2 * t)
+            + a3 * Math.sin(s.f3 * t + s.p3 * TAU + ps) * Math.exp(-s.d3 * t);
+      pts[i * 2] = x * norm;
+      pts[i * 2 + 1] = y * norm;
+    }
+    return pts;
+  }
+
+  /* ---------- grain ---------- */
+  var grainTile = null;
+  function getGrain(ctx) {
+    if (!grainTile) {
+      grainTile = document.createElement("canvas");
+      grainTile.width = grainTile.height = 140;
+      var g = grainTile.getContext("2d");
+      var img = g.createImageData(140, 140);
+      var rnd = mulberry32(99173);
+      for (var i = 0; i < img.data.length; i += 4) {
+        var v = 128 + (rnd() - 0.5) * 210;
+        img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+        img.data[i + 3] = 255;
+      }
+      g.putImageData(img, 0, 0);
+    }
+    // a pattern belongs to the context that made it, so mint a fresh one each time
+    return ctx.createPattern(grainTile, "repeat");
+  }
+
+  /* ---------- text helpers ---------- */
+  function setFont(ctx, weight, size, family, tracking) {
+    ctx.font = weight + " " + size + "px " + family;
+    try { ctx.letterSpacing = (tracking || 0) + "px"; } catch (e) { /* older engines */ }
+  }
+  function fitSize(ctx, text, maxW, start, weight, family, tracking) {
+    var size = start;
+    while (size > 10) {
+      setFont(ctx, weight, size, family, tracking * size);
+      if (ctx.measureText(text).width <= maxW) break;
+      size -= 2;
+    }
+    return size;
+  }
+
+  function fingerprint(s) {
+    var f = [s.f0, s.f1, s.f2, s.f3].map(function (v) { return v.toFixed(2); }).join("·");
+    var p = [s.p0, s.p1, s.p2, s.p3].map(function (v) { return v.toFixed(2).slice(1); }).join("·");
+    var d = ((s.d0 + s.d1 + s.d2 + s.d3) / 4).toFixed(4).slice(1);
+    return "f " + f + "   φ " + p + "   d " + d + "   t " + Math.round(s.tmax);
+  }
+  function seedTag(s) {
+    return "#" + (s.seed >>> 0).toString(16).toUpperCase().slice(0, 6).padStart(6, "0");
+  }
+
+  /* ---------- the poster ---------- */
+  function renderPoster(ctx, scale, s, progress, quality) {
+    var sh = SHEETS[s.sheet];
+    var W = POSTER_W, H = POSTER_H;
+    var M = 66;
+
+    ctx.save();
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = sh.paper;
+    ctx.fillRect(0, 0, W, H);
+
+    // figure
+    var boxTop = M + 18, boxBottom = 930;
+    var cx = W / 2, cy = (boxTop + boxBottom) / 2;
+    var radius = Math.min((W - M * 2), (boxBottom - boxTop)) / 2 * s.scale;
+
+    var steps = quality === "draft" ? Math.min(4200, Math.round(s.steps)) : Math.round(s.steps);
+    var visible = Math.max(2, Math.floor(steps * progress));
+    var chunk = 420;
+    var rot = s.rot * TAU;
+    var cosR = Math.cos(rot), sinR = Math.sin(rot);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(M - 10, boxTop - 26, W - (M - 10) * 2, boxBottom - boxTop + 52);
+    ctx.clip();
+    ctx.globalCompositeOperation = sh.blend;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.lineWidth = s.width;
+    ctx.globalAlpha = s.alpha;
+
+    var penCount = Math.round(s.pens);
+    for (var pen = 0; pen < penCount; pen++) {
+      var pts = makePath(s, steps, pen === 0 ? 0 : s.offset);
+      ctx.strokeStyle = pen === 0 ? sh.penA : sh.penB;
+      for (var start = 0; start < visible - 1; start += chunk) {
+        var end = Math.min(start + chunk, visible - 1);
+        ctx.beginPath();
+        for (var i = start; i <= end; i++) {
+          var px = pts[i * 2], py = pts[i * 2 + 1];
+          var rx = px * cosR - py * sinR;
+          var ry = px * sinR + py * cosR;
+          var X = cx + rx * radius, Y = cy + ry * radius;
+          if (i === start) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+        }
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    // typography block
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = sh.type;
+    ctx.textBaseline = "alphabetic";
+
+    var title = (s.title || "").toUpperCase();
+    if (title) {
+      var ts = fitSize(ctx, title, W - M * 2, 108, "700", DISPLAY, -0.045);
+      setFont(ctx, "700", ts, DISPLAY, -0.045 * ts);
+      ctx.fillText(title, M, 1058);
+    }
+
+    if (s.sub) {
+      setFont(ctx, "300", 25, DISPLAY, 0.2);
+      ctx.fillText(s.sub, M, 1098);
+    }
+
+    ctx.globalAlpha = 0.42;
+    ctx.fillRect(M, 1148, W - M * 2, 1);
+    ctx.globalAlpha = 0.78;
+
+    var fp = fingerprint(s);
+    var fpSize = fitSize(ctx, fp, W - M * 2 - 110, 16, "400", MONO, 0);
+    setFont(ctx, "400", fpSize, MONO, 0);
+    ctx.fillText(fp, M, 1180);
+
+    setFont(ctx, "400", 16, MONO, 0);
+    ctx.textAlign = "right";
+    ctx.fillText(seedTag(s), W - M, 1180);
+    ctx.textAlign = "left";
+    ctx.restore();
+
+    ctx.restore();
+
+    // grain, laid on in device pixels so it stays fine at export size
+    ctx.save();
+    ctx.globalAlpha = sh.grain;
+    ctx.globalCompositeOperation = "overlay";
+    ctx.fillStyle = getGrain(ctx);
+    ctx.fillRect(0, 0, W * scale, H * scale);
+    ctx.restore();
+  }
+
+  /* ---------- display canvas ---------- */
+  var canvas = document.getElementById("poster");
+  var ctx = canvas.getContext("2d");
+  var frame = document.getElementById("frame");
+  var backingScale = 1;
+
+  function resize() {
+    var cssW = frame.clientWidth || 640;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    backingScale = (cssW * dpr) / POSTER_W;
+    canvas.width = Math.round(POSTER_W * backingScale);
+    canvas.height = Math.round(POSTER_H * backingScale);
+    canvas.style.aspectRatio = POSTER_W + " / " + POSTER_H;
+    draw("full", 1);
+  }
+
+  var pending = null, animId = null;
+
+  function draw(quality, progress) {
+    var t0 = performance.now();
+    renderPoster(ctx, backingScale, st, progress, quality);
+    var ms = Math.round(performance.now() - t0);
+    document.getElementById("statFps").textContent = ms + " ms";
+    var pts = Math.round(st.steps) * Math.round(st.pens);
+    document.getElementById("statLen").textContent =
+      pts.toLocaleString("pl-PL") + " punktów · " + Math.round(st.tmax / TAU) + " obiegów";
+  }
+
+  function schedule(quality) {
+    if (pending) return;
+    pending = requestAnimationFrame(function () {
+      pending = null;
+      draw(quality || "draft", 1);
+    });
+  }
+
+  function animatePen() {
+    if (animId) cancelAnimationFrame(animId);
+    if (reduceMotion) { draw("full", 1); return; }
+    var start = performance.now(), dur = 760;
+    (function step(now) {
+      var k = Math.min(1, (now - start) / dur);
+      var eased = 1 - Math.pow(1 - k, 2.4);
+      draw(k < 1 ? "draft" : "full", eased);
+      if (k < 1) animId = requestAnimationFrame(step); else animId = null;
+    })(start);
+  }
+
+  /* ---------- rail construction ---------- */
+  var outputs = {}, inputs = {};
+  var groupsEl = document.getElementById("groups");
+
+  CONTROLS.forEach(function (g) {
+    var sec = document.createElement("div");
+    sec.className = "group";
+    var h = document.createElement("h2");
+    h.textContent = g.title;
+    if (g.hint) { var sp = document.createElement("span"); sp.textContent = g.hint; h.appendChild(sp); }
+    sec.appendChild(h);
+
+    g.items.forEach(function (it) {
+      var row = document.createElement("div");
+      row.className = "ctl";
+
+      var lab = document.createElement("label");
+      lab.textContent = it.l;
+      lab.setAttribute("for", "r_" + it.k);
+
+      var inp = document.createElement("input");
+      inp.type = "range";
+      inp.id = "r_" + it.k;
+      inp.min = it.min; inp.max = it.max; inp.step = it.step;
+      inp.value = st[it.k];
+
+      var out = document.createElement("output");
+      out.className = "mono";
+      out.htmlFor = "r_" + it.k;
+
+      row.appendChild(lab); row.appendChild(inp); row.appendChild(out);
+      sec.appendChild(row);
+
+      inputs[it.k] = inp; outputs[it.k] = { el: out, dec: it.dec };
+
+      inp.addEventListener("input", function () {
+        st[it.k] = parseFloat(inp.value);
+        syncOut(it.k);
+        schedule("draft");
+      });
+      inp.addEventListener("change", function () { schedule("full"); syncCode(); });
+    });
+
+    groupsEl.appendChild(sec);
+  });
+
+  function syncOut(k) {
+    var o = outputs[k];
+    if (!o) return;
+    o.el.textContent = o.dec === 0
+      ? Math.round(st[k]).toLocaleString("pl-PL")
+      : st[k].toFixed(o.dec);
+  }
+
+  function syncAll() {
+    KEYS.forEach(function (k) {
+      if (inputs[k]) inputs[k].value = st[k];
+      syncOut(k);
+    });
+    document.getElementById("inTitle").value = st.title;
+    document.getElementById("inSub").value = st.sub;
+    document.getElementById("sheetName").textContent = SHEETS[st.sheet].name;
+    Array.prototype.forEach.call(sheetSeg.children, function (b, i) {
+      b.setAttribute("aria-pressed", String(i === st.sheet));
+    });
+    syncCode();
+  }
+
+  /* ---------- sheet chooser ---------- */
+  var sheetSeg = document.getElementById("sheetSeg");
+  SHEETS.forEach(function (sh, i) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = sh.name;
+    b.setAttribute("aria-pressed", String(i === st.sheet));
+    b.addEventListener("click", function () { setSheet(i); });
+    sheetSeg.appendChild(b);
+  });
+  function setSheet(i) {
+    st.sheet = i;
+    document.getElementById("sheetName").textContent = SHEETS[i].name;
+    Array.prototype.forEach.call(sheetSeg.children, function (b, j) {
+      b.setAttribute("aria-pressed", String(j === i));
+    });
+    draw("full", 1);
+    syncCode();
+    renderSlots();
+  }
+
+  /* ---------- text fields ---------- */
+  document.getElementById("inTitle").addEventListener("input", function (e) {
+    st.title = e.target.value; schedule("full"); syncCode();
+  });
+  document.getElementById("inSub").addEventListener("input", function (e) {
+    st.sub = e.target.value; schedule("full"); syncCode();
+  });
+
+  /* ---------- code ---------- */
+  function encode(s) {
+    var arr = KEYS.map(function (k) { return +(+s[k]).toFixed(5); });
+    var payload = JSON.stringify([arr, s.sheet, s.seed, s.title, s.sub]);
+    return btoa(unescape(encodeURIComponent(payload))).replace(/=+$/, "");
+  }
+  function decode(code) {
+    var pad = code.length % 4 ? "=".repeat(4 - (code.length % 4)) : "";
+    var json = decodeURIComponent(escape(atob(code.trim() + pad)));
+    var d = JSON.parse(json);
+    if (!Array.isArray(d) || !Array.isArray(d[0]) || d[0].length !== KEYS.length) throw new Error("zły kod");
+    var next = {};
+    KEYS.forEach(function (k, i) { next[k] = d[0][i]; });
+    next.sheet = Math.max(0, Math.min(SHEETS.length - 1, d[1] | 0));
+    next.seed = d[2] | 0;
+    next.title = String(d[3] || "");
+    next.sub = String(d[4] || "");
+    return next;
+  }
+  function applyState(next) {
+    Object.keys(next).forEach(function (k) { st[k] = next[k]; });
+    syncAll();
+    animatePen();
+  }
+
+  var codeField = document.getElementById("inCode");
+  function syncCode() { codeField.value = encode(st); }
+  codeField.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter") return;
+    try { applyState(decode(codeField.value)); toast("Wczytano arkusz"); }
+    catch (err) { toast("Nie rozpoznano kodu"); syncCode(); }
+  });
+  codeField.addEventListener("focus", function () { codeField.select(); });
+
+  /* ---------- randomize ---------- */
+  function randomize() {
+    var seed = (Math.floor(Math.random() * 0xFFFFFF) + 1) >>> 0;
+    var rnd = mulberry32(seed);
+    var base = 1 + Math.floor(rnd() * 4);
+    function ratio() { return base * (1 + Math.floor(rnd() * 3)) / (1 + Math.floor(rnd() * 2)); }
+    function detune() { return (rnd() - 0.5) * 0.05; }
+
+    st.seed = seed;
+    st.f0 = clamp(ratio() + detune(), 0.5, 8);
+    st.f1 = clamp(st.f0 * (rnd() < 0.5 ? 1 : 2 / 3) + detune(), 0.5, 8);
+    st.f2 = clamp(ratio() + detune(), 0.5, 8);
+    st.f3 = clamp(st.f2 * (rnd() < 0.5 ? 1 : 3 / 2) + detune(), 0.5, 8);
+    st.p0 = round3(rnd()); st.p1 = round3(rnd()); st.p2 = round3(rnd()); st.p3 = round3(rnd());
+    var dBase = 0.002 + rnd() * 0.008;
+    st.d0 = round4(dBase * (0.6 + rnd() * 0.9));
+    st.d1 = round4(dBase * (0.6 + rnd() * 0.9));
+    st.d2 = round4(dBase * (0.6 + rnd() * 0.9));
+    st.d3 = round4(dBase * (0.6 + rnd() * 0.9));
+    st.tmax = Math.round(90 + rnd() * 180);
+    st.offset = round3(rnd() * 0.09);
+    st.pens = rnd() < 0.72 ? 2 : 1;
+    st.rot = round3(rnd());
+    st.alpha = round2(0.5 + rnd() * 0.4);
+    st.width = round2(0.6 + rnd() * 1.1);
+    syncAll();
+    animatePen();
+  }
+  function clamp(v, a, b) { return Math.min(b, Math.max(a, +v.toFixed(3))); }
+  function round2(v) { return +v.toFixed(2); }
+  function round3(v) { return +v.toFixed(3); }
+  function round4(v) { return +v.toFixed(4); }
+
+  document.getElementById("btnRand").addEventListener("click", randomize);
+
+  /* ---------- export ---------- */
+  document.getElementById("btnExport").addEventListener("click", function () {
+    var scale = 2480 / POSTER_W;
+    var off = document.createElement("canvas");
+    off.width = Math.round(POSTER_W * scale);
+    off.height = Math.round(POSTER_H * scale);
+    var octx = off.getContext("2d");
+    renderPoster(octx, scale, st, 1, "full");
+    var a = document.createElement("a");
+    a.download = "harmonograf-" + seedTag(st).slice(1).toLowerCase() + ".png";
+    a.href = off.toDataURL("image/png");
+    a.click();
+    toast("Zapisano " + off.width + "×" + off.height);
+  });
+
+  document.getElementById("btnCopy").addEventListener("click", function () {
+    var code = encode(st);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(
+        function () { toast("Kod skopiowany"); },
+        function () { fallbackCopy(code); }
+      );
+    } else fallbackCopy(code);
+  });
+  function fallbackCopy(text) {
+    codeField.value = text; codeField.focus(); codeField.select();
+    try { document.execCommand("copy"); toast("Kod skopiowany"); }
+    catch (e) { toast("Zaznaczono kod — skopiuj ręcznie"); }
+  }
+
+  /* ---------- slots ---------- */
+  var SLOT_KEY = "harmonograf.slots.v1";
+  var SLOT_N = 6;
+  var slotsEl = document.getElementById("slots");
+
+  function loadSlots() {
+    try {
+      var raw = localStorage.getItem(SLOT_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(arr)) arr = [];
+      arr.length = SLOT_N;
+      return arr;
+    } catch (e) { return new Array(SLOT_N); }
+  }
+  function saveSlots(arr) {
+    try { localStorage.setItem(SLOT_KEY, JSON.stringify(arr)); } catch (e) { /* private mode */ }
+  }
+
+  function renderSlots() {
+    var arr = loadSlots();
+    slotsEl.textContent = "";
+    var filled = 0;
+    for (var i = 0; i < SLOT_N; i++) {
+      (function (i) {
+        var code = arr[i];
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "slot" + (code ? "" : " empty");
+        b.setAttribute("aria-label", code ? "Wczytaj zapis " + (i + 1) : "Zapisz w polu " + (i + 1));
+        if (code) {
+          filled++;
+          var c = document.createElement("canvas");
+          c.width = 108; c.height = 153;
+          b.appendChild(c);
+          try {
+            var thumbState = decode(code);
+            var full = {};
+            KEYS.forEach(function (k) { full[k] = thumbState[k]; });
+            full.sheet = thumbState.sheet; full.seed = thumbState.seed;
+            full.title = ""; full.sub = "";
+            full.steps = Math.min(2600, full.steps);
+            var tctx = c.getContext("2d");
+            renderThumb(tctx, c.width / POSTER_W, full);
+          } catch (e) { /* corrupt entry renders blank */ }
+          var kill = document.createElement("span");
+          kill.className = "kill";
+          kill.textContent = "×";
+          kill.setAttribute("role", "button");
+          kill.setAttribute("tabindex", "0");
+          kill.setAttribute("aria-label", "Usuń zapis " + (i + 1));
+          function del(e) {
+            e.stopPropagation(); e.preventDefault();
+            var a2 = loadSlots(); a2[i] = null; saveSlots(a2); renderSlots(); toast("Usunięto zapis");
+          }
+          kill.addEventListener("click", del);
+          kill.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") del(e); });
+          b.appendChild(kill);
+        }
+        b.addEventListener("click", function () {
+          var a2 = loadSlots();
+          if (a2[i]) {
+            try { applyState(decode(a2[i])); toast("Wczytano zapis " + (i + 1)); }
+            catch (e) { toast("Zapis uszkodzony"); }
+          } else {
+            a2[i] = encode(st); saveSlots(a2); renderSlots(); toast("Zapisano w polu " + (i + 1));
+          }
+        });
+        slotsEl.appendChild(b);
+      })(i);
+    }
+    document.getElementById("slotCount").textContent = filled + " / " + SLOT_N;
+  }
+
+  function renderThumb(tctx, scale, s) {
+    var sh = SHEETS[s.sheet];
+    tctx.save();
+    tctx.scale(scale, scale);
+    tctx.fillStyle = sh.paper;
+    tctx.fillRect(0, 0, POSTER_W, POSTER_H);
+    var steps = Math.round(s.steps);
+    var pts0 = makePath(s, steps, 0);
+    var rot = s.rot * TAU, cosR = Math.cos(rot), sinR = Math.sin(rot);
+    var cx = POSTER_W / 2, cy = POSTER_H / 2;
+    var radius = (POSTER_W - 70) / 2 * s.scale;
+    tctx.globalCompositeOperation = sh.blend;
+    tctx.globalAlpha = Math.min(1, s.alpha + 0.15);
+    tctx.lineWidth = Math.max(2.6, s.width * 2.4);
+    var pens = Math.round(s.pens);
+    for (var pen = 0; pen < pens; pen++) {
+      var pts = pen === 0 ? pts0 : makePath(s, steps, s.offset);
+      tctx.strokeStyle = pen === 0 ? sh.penA : sh.penB;
+      tctx.beginPath();
+      for (var i = 0; i < steps; i++) {
+        var px = pts[i * 2], py = pts[i * 2 + 1];
+        var X = cx + (px * cosR - py * sinR) * radius;
+        var Y = cy + (px * sinR + py * cosR) * radius;
+        if (i === 0) tctx.moveTo(X, Y); else tctx.lineTo(X, Y);
+      }
+      tctx.stroke();
+    }
+    tctx.restore();
+  }
+
+  /* ---------- drag to rotate ---------- */
+  var dragging = false, lastX = 0;
+  function onDown(e) {
+    dragging = true;
+    lastX = (e.touches ? e.touches[0].clientX : e.clientX);
+    frame.setPointerCapture && e.pointerId != null && frame.setPointerCapture(e.pointerId);
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    var x = (e.touches ? e.touches[0].clientX : e.clientX);
+    var dx = x - lastX; lastX = x;
+    st.rot = (st.rot + dx * 0.0016 + 1) % 1;
+    if (inputs.rot) inputs.rot.value = st.rot;
+    syncOut("rot");
+    schedule("draft");
+    if (e.cancelable) e.preventDefault();
+  }
+  function onUp() { if (!dragging) return; dragging = false; draw("full", 1); syncCode(); }
+
+  frame.addEventListener("pointerdown", onDown);
+  window.addEventListener("pointermove", onMove, { passive: false });
+  window.addEventListener("pointerup", onUp);
+  frame.addEventListener("keydown", function (e) {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    st.rot = (st.rot + (e.key === "ArrowRight" ? 0.01 : -0.01) + 1) % 1;
+    if (inputs.rot) inputs.rot.value = st.rot;
+    syncOut("rot"); draw("full", 1); syncCode();
+    e.preventDefault();
+  });
+
+  /* ---------- shortcuts ---------- */
+  window.addEventListener("keydown", function (e) {
+    var tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key.toLowerCase();
+    if (k === "l") { randomize(); e.preventDefault(); }
+    else if (k === "e") { document.getElementById("btnExport").click(); e.preventDefault(); }
+    else if (k === "1" || k === "2" || k === "3") { setSheet(+k - 1); e.preventDefault(); }
+  });
+
+  /* ---------- toast ---------- */
+  var toastEl = document.getElementById("toast"), toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove("on"); }, 1800);
+  }
+
+  /* ---------- boot ---------- */
+  var ro = new ResizeObserver(function () { resize(); });
+  ro.observe(frame);
+
+  syncAll();
+  renderSlots();
+  resize();
+  if (!reduceMotion) animatePen();
+})();
+</script>
+
+<a href="/portfolio/#poza" class="sz-back" style="position:fixed;left:12px;bottom:12px;z-index:2147483000;font:700 13px/1 'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;background:rgba(255,255,255,.92);border:1px solid #e5e5e5;padding:8px 12px;text-decoration:none;letter-spacing:.02em">&larr; portfolio <span style="color:#a88bd4">~||-_^+*.</span></a><script>(function () { if (window.top !== window.self) { var el = document.querySelector(".sz-back"); if (el) el.style.display = "none"; } })();</script></body></html>

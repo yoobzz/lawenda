@@ -44,8 +44,8 @@
       <p>nazywam się staś. studiuję projektowanie w School of Form (SWPS)
       w Warszawie. robię rzeczy rękami i komputerem &mdash; ceramikę,
       krawiectwo, prototypy, modele 3D, grafikę. to portfolio jest
-      archiwum pierwszego roku: procesów, błędów i rzeczy, które
-      z nich wyszły.</p>
+      archiwum studiów i rzeczy robionych poza nimi: procesów, błędów
+      i tego, co z nich wyszło.</p>
       <ul class="contact-mini">
         <li><b>web</b> szpineta.com</li>
         <li><b>ig</b> s.sz_archive</li>
@@ -60,7 +60,17 @@
   <span class="ascii tl">&ldquo;~||-</span>
   <span class="ascii tr">_^+*.</span>
   <span class="side-label left"><b>projekty</b>&nbsp;<i>02</i></span>
-  <ol class="project-list" id="projectList"><!-- js --></ol>
+  <div class="years-wrap">
+    <div class="years" role="tablist" aria-label="lata studiów i projekty własne" id="yearTabs">
+      <button class="year-tab" type="button" role="tab" id="tab-rok-1" aria-controls="rok-1" aria-selected="false" data-key="rok-1"><span class="yt-num">1</span><span class="yt-txt"><span class="yt-word" data-word="rok">rok</span><span class="yt-meta">2025/26</span></span></button>
+      <button class="year-tab" type="button" role="tab" id="tab-rok-2" aria-controls="rok-2" aria-selected="true" data-key="rok-2"><span class="yt-num">2</span><span class="yt-txt"><span class="yt-word" data-word="rok">rok</span><span class="yt-meta">2026/27</span></span></button>
+      <button class="year-tab" type="button" role="tab" id="tab-poza" aria-controls="poza" aria-selected="false" data-key="poza"><span class="yt-num">*</span><span class="yt-txt"><span class="yt-word" data-word="poza school of form">poza school of form</span><span class="yt-meta">projekty własne</span></span></button>
+      <span class="years-ink" aria-hidden="true"></span>
+    </div>
+    <div class="year-panel" role="tabpanel" id="rok-1" aria-labelledby="tab-rok-1" hidden><ol class="project-list" id="projectList"><!-- js --></ol></div>
+    <div class="year-panel" role="tabpanel" id="rok-2" aria-labelledby="tab-rok-2"><div id="year2"><!-- js --></div></div>
+    <div class="year-panel" role="tabpanel" id="poza" aria-labelledby="tab-poza" hidden><ol class="project-list" id="privateList"><!-- js --></ol></div>
+  </div>
 </section>
 
 <!-- ================= WHY ================= -->

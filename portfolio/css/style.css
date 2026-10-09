@@ -198,33 +198,125 @@ section:nth-of-type(even) .pagenum { left: var(--pad); }
 }
 .project-meta b { font-weight: 700; color: var(--ink); }
 
-/* chowane menu: 1 rok na studiach */
-.project-list li.year-group { border-bottom: none; }
-.year-toggle {
+/* ---------- zakładki: 1 rok / 2 rok / poza school of form ---------- */
+
+.years-wrap { max-width: 1100px; width: 100%; margin: 48px auto; }
+
+.years {
+  position: relative;
   display: flex;
-  align-items: baseline;
-  gap: clamp(12px, 2vw, 28px);
-  width: 100%;
-  padding: clamp(18px, 3vh, 32px) 4px clamp(10px, 1.6vh, 18px);
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px clamp(24px, 5vw, 72px);
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e5e5e5;
+}
+.year-tab {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(8px, 1vw, 14px);
+  padding: 0;
   background: none;
   border: none;
-  border-bottom: 1px solid #e5e5e5;
   font: inherit;
-  color: var(--ink);
+  color: #c9c9c9;
   text-align: left;
   cursor: pointer;
+  transition: color 0.35s;
 }
-.year-sign {
+.yt-num {
   font-weight: 700;
-  color: var(--accent);
-  font-size: clamp(20px, 2.4vw, 32px);
-  /* same width as the 01, 02… column of the project list */
-  min-width: calc(clamp(14px, 1.4vw, 18px) * 2.2);
-  line-height: 1;
+  font-size: clamp(72px, 12vw, 168px);
+  line-height: 0.78;
+  letter-spacing: -0.04em;
+  display: inline-block;
+  transition: transform 0.5s cubic-bezier(.2, .8, .2, 1);
 }
-.year-toggle:hover .project-title { letter-spacing: 0.28em; color: var(--accent); }
-.year-list { list-style: none; }
-.year-list[hidden] { display: none; }
+.yt-txt { display: flex; flex-direction: column; gap: 4px; padding-bottom: 2px; }
+.yt-word {
+  font-weight: 700;
+  font-size: clamp(18px, 2.4vw, 32px);
+  line-height: 1;
+  white-space: nowrap;
+}
+.yt-meta { font-size: clamp(11px, 1.1vw, 14px); color: #9a9a9a; }
+
+.year-tab:hover { color: var(--accent); }
+.year-tab:hover .yt-num { transform: translateY(-8px) rotate(-4deg); }
+.year-tab[aria-selected="true"] { color: var(--ink); }
+.year-tab[aria-selected="true"] .yt-num { color: var(--accent); }
+.year-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+
+.years-ink {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 4px;
+  width: 0;
+  background: var(--accent);
+  transition: transform 0.55s cubic-bezier(.2, .8, .2, 1), width 0.55s cubic-bezier(.2, .8, .2, 1);
+}
+
+.year-panel[hidden] { display: none; }
+.year-panel .project-list { margin: 8px auto 0; }
+
+.year-panel.enter li,
+.year-panel.enter .feature {
+  animation: rise 0.6s cubic-bezier(.2, .8, .2, 1) both;
+  animation-delay: calc(min(var(--i, 0), 14) * 40ms);
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 2 rok: duża karta projektu */
+.feature {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: clamp(20px, 4vw, 56px);
+  align-items: center;
+  padding: clamp(24px, 4vh, 48px) 0;
+  color: var(--ink);
+  text-decoration: none;
+}
+.feature-media {
+  aspect-ratio: 5 / 4;
+  background: var(--bg);
+  overflow: hidden;
+}
+.feature-media video,
+.feature-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.8s cubic-bezier(.2, .8, .2, 1);
+}
+.feature:hover .feature-media video,
+.feature:hover .feature-media img { transform: scale(1.04); }
+.feature-kicker { font-weight: 700; font-size: clamp(12px, 1.2vw, 15px); color: var(--accent); letter-spacing: 0.06em; }
+.feature-title {
+  font-weight: 700;
+  font-size: clamp(56px, 9vw, 128px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  margin: 10px 0 14px;
+  transition: letter-spacing 0.6s ease, color 0.3s;
+}
+.feature:hover .feature-title { letter-spacing: 0.08em; color: var(--accent); }
+.feature-kind { font-weight: 700; font-size: clamp(14px, 1.4vw, 18px); margin-bottom: 10px; }
+.feature-desc { font-size: clamp(14px, 1.3vw, 17px); line-height: 1.55; max-width: 44ch; color: #444; }
+.feature-go {
+  display: inline-block;
+  margin-top: 18px;
+  font-weight: 700;
+  font-size: clamp(14px, 1.4vw, 18px);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 2px;
+  transition: transform 0.3s;
+}
+.feature:hover .feature-go { transform: translateX(8px); }
 
 /* ---------- why ---------- */
 
@@ -318,7 +410,8 @@ section:nth-of-type(even) .pagenum { left: var(--pad); }
   align-items: center;
   justify-content: center;
 }
-.viewer-slide img {
+.viewer-slide img,
+.viewer-slide video {
   max-width: 100%;
   max-height: calc(100vh - 200px);
   object-fit: contain;
@@ -352,8 +445,17 @@ section:nth-of-type(even) .pagenum { left: var(--pad); }
 @media (max-width: 720px) {
   .bio-grid, .why-grid { grid-template-columns: 1fr; }
   .project-meta { display: none; }
-  .project-list a:hover .project-title, .year-toggle:hover .project-title { letter-spacing: 0.12em; }
+  .project-list a:hover .project-title { letter-spacing: 0.12em; }
+  .years { gap: 18px 28px; }
+  .yt-word { white-space: normal; max-width: 7em; }
+  .feature { grid-template-columns: 1fr; }
+  .feature:hover .feature-title { letter-spacing: 0.02em; }
   .side-label { font-size: 15px; }
   .viewer-track { margin: 40px 0 8px; }
   .contact-list { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .year-panel.enter li, .year-panel.enter .feature { animation: none; }
+  .yt-num, .years-ink, .feature-media video, .feature-media img { transition: none; }
 }
