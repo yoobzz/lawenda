@@ -2270,6 +2270,304 @@ async function stateVerify(code, backState) {
   showActions();
 }
 
+/* ─────────────────────────────────────────────────────────────
+   bramka z kodem: wpisywany kod zamiast kamery (GATE_CONFIG.camera = false)
+   kod znajdki = 4 znaki z ALPHABET, kod ze znaczków = 3–16 znaczków (mode universal)
+   ───────────────────────────────────────────────────────────── */
+const CG_ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
+const CG_GLYPHS = '|+_.,!*^~-=:;"\'`<>/\\';
+const CG_IDLE_GLYPHS = ['~', '|', '|', '-', '_', '^', '+', '*', '.'];
+const CG_TEXT = Object.assign({
+  label: 'wpisz kod',
+  frame: ['swoje znajdki', 'tak oddaje', 'przeznaczenie', 'znaczy znaczek'],
+  go: 'otwórz →',
+  checking: 'sprawdzam',
+  notFound: 'nie ma takiego kodu',
+  banned: 'w kodach nie ma 0, O, 1, I, L ani U',
+  known: 'z powrotem.',
+  transferPersonal: ['ten kod ma już właściciela.', 'nie da się go przejąć.'],
+  transferWild: ['ta znajdka jest teraz u kogoś.', 'kiedy ją puści, wpisz kod jeszcze raz.'],
+  error: 'coś poszło nie tak',
+  offline: 'brak połączenia',
+  retry: 'spróbuj jeszcze raz',
+  another: 'wpisz inny kod',
+  back: '← wracam',
+}, (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.codeGate) || {});
+
+const cg = {
+  root: null, input: null, slots: null, status: null, go: null,
+  kind: 'alnum', value: '', busy: false, idleTimer: null, scrambleTimer: null, onGo: null,
+};
+
+function cgRandomGlyph() {
+  return CG_IDLE_GLYPHS[Math.floor(Math.random() * CG_IDLE_GLYPHS.length)];
+}
+
+/* wejście → { kind, value, banned }; łapie też wklejony link …/g/ABCD i małe litery */
+function cgParse(raw) {
+  const text = String(raw || '');
+  const fromUrl = text.match(/\/g\/([a-z0-9]{4})(?![a-z0-9])/i);
+  if (fromUrl) {
+    const up = fromUrl[1].toUpperCase();
+    return { kind: 'alnum', value: up.split('').filter(c => CG_ALPHABET.includes(c)).join('').slice(0, 4), banned: /[0O1ILU]/.test(up) };
+  }
+  const compact = text.replace(/\s+/g, '');
+  if (compact && CG_GLYPHS.includes(compact[0])) {
+    return { kind: 'glyph', value: compact.split('').filter(c => CG_GLYPHS.includes(c)).join('').slice(0, 16), banned: false };
+  }
+  const up = compact.toUpperCase();
+  return {
+    kind: 'alnum',
+    value: up.split('').filter(c => CG_ALPHABET.includes(c)).join('').slice(0, 4),
+    banned: /[0O1ILU]/.test(up),
+  };
+}
+
+function cgReady() {
+  return cg.kind === 'alnum' ? cg.value.length === 4 : cg.value.length >= 3;
+}
+
+function cgRender(typedIndex) {
+  const box = cg.slots;
+  box.innerHTML = '';
+  if (cg.kind === 'glyph') {
+    const line = document.createElement('div');
+    line.className = 'cg-line';
+    line.textContent = cg.value;
+    const caret = document.createElement('span');
+    caret.className = 'cg-caret';
+    caret.textContent = '|';
+    line.appendChild(caret);
+    box.appendChild(line);
+  } else {
+    for (let i = 0; i < 4; i += 1) {
+      const slot = document.createElement('span');
+      slot.className = 'cg-slot';
+      if (i < cg.value.length) {
+        slot.textContent = cg.value[i];
+        if (i === typedIndex) slot.classList.add('typed');
+      } else {
+        const g = document.createElement('span');
+        g.className = 'cg-glyph';
+        g.textContent = cgRandomGlyph();
+        slot.appendChild(g);
+        slot.classList.add('empty');
+        if (i === cg.value.length) slot.classList.add('active');
+      }
+      box.appendChild(slot);
+    }
+  }
+  cg.go.disabled = cg.busy || !cgReady();
+}
+
+function cgSetStatus(text, opts) {
+  const o = opts || {};
+  cg.status.classList.toggle('msg', Boolean(o.msg));
+  cg.status.innerHTML = '';
+  if (!text) return;
+  const lines = Array.isArray(text) ? text : [text];
+  lines.forEach((line, k) => {
+    if (k) cg.status.appendChild(document.createElement('br'));
+    if (k === 0 && o.mark) {
+      const m = document.createElement('span');
+      m.className = 'cg-mark';
+      m.textContent = o.mark;
+      cg.status.appendChild(m);
+    }
+    cg.status.appendChild(document.createTextNode(line));
+  });
+}
+
+function cgSetButton(label, onClick) {
+  cg.go.textContent = label;
+  cg.onGo = onClick;
+}
+
+function cgStartIdle() {
+  clearInterval(cg.idleTimer);
+  if (prefersReducedMotion()) return;
+  cg.idleTimer = setInterval(() => {
+    cg.slots.querySelectorAll('.cg-glyph').forEach(g => { g.textContent = cgRandomGlyph(); });
+  }, 650);
+}
+
+function cgStartScramble() {
+  clearInterval(cg.scrambleTimer);
+  if (prefersReducedMotion()) return;
+  const slots = Array.from(cg.slots.querySelectorAll('.cg-slot'));
+  cg.scrambleTimer = setInterval(() => {
+    slots.forEach((slot, i) => {
+      slot.textContent = Math.random() < 0.55 ? cgRandomGlyph() : (cg.value[i] || '');
+    });
+  }, 80);
+}
+
+function cgStopScramble() {
+  clearInterval(cg.scrambleTimer);
+  cg.scrambleTimer = null;
+  cgRender();
+}
+
+function cgReset(statusText, mark) {
+  cg.busy = false;
+  cg.kind = 'alnum';
+  cg.value = '';
+  cg.input.value = '';
+  cg.input.readOnly = false;
+  cg.root.classList.remove('shake', 'leaving');
+  cgSetButton(CG_TEXT.go, () => cgSubmit());
+  cgSetStatus(statusText || '', { mark });
+  cgRender();
+  try { cg.input.focus({ preventScroll: true }); } catch (_) {}
+}
+
+function cgOnInput() {
+  if (cg.busy) return;
+  const before = cg.value.length;
+  const parsed = cgParse(cg.input.value);
+  cg.kind = parsed.kind;
+  cg.value = parsed.value;
+  // pole pokazuje tylko to, co przeszło filtr — kolejne znaki dopisują się do czystego kodu
+  if (cg.input.value !== cg.value) cg.input.value = cg.value;
+  cgSetStatus(parsed.banned ? CG_TEXT.banned : '', { mark: parsed.banned ? '×' : '' });
+  cgRender(cg.value.length > before ? cg.value.length - 1 : -1);
+  if (cg.kind === 'alnum' && cg.value.length === 4) setTimeout(() => { if (!cg.busy && cgReady()) cgSubmit(); }, 220);
+}
+
+async function cgLeave() {
+  cg.root.classList.add('leaving');
+  await sleep(prefersReducedMotion() ? 120 : 620);
+}
+
+function cgShowTransfer(result) {
+  cg.busy = false;
+  cg.input.readOnly = true;
+  cgSetStatus(result && result.personal ? CG_TEXT.transferPersonal : CG_TEXT.transferWild, { msg: true, mark: '|' });
+  cgSetButton(CG_TEXT.another, () => cgReset());
+  cg.go.disabled = false;
+  cg.go.focus();
+}
+
+function cgShowFailure(text, code) {
+  cg.busy = false;
+  cg.input.readOnly = true;
+  cgSetStatus(text, { msg: true, mark: '×' });
+  cgSetButton(CG_TEXT.retry, () => { cg.input.readOnly = false; cgSetButton(CG_TEXT.go, () => cgSubmit()); cgVerifyCode(code); });
+  cg.go.disabled = false;
+  cg.go.focus();
+}
+
+async function cgVerifyCode(code) {
+  cg.busy = true;
+  cg.go.disabled = true;
+  cg.root.classList.remove('shake');
+  cgSetStatus(CG_TEXT.checking, { mark: '~' });
+  cgStartScramble();
+  let result = null;
+  let offline = false;
+  try { result = await apiScan(code, fingerprint); } catch (_) { offline = true; }
+  cgStopScramble();
+
+  if (offline) { cgShowFailure(CG_TEXT.offline, code); return; }
+
+  const state = result && result.state;
+  if (state === 'first') {
+    cgSetStatus('');
+    await cgLeave();
+    const named = await handleFirstWithTrace(code);
+    if (!named) await showFirstAccessVisual();
+    pageOut('/poems.html');
+    return;
+  }
+  if (state === 'known') {
+    cgSetStatus(CG_TEXT.known, { msg: true, mark: '+' });
+    await sleep(700);
+    await cgLeave();
+    pageOut('/poems.html');
+    return;
+  }
+  if (state === 'universal') {
+    cgSetStatus('');
+    await cgLeave();
+    pageOut('/poems.html');
+    return;
+  }
+  if (state === 'transfer') { cgShowTransfer(result); return; }
+
+  const err = result && result.error;
+  if (err === 'code not found' || err === 'invalid code format') {
+    cg.root.classList.add('shake');
+    cgSetStatus(CG_TEXT.notFound, { msg: true, mark: '×' });
+    await sleep(1300);
+    cgReset(CG_TEXT.notFound, '×');
+    return;
+  }
+  cgShowFailure(CG_TEXT.error, code);
+}
+
+function cgSubmit() {
+  if (cg.busy || !cgReady()) return;
+  cgVerifyCode(cg.kind === 'alnum' ? cg.value.toUpperCase() : cg.value);
+}
+
+/* kod z adresu /g/KOD: wpisuje się sam na oczach i od razu się sprawdza */
+async function cgTypeOut(code) {
+  cg.busy = true;
+  cg.input.readOnly = true;
+  const step = prefersReducedMotion() ? 0 : 170;
+  for (let i = 1; i <= code.length; i += 1) {
+    cg.value = code.slice(0, i);
+    cg.input.value = cg.value;
+    cgRender(i - 1);
+    await sleep(step);
+  }
+  cg.input.readOnly = false;
+  await sleep(step ? 260 : 0);
+  await cgVerifyCode(code);
+}
+
+function cgBuild() {
+  cg.root = document.getElementById('code-gate');
+  cg.input = document.getElementById('cg-input');
+  cg.slots = document.getElementById('cg-slots');
+  cg.status = document.getElementById('cg-status');
+  cg.go = document.getElementById('cg-go');
+  if (!cg.root) return false;
+
+  const back = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.returnHref) || '/';
+  document.getElementById('cg-home').setAttribute('href', back);
+  const backBtn = document.getElementById('cg-back');
+  backBtn.textContent = CG_TEXT.back;
+  backBtn.onclick = () => pageOut(back);
+  document.getElementById('cg-label').textContent = CG_TEXT.label;
+  ['top', 'right', 'bottom', 'left'].forEach((edge, i) => {
+    cg.root.querySelector('.cg-edge.' + edge).textContent = CG_TEXT.frame[i] || '';
+  });
+  const fav = document.getElementById('first-access-visual');
+  if (fav && GATE_CONFIG.firstAccessCaption) fav.setAttribute('data-caption', GATE_CONFIG.firstAccessCaption);
+
+  cg.input.addEventListener('input', cgOnInput);
+  cg.input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (cg.onGo && !cg.go.disabled) cg.onGo(); } });
+  cg.go.addEventListener('click', () => { if (cg.onGo) cg.onGo(); });
+
+  document.body.classList.add('code-mode');
+  cg.root.classList.add('show');
+  cg.root.setAttribute('aria-hidden', 'false');
+  cgSetButton(CG_TEXT.go, () => cgSubmit());
+  cgRender();
+  cgStartIdle();
+  return true;
+}
+
+async function stateCodeGate(prefill) {
+  if (!cgBuild()) return;
+  if (prefill) {
+    await cgTypeOut(prefill);
+  } else {
+    try { cg.input.focus({ preventScroll: true }); } catch (_) {}
+  }
+}
+
 async function init() {
   setOwnerNoticeVisual(false);
   if (FORCE_SCAN_PROTO) {
@@ -2292,6 +2590,10 @@ async function init() {
   initZnaczki();
   fingerprint = await generateFingerprint();
   codeFromUrl = getCodeFromUrl();
+  if (!GATE_CONFIG.camera) {
+    await stateCodeGate(codeFromUrl);
+    return;
+  }
   if (codeFromUrl) {
     await statePreGateWithCode(codeFromUrl);
   } else {

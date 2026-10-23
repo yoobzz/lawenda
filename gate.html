@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -20,6 +20,14 @@
             font-display: swap;
         }
 
+        @font-face {
+            font-family: 'ABC Helveesti';
+            src: url('fonts/ABCHelveestiPlusVariable-Trial.woff2') format('woff2'),
+                 url('fonts/ABCHelveestiPlusVariable-Trial.woff') format('woff');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
         :root {
             --lav: rgb(150, 130, 220);
             --lav-dim: rgba(150, 130, 220, 0.55);
@@ -957,6 +965,285 @@
                 opacity: 1;
             }
         }
+        /* ──────────────────────────────────────
+           BRAMKA Z KODEM (wpisywanym, bez kamery)
+           duże pola na znaki w ramie ze słów, pełny tusz dla wszystkiego, co trzeba przeczytać
+        ────────────────────────────────────── */
+        body.code-mode .vignette,
+        body.code-mode #gate,
+        body.code-mode #nocode-landing,
+        body.code-mode #scan-prototype-stage,
+        body.code-mode #camera-area { display: none !important; }
+        body.code-mode .star-particle.typing-in { opacity: 0.55; }
+
+        #code-gate {
+            --cg-fs: clamp(64px, 12.5vw, 176px);
+            --cg-ui: 'Inter', system-ui, sans-serif;
+            --cg-big: 'ABC Helveesti', 'Inter', system-ui, sans-serif;
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 72px 20px 40px;
+            color: var(--ink);
+            font-family: var(--cg-ui);
+            /* środek czysty jak kartka, znaczki w tle zostają tylko przy brzegach */
+            background: radial-gradient(ellipse 52% 56% at 50% 52%, var(--bg) 64%, rgba(249, 249, 248, 0) 100%);
+        }
+        #code-gate.show { display: flex; }
+
+        #cg-home {
+            position: absolute;
+            top: clamp(18px, 3vw, 36px);
+            left: clamp(18px, 3vw, 40px);
+            font-family: var(--cg-big);
+            font-weight: 700;
+            font-size: clamp(20px, 2vw, 28px);
+            letter-spacing: 0.02em;
+            color: var(--ink);
+            text-decoration: none;
+        }
+        #cg-home:hover { color: var(--lav); }
+        #cg-back {
+            position: absolute;
+            top: clamp(18px, 3vw, 36px);
+            right: clamp(18px, 3vw, 40px);
+            background: none;
+            border: none;
+            font-family: var(--cg-ui);
+            font-weight: 500;
+            font-size: 15px;
+            color: var(--ink);
+            cursor: pointer;
+            padding: 6px 2px;
+            border-bottom: 2px solid transparent;
+        }
+        #cg-back:hover { border-bottom-color: var(--ink); }
+
+        /* rama: krzyżyki w rogach, słowa na krawędziach */
+        #cg-frame {
+            position: relative;
+            padding: clamp(48px, 6.5vw, 84px) clamp(48px, 7vw, 96px);
+        }
+        .cg-corner {
+            position: absolute;
+            font-family: var(--cg-big);
+            font-weight: 700;
+            font-size: 24px;
+            line-height: 1;
+            color: var(--ink);
+        }
+        .cg-corner.tl { top: 0; left: 0; }
+        .cg-corner.tr { top: 0; right: 0; }
+        .cg-corner.bl { bottom: 0; left: 0; }
+        .cg-corner.br { bottom: 0; right: 0; }
+        .cg-edge {
+            position: absolute;
+            font-family: var(--cg-ui);
+            font-weight: 500;
+            font-size: 13px;
+            letter-spacing: 0.34em;
+            white-space: nowrap;
+            color: var(--ink);
+            opacity: 0.72;
+            user-select: none;
+        }
+        .cg-edge.top { top: 4px; left: 50%; transform: translateX(-50%); }
+        .cg-edge.bottom { bottom: 4px; left: 50%; transform: translateX(-50%) rotate(180deg); }
+        .cg-edge.left { left: 4px; top: 50%; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); }
+        .cg-edge.right { right: 4px; top: 50%; writing-mode: vertical-rl; transform: translateY(-50%); }
+
+        #cg-label {
+            display: block;
+            font-weight: 700;
+            font-size: clamp(16px, 1.5vw, 20px);
+            margin-bottom: clamp(14px, 2vh, 24px);
+        }
+        #cg-label::before { content: '~ '; color: var(--lav); }
+
+        #cg-field { position: relative; }
+        #cg-slots {
+            display: flex;
+            gap: clamp(10px, 1.6vw, 26px);
+            font-family: var(--cg-big);
+            font-weight: 700;
+            font-size: var(--cg-fs);
+            line-height: 1;
+        }
+        .cg-slot {
+            position: relative;
+            display: inline-flex;
+            align-items: flex-end;
+            justify-content: center;
+            width: 0.86em;
+            height: 1.08em;
+            padding-bottom: 0.06em;
+            border-bottom: 0.055em solid var(--ink);
+            transition: border-color 0.25s, color 0.25s, transform 0.4s cubic-bezier(.2, .8, .2, 1), opacity 0.4s;
+        }
+        .cg-slot .cg-glyph {
+            color: var(--lav);
+            font-weight: 400;
+            transform: scale(0.62);
+            transform-origin: 50% 85%;
+            opacity: 0.75;
+        }
+        #cg-field:focus-within .cg-slot.active { border-bottom-color: var(--lav); }
+        #cg-field:focus-within .cg-slot.active .cg-glyph { animation: cg-blink 1s steps(2, start) infinite; opacity: 1; }
+        @keyframes cg-blink { to { visibility: hidden; } }
+        .cg-slot.typed { animation: cg-drop 0.32s cubic-bezier(.2, .8, .2, 1); }
+        @keyframes cg-drop { from { transform: translateY(-0.18em); opacity: 0.3; } }
+
+        /* kod ze znaczków: jedna linia zamiast czterech pól */
+        .cg-line {
+            display: flex;
+            align-items: flex-end;
+            /* tyle miejsca co cztery pola, żeby przejście na znaczki nie przesuwało ramy */
+            min-width: calc(4 * 0.86 * var(--cg-fs) + 3 * clamp(10px, 1.6vw, 26px));
+            height: calc(1.08 * var(--cg-fs));
+            padding: 0 0.1em 0.06em;
+            border-bottom: 0.07em solid var(--ink);
+            font-size: clamp(44px, 6.4vw, 92px);
+            letter-spacing: 0.04em;
+            white-space: pre;
+        }
+        .cg-caret { color: var(--lav); font-weight: 400; animation: cg-blink 1s steps(2, start) infinite; }
+
+        #cg-input {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 16px; /* iOS nie przybliża przy fokusie */
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            caret-color: transparent;
+            background: transparent;
+            border: 0;
+            outline: none;
+            cursor: text;
+        }
+        #cg-input::selection { background: transparent; }
+
+        #cg-under {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px 28px;
+            width: 100%;
+            max-width: calc(4 * 0.86 * var(--cg-fs) + 3 * clamp(10px, 1.6vw, 26px) + 2 * clamp(48px, 7vw, 96px));
+            margin-top: clamp(14px, 2.4vh, 28px);
+            padding: 0 clamp(48px, 7vw, 96px);
+        }
+        #cg-status {
+            min-height: 1.4em;
+            font-weight: 500;
+            font-size: clamp(16px, 1.5vw, 20px);
+            line-height: 1.35;
+        }
+        #cg-status.msg { font-weight: 700; font-size: clamp(18px, 2vw, 26px); }
+        #cg-status .cg-mark { color: var(--lav); margin-right: 0.4em; }
+        #cg-go {
+            font-family: var(--cg-ui);
+            font-weight: 700;
+            font-size: 16px;
+            padding: 14px 22px;
+            color: var(--bg);
+            background: var(--ink);
+            border: 2px solid var(--ink);
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+        }
+        #cg-go:hover:not(:disabled) { background: var(--lav); border-color: var(--lav); }
+        #cg-go:disabled { background: transparent; color: var(--ink); opacity: 0.32; cursor: default; }
+        #cg-go:focus-visible, #cg-back:focus-visible, #cg-home:focus-visible { outline: 3px solid var(--lav); outline-offset: 3px; }
+
+        #code-gate.shake #cg-slots { animation: cg-shake 0.5s; }
+        #code-gate.shake .cg-slot, #code-gate.shake .cg-line { color: var(--lav); border-bottom-color: var(--lav); }
+        @keyframes cg-shake {
+            20% { transform: translateX(-0.12em); }
+            40% { transform: translateX(0.1em); }
+            60% { transform: translateX(-0.07em); }
+            80% { transform: translateX(0.04em); }
+        }
+        #code-gate.leaving .cg-slot,
+        #code-gate.leaving .cg-line { transform: translateY(-0.5em); opacity: 0; border-bottom-color: transparent; }
+        #code-gate.leaving .cg-slot:nth-child(2) { transition-delay: 0.06s; }
+        #code-gate.leaving .cg-slot:nth-child(3) { transition-delay: 0.12s; }
+        #code-gate.leaving .cg-slot:nth-child(4) { transition-delay: 0.18s; }
+        #code-gate.leaving #cg-under, #code-gate.leaving #cg-label { opacity: 0; transition: opacity 0.3s; }
+
+        @media (max-width: 600px) {
+            #code-gate { --cg-fs: clamp(52px, 17vw, 96px); }
+            #cg-frame { padding: 40px 34px; }
+            .cg-edge { font-size: 11px; letter-spacing: 0.26em; }
+            .cg-corner { font-size: 18px; }
+            #cg-under { padding: 0 34px; max-width: none; }
+            #cg-go { width: 100%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .cg-slot, .cg-line { transition: none; }
+            .cg-slot.typed, #code-gate.shake #cg-slots { animation: none; }
+            #cg-field:focus-within .cg-slot.active .cg-glyph, .cg-caret { animation: none; }
+        }
+
+        /* pytanie o imię po pierwszym wejściu: ten sam duży, pełny tusz */
+        body.code-mode #proto-trace { background: var(--bg); gap: 2.2rem; }
+        body.code-mode #proto-trace .trace-glyph { color: var(--lav); opacity: 0; font-family: 'ABC Helveesti', 'Inter', sans-serif; font-weight: 700; }
+        body.code-mode #proto-trace .trace-glyph.visible { opacity: 0.5; }
+        body.code-mode #proto-trace .trace-glyph.burst { color: var(--lav); }
+        body.code-mode #proto-trace .trace-glyph.burst.visible { opacity: 0.9; }
+        body.code-mode #proto-trace-prompt {
+            font-family: 'ABC Helveesti', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(30px, 4.6vw, 64px);
+            letter-spacing: -0.01em;
+            color: var(--ink);
+        }
+        body.code-mode #proto-trace-input {
+            font-family: 'ABC Helveesti', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(32px, 5vw, 68px);
+            letter-spacing: 0.01em;
+            width: min(86vw, 36rem);
+            max-width: none;
+            border-bottom: 0.07em solid var(--ink);
+            caret-color: var(--lav);
+        }
+        body.code-mode #proto-trace-hint {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.08em;
+            text-transform: none;
+            color: var(--ink);
+        }
+        body.code-mode #proto-trace-skip {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: 0.02em;
+            color: var(--ink);
+            text-decoration-thickness: 2px;
+        }
+
+        /* ekran pierwszego wejścia: grubszy znak + napis */
+        body.code-mode #first-access-visual { flex-direction: column; gap: 22px; background: var(--bg); }
+        body.code-mode #first-access-visual::after {
+            content: attr(data-caption);
+            font-family: 'ABC Helveesti', 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: clamp(32px, 5vw, 64px);
+            color: var(--ink);
+        }
+        body.code-mode .fav-sigil { width: 112px; height: 112px; }
+        body.code-mode .fav-sigil-ring { stroke: var(--ink); stroke-width: 3.2; }
+        body.code-mode .fav-sigil-dot { fill: var(--ink); }
+
         .sr-only {
             position: absolute;
             width: 1px;
@@ -1017,6 +1304,30 @@
     <button id="camera-cancel" type="button">anuluj</button>
 </div>
 
+<div id="code-gate" aria-hidden="true">
+    <a id="cg-home" href="/">&rdquo;~||-_^+*.</a>
+    <button id="cg-back" type="button"></button>
+    <div id="cg-frame">
+        <span class="cg-corner tl" aria-hidden="true">+</span>
+        <span class="cg-corner tr" aria-hidden="true">+</span>
+        <span class="cg-corner bl" aria-hidden="true">+</span>
+        <span class="cg-corner br" aria-hidden="true">+</span>
+        <span class="cg-edge top" aria-hidden="true"></span>
+        <span class="cg-edge right" aria-hidden="true"></span>
+        <span class="cg-edge bottom" aria-hidden="true"></span>
+        <span class="cg-edge left" aria-hidden="true"></span>
+        <label id="cg-label" for="cg-input"></label>
+        <div id="cg-field">
+            <div id="cg-slots" aria-hidden="true"></div>
+            <input id="cg-input" type="text" inputmode="text" maxlength="80" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-describedby="cg-status" />
+        </div>
+    </div>
+    <div id="cg-under">
+        <p id="cg-status" role="status" aria-live="polite"></p>
+        <button id="cg-go" type="button" disabled></button>
+    </div>
+</div>
+
 <div id="scan-prototype-stage" aria-hidden="true">
     <div id="scan-prototype-grid"></div>
     <div id="scan-prototype-seed"></div>
@@ -1024,7 +1335,7 @@
     <div id="proto-manual">
         <div id="proto-manual-prompt"></div>
         <div id="proto-manual-row">
-            <input id="proto-manual-input" type="text" maxlength="4" placeholder="A1B2" autocomplete="off" spellcheck="false" />
+            <input id="proto-manual-input" type="text" maxlength="16" placeholder="" autocomplete="off" spellcheck="false" />
             <button id="proto-manual-submit" type="button">otwórz</button>
         </div>
         <div id="proto-manual-error"></div>
@@ -1053,7 +1364,7 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" integrity="sha384-9Q0jWoineiIq95JeIyBsNV90KKLfDsbkj29k/YFxf76a2JwkHDYkMuSbNGN6XJfV" crossorigin="anonymous"></script>
+<!-- jsQR zdjęty: jego integrity nie pasowało do pliku z CDN (przeglądarka go blokowała); bramka działa na wpisywanym kodzie (GATE_CONFIG.camera = false) -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
 <script src="/gate-config.js"></script>

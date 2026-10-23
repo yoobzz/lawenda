@@ -1,4 +1,25 @@
 var GATE_CONFIG = {
+  // false = bramka prosi o wpisanie kodu (bez kamery); true = dawne skanowanie QR kamerą
+  camera: false,
+  // dokąd prowadzi „← wracam” i znaczki w rogu (start lawendy)
+  returnHref: '/',
+  codeGate: {
+    label: 'wpisz kod',
+    frame: ['swoje znajdki', 'tak oddaje', 'przeznaczenie', 'znaczy znaczek'],
+    go: 'otwórz →',
+    checking: 'sprawdzam',
+    notFound: 'nie ma takiego kodu',
+    banned: 'w kodach nie ma 0, O, 1, I, L ani U',
+    known: 'z powrotem.',
+    transferPersonal: ['ten kod ma już właściciela.', 'nie da się go przejąć.'],
+    transferWild: ['ta znajdka jest teraz u kogoś.', 'kiedy ją puści, wpisz kod jeszcze raz.'],
+    error: 'coś poszło nie tak',
+    offline: 'brak połączenia',
+    retry: 'spróbuj jeszcze raz',
+    another: 'wpisz inny kod',
+    back: '← wracam',
+  },
+  firstAccessCaption: 'otwarte.',
   intro: '~ hej.',
   activateLabel: 'czytaj',
   welcomeFirst: [
