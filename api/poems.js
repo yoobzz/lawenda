@@ -2,6 +2,7 @@
 
 const kv = require('./_lib/kv.js');
 const { verify } = require('./_lib/jwt.js');
+const { devicesOf } = require('./_lib/codes.js');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -16,7 +17,7 @@ function parseCookies(header) {
 }
 
 // Pelny dostep tylko dla waznej sesji: admin (master) ALBO posiadacz znajdki,
-// ktorej kod istnieje, nie jest wycofany i ma aktualna pare z tym fingerprintem.
+// ktorej kod istnieje, nie jest wycofany i ma to urzadzenie wsrod przypietych do kodu.
 // Dzieki temu "wycofaj"/"oddaj"/przejecie blokuja dostep natychmiast. Brak zajawki.
 async function isFullAccess(req) {
   if (!JWT_SECRET) return false;
@@ -43,7 +44,9 @@ async function isFullAccess(req) {
 
   const pairing = await kv.get(`code_pairings:${code}`);
   if (!pairing) return false;
-  if (payload.fingerprint && pairing.fingerprint && pairing.fingerprint !== payload.fingerprint) return false;
+  // sesja musi pochodzić z urządzenia przypiętego do kodu (kod osobisty: do kilku urządzeń)
+  const devices = devicesOf(pairing);
+  if (payload.fingerprint && devices.length && !devices.includes(payload.fingerprint)) return false;
 
   return true;
 }

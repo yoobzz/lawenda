@@ -2272,11 +2272,12 @@ async function stateVerify(code, backState) {
 
 /* ─────────────────────────────────────────────────────────────
    bramka z kodem: wpisywany kod zamiast kamery (GATE_CONFIG.camera = false)
-   kod znajdki = 4 znaki z ALPHABET, kod ze znaczków = 3–16 znaczków (mode universal)
+   kod ze znaczków = 6 znaczków z CG_GLYPHS (wpisywany klawiaturą znaczków),
+   kod literowy = 4 znaki z CG_ALPHABET (stare znajdki z QR /g/ABCD)
    ───────────────────────────────────────────────────────────── */
 const CG_ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
-const CG_GLYPHS = '|+_.,!*^~-=:;"\'`<>/\\';
-const CG_IDLE_GLYPHS = ['~', '|', '|', '-', '_', '^', '+', '*', '.'];
+const CG_GLYPHS = '"\';.,/\\|~*^!=+-_';
+const CG_GLYPH_LEN = 6;
 const CG_TEXT = Object.assign({
   label: 'wpisz kod',
   frame: ['swoje znajdki', 'tak oddaje', 'przeznaczenie', 'znaczy znaczek'],
@@ -2284,80 +2285,95 @@ const CG_TEXT = Object.assign({
   checking: 'sprawdzam',
   notFound: 'nie ma takiego kodu',
   banned: 'w kodach nie ma 0, O, 1, I, L ani U',
+  glyphOnly: 'tylko znaczki z klawiatury',
   known: 'z powrotem.',
-  transferPersonal: ['ten kod ma już właściciela.', 'nie da się go przejąć.'],
+  device: 'dopisane urządzenie {n} z {max}.',
+  transferPersonal: ['ten kod jest już na {max} urządzeniach.', 'kolejnego nie da się dopisać.'],
   transferWild: ['ta znajdka jest teraz u kogoś.', 'kiedy ją puści, wpisz kod jeszcze raz.'],
   error: 'coś poszło nie tak',
   offline: 'brak połączenia',
   retry: 'spróbuj jeszcze raz',
   another: 'wpisz inny kod',
   back: '← wracam',
+  keyDelete: 'usuń',
+  keyLetters: 'abc',
+  keyLettersTitle: 'stary kod z literami',
 }, (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.codeGate) || {});
 
 const cg = {
-  root: null, input: null, slots: null, status: null, go: null,
-  kind: 'alnum', value: '', busy: false, idleTimer: null, scrambleTimer: null, onGo: null,
+  root: null, input: null, slots: null, status: null, go: null, keys: null,
+  kind: 'glyph', value: '', busy: false, idleTimer: null, scrambleTimer: null, onGo: null,
+  touch: false,
 };
 
-function cgRandomGlyph() {
-  return CG_IDLE_GLYPHS[Math.floor(Math.random() * CG_IDLE_GLYPHS.length)];
+function cgFill(text, vars) {
+  return String(text).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] !== undefined ? vars[k] : m));
 }
 
-/* wejście → { kind, value, banned }; łapie też wklejony link …/g/ABCD i małe litery */
+function cgRandomGlyph() {
+  return CG_GLYPHS[Math.floor(Math.random() * CG_GLYPHS.length)];
+}
+
+/* telefony i wiadomości zamieniają proste cudzysłowy na drukarskie — wracamy do " i ' */
+function cgStraightQuotes(text) {
+  return String(text || '')
+    .replace(/[“”„‟″«»]/g, '"')
+    .replace(/[‘’‚‛′´]/g, "'");
+}
+
+/* wejście → { kind, value, dropped }; łapie też wklejony link …/g/ABCD albo …?kod=… */
 function cgParse(raw) {
-  const text = String(raw || '');
-  const fromUrl = text.match(/\/g\/([a-z0-9]{4})(?![a-z0-9])/i);
-  if (fromUrl) {
-    const up = fromUrl[1].toUpperCase();
-    return { kind: 'alnum', value: up.split('').filter(c => CG_ALPHABET.includes(c)).join('').slice(0, 4), banned: /[0O1ILU]/.test(up) };
+  const text = cgStraightQuotes(raw);
+  const fromParam = text.match(/[?&]kod=([^&#\s]+)/);
+  if (fromParam) {
+    let decoded = '';
+    try { decoded = decodeURIComponent(fromParam[1]); } catch (_) { decoded = ''; }
+    return cgParse(decoded);
   }
-  const compact = text.replace(/\s+/g, '');
-  if (compact && CG_GLYPHS.includes(compact[0])) {
-    return { kind: 'glyph', value: compact.split('').filter(c => CG_GLYPHS.includes(c)).join('').slice(0, 16), banned: false };
+  const fromPath = text.match(/\/g\/([a-z0-9]{4})(?![a-z0-9])/i);
+  const compact = (fromPath ? fromPath[1] : text).replace(/\s+/g, '');
+  if (!compact) return { kind: cg.kind, value: '', dropped: '' };
+  if (/^[a-z0-9]/i.test(compact)) {
+    const up = compact.toUpperCase();
+    const value = up.split('').filter(c => CG_ALPHABET.includes(c)).join('').slice(0, 4);
+    return { kind: 'alnum', value, dropped: /[0O1ILU]/.test(up) ? 'banned' : '' };
   }
-  const up = compact.toUpperCase();
-  return {
-    kind: 'alnum',
-    value: up.split('').filter(c => CG_ALPHABET.includes(c)).join('').slice(0, 4),
-    banned: /[0O1ILU]/.test(up),
-  };
+  const kept = compact.split('').filter(c => CG_GLYPHS.includes(c));
+  const dropped = kept.length < compact.length && !/[a-z0-9]/i.test(compact) ? 'glyph' : '';
+  return { kind: 'glyph', value: kept.join('').slice(0, CG_GLYPH_LEN), dropped };
+}
+
+function cgSlotCount() {
+  return cg.kind === 'alnum' ? 4 : CG_GLYPH_LEN;
 }
 
 function cgReady() {
-  return cg.kind === 'alnum' ? cg.value.length === 4 : cg.value.length >= 3;
+  return cg.value.length === cgSlotCount();
 }
 
 function cgRender(typedIndex) {
   const box = cg.slots;
+  cg.root.dataset.kind = cg.kind;
   box.innerHTML = '';
-  if (cg.kind === 'glyph') {
-    const line = document.createElement('div');
-    line.className = 'cg-line';
-    line.textContent = cg.value;
-    const caret = document.createElement('span');
-    caret.className = 'cg-caret';
-    caret.textContent = '|';
-    line.appendChild(caret);
-    box.appendChild(line);
-  } else {
-    for (let i = 0; i < 4; i += 1) {
-      const slot = document.createElement('span');
-      slot.className = 'cg-slot';
-      if (i < cg.value.length) {
-        slot.textContent = cg.value[i];
-        if (i === typedIndex) slot.classList.add('typed');
-      } else {
-        const g = document.createElement('span');
-        g.className = 'cg-glyph';
-        g.textContent = cgRandomGlyph();
-        slot.appendChild(g);
-        slot.classList.add('empty');
-        if (i === cg.value.length) slot.classList.add('active');
-      }
-      box.appendChild(slot);
+  const n = cgSlotCount();
+  for (let i = 0; i < n; i += 1) {
+    const slot = document.createElement('span');
+    slot.className = 'cg-slot';
+    if (i < cg.value.length) {
+      slot.textContent = cg.value[i];
+      if (i === typedIndex) slot.classList.add('typed');
+    } else {
+      const g = document.createElement('span');
+      g.className = 'cg-glyph';
+      g.textContent = cgRandomGlyph();
+      slot.appendChild(g);
+      slot.classList.add('empty');
+      if (i === cg.value.length) slot.classList.add('active');
     }
+    box.appendChild(slot);
   }
   cg.go.disabled = cg.busy || !cgReady();
+  if (cg.keys) cg.keys.classList.toggle('locked', cg.busy || cg.input.readOnly);
 }
 
 function cgSetStatus(text, opts) {
@@ -2374,7 +2390,7 @@ function cgSetStatus(text, opts) {
       m.textContent = o.mark;
       cg.status.appendChild(m);
     }
-    cg.status.appendChild(document.createTextNode(line));
+    cg.status.appendChild(document.createTextNode(cgFill(line, o.vars)));
   });
 }
 
@@ -2408,30 +2424,89 @@ function cgStopScramble() {
   cgRender();
 }
 
-function cgReset(statusText, mark) {
-  cg.busy = false;
-  cg.kind = 'alnum';
-  cg.value = '';
-  cg.input.value = '';
-  cg.input.readOnly = false;
-  cg.root.classList.remove('shake', 'leaving');
-  cgSetButton(CG_TEXT.go, () => cgSubmit());
-  cgSetStatus(statusText || '', { mark });
-  cgRender();
+function cgFocus() {
   try { cg.input.focus({ preventScroll: true }); } catch (_) {}
 }
 
-function cgOnInput() {
-  if (cg.busy) return;
+function cgReset(statusText, mark) {
+  cg.busy = false;
+  cg.kind = 'glyph';
+  cg.value = '';
+  cg.input.value = '';
+  cg.input.readOnly = false;
+  cg.root.classList.remove('shake', 'leaving', 'message');
+  cgSetButton(CG_TEXT.go, () => cgSubmit());
+  cgSetStatus(statusText || '', { mark });
+  cgRender();
+  if (!cg.touch) cgFocus();
+}
+
+function cgApply(raw, opts) {
+  if (cg.busy || cg.input.readOnly) return;
   const before = cg.value.length;
-  const parsed = cgParse(cg.input.value);
+  const parsed = cgParse(raw);
   cg.kind = parsed.kind;
   cg.value = parsed.value;
   // pole pokazuje tylko to, co przeszło filtr — kolejne znaki dopisują się do czystego kodu
   if (cg.input.value !== cg.value) cg.input.value = cg.value;
-  cgSetStatus(parsed.banned ? CG_TEXT.banned : '', { mark: parsed.banned ? '×' : '' });
+  if (parsed.dropped === 'banned') cgSetStatus(CG_TEXT.banned, { mark: '×' });
+  else if (parsed.dropped === 'glyph') cgSetStatus(CG_TEXT.glyphOnly, { mark: '×' });
+  else if (!opts || !opts.keepStatus) cgSetStatus('');
   cgRender(cg.value.length > before ? cg.value.length - 1 : -1);
-  if (cg.kind === 'alnum' && cg.value.length === 4) setTimeout(() => { if (!cg.busy && cgReady()) cgSubmit(); }, 220);
+  if (cgReady()) setTimeout(() => { if (!cg.busy && cgReady()) cgSubmit(); }, 260);
+}
+
+function cgOnInput() {
+  cgApply(cg.input.value);
+}
+
+/* klawiatura znaczków: znaczek dopisuje się do kodu ze znaczków (kod literowy zaczyna od nowa) */
+function cgPressGlyph(ch) {
+  if (cg.busy || cg.input.readOnly) return;
+  const base = cg.kind === 'glyph' ? cg.value : '';
+  cgApply(base + ch);
+}
+
+function cgPressDelete() {
+  if (cg.busy || cg.input.readOnly) return;
+  cg.value = cg.value.slice(0, -1);
+  cg.input.value = cg.value;
+  cgSetStatus('');
+  cgRender();
+}
+
+function cgPressLetters() {
+  if (cg.busy || cg.input.readOnly) return;
+  cg.kind = 'alnum';
+  cg.value = '';
+  cg.input.value = '';
+  cgRender();
+  // na telefonie: dopiero teraz zwykła klawiatura systemu
+  cg.input.setAttribute('inputmode', 'text');
+  cgFocus();
+}
+
+function cgBuildKeyboard() {
+  const box = document.getElementById('cg-keys');
+  if (!box) return null;
+  box.innerHTML = '';
+  const add = (label, cls, onPress, title) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cg-key' + (cls ? ' ' + cls : '');
+    b.textContent = label;
+    if (title) b.title = title;
+    b.setAttribute('aria-label', title || label);
+    // nie zabieraj fokusu polu (na komputerze dalej można pisać z klawiatury)
+    b.addEventListener('mousedown', e => e.preventDefault());
+    b.addEventListener('click', onPress);
+    box.appendChild(b);
+    return b;
+  };
+  CG_GLYPHS.split('').forEach(ch => add(ch, 'glyph', () => cgPressGlyph(ch), 'znaczek ' + ch));
+  add(CG_TEXT.keyLetters, 'fn letters', cgPressLetters, CG_TEXT.keyLettersTitle);
+  add(CG_TEXT.keyDelete, 'fn del', cgPressDelete, CG_TEXT.keyDelete);
+  return box;
 }
 
 async function cgLeave() {
@@ -2439,28 +2514,31 @@ async function cgLeave() {
   await sleep(prefersReducedMotion() ? 120 : 620);
 }
 
-function cgShowTransfer(result) {
+function cgShowMessage(lines, mark, vars, buttonLabel, onButton) {
   cg.busy = false;
   cg.input.readOnly = true;
-  cgSetStatus(result && result.personal ? CG_TEXT.transferPersonal : CG_TEXT.transferWild, { msg: true, mark: '|' });
-  cgSetButton(CG_TEXT.another, () => cgReset());
+  cg.root.classList.add('message');
+  cgSetStatus(lines, { msg: true, mark, vars });
+  cgSetButton(buttonLabel, onButton);
+  cgRender();
   cg.go.disabled = false;
   cg.go.focus();
 }
 
 function cgShowFailure(text, code) {
-  cg.busy = false;
-  cg.input.readOnly = true;
-  cgSetStatus(text, { msg: true, mark: '×' });
-  cgSetButton(CG_TEXT.retry, () => { cg.input.readOnly = false; cgSetButton(CG_TEXT.go, () => cgSubmit()); cgVerifyCode(code); });
-  cg.go.disabled = false;
-  cg.go.focus();
+  cgShowMessage(text, '×', null, CG_TEXT.retry, () => {
+    cg.input.readOnly = false;
+    cg.root.classList.remove('message');
+    cgSetButton(CG_TEXT.go, () => cgSubmit());
+    cgVerifyCode(code);
+  });
 }
 
 async function cgVerifyCode(code) {
   cg.busy = true;
   cg.go.disabled = true;
   cg.root.classList.remove('shake');
+  if (cg.keys) cg.keys.classList.add('locked');
   cgSetStatus(CG_TEXT.checking, { mark: '~' });
   cgStartScramble();
   let result = null;
@@ -2479,9 +2557,10 @@ async function cgVerifyCode(code) {
     pageOut('/poems.html');
     return;
   }
-  if (state === 'known') {
-    cgSetStatus(CG_TEXT.known, { msg: true, mark: '+' });
-    await sleep(700);
+  if (state === 'known' || state === 'device') {
+    const text = state === 'device' ? CG_TEXT.device : CG_TEXT.known;
+    cgSetStatus(text, { msg: true, mark: '+', vars: { n: result.devices, max: result.maxDevices } });
+    await sleep(state === 'device' ? 1300 : 700);
     await cgLeave();
     pageOut('/poems.html');
     return;
@@ -2492,7 +2571,12 @@ async function cgVerifyCode(code) {
     pageOut('/poems.html');
     return;
   }
-  if (state === 'transfer') { cgShowTransfer(result); return; }
+  if (state === 'transfer') {
+    const personal = result && result.personal;
+    cgShowMessage(personal ? CG_TEXT.transferPersonal : CG_TEXT.transferWild, '|',
+      { max: (result && result.maxDevices) || 3 }, CG_TEXT.another, () => cgReset());
+    return;
+  }
 
   const err = result && result.error;
   if (err === 'code not found' || err === 'invalid code format') {
@@ -2507,23 +2591,36 @@ async function cgVerifyCode(code) {
 
 function cgSubmit() {
   if (cg.busy || !cgReady()) return;
-  cgVerifyCode(cg.kind === 'alnum' ? cg.value.toUpperCase() : cg.value);
+  cgVerifyCode(cg.value);
 }
 
-/* kod z adresu /g/KOD: wpisuje się sam na oczach i od razu się sprawdza */
+/* kod z adresu (/g/KOD albo ?kod=…): wpisuje się sam na oczach i od razu się sprawdza */
 async function cgTypeOut(code) {
+  const parsed = cgParse(code);
+  if (!parsed.value) return;
+  cg.kind = parsed.kind;
   cg.busy = true;
   cg.input.readOnly = true;
   const step = prefersReducedMotion() ? 0 : 170;
-  for (let i = 1; i <= code.length; i += 1) {
-    cg.value = code.slice(0, i);
+  for (let i = 1; i <= parsed.value.length; i += 1) {
+    cg.value = parsed.value.slice(0, i);
     cg.input.value = cg.value;
     cgRender(i - 1);
     await sleep(step);
   }
   cg.input.readOnly = false;
   await sleep(step ? 260 : 0);
-  await cgVerifyCode(code);
+  if (cgReady()) await cgVerifyCode(cg.value);
+  else { cg.busy = false; cgRender(); }
+}
+
+function cgCodeFromUrl() {
+  const fromPath = getCodeFromUrl();
+  if (fromPath) return fromPath;
+  const kod = new URLSearchParams(window.location.search).get('kod');
+  if (!kod) return null;
+  const parsed = cgParse(kod);
+  return parsed.value || null;
 }
 
 function cgBuild() {
@@ -2533,6 +2630,9 @@ function cgBuild() {
   cg.status = document.getElementById('cg-status');
   cg.go = document.getElementById('cg-go');
   if (!cg.root) return false;
+  cg.touch = Boolean(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+  // telefon: klawiatura znaczków zamiast systemowej (systemowa dopiero po „abc”)
+  if (cg.touch) cg.input.setAttribute('inputmode', 'none');
 
   const back = (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.returnHref) || '/';
   document.getElementById('cg-home').setAttribute('href', back);
@@ -2546,8 +2646,11 @@ function cgBuild() {
   const fav = document.getElementById('first-access-visual');
   if (fav && GATE_CONFIG.firstAccessCaption) fav.setAttribute('data-caption', GATE_CONFIG.firstAccessCaption);
 
+  cg.keys = cgBuildKeyboard();
   cg.input.addEventListener('input', cgOnInput);
-  cg.input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (cg.onGo && !cg.go.disabled) cg.onGo(); } });
+  cg.input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); if (cg.onGo && !cg.go.disabled) cg.onGo(); }
+  });
   cg.go.addEventListener('click', () => { if (cg.onGo) cg.onGo(); });
 
   document.body.classList.add('code-mode');
@@ -2563,8 +2666,8 @@ async function stateCodeGate(prefill) {
   if (!cgBuild()) return;
   if (prefill) {
     await cgTypeOut(prefill);
-  } else {
-    try { cg.input.focus({ preventScroll: true }); } catch (_) {}
+  } else if (!cg.touch) {
+    cgFocus();
   }
 }
 
@@ -2591,7 +2694,7 @@ async function init() {
   fingerprint = await generateFingerprint();
   codeFromUrl = getCodeFromUrl();
   if (!GATE_CONFIG.camera) {
-    await stateCodeGate(codeFromUrl);
+    await stateCodeGate(cgCodeFromUrl());
     return;
   }
   if (codeFromUrl) {

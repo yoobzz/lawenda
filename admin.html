@@ -159,6 +159,12 @@
       <div class="mint-box">
         <div class="mint-grid">
           <div class="field"><label>ile</label><input type="number" id="mintCount" min="1" max="50" value="1" /></div>
+          <div class="field"><label>rodzaj</label>
+            <select id="mintKind">
+              <option value="glyph">znaczki (wpisywane)</option>
+              <option value="alnum">litery (stare znajdki z QR)</option>
+            </select>
+          </div>
           <div class="field"><label>tryb</label>
             <select id="mintMode">
               <option value="wild">dzika (można puścić)</option>
@@ -262,7 +268,12 @@
       if (!v) v = 'https://szpineta.com';
       return v;
     }
-    function codeUrl(code) { return siteBase() + '/g/' + code; }
+    const ALNUM_CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
+    function codeUrl(code) {
+      return ALNUM_CODE_RE.test(code)
+        ? siteBase() + '/g/' + code
+        : siteBase() + '/gate.html?kod=' + encodeURIComponent(code);
+    }
 
     // ════════ AUTH ════════
     async function boot() {
@@ -313,9 +324,10 @@
       return { key: 'fresh', label: 'świeży', cls: 'lav' };
     }
     function whoText(row) {
-      if (row.holderName) return row.holderName;
+      const dev = row.devices > 1 ? ' · ' + row.devices + ' urz.' : '';
+      if (row.holderName) return row.holderName + dev;
       if (row.recipient) return row.recipient;
-      if (row.hasOwner) return row.ownerFingerprintShort || 'urządzenie';
+      if (row.hasOwner) return (row.ownerFingerprintShort || 'urządzenie') + dev;
       return '—';
     }
 
@@ -462,8 +474,8 @@
       const url = qrDataUrl(code);
       const w = window.open('', '_blank');
       if (!w) return;
-      w.document.write('<html><head><title>' + code + '</title><style>body{font-family:monospace;text-align:center;padding:40px;}img{width:300px;height:300px;}h2{letter-spacing:.2em;margin:18px 0 4px;}p{color:#666;font-size:12px;}</style></head><body>'
-        + '<img src="' + url + '" /><h2>' + code + '</h2><p>' + codeUrl(code) + '</p></body></html>');
+      w.document.write('<html><head><title>' + esc(code) + '</title><style>body{font-family:monospace;text-align:center;padding:40px;}img{width:300px;height:300px;}h2{letter-spacing:.2em;margin:18px 0 4px;}p{color:#666;font-size:12px;}</style></head><body>'
+        + '<img src="' + url + '" /><h2>' + esc(code) + '</h2><p>' + esc(codeUrl(code)) + '</p></body></html>');
       w.document.close();
       w.focus();
       setTimeout(function () { w.print(); }, 250);
@@ -473,6 +485,7 @@
       const count = Math.max(1, Math.min(50, parseInt($('mintCount').value, 10) || 1));
       const payload = {
         action: 'mint', count: count,
+        kind: $('mintKind').value,
         mode: $('mintMode').value,
         recipient: $('mintRecipient').value || '',
         label: $('mintLabel').value || '',
@@ -496,11 +509,11 @@
       const grid = $('qrGrid');
       grid.innerHTML = codes.map(function (c) {
         return '<div class="qr-card">'
-          + '<div class="qr-img" id="mintqr-' + c + '"></div>'
-          + '<div class="qr-code">' + c + '</div>'
+          + '<div class="qr-img" id="mintqr-' + esc(c) + '"></div>'
+          + '<div class="qr-code">' + esc(c) + '</div>'
           + '<div class="qr-url">' + esc(codeUrl(c)) + '</div>'
-          + '<div class="qr-actions"><button class="btn btn-sm" data-act="copy" data-code="' + c + '">kopiuj</button>'
-          + '<button class="btn btn-sm" data-act="print" data-code="' + c + '">drukuj</button></div>'
+          + '<div class="qr-actions"><button class="btn btn-sm" data-act="copy" data-code="' + esc(c) + '">kopiuj</button>'
+          + '<button class="btn btn-sm" data-act="print" data-code="' + esc(c) + '">drukuj</button></div>'
           + '</div>';
       }).join('');
       codes.forEach(function (c) {
@@ -519,7 +532,7 @@
       renderCodes();
       copyText(codeUrl(next.code));
       setStatus($('codesStatus'), 'ok', 'następny wolny: ' + next.code + ' — link skopiowany');
-      const tr = document.querySelector('tr[data-code="' + next.code + '"]');
+      const tr = document.querySelector('tr[data-code="' + CSS.escape(next.code) + '"]');
       if (tr) { tr.classList.add('row-hi'); tr.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(function () { tr.classList.remove('row-hi'); }, 2200); }
     }
 

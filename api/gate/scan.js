@@ -2,13 +2,11 @@
 
 const kv = require('../_lib/kv.js');
 const { sign } = require('../_lib/jwt.js');
+const { normalizeCode, devicesOf, MAX_DEVICES } = require('../_lib/codes.js');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_30_DAYS = 30 * 24 * 60 * 60;
 const TRANSFER_5_MIN = 5 * 60;
-const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
-// kody uniwersalne: sekwencje znaczkow (3-16 znakow), np. |+_.! — dzialaja dla kazdego, bez parowania
-const UNIVERSAL_RE = /^[|+_.,!*^~\-=:;"'`<>/\\]{3,16}$/;
 const MAX_TRACE = 60;
 
 // Opcjonalny "ślad" zostawiany przez znalazcę (imię/@insta). Bez znaków kontrolnych.
@@ -58,15 +56,12 @@ module.exports = async function handler(req, res) {
   if (!code || !fingerprint || typeof code !== 'string' || typeof fingerprint !== 'string') {
     return res.status(400).json({ error: 'missing code or fingerprint' });
   }
-  const rawCode = code.trim();
-  const upperCode = rawCode.toUpperCase();
-  const isZnajdka = CODE_RE.test(upperCode);
-  const isUniversalFormat = !isZnajdka && UNIVERSAL_RE.test(rawCode);
-  if (!isZnajdka && !isUniversalFormat) {
+  // kod literowy (stare znajdki) albo ze znaczków; jeden klucz codes:{kod} dla obu
+  const codeKey = normalizeCode(code);
+  if (!codeKey) {
     return res.status(400).json({ error: 'invalid code format' });
   }
 
-  const codeKey = isZnajdka ? upperCode : rawCode;
   const traceName = cleanTrace(trace);
   const codeData = await kv.get(`codes:${codeKey}`);
   if (!codeData || codeData.status !== 'active' || codeData.state === 'revoked') {
@@ -81,49 +76,57 @@ module.exports = async function handler(req, res) {
     return res.json({ state: 'universal' });
   }
 
-  // format znaczkowy bez trybu universal nie przechodzi do logiki parowania znajdek
-  if (isUniversalFormat) {
-    return res.status(404).json({ error: 'code not found' });
-  }
-
-  const pairing = await kv.get(`code_pairings:${upperCode}`);
+  const pairing = await kv.get(`code_pairings:${codeKey}`);
   const now = new Date().toISOString();
 
   if (!pairing) {
-    await kv.set(`code_pairings:${upperCode}`, {
-      code: upperCode,
+    await kv.set(`code_pairings:${codeKey}`, {
+      code: codeKey,
       fingerprint,
+      devices: [fingerprint],
       firstActivatedAt: now,
       lastSeenAt: now,
       ...(traceName ? { holderName: traceName } : {}),
     });
-    const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
+    const token = sign({ code: codeKey, fingerprint }, JWT_SECRET, JWT_30_DAYS);
     setCookie(res, token, JWT_30_DAYS);
-    await logScan(req, upperCode, fingerprint, 'first');
+    await logScan(req, codeKey, fingerprint, 'first');
     return res.json({ state: 'first' });
   }
 
-  if (pairing.fingerprint === fingerprint) {
+  const devices = devicesOf(pairing);
+
+  if (devices.includes(fingerprint)) {
     // dopisz ślad jeśli posiadacz go teraz zostawił, a wcześniej go nie było
     const holderName = pairing.holderName || traceName;
-    await kv.set(`code_pairings:${upperCode}`, {
+    await kv.set(`code_pairings:${codeKey}`, {
       ...pairing,
+      devices,
       lastSeenAt: now,
       ...(holderName ? { holderName } : {}),
     });
-    const token = sign({ code: upperCode, fingerprint }, JWT_SECRET, JWT_30_DAYS);
+    const token = sign({ code: codeKey, fingerprint }, JWT_SECRET, JWT_30_DAYS);
     setCookie(res, token, JWT_30_DAYS);
-    await logScan(req, upperCode, fingerprint, 'known');
+    await logScan(req, codeKey, fingerprint, 'known');
     return res.json({ state: 'known' });
   }
 
-  // Inne urządzenie. Tryb "personal" = nie da się przejąć (brak tokenu transferu).
+  // Kod osobisty: kolejne urządzenie tej samej osoby, do MAX_DEVICES. Potem nie wpuszcza.
   if (codeData.mode === 'personal') {
-    await logScan(req, upperCode, fingerprint, 'transfer');
-    return res.json({ state: 'transfer', personal: true });
+    if (devices.length < MAX_DEVICES) {
+      const next = devices.concat(fingerprint);
+      await kv.set(`code_pairings:${codeKey}`, { ...pairing, devices: next, lastSeenAt: now });
+      const token = sign({ code: codeKey, fingerprint }, JWT_SECRET, JWT_30_DAYS);
+      setCookie(res, token, JWT_30_DAYS);
+      await logScan(req, codeKey, fingerprint, 'device');
+      return res.json({ state: 'device', devices: next.length, maxDevices: MAX_DEVICES });
+    }
+    await logScan(req, codeKey, fingerprint, 'transfer');
+    return res.json({ state: 'transfer', personal: true, full: true, maxDevices: MAX_DEVICES });
   }
-  // Tryb "wild" — krótkotrwały token transferu (zachowanie dotychczasowe).
-  const transferToken = sign({ code: upperCode, action: 'transfer' }, JWT_SECRET, TRANSFER_5_MIN);
-  await logScan(req, upperCode, fingerprint, 'transfer');
+
+  // Tryb "wild" — jedno urządzenie; krótkotrwały token transferu (zachowanie dotychczasowe).
+  const transferToken = sign({ code: codeKey, action: 'transfer' }, JWT_SECRET, TRANSFER_5_MIN);
+  await logScan(req, codeKey, fingerprint, 'transfer');
   return res.json({ state: 'transfer', transferToken });
 };

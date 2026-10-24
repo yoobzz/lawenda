@@ -2,18 +2,11 @@
 
 const kv = require('../_lib/kv.js');
 const { requireAdmin } = require('../_lib/admin-auth.js');
-
-const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
+const { normalizeCode, isGlyphCode, devicesOf } = require('../_lib/codes.js');
 
 function normalizeCodeList(rawList) {
   if (!Array.isArray(rawList)) return [];
-  return Array.from(
-    new Set(
-      rawList
-        .map(code => String(code || '').toUpperCase().trim())
-        .filter(code => CODE_RE.test(code)),
-    ),
-  ).sort();
+  return Array.from(new Set(rawList.map(normalizeCode).filter(Boolean))).sort();
 }
 
 function shortFingerprint(fingerprint) {
@@ -44,7 +37,8 @@ module.exports = async function handler(req, res) {
   if (requireAdmin(req, res) !== true) return;
 
   const ownerFilter = String(req.query.owner || 'all');
-  const search = String(req.query.search || '').toUpperCase().trim();
+  const search = String(req.query.search || '').trim();
+  const searchUpper = search.toUpperCase();
   const onlyWithOwner = ownerFilter === 'with';
   const onlyWithoutOwner = ownerFilter === 'without';
 
@@ -64,6 +58,8 @@ module.exports = async function handler(req, res) {
 
         return {
           code,
+          kind: isGlyphCode(code) ? 'glyph' : 'alnum',
+          devices: devicesOf(pairing).length,
           status: typeof cd.status === 'string' ? cd.status : 'unknown',
           state: typeof cd.state === 'string' ? cd.state : 'minted',
           mode: cd.mode === 'personal' ? 'personal' : 'wild',
@@ -83,7 +79,7 @@ module.exports = async function handler(req, res) {
     );
 
     const filtered = rows.filter(row => {
-      if (search && !row.code.includes(search)) return false;
+      if (search && !row.code.includes(search) && !row.code.includes(searchUpper)) return false;
       if (onlyWithOwner && !row.hasOwner) return false;
       if (onlyWithoutOwner && row.hasOwner) return false;
       return true;

@@ -48,6 +48,7 @@ module.exports = async function handler(req, res) {
   await kv.set(`code_pairings:${code}`, {
     ...pairing,
     fingerprint,
+    devices: [fingerprint],
     lastSeenAt: now,
     transferredAt: now,
   });

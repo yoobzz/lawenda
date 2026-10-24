@@ -3,21 +3,16 @@
 const crypto = require('crypto');
 const kv = require('../_lib/kv.js');
 const { requireAdmin } = require('../_lib/admin-auth.js');
+const { ALPHABET, GLYPHS, GLYPH_LEN, normalizeCode } = require('../_lib/codes.js');
 
-const CODE_RE = /^[ABCDEFGHJKMNPQRSTVWXYZ23456789]{4}$/;
 const FINGERPRINT_RE = /^[a-zA-Z0-9_-]{8,128}$/;
-// Alfabet jak w scripts/mint-codes.js — bez mylących znaków (0/O/1/I/L/U).
-const ALPHABET = 'ABCDEFGHJKMNPQRSTVWXYZ23456789';
+const KINDS = ['glyph', 'alnum'];
 const MODES = ['wild', 'personal'];
 const STATES = ['minted', 'assigned', 'revoked'];
 const MAX_LABEL = 80;
 const MAX_RECIPIENT = 80;
 const MAX_NOTE = 280;
 const MAX_MINT = 50;
-
-function normalizeCode(code) {
-  return String(code || '').toUpperCase().trim();
-}
 
 // Zwraca undefined gdy pola nie podano (nie nadpisujemy); '' pozwala wyczyścić.
 // Usuwa znaki kontrolne (kod < 32 lub 127) bez regexa, żeby źródło było czyste ASCII.
@@ -32,10 +27,19 @@ function cleanText(value, max) {
   return out.trim().slice(0, max);
 }
 
-function randomCode() {
+// kod literowy: 4 znaki z ALPHABET (stare znajdki z QR)
+function randomAlnumCode() {
   const buf = crypto.randomBytes(4);
   let s = '';
   for (let i = 0; i < 4; i += 1) s += ALPHABET[buf[i] % ALPHABET.length];
+  return s;
+}
+
+// kod ze znaczków: GLYPH_LEN znaczków; 16 znaczków, więc 4 bity z bajtu dają równy rozkład
+function randomGlyphCode() {
+  const buf = crypto.randomBytes(GLYPH_LEN);
+  let s = '';
+  for (let i = 0; i < GLYPH_LEN; i += 1) s += GLYPHS[buf[i] & 15];
   return s;
 }
 
@@ -59,6 +63,9 @@ module.exports = async function handler(req, res) {
       const recipient = cleanText(body.recipient, MAX_RECIPIENT) || '';
       const note = cleanText(body.note, MAX_NOTE) || '';
       const mode = MODES.includes(body.mode) ? body.mode : 'wild';
+      // domyślnie kody ze znaczków; 'alnum' tylko gdy panel wprost o to prosi
+      const kind = KINDS.includes(body.kind) ? body.kind : 'glyph';
+      const randomCode = kind === 'alnum' ? randomAlnumCode : randomGlyphCode;
 
       const index = await loadIndex();
       const known = new Set(index);
@@ -78,6 +85,7 @@ module.exports = async function handler(req, res) {
           status: 'active',
           state: recipient ? 'assigned' : 'minted',
           mode,
+          kind,
           label,
           recipient,
           note,
@@ -99,7 +107,7 @@ module.exports = async function handler(req, res) {
 
     // ── pozostałe akcje wymagają poprawnego kodu ──
     const code = normalizeCode(body.code);
-    if (!CODE_RE.test(code)) return res.status(400).json({ error: 'invalid code' });
+    if (!code) return res.status(400).json({ error: 'invalid code' });
 
     if (action === 'setLabel') {
       const current = (await kv.get(`codes:${code}`)) || { code, status: 'active' };
@@ -152,8 +160,8 @@ module.exports = async function handler(req, res) {
       const now = new Date().toISOString();
       const pairing = await kv.get(`code_pairings:${code}`);
       const next = pairing && typeof pairing === 'object'
-        ? { ...pairing, fingerprint, lastSeenAt: now }
-        : { code, fingerprint, firstActivatedAt: now, lastSeenAt: now };
+        ? { ...pairing, fingerprint, devices: [fingerprint], lastSeenAt: now }
+        : { code, fingerprint, devices: [fingerprint], firstActivatedAt: now, lastSeenAt: now };
       await kv.set(`code_pairings:${code}`, next);
       return res.json({ ok: true, code, action: 'setFingerprint' });
     }

@@ -978,6 +978,9 @@
 
         #code-gate {
             --cg-fs: clamp(64px, 12.5vw, 176px);
+            --cg-n: 4;
+            --cg-gap: clamp(10px, 1.6vw, 26px);
+            --cg-pad: clamp(44px, 6vw, 88px);
             --cg-ui: 'Inter', system-ui, sans-serif;
             --cg-big: 'ABC Helveesti', 'Inter', system-ui, sans-serif;
             position: fixed;
@@ -994,6 +997,8 @@
             background: radial-gradient(ellipse 52% 56% at 50% 52%, var(--bg) 64%, rgba(249, 249, 248, 0) 100%);
         }
         #code-gate.show { display: flex; }
+        /* kod ze znaczków: 6 pól, mniejszy krój, żeby zmieściły się obok siebie */
+        #code-gate[data-kind="glyph"] { --cg-fs: clamp(48px, 8vw, 116px); --cg-n: 6; }
 
         #cg-home {
             position: absolute;
@@ -1026,7 +1031,7 @@
         /* rama: krzyżyki w rogach, słowa na krawędziach */
         #cg-frame {
             position: relative;
-            padding: clamp(48px, 6.5vw, 84px) clamp(48px, 7vw, 96px);
+            padding: clamp(40px, 5vw, 72px) var(--cg-pad);
         }
         .cg-corner {
             position: absolute;
@@ -1067,7 +1072,7 @@
         #cg-field { position: relative; }
         #cg-slots {
             display: flex;
-            gap: clamp(10px, 1.6vw, 26px);
+            gap: var(--cg-gap);
             font-family: var(--cg-big);
             font-weight: 700;
             font-size: var(--cg-fs);
@@ -1135,9 +1140,9 @@
             flex-wrap: wrap;
             gap: 14px 28px;
             width: 100%;
-            max-width: calc(4 * 0.86 * var(--cg-fs) + 3 * clamp(10px, 1.6vw, 26px) + 2 * clamp(48px, 7vw, 96px));
-            margin-top: clamp(14px, 2.4vh, 28px);
-            padding: 0 clamp(48px, 7vw, 96px);
+            max-width: calc(var(--cg-n) * 0.86 * var(--cg-fs) + (var(--cg-n) - 1) * var(--cg-gap) + 2 * var(--cg-pad));
+            margin-top: clamp(10px, 2vh, 22px);
+            padding: 0 var(--cg-pad);
         }
         #cg-status {
             min-height: 1.4em;
@@ -1162,6 +1167,38 @@
         #cg-go:disabled { background: transparent; color: var(--ink); opacity: 0.32; cursor: default; }
         #cg-go:focus-visible, #cg-back:focus-visible, #cg-home:focus-visible { outline: 3px solid var(--lav); outline-offset: 3px; }
 
+        /* klawiatura znaczków */
+        #cg-keys {
+            display: grid;
+            grid-template-columns: repeat(9, clamp(46px, 4.4vw, 60px));
+            gap: 8px;
+            margin-top: clamp(16px, 2.8vh, 30px);
+        }
+        .cg-key {
+            height: clamp(46px, 4.4vw, 60px);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            color: var(--ink);
+            border: 2px solid var(--ink);
+            font-family: var(--cg-big);
+            font-weight: 700;
+            font-size: clamp(22px, 2.1vw, 30px);
+            line-height: 1;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s, opacity 0.2s;
+        }
+        .cg-key.fn { font-family: var(--cg-ui); font-weight: 700; font-size: 14px; }
+        .cg-key:hover { background: var(--lav); border-color: var(--lav); }
+        .cg-key:active { transform: translateY(2px); }
+        .cg-key:focus-visible { outline: 3px solid var(--lav); outline-offset: 2px; }
+        #cg-keys.locked .cg-key { opacity: 0.3; pointer-events: none; }
+        #code-gate.message #cg-keys { visibility: hidden; }
+
         #code-gate.shake #cg-slots { animation: cg-shake 0.5s; }
         #code-gate.shake .cg-slot, #code-gate.shake .cg-line { color: var(--lav); border-bottom-color: var(--lav); }
         @keyframes cg-shake {
@@ -1178,12 +1215,14 @@
         #code-gate.leaving #cg-under, #code-gate.leaving #cg-label { opacity: 0; transition: opacity 0.3s; }
 
         @media (max-width: 600px) {
-            #code-gate { --cg-fs: clamp(52px, 17vw, 96px); }
-            #cg-frame { padding: 40px 34px; }
+            #code-gate { --cg-fs: clamp(52px, 17vw, 96px); --cg-pad: 30px; --cg-gap: 9px; padding-top: 64px; justify-content: flex-start; }
+            #code-gate[data-kind="glyph"] { --cg-fs: clamp(34px, 10.6vw, 52px); }
+            #cg-frame { padding: 36px var(--cg-pad); margin-top: 4vh; }
+            #cg-keys { grid-template-columns: repeat(6, 1fr); width: 100%; max-width: 360px; gap: 7px; }
+            .cg-key { height: 52px; font-size: 26px; }
             .cg-edge { font-size: 11px; letter-spacing: 0.26em; }
             .cg-corner { font-size: 18px; }
-            #cg-under { padding: 0 34px; max-width: none; }
-            #cg-go { width: 100%; }
+            #cg-under { padding: 0 var(--cg-pad); max-width: none; }
         }
         @media (prefers-reduced-motion: reduce) {
             .cg-slot, .cg-line { transition: none; }
@@ -1326,6 +1365,7 @@
         <p id="cg-status" role="status" aria-live="polite"></p>
         <button id="cg-go" type="button" disabled></button>
     </div>
+    <div id="cg-keys" role="group" aria-label="klawiatura znaczków"></div>
 </div>
 
 <div id="scan-prototype-stage" aria-hidden="true">
