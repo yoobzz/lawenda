@@ -966,19 +966,30 @@
             }
         }
         /* ──────────────────────────────────────
-           BRAMKA Z KODEM: ściana ze znaczków (gate-wall.js) + szczelina na kod
-           język strony startowej: Inter 300, rozstrzelone znaczki, lawenda, bez ramek
+           BRAMKA Z KODEM: biała kartka z rysą
+           język strony startowej: Inter 300, rozstrzelone znaczki, lawenda, bez ramek.
+           kod wpisuje się na kartce; od pól biegnie rysa, z każdym znaczkiem dłuższa;
+           dobry kod rozłamuje kartkę na dwie połowy (za nią lawendowe znaczki), zły — rysa się zasklepia
         ────────────────────────────────────── */
         body.code-mode .vignette,
-        body.code-mode .star-fog,
         body.code-mode #gate,
         body.code-mode #nocode-landing,
         body.code-mode #scan-prototype-stage,
         body.code-mode #camera-area { display: none !important; }
+        /* za kartką: rzadkie lawendowe znaczki jak na starcie */
+        body.code-mode .star-fog { z-index: 0; }
+        body.code-mode .star-particle { font-size: 1rem; }
+        body.code-mode .star-particle.typing-in { opacity: 0.6; }
 
-        #cg-wall { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+        #cg-crack { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 45; pointer-events: none; overflow: visible; }
+        #cg-crack-gap { fill: rgba(150, 130, 220, 0.22); }
+        #cg-crack-l, #cg-crack-r { fill: none; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+        /* połowy kartki po rozłamaniu */
+        .cg-half { position: fixed; inset: 0; z-index: 46; background: var(--bg); overflow: hidden; }
+        .cg-half > * { pointer-events: none; }
 
         #code-gate {
+            background: var(--bg);
             --cg-n: 6;
             --cg-fs: clamp(2.4rem, 7.2vw, 5rem);
             --cg-gap: 0.26em;
@@ -1046,8 +1057,8 @@
         }
         .cg-edge.top { top: 4px; left: 50%; transform: translateX(-50%); }
         .cg-edge.bottom { bottom: 4px; left: 50%; transform: translateX(-50%) rotate(180deg); }
-        .cg-edge.left { left: 4px; top: 50%; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); }
-        .cg-edge.right { right: 4px; top: 50%; writing-mode: vertical-rl; transform: translateY(-50%); }
+        .cg-edge.left { left: 4px; top: 10px; writing-mode: vertical-rl; transform: rotate(180deg); }
+        .cg-edge.right { right: 4px; bottom: 10px; writing-mode: vertical-rl; }
 
         #cg-opening { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         #cg-label {
@@ -1108,6 +1119,7 @@
         #cg-input::selection { background: transparent; }
 
         #cg-status {
+            margin-top: 22px;
             min-height: 1.3em;
             font-weight: 300;
             font-size: 0.84rem;
@@ -1193,6 +1205,9 @@
             transform: translate(-50%, -50%);
         }
 
+        /* rozłamanie: kartka znika, połowy (klony) odjeżdżają; kod zostaje na połowach */
+        #code-gate.split { visibility: hidden; }
+
         #code-gate.shake #cg-slots { animation: cg-shake 0.5s; }
         #code-gate.shake .cg-slot { color: var(--lav); border-bottom-color: var(--lav); }
         @keyframes cg-shake {
@@ -1204,14 +1219,6 @@
         /* zły kod: znaczki wypadają z pól */
         #code-gate.drop .cg-slot { transform: translateY(0.9em) rotate(8deg); opacity: 0; }
         #code-gate.drop .cg-slot:nth-child(even) { transform: translateY(1.1em) rotate(-10deg); }
-        /* dobry kod: szczelina pęka, pola odlatują w górę */
-        #code-gate.leaving .cg-slot { transform: translateY(-0.6em); opacity: 0; border-bottom-color: transparent; }
-        #code-gate.leaving .cg-slot:nth-child(2) { transition-delay: 0.05s; }
-        #code-gate.leaving .cg-slot:nth-child(3) { transition-delay: 0.1s; }
-        #code-gate.leaving .cg-slot:nth-child(4) { transition-delay: 0.15s; }
-        #code-gate.leaving .cg-slot:nth-child(5) { transition-delay: 0.2s; }
-        #code-gate.leaving .cg-slot:nth-child(6) { transition-delay: 0.25s; }
-        #code-gate.leaving #cg-label, #code-gate.leaving #cg-status, #code-gate.leaving #cg-keys, #code-gate.leaving .cg-edge { opacity: 0; transition: opacity 0.4s; }
 
         @media (max-width: 600px) {
             #code-gate { --cg-fs: clamp(2.2rem, 11vw, 3.2rem); --cg-gap: 0.2em; padding: 64px 14px 28px; }
@@ -1324,7 +1331,14 @@
     <button id="camera-cancel" type="button">anuluj</button>
 </div>
 
-<canvas id="cg-wall" aria-hidden="true"></canvas>
+<svg id="cg-crack" aria-hidden="true">
+    <defs><clipPath id="cg-crack-clip"><rect id="cg-crack-clip-rect" x="0" y="0" width="0" height="0"/></clipPath></defs>
+    <g clip-path="url(#cg-crack-clip)">
+        <polygon id="cg-crack-gap"/>
+        <polyline id="cg-crack-l"/>
+        <polyline id="cg-crack-r"/>
+    </g>
+</svg>
 <div id="code-gate" aria-hidden="true">
     <a id="cg-home" href="/">&rdquo;~||-_^+*.</a>
     <button id="cg-back" type="button"></button>
@@ -1386,7 +1400,6 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
 <script src="/gate-config.js"></script>
-<script src="/gate-wall.js"></script>
 <script src="/gate.js"></script>
 </body>
 </html>
