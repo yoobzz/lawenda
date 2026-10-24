@@ -1149,8 +1149,9 @@
         }
         body { animation: page-enter 0.55s ease forwards; }
     </style>
+    <link rel="stylesheet" href="/gate.css">
 </head>
-<body>
+<body data-gate-embedded>
     <div id="pointcloud-bg"></div>
     <div id="pointcloud-loading" class="hidden" aria-hidden="true"></div>
     <div class="star-fog" id="starFog">
@@ -1475,6 +1476,8 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
             let frameCount = 0;
             let threeAnimStopped = false;
             window.__stopThreeAnimate = function(){ threeAnimStopped = true; };
+            // poza kamery dla bramki osadzonej: gate-title.js przejmuje lawendę z tego samego miejsca
+            window.__lawendaCamera = function(){ return { theta: currentTheta, phi: currentPhi, r: currentRadius * zoom }; };
             function animate() {
                 if (threeAnimStopped) return;
                 requestAnimationFrame(animate);
@@ -2483,130 +2486,44 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
         
         // Apply glitch animation to poems will be called when needed
 
-        // Funkcja animacji przejścia - backspace usuwanie strony, potem lawenda + decrypt, animacja chars po kliknięciu "czytaj tutaj"
+        // Przejście do bramki bez przeładowania: lawenda (pointcloud) przechodzi pod silnik gate-title.js
+        // z tą samą pozycją kamery (podmiana niewidoczna), kondensuje się w tytuł, a pod nim pojawia się kod.
         function animateTransitionToPoems() {
+            if (hasTransitioned) return;
+            hasTransitioned = true;
+            typedTextAnimationStopped = true;
             const title = document.getElementById('title');
+            const landing = document.getElementById('landingContainer');
             const typingText = document.getElementById('typingText');
             const authorName = document.getElementById('authorName');
             const starFog = document.getElementById('starFog');
             const pointcloudBg = document.getElementById('pointcloud-bg');
             const audioToggle = document.querySelector('.audio-toggle');
-            
-            typedTextAnimationStopped = true;
-            if (typingText) { typingText.style.transition = 'opacity 0.4s ease'; typingText.style.opacity = '0'; }
-            if (authorName) { authorName.style.transition = 'opacity 0.4s ease'; authorName.style.opacity = '0'; }
-            if (starFog) { starFog.style.transition = 'opacity 0.6s ease'; starFog.style.opacity = '0'; }
-            if (pointcloudBg) { pointcloudBg.style.transition = 'opacity 0.6s ease'; pointcloudBg.style.opacity = '0'; }
-            if (audioToggle) audioToggle.style.opacity = '0';
-            
-            function ensureTitleSpans() {
-                if (!title.querySelector('.title-char')) {
-                    const text = title.textContent;
-                    title.innerHTML = '';
-                    for (let i = 0; i < text.length; i++) {
-                        const s = document.createElement('span');
-                        s.className = 'title-char';
-                        s.textContent = text[i];
-                        title.appendChild(s);
-                    }
-                }
-            }
-            function removeTitleSpan(cb) {
-                const spans = title.querySelectorAll('.title-char');
-                if (spans.length === 0) { cb(); return; }
-                const last = spans[spans.length - 1];
-                last.style.transition = 'opacity 0.04s ease, transform 0.04s ease';
-                last.style.opacity = '0';
-                last.style.transform = 'translateY(-3px)';
-                setTimeout(() => { last.remove(); cb(); }, 42);
-            }
-            function backspaceTitleSequence(onDone) {
-                ensureTitleSpans();
-                const total = title.querySelectorAll('.title-char').length;
-                let removed = 0;
-                function next() {
-                    if (removed >= total) { onDone(); return; }
-                    removeTitleSpan(() => { removed++; next(); });
-                }
-                next();
-            }
-            
-            const safetyTimeout = setTimeout(() => { if (!hasTransitioned) window.location.href = 'gate.html'; }, 15000);
-            
-            setTimeout(() => {
-                if (typingText && typingText.parentNode) typingText.style.display = 'none';
-                const titleIsLawenda = title.textContent === 'lawenda';
-                function showOverlay() {
-                    const overlay = document.createElement('div');
-                    overlay.className = 'transition-overlay';
-                    overlay.style.background = 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)';
-                    document.body.appendChild(overlay);
-                    overlay.classList.add('active');
+            const fade = (el, s) => { if (el) { el.style.transition = 'opacity ' + s + 's ease'; el.style.opacity = '0'; } };
+            fade(title, 0.5); fade(typingText, 0.4); fade(authorName, 0.4); fade(starFog, 0.6); fade(audioToggle, 0.4);
 
-                    // od razu animacja znaków → gate.html
-                    setTimeout(() => {
-                        (window.dataLayer = window.dataLayer || []).push({ event: 'read_poems_click' });
-                        clearTimeout(safetyTimeout);
-                        const poemsSection = document.getElementById('poemsSection');
-                        let poemText = poemsSection && poemsSection.querySelector('.poem') ? (poemsSection.querySelector('.poem').innerText || '').trim() : '~||-_^+*.';
-                        const poemChars = poemText.split('').filter(c => c.trim() !== '');
-                        const randomChars = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ź', 'ż'];
-                        const titleSymbols = '"~||-_^+*.';
-                        const W = window.innerWidth, H = window.innerHeight;
-                        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-                        const rawCount = Math.floor((W / 12) * (H / 20));
-                        const charCount = Math.min(rawCount, 450);
-                        const allChars = [];
-                        for (let i = 0; i < charCount; i++) {
-                            let ch;
-                            if (Math.random() < 0.35) ch = titleSymbols[Math.floor(Math.random() * titleSymbols.length)];
-                            else if (Math.random() < 0.46 && poemChars.length) ch = poemChars[Math.floor(Math.random() * poemChars.length)];
-                            else ch = randomChars[Math.floor(Math.random() * randomChars.length)];
-                            allChars.push({ char: ch, x: Math.random() * W, y: Math.random() * H });
-                        }
-                        const cvs = document.createElement('canvas');
-                        cvs.width = W * dpr; cvs.height = H * dpr;
-                        cvs.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:10001;pointer-events:none;';
-                        document.body.appendChild(cvs);
-                        const ctx = cvs.getContext('2d');
-                        ctx.scale(dpr, dpr);
-                        const fontSize = Math.max(12, Math.min(W * 0.015, 22));
-                        ctx.font = '300 ' + fontSize + "px 'ABC Diatype Rounded', 'Inter', sans-serif";
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        let drawn = 0;
-                        const charsPerFrame = 40;
-                        const totalFrames = Math.ceil(charCount / charsPerFrame);
-                        const targetMs = 400;
-                        const frameDelay = Math.max(6, targetMs / totalFrames);
-                        function drawBatch() {
-                            if (drawn >= allChars.length) {
-                                cvs.style.transition = 'opacity 0.5s ease-out';
-                                cvs.style.opacity = '0';
-                                setTimeout(() => {
-                                    try { overlay.remove(); } catch(e) {}
-                                    try { cvs.remove(); } catch(e) {}
-                                    window.location.href = 'gate.html';
-                                }, 600);
-                                return;
-                            }
-                            ctx.fillStyle = 'rgba(0,0,0,0.9)';
-                            const end = Math.min(drawn + charsPerFrame, allChars.length);
-                            for (let i = drawn; i < end; i++) {
-                                ctx.fillText(allChars[i].char, allChars[i].x, allChars[i].y);
-                            }
-                            drawn = end;
-                            setTimeout(() => requestAnimationFrame(drawBatch), frameDelay);
-                        }
-                        drawBatch();
-                    }, 300);
-                }
-                if (titleIsLawenda) {
-                    showOverlay();
-                } else {
-                    backspaceTitleSequence(showOverlay);
-                }
-            }, 250);
+            const canvas = document.getElementById('cg-title');
+            const reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            const fallback = () => { window.location.href = 'gate.html'; };
+            if (!window.GateTitle || !window.LawendaGate || !canvas) { fallback(); return; }
+            const cam = window.__lawendaCamera ? window.__lawendaCamera() : null;
+            canvas.style.opacity = '0';
+            const started = window.GateTitle.init({ canvas: canvas, reduced: reduced, camera: cam, hold: true });
+            if (!started || !started.then) { fallback(); return; }
+            started.then(() => {
+                if (window.__lawendaCamera) window.GateTitle.setCamera(window.__lawendaCamera());
+                canvas.style.transition = 'opacity 0.35s ease';
+                canvas.style.opacity = '1';
+                fade(pointcloudBg, 0.35);
+                setTimeout(() => {
+                    if (window.__stopThreeAnimate) window.__stopThreeAnimate();
+                    if (pointcloudBg) pointcloudBg.style.display = 'none';
+                    if (landing) landing.style.display = 'none';
+                    if (starFog) starFog.style.display = 'none';
+                    window.GateTitle.morph();
+                    setTimeout(() => { window.LawendaGate.start(); }, reduced ? 0 : 900);
+                }, 380);
+            }).catch(fallback);
         }
 
         document.getElementById('title').addEventListener('click', () => {
@@ -2772,7 +2689,7 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 goToPoem(randomIndex);
             }
             // wyjście Esc
-            else if (e.key === 'Escape' && hasTransitioned) {
+            else if (e.key === 'Escape' && hasTransitioned && !document.body.classList.contains('code-mode')) {
                 e.preventDefault();
                 const backBtn = document.getElementById('backToStart');
                 if (backBtn && backBtn.style.display !== 'none') {
@@ -3106,5 +3023,55 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
 
         // Inicjalizacja - nic na początku, wszystko po 6 sekundach
     </script>
+
+<!-- ── bramka z kodem, osadzona: pokazuje się po kliknięciu tytułu (gate.css, gate.js, gate-title.js) ── -->
+<canvas id="cg-title" aria-hidden="true"></canvas>
+<div id="code-gate" aria-hidden="true">
+    <a id="cg-home" href="/">&rdquo;~||-_^+*.</a>
+    <button id="cg-back" type="button"></button>
+    <div id="cg-frame">
+        <span class="cg-edge top" style="--i:0" aria-hidden="true"></span>
+        <span class="cg-edge right" style="--i:1" aria-hidden="true"></span>
+        <span class="cg-edge bottom" style="--i:2" aria-hidden="true"></span>
+        <span class="cg-edge left" style="--i:3" aria-hidden="true"></span>
+        <div id="cg-opening">
+            <label id="cg-label" for="cg-input"></label>
+            <div id="cg-field">
+                <div id="cg-slots" aria-hidden="true"></div>
+                <input id="cg-input" type="text" inputmode="text" maxlength="80" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-describedby="cg-status" />
+            </div>
+            <p id="cg-status" role="status" aria-live="polite"></p>
+            <button id="cg-go" type="button" hidden></button>
+        </div>
+    </div>
+    <div id="cg-keys" role="group" aria-label="klawiatura znaczków"></div>
+</div>
+
+<div id="proto-trace" aria-hidden="true">
+    <div id="proto-trace-prompt"></div>
+    <input id="proto-trace-input" type="text" maxlength="60" autocomplete="off" autocapitalize="words" spellcheck="false" />
+    <div id="proto-trace-hint"></div>
+    <button id="proto-trace-skip" type="button">pomiń</button>
+</div>
+
+<div id="first-access-visual" aria-hidden="true" role="status" aria-live="polite">
+    <span class="sr-only">Dostęp do tej znajdki został przypisany do tego urządzenia.</span>
+    <div class="fav-core">
+        <svg class="fav-sigil" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle class="fav-sigil-ring" cx="40" cy="40" r="30"
+                stroke="rgba(13,13,13,0.68)" stroke-width="1"
+                stroke-linecap="round"
+                transform="rotate(-90 40 40)"/>
+            <circle class="fav-sigil-dot" cx="40" cy="40" r="3.5"
+                fill="rgba(13,13,13,0.72)"/>
+        </svg>
+    </div>
+</div>
+
+<!-- jsQR zdjęty: jego integrity nie pasowało do pliku z CDN (przeglądarka go blokowała); bramka działa na wpisywanym kodzie (GATE_CONFIG.camera = false) -->
+
+<script src="/gate-config.js"></script>
+<script src="/gate-title.js"></script>
+<script src="/gate.js"></script>
 </body>
 </html>                                                                                                                                                                                                                                                                                                                                                 

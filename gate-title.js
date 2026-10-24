@@ -1,42 +1,54 @@
 /* ─────────────────────────────────────────────────────────────
    gate-title.js  ~||-_^+*.
-   tło bramki: chmura lawendy ze strony startowej (pointcloud.bin, te same
-   znaczki i odcienie) kondensuje się i układa w tytuł „~||-_^+*.” w 3D.
-   kamera leniwie dryfuje wokół napisu; każdy wpisany znaczek rozświetla
-   swoje odpowiedniki w tytule i puszcza przez niego falę; zły kod = dreszcz,
-   dobry = przelot kamery przez napis.
+   chmura lawendy ze strony startowej (pointcloud.bin, te same znaczki
+   i odcienie) kondensuje się i układa w gruby tytuł „~||-_^+*.” w 3D.
+   potem kamera leniwie dryfuje wokół napisu. na wpisywany kod reaguje
+   WYŁĄCZNIE kamera: każdy znaczek = nowe ujęcie na jego odpowiednik
+   w tytule; zły kod = kamera się cofa; dobry = przelot przez napis.
 
    API (window.GateTitle):
-     init({ canvas, reduced })
-     pulse(glyph, index, count)   wpisany znaczek
-     fail()                       zły kod
-     enter(onDone)                przelot do wierszy
-   wymaga three.js (ładowane w gate.html); bez niego — nic.
+     init({ canvas, reduced, camera?, hold? })  → Promise (po zbudowaniu)
+        camera = { theta, phi, r } ze strony startowej (ta sama poza, więc
+        podmiana silnika jest niewidoczna); hold = true trzyma roślinę
+        do wywołania morph()
+     morph()                        roślina → tytuł
+     active()                       czy silnik już działa
+     pulse(glyph, index, count)     wpisany znaczek (ujęcie kamery)
+     fail()                         zły kod (kamera się cofa)
+     enter(onDone)                  przelot do wierszy
+   wymaga three.js; bez niego init zwraca false.
    ───────────────────────────────────────────────────────────── */
 (function () {
   'use strict';
 
   var TITLE = '"~||-_^+*.';
   var GLYPHS = ['_', '-', '~', '"', '|', ',', '*', '^', ':', ';', '.', '+', '=', '`', "'", '!'];
-  /* odcienie jak na starcie (index.html) */
+  /* odcienie jak na starcie (index.html); tytuł tylko z lawendy */
   var LAV = [[158, 128, 218], [180, 155, 232], [208, 188, 244], [138, 105, 202]];
   var GRN = [[55, 142, 65], [80, 165, 82], [108, 182, 92], [38, 120, 50]];
-  var INK = [13, 13, 13];
 
   var S = {
     canvas: null, renderer: null, scene: null, camera: null,
     reduced: false, running: false, t0: 0, last: 0,
-    n: 0, glyphOf: null, from: null, to: null, col0: null, col1: null, col: null,
-    disp: null, vel: null, groups: [], posAttrs: [], colAttrs: [],
+    n: 0, glyphOf: null, from: null, to: null, col0: null, col1: null, groups: [],
     morph: { t: -1, delay: null },
-    cam: { theta: 0.5, phi: 0.9, r: 7.2, roll: 0, kick: 0, lookY: 0, baseR: 7, shake: 0 },
-    glow: null, glowT: null, dim: 0, mode: 'idle', enterT: 0, onEnter: null,
-    titleW: 7, titleX0: -3.5,
+    cam: {
+      theta: 0.5, phi: 0.9, r: 7.2, roll: 0,
+      lookX: 0, lookY: 0, lookTarget: 0,
+      focusX: 0, focusSide: 1, focusT: 0, pull: 0,
+    },
+    mode: 'idle', enterT: 0, onEnter: null,
+    titleW: 7, charX: [],
   };
 
   function rnd(a, b) { return a + Math.random() * (b - a); }
+  var _col = null;
+  function lin(c) {
+    if (!_col) _col = new THREE.Color();
+    _col.setRGB(c[0] / 255, c[1] / 255, c[2] / 255).convertSRGBToLinear();
+    return [_col.r, _col.g, _col.b];
+  }
   function easeInOut(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
 
   function glyphTexture(ch) {
     var size = 128;
@@ -54,7 +66,8 @@
     return tex;
   }
 
-  /* tytuł rasteryzowany tym samym krojem co na starcie → komórki z tuszem = cele punktów */
+  /* tytuł rasteryzowany grubo (Inter 800 + obrys) → komórki z tuszem = cele punktów;
+     przy okazji środek każdego znaku, żeby kamera umiała na niego spojrzeć */
   function titleTargets(wanted) {
     var W = 2400, H = 520;
     var c = document.createElement('canvas');
@@ -65,7 +78,6 @@
     x.textAlign = 'center';
     x.textBaseline = 'middle';
     x.fillText(TITLE, W / 2, H / 2 + 10);
-    /* dodatkowo obrys: jeszcze grubsze kreski */
     x.lineWidth = 18;
     x.strokeStyle = '#000';
     x.lineJoin = 'round';
@@ -84,11 +96,17 @@
       }
     }
     if (!cells.length) return null;
-    var width = maxX - minX;
-    var scale = S.titleW / width;
+    var scale = S.titleW / (maxX - minX);
     var cx = (minX + maxX) / 2, cy = H / 2;
-    /* wiele punktów na komórkę, z rozrzutem — litery gęste jak kwiatostan; sortowane po x,
-       żeby roślina zwijała się w napis od lewej do prawej */
+    /* środki znaków w świecie */
+    var total = x.measureText(TITLE).width;
+    var startX = W / 2 - total / 2;
+    S.charX = [];
+    for (var k = 0; k < TITLE.length; k += 1) {
+      var pre = x.measureText(TITLE.slice(0, k)).width;
+      var cw = x.measureText(TITLE[k]).width;
+      S.charX.push({ ch: TITLE[k], x: (startX + pre + cw / 2 - cx) * scale });
+    }
     var out = new Float32Array(wanted * 3);
     for (var i = 0; i < wanted; i += 1) {
       var cell = cells[Math.floor(Math.random() * cells.length)];
@@ -96,7 +114,6 @@
       out[i * 3 + 1] = -(cell[1] - cy) * scale + rnd(-2.2, 2.2) * scale;
       out[i * 3 + 2] = rnd(-0.12, 0.12);
     }
-    S.titleX0 = -S.titleW / 2;
     return out;
   }
 
@@ -108,14 +125,14 @@
     for (var k = 0; k < n; k += 1) {
       out[k * 3] = arr[idx[k] * 3]; out[k * 3 + 1] = arr[idx[k] * 3 + 1]; out[k * 3 + 2] = arr[idx[k] * 3 + 2];
     }
-    return out;
+    return { pos: out, order: idx };
   }
 
   function build(ab) {
     var view = new DataView(ab);
     var count = view.getUint32(0, true);
     var mobile = window.innerWidth < 640;
-    var step = mobile ? 2 : 1;
+    var step = mobile ? 3 : 1;
     var n = Math.ceil(count / step);
     var from = new Float32Array(n * 3);
     var col0 = new Float32Array(n * 3);
@@ -127,36 +144,26 @@
       from[k * 3 + 1] = view.getFloat32(off + 8, true);
       from[k * 3 + 2] = -view.getFloat32(off + 4, true);
       var stalk = view.getUint8(off + 12) === 1;
-      var sh = (stalk ? GRN : LAV)[Math.floor(Math.random() * 4)];
-      col0[k * 3] = sh[0] / 255; col0[k * 3 + 1] = sh[1] / 255; col0[k * 3 + 2] = sh[2] / 255;
+      var sh = lin((stalk ? GRN : LAV)[Math.floor(Math.random() * 4)]);
+      col0[k * 3] = sh[0]; col0[k * 3 + 1] = sh[1]; col0[k * 3 + 2] = sh[2];
       k += 1;
     }
     n = k;
     S.n = n;
     /* rank po x z obu stron: punkt i-ty od lewej rośliny trafia w i-ty cel od lewej */
-    var fromSorted = sortByX(from, n);
-    var order = new Array(n);
-    for (i = 0; i < n; i += 1) order[i] = i;
-    order.sort(function (a, b) { return from[a * 3] - from[b * 3]; });
+    var fs = sortByX(from, n);
     var to = titleTargets(n);
-    var toSorted = to ? sortByX(to, n) : fromSorted;
-    S.from = new Float32Array(n * 3);
-    S.to = new Float32Array(n * 3);
+    var ts = to ? sortByX(to, n) : fs;
+    S.from = fs.pos;
+    S.to = ts.pos;
     S.col0 = new Float32Array(n * 3);
     S.col1 = new Float32Array(n * 3);
     for (i = 0; i < n; i += 1) {
-      var src = order[i];
-      S.from[i * 3] = fromSorted[i * 3]; S.from[i * 3 + 1] = fromSorted[i * 3 + 1]; S.from[i * 3 + 2] = fromSorted[i * 3 + 2];
-      S.to[i * 3] = toSorted[i * 3]; S.to[i * 3 + 1] = toSorted[i * 3 + 1]; S.to[i * 3 + 2] = toSorted[i * 3 + 2];
+      var src = fs.order[i];
       S.col0[i * 3] = col0[src * 3]; S.col0[i * 3 + 1] = col0[src * 3 + 1]; S.col0[i * 3 + 2] = col0[src * 3 + 2];
-      /* tytuł: lawenda, co dwudziesty znaczek tuszem — jak na starcie */
-      var t1 = Math.random() < 0.14 ? INK : LAV[Math.floor(Math.random() * 4)];
-      S.col1[i * 3] = t1[0] / 255; S.col1[i * 3 + 1] = t1[1] / 255; S.col1[i * 3 + 2] = t1[2] / 255;
+      var t1 = lin(LAV[Math.floor(Math.random() * 4)]);
+      S.col1[i * 3] = t1[0]; S.col1[i * 3 + 1] = t1[1]; S.col1[i * 3 + 2] = t1[2];
     }
-    S.col = new Float32Array(S.col0);
-    S.disp = new Float32Array(n * 3);
-    S.vel = new Float32Array(n * 3);
-    S.glow = new Float32Array(n);
     S.glyphOf = new Uint8Array(n);
     S.morph.delay = new Float32Array(n);
     for (i = 0; i < n; i += 1) {
@@ -168,8 +175,8 @@
     var byGlyph = [];
     for (var g = 0; g < GLYPHS.length; g += 1) byGlyph.push([]);
     for (i = 0; i < n; i += 1) byGlyph[S.glyphOf[i]].push(i);
-    var size = mobile ? 0.16 : 0.082;
-    S.groups = []; S.posAttrs = []; S.colAttrs = [];
+    var size = mobile ? 0.12 : 0.1;
+    S.groups = [];
     for (g = 0; g < GLYPHS.length; g += 1) {
       var ids = byGlyph[g];
       var geo = new THREE.BufferGeometry();
@@ -184,9 +191,8 @@
       var pts = new THREE.Points(geo, mat);
       pts.frustumCulled = false;
       S.scene.add(pts);
-      S.groups.push({ ids: ids, pos: pos, cols: cols, geo: geo, mat: mat, size: size });
+      S.groups.push({ ids: ids, pos: pos, cols: cols, geo: geo });
     }
-    S.morph.t = 0;
     S.running = true;
     S.t0 = performance.now();
     S.last = S.t0;
@@ -200,103 +206,92 @@
     return Math.max(5.5, Math.min(15, r));
   }
 
+  function lerpTo(cur, target, rate) { return cur + (target - cur) * Math.min(1, rate); }
+
   function frame(now) {
     if (!S.running) return;
     var dt = Math.max(0, Math.min(0.05, (now - S.last) / 1000));
     S.last = now;
     var t = (now - S.t0) / 1000;
-    var n = S.n;
     var i;
 
     /* ── morf: roślina → tytuł; każdy punkt leci łukiem z własnym opóźnieniem ── */
     var m = S.morph;
-    if (m.t >= 0 && m.t < 1) {
-      m.t = Math.min(1, m.t + dt / (S.reduced ? 0.01 : 2.6));
-    }
-    var morphing = m.t >= 0 && m.t <= 1;
-
-    /* ── fizyka: sprężyna do bazy + impulsy ── */
-    var k = 9, c = 3.2;
-    for (i = 0; i < n * 3; i += 1) {
-      var d = S.disp[i], v = S.vel[i];
-      v += (-k * d - c * v) * dt;
-      d += v * dt;
-      S.disp[i] = d; S.vel[i] = v;
-    }
-    if (S.cam.shake > 0) S.cam.shake = Math.max(0, S.cam.shake - dt * 2.2);
+    if (m.t >= 0 && m.t < 1) m.t = Math.min(1, m.t + dt / (S.reduced ? 0.01 : 2.6));
+    var held = m.t < 0;
+    var morphing = m.t >= 0 && m.t < 1;
 
     for (var g = 0; g < S.groups.length; g += 1) {
       var G = S.groups[g];
       var ids = G.ids;
       for (var j = 0; j < ids.length; j += 1) {
         i = ids[j];
-        var p = m.t >= 1 ? 1 : (m.t < 0 ? 0 : easeInOut(Math.max(0, Math.min(1, (m.t - m.delay[i] * 0.6) / 0.42))));
+        var p = held ? 0 : (m.t >= 1 ? 1 : easeInOut(Math.max(0, Math.min(1, (m.t - m.delay[i] * 0.6) / 0.42))));
         var arc = Math.sin(p * Math.PI) * 0.9;
-        var bx = S.from[i * 3] + (S.to[i * 3] - S.from[i * 3]) * p;
-        var by = S.from[i * 3 + 1] + (S.to[i * 3 + 1] - S.from[i * 3 + 1]) * p + arc;
-        var bz = S.from[i * 3 + 2] + (S.to[i * 3 + 2] - S.from[i * 3 + 2]) * p;
         var breath = (m.t >= 1 && !S.reduced) ? Math.sin(t * 0.9 + i * 0.37) * 0.012 : 0;
-        G.pos[j * 3] = bx + S.disp[i * 3];
-        G.pos[j * 3 + 1] = by + S.disp[i * 3 + 1] + breath;
-        G.pos[j * 3 + 2] = bz + S.disp[i * 3 + 2] + breath * 2;
-        /* kolor: łodyga/kwiat → lawenda tytułu; błysk po wpisanym znaczku; przygaszenie po błędzie */
-        var gl = S.glow[i];
-        if (gl > 0) S.glow[i] = gl = Math.max(0, gl - dt * 1.6);
-        var r0 = S.col0[i * 3] + (S.col1[i * 3] - S.col0[i * 3]) * p;
-        var g0 = S.col0[i * 3 + 1] + (S.col1[i * 3 + 1] - S.col0[i * 3 + 1]) * p;
-        var b0 = S.col0[i * 3 + 2] + (S.col1[i * 3 + 2] - S.col0[i * 3 + 2]) * p;
-        if (gl > 0) { r0 += (0.05 - r0) * gl; g0 += (0.05 - g0) * gl; b0 += (0.05 - b0) * gl; }
-        if (S.dim > 0) { var gr = 0.8; r0 += (gr - r0) * S.dim; g0 += (gr - g0) * S.dim; b0 += (gr - b0) * S.dim; }
-        G.cols[j * 3] = r0; G.cols[j * 3 + 1] = g0; G.cols[j * 3 + 2] = b0;
+        G.pos[j * 3] = S.from[i * 3] + (S.to[i * 3] - S.from[i * 3]) * p;
+        G.pos[j * 3 + 1] = S.from[i * 3 + 1] + (S.to[i * 3 + 1] - S.from[i * 3 + 1]) * p + arc + breath;
+        G.pos[j * 3 + 2] = S.from[i * 3 + 2] + (S.to[i * 3 + 2] - S.from[i * 3 + 2]) * p + breath * 2;
+        G.cols[j * 3] = S.col0[i * 3] + (S.col1[i * 3] - S.col0[i * 3]) * p;
+        G.cols[j * 3 + 1] = S.col0[i * 3 + 1] + (S.col1[i * 3 + 1] - S.col0[i * 3 + 1]) * p;
+        G.cols[j * 3 + 2] = S.col0[i * 3 + 2] + (S.col1[i * 3 + 2] - S.col0[i * 3 + 2]) * p;
       }
       G.geo.attributes.position.needsUpdate = true;
       G.geo.attributes.color.needsUpdate = true;
     }
-    if (S.dim > 0) S.dim = Math.max(0, S.dim - dt * 1.4);
 
-    /* ── kamera: podczas morfu dojeżdża na wprost napisu, potem dryfuje wokół różnych osi ── */
+    /* ── kamera ── */
     var C = S.cam;
     var baseR = aspectRadius();
-    var thetaT, phiT, rT, rollT;
+    var cam = S.camera;
     if (S.mode === 'enter') {
       S.enterT += dt / 1.15;
       var e = easeInOut(Math.min(1, S.enterT));
-      thetaT = Math.PI / 2; phiT = Math.PI / 2; rollT = 0;
-      rT = C.r + (-1.2 - C.r) * e * 0.9;
-      C.theta += (thetaT - C.theta) * Math.min(1, dt * 4);
-      C.phi += (phiT - C.phi) * Math.min(1, dt * 4);
-      C.r = rT;
+      C.theta = lerpTo(C.theta, Math.PI / 2, dt * 4);
+      C.phi = lerpTo(C.phi, Math.PI / 2, dt * 4);
+      C.roll = lerpTo(C.roll, 0, dt * 4);
+      C.lookX = lerpTo(C.lookX, 0, dt * 4);
+      C.r = C.r + (-1.2 - C.r) * e * 0.9;
       S.canvas.style.opacity = String(Math.max(0, 1 - Math.max(0, S.enterT - 0.55) / 0.45));
       if (S.enterT >= 1) { S.running = false; var cb = S.onEnter; S.onEnter = null; if (cb) cb(); return; }
-    } else if (morphing && m.t < 1) {
-      thetaT = Math.PI / 2; phiT = Math.PI / 2; rT = baseR; rollT = 0;
-      C.theta += (thetaT - C.theta) * Math.min(1, dt * 1.1);
-      C.phi += (phiT - C.phi) * Math.min(1, dt * 1.1);
-      C.r += (rT - C.r) * Math.min(1, dt * 1.1);
-      C.roll += (rollT - C.roll) * Math.min(1, dt * 1.1);
+    } else if (held) {
+      /* roślina jak na starcie: powolny obrót, ta sama poza co tam */
+      if (!S.reduced) C.theta += dt * 0.10;
+      C.lookX = 0; C.lookY = 0;
+    } else if (morphing) {
+      C.theta = lerpTo(C.theta, Math.PI / 2, dt * 1.1);
+      C.phi = lerpTo(C.phi, Math.PI / 2, dt * 1.1);
+      C.r = lerpTo(C.r, baseR, dt * 1.1);
+      C.roll = lerpTo(C.roll, 0, dt * 1.1);
+      C.lookX = lerpTo(C.lookX, 0, dt * 1.1);
+      C.lookY = C.lookTarget * easeInOut(Math.min(1, m.t));
     } else if (!S.reduced) {
-      thetaT = Math.PI / 2 + Math.sin(t * 0.09) * 0.42 + C.kick;
-      phiT = Math.PI / 2 + Math.sin(t * 0.067 + 1.3) * 0.26;
-      rT = baseR * (1 + Math.sin(t * 0.05 + 0.6) * 0.14);
-      rollT = Math.sin(t * 0.058 + 2.1) * 0.14;
-      C.kick *= Math.max(0, 1 - dt * 1.4);
-      C.theta += (thetaT - C.theta) * Math.min(1, dt * 0.6);
-      C.phi += (phiT - C.phi) * Math.min(1, dt * 0.6);
-      C.r += (rT - C.r) * Math.min(1, dt * 0.5);
-      C.roll += (rollT - C.roll) * Math.min(1, dt * 0.5);
+      /* dryf wokół różnych osi + ujęcie na wpisany znaczek (focus) + cofnięcie po błędzie (pull) */
+      var f = C.focusT;
+      var pull = C.pull;
+      var thetaT = Math.PI / 2 + Math.sin(t * 0.09) * 0.42 - C.focusSide * 0.3 * f;
+      var phiT = Math.PI / 2 + Math.sin(t * 0.067 + 1.3) * 0.26 - 0.1 * f + 0.2 * pull;
+      var rT = baseR * (1 + Math.sin(t * 0.05 + 0.6) * 0.14) * (1 - 0.2 * f) * (1 + 0.32 * pull);
+      var rollT = Math.sin(t * 0.058 + 2.1) * 0.14 + C.focusSide * 0.05 * f;
+      var rate = dt * (0.6 + 2.4 * f + 1.6 * pull);
+      C.theta = lerpTo(C.theta, thetaT, rate);
+      C.phi = lerpTo(C.phi, phiT, rate);
+      C.r = lerpTo(C.r, rT, rate);
+      C.roll = lerpTo(C.roll, rollT, rate);
+      C.lookX = lerpTo(C.lookX, C.focusX * f, rate);
+      C.lookY = C.lookTarget;
+      C.focusT = Math.max(0, f - dt / 2.6);
+      C.pull = Math.max(0, pull - dt / 1.8);
     } else {
-      C.theta = Math.PI / 2; C.phi = Math.PI / 2; C.r = baseR; C.roll = 0;
+      C.theta = Math.PI / 2; C.phi = Math.PI / 2; C.r = baseR; C.roll = 0; C.lookX = 0; C.lookY = C.lookTarget;
     }
-    C.lookY = (C.lookTarget || 0) * (m.t < 0 ? 0 : easeInOut(Math.min(1, m.t)));
-    var sh = C.shake;
-    var cam = S.camera;
     cam.position.set(
-      C.r * Math.sin(C.phi) * Math.cos(C.theta) + rnd(-sh, sh) * 0.12,
-      C.r * Math.cos(C.phi) + rnd(-sh, sh) * 0.12,
+      C.r * Math.sin(C.phi) * Math.cos(C.theta),
+      C.r * Math.cos(C.phi),
       C.r * Math.sin(C.phi) * Math.sin(C.theta)
     );
     cam.up.set(Math.sin(C.roll), Math.cos(C.roll), 0);
-    cam.lookAt(0, C.lookY, 0);
+    cam.lookAt(C.lookX, C.lookY, 0);
     S.renderer.render(S.scene, cam);
     requestAnimationFrame(frame);
   }
@@ -314,6 +309,7 @@
   var GateTitle = {
     init: function (opts) {
       if (typeof THREE === 'undefined' || !opts || !opts.canvas) return false;
+      if (S.running) return Promise.resolve();
       S.canvas = opts.canvas;
       S.reduced = Boolean(opts.reduced);
       S.scene = new THREE.Scene();
@@ -322,39 +318,40 @@
       S.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       S.renderer.setClearColor(0x000000, 0);
       resize();
+      if (opts.camera) {
+        S.cam.theta = opts.camera.theta; S.cam.phi = opts.camera.phi; S.cam.r = opts.camera.r;
+      }
+      S.morph.t = opts.hold ? -1 : 0;
       var rt = null;
       window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(resize, 120); });
       var ready = (document.fonts && document.fonts.load) ? document.fonts.load('800 300px Inter').catch(function () {}) : Promise.resolve();
-      Promise.all([fetch('/pointcloud.bin').then(function (r) { if (!r.ok) throw new Error('bin'); return r.arrayBuffer(); }), ready])
+      return Promise.all([fetch('/pointcloud.bin').then(function (r) { if (!r.ok) throw new Error('bin'); return r.arrayBuffer(); }), ready])
         .then(function (res) { build(res[0]); })
-        .catch(function () { S.canvas.style.display = 'none'; });
-      return true;
+        .catch(function (err) { S.canvas.style.display = 'none'; throw err; });
     },
-    /* wpisany znaczek: jego odpowiedniki w napisie błyskają tuszem, fala idzie od miejsca pola, kamera drga */
+    morph: function () { if (S.morph.t < 0) S.morph.t = 0; },
+    setCamera: function (c) { if (c) { S.cam.theta = c.theta; S.cam.phi = c.phi; S.cam.r = c.r; } },
+    active: function () { return S.running; },
+    /* wpisany znaczek: kamera robi ujęcie na jego odpowiednik w tytule (najbliższy miejscu pola) */
     pulse: function (glyph, index, count) {
-      if (!S.n) return;
-      var gi = GLYPHS.indexOf(glyph);
-      var ox = S.titleX0 + ((index + 0.5) / Math.max(1, count)) * S.titleW;
-      var R = 1.9;
-      for (var i = 0; i < S.n; i += 1) {
-        if (gi >= 0 && S.glyphOf[i] === gi) S.glow[i] = 1;
-        var dx = S.to[i * 3] - ox, dy = S.to[i * 3 + 1];
-        var d2 = dx * dx + dy * dy;
-        if (d2 < R * R) {
-          var d = Math.sqrt(d2) || 0.001;
-          var f = (1 - d / R) * (S.reduced ? 0 : 2.6);
-          S.vel[i * 3] += (dx / d) * f * 0.5;
-          S.vel[i * 3 + 1] += (dy / d) * f * 0.5;
-          S.vel[i * 3 + 2] += f * 1.3;
-        }
+      if (!S.n || S.reduced) return;
+      var expect = ((index + 0.5) / Math.max(1, count) - 0.5) * S.titleW;
+      var best = null, bestD = Infinity;
+      for (var k = 0; k < S.charX.length; k += 1) {
+        var c = S.charX[k];
+        var d = Math.abs(c.x - expect) + (c.ch === glyph ? 0 : 100);
+        if (d < bestD) { bestD = d; best = c; }
       }
-      S.cam.kick += (Math.random() < 0.5 ? -1 : 1) * 0.09;
+      var x = best ? best.x : expect;
+      S.cam.focusX = x * 0.5;
+      S.cam.focusSide = x < 0 ? -1 : 1;
+      S.cam.focusT = 1;
+      S.cam.pull = 0;
     },
     fail: function () {
       if (!S.n || S.reduced) return;
-      for (var i = 0; i < S.n * 3; i += 1) S.vel[i] += rnd(-1.1, 1.1);
-      S.cam.shake = 1;
-      S.dim = 1;
+      S.cam.pull = 1;
+      S.cam.focusT = 0;
     },
     enter: function (onDone) {
       if (!S.n) { if (onDone) onDone(); return; }

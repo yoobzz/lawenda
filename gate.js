@@ -2702,7 +2702,8 @@ function cgBuild() {
   cgSetButton(CG_TEXT.go, cgSubmit);
   cgRender();
   const titleCanvas = document.getElementById('cg-title');
-  if (titleCanvas && cgTitle()) cgTitle().init({ canvas: titleCanvas, reduced: prefersReducedMotion() });
+  // na stronie startowej silnik tytułu już działa (podmieniony pod lawendę) — nie startuj go drugi raz
+  if (titleCanvas && cgTitle() && !cgTitle().active()) cgTitle().init({ canvas: titleCanvas, reduced: prefersReducedMotion() });
   cgStartIdle();
   return true;
 }
@@ -2750,8 +2751,18 @@ async function init() {
   }
 }
 
-init().catch(err => {
-  console.error('gate init error:', err);
-  clearChat();
-  createBubble('błąd ładowania — odśwież stronę');
-});
+if (document.body && document.body.hasAttribute('data-gate-embedded')) {
+  // bramka osadzona w stronie startowej (index.html): startuje po kliknięciu tytułu, bez przeładowania
+  window.LawendaGate = {
+    start: async function (prefill) {
+      fingerprint = await generateFingerprint();
+      await stateCodeGate(prefill || null);
+    },
+  };
+} else {
+  init().catch(err => {
+    console.error('gate init error:', err);
+    clearChat();
+    createBubble('błąd ładowania — odśwież stronę');
+  });
+}
