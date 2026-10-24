@@ -2301,10 +2301,41 @@ const CG_TEXT = Object.assign({
 }, (typeof GATE_CONFIG !== 'undefined' && GATE_CONFIG.codeGate) || {});
 
 const cg = {
-  root: null, input: null, slots: null, status: null, go: null, keys: null,
+  root: null, input: null, slots: null, status: null, go: null, keys: null, wall: null,
   kind: 'glyph', value: '', busy: false, idleTimer: null, scrambleTimer: null, onGo: null,
   touch: false,
 };
+
+/* ściana ze znaczków (gate-wall.js): poziom rozdarcia = ile znaczków już w szczelinie */
+function cgWallLevel() {
+  const level = cgSlotCount() ? cg.value.length / cgSlotCount() : 0;
+  cg.root.style.setProperty('--lv', level.toFixed(3));
+  if (cg.wall) cg.wall.setOpening(level);
+}
+
+/* wyjęty znaczek leci z klawisza (albo z klawiatury fizycznej: z jego klawisza) do pola */
+function cgFly(ch, fromEl, index) {
+  if (prefersReducedMotion() || !window.gsap) return;
+  const key = fromEl || (cg.keys && Array.from(cg.keys.querySelectorAll('.cg-key.glyph')).find(k => k.textContent === ch));
+  const slot = cg.slots.children[index];
+  if (!key || !slot) return;
+  const a = key.getBoundingClientRect();
+  const b = slot.getBoundingClientRect();
+  const fly = document.createElement('span');
+  fly.className = 'cg-fly';
+  fly.textContent = ch;
+  fly.style.left = (a.left + a.width / 2) + 'px';
+  fly.style.top = (a.top + a.height / 2) + 'px';
+  fly.style.fontSize = getComputedStyle(key).fontSize;
+  document.body.appendChild(fly);
+  const targetSize = parseFloat(getComputedStyle(cg.slots).fontSize) || 48;
+  slot.style.visibility = 'hidden';
+  gsap.to(fly, {
+    left: b.left + b.width / 2, top: b.top + b.height * 0.56, fontSize: targetSize,
+    duration: 0.42, ease: 'power3.out',
+    onComplete: () => { fly.remove(); slot.style.visibility = ''; },
+  });
+}
 
 function cgFill(text, vars) {
   return String(text).replace(/\{(\w+)\}/g, (m, k) => (vars && vars[k] !== undefined ? vars[k] : m));
@@ -2374,6 +2405,8 @@ function cgRender(typedIndex) {
   }
   cg.go.disabled = cg.busy || !cgReady();
   if (cg.keys) cg.keys.classList.toggle('locked', cg.busy || cg.input.readOnly);
+  cgWallLevel();
+  if (cg.wall) requestAnimationFrame(() => cg.wall.remeasure());
 }
 
 function cgSetStatus(text, opts) {
@@ -2394,9 +2427,11 @@ function cgSetStatus(text, opts) {
   });
 }
 
+/* przycisk pokazuje się tylko w komunikatach (kod sprawdza się sam po ostatnim znaczku) */
 function cgSetButton(label, onClick) {
   cg.go.textContent = label;
   cg.onGo = onClick;
+  cg.go.hidden = onClick === cgSubmit;
 }
 
 function cgStartIdle() {
@@ -2434,8 +2469,9 @@ function cgReset(statusText, mark) {
   cg.value = '';
   cg.input.value = '';
   cg.input.readOnly = false;
-  cg.root.classList.remove('shake', 'leaving', 'message');
-  cgSetButton(CG_TEXT.go, () => cgSubmit());
+  cg.root.classList.remove('shake', 'leaving', 'message', 'drop');
+  if (cg.wall) cg.wall.heal();
+  cgSetButton(CG_TEXT.go, cgSubmit);
   cgSetStatus(statusText || '', { mark });
   cgRender();
   if (!cg.touch) cgFocus();
@@ -2444,6 +2480,7 @@ function cgReset(statusText, mark) {
 function cgApply(raw, opts) {
   if (cg.busy || cg.input.readOnly) return;
   const before = cg.value.length;
+  const fromKey = opts && opts.fromKey;
   const parsed = cgParse(raw);
   cg.kind = parsed.kind;
   cg.value = parsed.value;
@@ -2452,8 +2489,10 @@ function cgApply(raw, opts) {
   if (parsed.dropped === 'banned') cgSetStatus(CG_TEXT.banned, { mark: '×' });
   else if (parsed.dropped === 'glyph') cgSetStatus(CG_TEXT.glyphOnly, { mark: '×' });
   else if (!opts || !opts.keepStatus) cgSetStatus('');
-  cgRender(cg.value.length > before ? cg.value.length - 1 : -1);
-  if (cgReady()) setTimeout(() => { if (!cg.busy && cgReady()) cgSubmit(); }, 260);
+  const typedIndex = cg.value.length > before ? cg.value.length - 1 : -1;
+  cgRender(typedIndex);
+  if (typedIndex >= 0 && cg.kind === 'glyph') cgFly(cg.value[typedIndex], fromKey, typedIndex);
+  if (cgReady()) setTimeout(() => { if (!cg.busy && cgReady()) cgSubmit(); }, 420);
 }
 
 function cgOnInput() {
@@ -2461,10 +2500,10 @@ function cgOnInput() {
 }
 
 /* klawiatura znaczków: znaczek dopisuje się do kodu ze znaczków (kod literowy zaczyna od nowa) */
-function cgPressGlyph(ch) {
+function cgPressGlyph(ch, keyEl) {
   if (cg.busy || cg.input.readOnly) return;
   const base = cg.kind === 'glyph' ? cg.value : '';
-  cgApply(base + ch);
+  cgApply(base + ch, { fromKey: keyEl });
 }
 
 function cgPressDelete() {
@@ -2503,7 +2542,7 @@ function cgBuildKeyboard() {
     box.appendChild(b);
     return b;
   };
-  CG_GLYPHS.split('').forEach(ch => add(ch, 'glyph', () => cgPressGlyph(ch), 'znaczek ' + ch));
+  CG_GLYPHS.split('').forEach(ch => { const b = add(ch, 'glyph', () => cgPressGlyph(ch, b), 'znaczek ' + ch); });
   add(CG_TEXT.keyLetters, 'fn letters', cgPressLetters, CG_TEXT.keyLettersTitle);
   add(CG_TEXT.keyDelete, 'fn del', cgPressDelete, CG_TEXT.keyDelete);
   return box;
@@ -2511,7 +2550,10 @@ function cgBuildKeyboard() {
 
 async function cgLeave() {
   cg.root.classList.add('leaving');
-  await sleep(prefersReducedMotion() ? 120 : 620);
+  await new Promise(resolve => {
+    if (cg.wall) cg.wall.burst(resolve); else resolve();
+    setTimeout(resolve, 1400);
+  });
 }
 
 function cgShowMessage(lines, mark, vars, buttonLabel, onButton) {
@@ -2529,7 +2571,7 @@ function cgShowFailure(text, code) {
   cgShowMessage(text, '×', null, CG_TEXT.retry, () => {
     cg.input.readOnly = false;
     cg.root.classList.remove('message');
-    cgSetButton(CG_TEXT.go, () => cgSubmit());
+    cgSetButton(CG_TEXT.go, cgSubmit);
     cgVerifyCode(code);
   });
 }
@@ -2582,7 +2624,10 @@ async function cgVerifyCode(code) {
   if (err === 'code not found' || err === 'invalid code format') {
     cg.root.classList.add('shake');
     cgSetStatus(CG_TEXT.notFound, { msg: true, mark: '×' });
-    await sleep(1300);
+    await sleep(900);
+    cg.root.classList.add('drop');
+    if (cg.wall) cg.wall.heal();
+    await sleep(prefersReducedMotion() ? 50 : 520);
     cgReset(CG_TEXT.notFound, '×');
     return;
   }
@@ -2647,6 +2692,16 @@ function cgBuild() {
   if (fav && GATE_CONFIG.firstAccessCaption) fav.setAttribute('data-caption', GATE_CONFIG.firstAccessCaption);
 
   cg.keys = cgBuildKeyboard();
+  const wallCanvas = document.getElementById('cg-wall');
+  if (wallCanvas && window.GateWall) {
+    cg.wall = window.GateWall;
+    cg.wall.init({
+      canvas: wallCanvas,
+      openingEl: document.getElementById('cg-opening'),
+      keepClear: [cg.keys, document.getElementById('cg-home'), backBtn],
+      reduced: prefersReducedMotion(),
+    });
+  }
   cg.input.addEventListener('input', cgOnInput);
   cg.input.addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); if (cg.onGo && !cg.go.disabled) cg.onGo(); }
@@ -2656,7 +2711,7 @@ function cgBuild() {
   document.body.classList.add('code-mode');
   cg.root.classList.add('show');
   cg.root.setAttribute('aria-hidden', 'false');
-  cgSetButton(CG_TEXT.go, () => cgSubmit());
+  cgSetButton(CG_TEXT.go, cgSubmit);
   cgRender();
   cgStartIdle();
   return true;
@@ -2690,13 +2745,14 @@ async function init() {
     };
     return;
   }
-  initZnaczki();
-  fingerprint = await generateFingerprint();
-  codeFromUrl = getCodeFromUrl();
   if (!GATE_CONFIG.camera) {
+    fingerprint = await generateFingerprint();
     await stateCodeGate(cgCodeFromUrl());
     return;
   }
+  initZnaczki();
+  fingerprint = await generateFingerprint();
+  codeFromUrl = getCodeFromUrl();
   if (codeFromUrl) {
     await statePreGateWithCode(codeFromUrl);
   } else {

@@ -966,23 +966,23 @@
             }
         }
         /* ──────────────────────────────────────
-           BRAMKA Z KODEM (wpisywanym, bez kamery)
-           duże pola na znaki w ramie ze słów, pełny tusz dla wszystkiego, co trzeba przeczytać
+           BRAMKA Z KODEM: ściana ze znaczków (gate-wall.js) + szczelina na kod
+           język strony startowej: Inter 300, rozstrzelone znaczki, lawenda, bez ramek
         ────────────────────────────────────── */
         body.code-mode .vignette,
+        body.code-mode .star-fog,
         body.code-mode #gate,
         body.code-mode #nocode-landing,
         body.code-mode #scan-prototype-stage,
         body.code-mode #camera-area { display: none !important; }
-        body.code-mode .star-particle.typing-in { opacity: 0.55; }
+
+        #cg-wall { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
 
         #code-gate {
-            --cg-fs: clamp(64px, 12.5vw, 176px);
-            --cg-n: 4;
-            --cg-gap: clamp(10px, 1.6vw, 26px);
-            --cg-pad: clamp(44px, 6vw, 88px);
-            --cg-ui: 'Inter', system-ui, sans-serif;
-            --cg-big: 'ABC Helveesti', 'Inter', system-ui, sans-serif;
+            --cg-n: 6;
+            --cg-fs: clamp(2.4rem, 7.2vw, 5rem);
+            --cg-gap: 0.26em;
+            --lv: 0;
             position: fixed;
             inset: 0;
             z-index: 40;
@@ -992,22 +992,19 @@
             justify-content: center;
             padding: 72px 20px 40px;
             color: var(--ink);
-            font-family: var(--cg-ui);
-            /* środek czysty jak kartka, znaczki w tle zostają tylko przy brzegach */
-            background: radial-gradient(ellipse 52% 56% at 50% 52%, var(--bg) 64%, rgba(249, 249, 248, 0) 100%);
+            font-family: var(--ff);
         }
         #code-gate.show { display: flex; }
-        /* kod ze znaczków: 6 pól, mniejszy krój, żeby zmieściły się obok siebie */
-        #code-gate[data-kind="glyph"] { --cg-fs: clamp(48px, 8vw, 116px); --cg-n: 6; }
+        #code-gate[data-kind="alnum"] { --cg-n: 4; --cg-fs: clamp(2.8rem, 8.5vw, 6rem); }
 
         #cg-home {
             position: absolute;
             top: clamp(18px, 3vw, 36px);
             left: clamp(18px, 3vw, 40px);
-            font-family: var(--cg-big);
-            font-weight: 700;
-            font-size: clamp(20px, 2vw, 28px);
-            letter-spacing: 0.02em;
+            z-index: 50;
+            font-weight: 300;
+            font-size: clamp(1rem, 1.6vw, 1.3rem);
+            letter-spacing: 0.12em;
             color: var(--ink);
             text-decoration: none;
         }
@@ -1016,44 +1013,35 @@
             position: absolute;
             top: clamp(18px, 3vw, 36px);
             right: clamp(18px, 3vw, 40px);
+            z-index: 50;
             background: none;
             border: none;
-            font-family: var(--cg-ui);
-            font-weight: 500;
-            font-size: 15px;
+            border-bottom: 1px solid transparent;
+            padding: 0.2rem 0;
+            font-family: var(--ff);
+            font-weight: 300;
+            font-size: 0.8rem;
+            letter-spacing: 0.16em;
             color: var(--ink);
             cursor: pointer;
-            padding: 6px 2px;
-            border-bottom: 2px solid transparent;
         }
         #cg-back:hover { border-bottom-color: var(--ink); }
 
-        /* rama: krzyżyki w rogach, słowa na krawędziach */
+        /* rama ze słów: odsłania się, gdy szczelina się rozdziera (--lv rośnie z każdym znaczkiem) */
         #cg-frame {
             position: relative;
-            padding: clamp(40px, 5vw, 72px) var(--cg-pad);
+            z-index: 50;
+            padding: clamp(40px, 6vw, 72px) clamp(44px, 7vw, 100px);
         }
-        .cg-corner {
-            position: absolute;
-            font-family: var(--cg-big);
-            font-weight: 700;
-            font-size: 24px;
-            line-height: 1;
-            color: var(--ink);
-        }
-        .cg-corner.tl { top: 0; left: 0; }
-        .cg-corner.tr { top: 0; right: 0; }
-        .cg-corner.bl { bottom: 0; left: 0; }
-        .cg-corner.br { bottom: 0; right: 0; }
         .cg-edge {
             position: absolute;
-            font-family: var(--cg-ui);
-            font-weight: 500;
-            font-size: 13px;
-            letter-spacing: 0.34em;
+            font-weight: 300;
+            font-size: 0.74rem;
+            letter-spacing: 0.3em;
             white-space: nowrap;
             color: var(--ink);
-            opacity: 0.72;
+            opacity: clamp(0, calc((var(--lv) - 0.25 - var(--i, 0) * 0.08) / 0.45), 1);
+            transition: opacity 0.6s ease;
             user-select: none;
         }
         .cg-edge.top { top: 4px; left: 50%; transform: translateX(-50%); }
@@ -1061,21 +1049,22 @@
         .cg-edge.left { left: 4px; top: 50%; writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg); }
         .cg-edge.right { right: 4px; top: 50%; writing-mode: vertical-rl; transform: translateY(-50%); }
 
+        #cg-opening { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         #cg-label {
-            display: block;
-            font-weight: 700;
-            font-size: clamp(16px, 1.5vw, 20px);
-            margin-bottom: clamp(14px, 2vh, 24px);
+            font-weight: 300;
+            font-size: 0.8rem;
+            letter-spacing: 0.22em;
+            color: var(--ink);
+            opacity: 0.75;
         }
-        #cg-label::before { content: '~ '; color: var(--lav); }
+        #cg-label::before { content: '~ '; color: var(--lav); opacity: 1; }
 
         #cg-field { position: relative; }
         #cg-slots {
             display: flex;
             gap: var(--cg-gap);
-            font-family: var(--cg-big);
-            font-weight: 700;
             font-size: var(--cg-fs);
+            font-weight: 300;
             line-height: 1;
         }
         .cg-slot {
@@ -1083,39 +1072,24 @@
             display: inline-flex;
             align-items: flex-end;
             justify-content: center;
-            width: 0.86em;
-            height: 1.08em;
-            padding-bottom: 0.06em;
-            border-bottom: 0.055em solid var(--ink);
-            transition: border-color 0.25s, color 0.25s, transform 0.4s cubic-bezier(.2, .8, .2, 1), opacity 0.4s;
+            width: 0.9em;
+            height: 1.15em;
+            padding-bottom: 0.08em;
+            border-bottom: 1px solid rgba(13, 13, 13, 0.4);
+            color: var(--ink);
+            transition: border-color 0.3s, color 0.3s, transform 0.45s cubic-bezier(.2, .8, .2, 1), opacity 0.45s;
         }
         .cg-slot .cg-glyph {
             color: var(--lav);
-            font-weight: 400;
-            transform: scale(0.62);
+            opacity: 0.7;
+            transform: scale(0.7);
             transform-origin: 50% 85%;
-            opacity: 0.75;
         }
         #cg-field:focus-within .cg-slot.active { border-bottom-color: var(--lav); }
         #cg-field:focus-within .cg-slot.active .cg-glyph { animation: cg-blink 1s steps(2, start) infinite; opacity: 1; }
         @keyframes cg-blink { to { visibility: hidden; } }
-        .cg-slot.typed { animation: cg-drop 0.32s cubic-bezier(.2, .8, .2, 1); }
-        @keyframes cg-drop { from { transform: translateY(-0.18em); opacity: 0.3; } }
-
-        /* kod ze znaczków: jedna linia zamiast czterech pól */
-        .cg-line {
-            display: flex;
-            align-items: flex-end;
-            /* tyle miejsca co cztery pola, żeby przejście na znaczki nie przesuwało ramy */
-            min-width: calc(4 * 0.86 * var(--cg-fs) + 3 * clamp(10px, 1.6vw, 26px));
-            height: calc(1.08 * var(--cg-fs));
-            padding: 0 0.1em 0.06em;
-            border-bottom: 0.07em solid var(--ink);
-            font-size: clamp(44px, 6.4vw, 92px);
-            letter-spacing: 0.04em;
-            white-space: pre;
-        }
-        .cg-caret { color: var(--lav); font-weight: 400; animation: cg-blink 1s steps(2, start) infinite; }
+        .cg-slot.typed { animation: cg-land 0.35s cubic-bezier(.2, .8, .2, 1); }
+        @keyframes cg-land { from { transform: translateY(-0.25em) scale(1.15); opacity: 0.4; } }
 
         #cg-input {
             position: absolute;
@@ -1133,155 +1107,162 @@
         }
         #cg-input::selection { background: transparent; }
 
-        #cg-under {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 14px 28px;
-            width: 100%;
-            max-width: calc(var(--cg-n) * 0.86 * var(--cg-fs) + (var(--cg-n) - 1) * var(--cg-gap) + 2 * var(--cg-pad));
-            margin-top: clamp(10px, 2vh, 22px);
-            padding: 0 var(--cg-pad);
-        }
         #cg-status {
-            min-height: 1.4em;
-            font-weight: 500;
-            font-size: clamp(16px, 1.5vw, 20px);
-            line-height: 1.35;
+            min-height: 1.3em;
+            font-weight: 300;
+            font-size: 0.84rem;
+            letter-spacing: 0.14em;
+            line-height: 1.5;
+            text-align: center;
+            color: var(--ink);
         }
-        #cg-status.msg { font-weight: 700; font-size: clamp(18px, 2vw, 26px); }
-        #cg-status .cg-mark { color: var(--lav); margin-right: 0.4em; }
+        #cg-status.msg { font-size: clamp(1rem, 1.6vw, 1.2rem); letter-spacing: 0.06em; }
+        #cg-status .cg-mark { color: var(--lav); margin-right: 0.45em; }
         #cg-go {
-            font-family: var(--cg-ui);
-            font-weight: 700;
-            font-size: 16px;
-            padding: 14px 22px;
-            color: var(--bg);
-            background: var(--ink);
-            border: 2px solid var(--ink);
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--ink);
+            padding: 0.25rem 0;
+            font-family: var(--ff);
+            font-weight: 300;
+            font-size: 0.82rem;
+            letter-spacing: 0.16em;
+            color: var(--ink);
             cursor: pointer;
-            transition: background 0.2s, border-color 0.2s, opacity 0.2s;
         }
-        #cg-go:hover:not(:disabled) { background: var(--lav); border-color: var(--lav); }
-        #cg-go:disabled { background: transparent; color: var(--ink); opacity: 0.32; cursor: default; }
-        #cg-go:focus-visible, #cg-back:focus-visible, #cg-home:focus-visible { outline: 3px solid var(--lav); outline-offset: 3px; }
+        #cg-go:hover { color: var(--lav); border-bottom-color: var(--lav); }
+        #cg-go[hidden] { display: none; }
+        #cg-go:focus-visible, #cg-back:focus-visible { outline: none; color: var(--lav); border-bottom-color: var(--lav); }
+        #cg-home:focus-visible, .cg-key:focus-visible { outline: 1px solid var(--lav); outline-offset: 4px; }
 
-        /* klawiatura znaczków */
+        /* klawiatura: znaczki wbite w ścianę, bez ramek; wyjęty leci do szczeliny */
         #cg-keys {
-            display: grid;
-            grid-template-columns: repeat(9, clamp(46px, 4.4vw, 60px));
-            gap: 8px;
-            margin-top: clamp(16px, 2.8vh, 30px);
+            position: relative;
+            z-index: 50;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 2px clamp(2px, 0.8vw, 8px);
+            max-width: 760px;
+            margin-top: clamp(28px, 5vh, 56px);
         }
         .cg-key {
-            height: clamp(46px, 4.4vw, 60px);
+            width: clamp(42px, 3.6vw, 52px);
+            height: 52px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg);
-            color: var(--ink);
-            border: 2px solid var(--ink);
-            font-family: var(--cg-big);
-            font-weight: 700;
-            font-size: clamp(22px, 2.1vw, 30px);
+            background: none;
+            border: 0;
+            font-family: var(--ff);
+            font-weight: 300;
+            font-size: clamp(1.7rem, 2.3vw, 2.2rem);
             line-height: 1;
+            color: var(--ink);
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
             touch-action: manipulation;
-            transition: background 0.15s, border-color 0.15s, transform 0.1s, opacity 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            transition: color 0.15s, transform 0.2s cubic-bezier(.2, .8, .2, 1), opacity 0.25s;
         }
-        .cg-key.fn { font-family: var(--cg-ui); font-weight: 700; font-size: 14px; }
-        .cg-key:hover { background: var(--lav); border-color: var(--lav); }
-        .cg-key:active { transform: translateY(2px); }
-        .cg-key:focus-visible { outline: 3px solid var(--lav); outline-offset: 2px; }
+        .cg-key:hover { color: var(--lav); transform: translateY(-5px); }
+        .cg-key:active { transform: scale(1.3); color: var(--lav); }
+        .cg-key.fn {
+            width: auto;
+            height: auto;
+            margin: 0 10px;
+            padding: 0.2rem 0;
+            border-bottom: 1px solid rgba(13, 13, 13, 0.35);
+            font-size: 0.74rem;
+            letter-spacing: 0.18em;
+        }
+        .cg-key.fn:hover { transform: none; border-bottom-color: var(--lav); }
         #cg-keys.locked .cg-key { opacity: 0.3; pointer-events: none; }
         #code-gate.message #cg-keys { visibility: hidden; }
 
+        .cg-fly {
+            position: fixed;
+            z-index: 60;
+            pointer-events: none;
+            font-family: var(--ff);
+            font-weight: 300;
+            line-height: 1;
+            color: var(--ink);
+            transform: translate(-50%, -50%);
+        }
+
         #code-gate.shake #cg-slots { animation: cg-shake 0.5s; }
-        #code-gate.shake .cg-slot, #code-gate.shake .cg-line { color: var(--lav); border-bottom-color: var(--lav); }
+        #code-gate.shake .cg-slot { color: var(--lav); border-bottom-color: var(--lav); }
         @keyframes cg-shake {
             20% { transform: translateX(-0.12em); }
             40% { transform: translateX(0.1em); }
             60% { transform: translateX(-0.07em); }
             80% { transform: translateX(0.04em); }
         }
-        #code-gate.leaving .cg-slot,
-        #code-gate.leaving .cg-line { transform: translateY(-0.5em); opacity: 0; border-bottom-color: transparent; }
-        #code-gate.leaving .cg-slot:nth-child(2) { transition-delay: 0.06s; }
-        #code-gate.leaving .cg-slot:nth-child(3) { transition-delay: 0.12s; }
-        #code-gate.leaving .cg-slot:nth-child(4) { transition-delay: 0.18s; }
-        #code-gate.leaving #cg-under, #code-gate.leaving #cg-label { opacity: 0; transition: opacity 0.3s; }
+        /* zły kod: znaczki wypadają z pól */
+        #code-gate.drop .cg-slot { transform: translateY(0.9em) rotate(8deg); opacity: 0; }
+        #code-gate.drop .cg-slot:nth-child(even) { transform: translateY(1.1em) rotate(-10deg); }
+        /* dobry kod: szczelina pęka, pola odlatują w górę */
+        #code-gate.leaving .cg-slot { transform: translateY(-0.6em); opacity: 0; border-bottom-color: transparent; }
+        #code-gate.leaving .cg-slot:nth-child(2) { transition-delay: 0.05s; }
+        #code-gate.leaving .cg-slot:nth-child(3) { transition-delay: 0.1s; }
+        #code-gate.leaving .cg-slot:nth-child(4) { transition-delay: 0.15s; }
+        #code-gate.leaving .cg-slot:nth-child(5) { transition-delay: 0.2s; }
+        #code-gate.leaving .cg-slot:nth-child(6) { transition-delay: 0.25s; }
+        #code-gate.leaving #cg-label, #code-gate.leaving #cg-status, #code-gate.leaving #cg-keys, #code-gate.leaving .cg-edge { opacity: 0; transition: opacity 0.4s; }
 
         @media (max-width: 600px) {
-            #code-gate { --cg-fs: clamp(52px, 17vw, 96px); --cg-pad: 30px; --cg-gap: 9px; padding-top: 64px; justify-content: flex-start; }
-            #code-gate[data-kind="glyph"] { --cg-fs: clamp(34px, 10.6vw, 52px); }
-            #cg-frame { padding: 36px var(--cg-pad); margin-top: 4vh; }
-            #cg-keys { grid-template-columns: repeat(6, 1fr); width: 100%; max-width: 360px; gap: 7px; }
-            .cg-key { height: 52px; font-size: 26px; }
-            .cg-edge { font-size: 11px; letter-spacing: 0.26em; }
-            .cg-corner { font-size: 18px; }
-            #cg-under { padding: 0 var(--cg-pad); max-width: none; }
+            #code-gate { --cg-fs: clamp(2.2rem, 11vw, 3.2rem); --cg-gap: 0.2em; padding: 64px 14px 28px; }
+            #code-gate[data-kind="alnum"] { --cg-fs: clamp(2.6rem, 14vw, 4rem); }
+            #cg-frame { padding: 34px 30px; }
+            .cg-edge { font-size: 0.66rem; letter-spacing: 0.24em; }
+            #cg-keys { gap: 0 2px; max-width: 360px; margin-top: 36px; }
+            .cg-key { width: 11.2vw; max-width: 44px; height: 56px; font-size: 1.8rem; }
+            .cg-key.fn { width: auto; max-width: none; height: auto; margin: 8px 12px 0; }
         }
         @media (prefers-reduced-motion: reduce) {
-            .cg-slot, .cg-line { transition: none; }
+            .cg-slot, .cg-key, .cg-edge { transition: none; }
             .cg-slot.typed, #code-gate.shake #cg-slots { animation: none; }
-            #cg-field:focus-within .cg-slot.active .cg-glyph, .cg-caret { animation: none; }
+            #cg-field:focus-within .cg-slot.active .cg-glyph { animation: none; }
         }
 
-        /* pytanie o imię po pierwszym wejściu: ten sam duży, pełny tusz */
-        body.code-mode #proto-trace { background: var(--bg); gap: 2.2rem; }
-        body.code-mode #proto-trace .trace-glyph { color: var(--lav); opacity: 0; font-family: 'ABC Helveesti', 'Inter', sans-serif; font-weight: 700; }
-        body.code-mode #proto-trace .trace-glyph.visible { opacity: 0.5; }
-        body.code-mode #proto-trace .trace-glyph.burst { color: var(--lav); }
+        /* pytanie o imię po pierwszym wejściu: ten sam cienki, rozstrzelony krój */
+        body.code-mode #proto-trace { background: var(--bg); gap: 2rem; }
+        body.code-mode #proto-trace .trace-glyph { color: var(--lav); font-weight: 300; }
+        body.code-mode #proto-trace .trace-glyph.visible { opacity: 0.55; }
         body.code-mode #proto-trace .trace-glyph.burst.visible { opacity: 0.9; }
         body.code-mode #proto-trace-prompt {
-            font-family: 'ABC Helveesti', 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: clamp(30px, 4.6vw, 64px);
-            letter-spacing: -0.01em;
+            font-weight: 300;
+            font-size: clamp(1.5rem, 3.4vw, 2.8rem);
+            letter-spacing: 0.08em;
             color: var(--ink);
         }
         body.code-mode #proto-trace-input {
-            font-family: 'ABC Helveesti', 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: clamp(32px, 5vw, 68px);
-            letter-spacing: 0.01em;
-            width: min(86vw, 36rem);
+            font-weight: 300;
+            font-size: clamp(1.7rem, 3.8vw, 3rem);
+            letter-spacing: 0.06em;
+            width: min(86vw, 30rem);
             max-width: none;
-            border-bottom: 0.07em solid var(--ink);
+            border-bottom: 1px solid var(--ink);
             caret-color: var(--lav);
         }
-        body.code-mode #proto-trace-hint {
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 14px;
-            letter-spacing: 0.08em;
-            text-transform: none;
-            color: var(--ink);
-        }
-        body.code-mode #proto-trace-skip {
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 15px;
-            letter-spacing: 0.02em;
-            color: var(--ink);
-            text-decoration-thickness: 2px;
-        }
+        body.code-mode #proto-trace-hint { font-weight: 300; font-size: 0.68rem; letter-spacing: 0.24em; color: var(--ink); opacity: 0.6; }
+        body.code-mode #proto-trace-skip { font-weight: 300; font-size: 0.78rem; letter-spacing: 0.14em; color: var(--ink); }
 
-        /* ekran pierwszego wejścia: grubszy znak + napis */
-        body.code-mode #first-access-visual { flex-direction: column; gap: 22px; background: var(--bg); }
+        /* ekran pierwszego wejścia: znak + napis */
+        body.code-mode #first-access-visual { flex-direction: column; gap: 26px; background: var(--bg); }
         body.code-mode #first-access-visual::after {
             content: attr(data-caption);
-            font-family: 'ABC Helveesti', 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: clamp(32px, 5vw, 64px);
+            font-weight: 300;
+            font-size: clamp(1.5rem, 3.4vw, 2.8rem);
+            letter-spacing: 0.12em;
             color: var(--ink);
         }
-        body.code-mode .fav-sigil { width: 112px; height: 112px; }
-        body.code-mode .fav-sigil-ring { stroke: var(--ink); stroke-width: 3.2; }
-        body.code-mode .fav-sigil-dot { fill: var(--ink); }
+        body.code-mode .fav-sigil { width: 96px; height: 96px; }
+        body.code-mode .fav-sigil-ring { stroke: var(--ink); stroke-width: 1.4; }
+        body.code-mode .fav-sigil-dot { fill: var(--lav); }
 
         .sr-only {
             position: absolute;
@@ -1343,27 +1324,24 @@
     <button id="camera-cancel" type="button">anuluj</button>
 </div>
 
+<canvas id="cg-wall" aria-hidden="true"></canvas>
 <div id="code-gate" aria-hidden="true">
     <a id="cg-home" href="/">&rdquo;~||-_^+*.</a>
     <button id="cg-back" type="button"></button>
     <div id="cg-frame">
-        <span class="cg-corner tl" aria-hidden="true">+</span>
-        <span class="cg-corner tr" aria-hidden="true">+</span>
-        <span class="cg-corner bl" aria-hidden="true">+</span>
-        <span class="cg-corner br" aria-hidden="true">+</span>
-        <span class="cg-edge top" aria-hidden="true"></span>
-        <span class="cg-edge right" aria-hidden="true"></span>
-        <span class="cg-edge bottom" aria-hidden="true"></span>
-        <span class="cg-edge left" aria-hidden="true"></span>
-        <label id="cg-label" for="cg-input"></label>
-        <div id="cg-field">
-            <div id="cg-slots" aria-hidden="true"></div>
-            <input id="cg-input" type="text" inputmode="text" maxlength="80" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-describedby="cg-status" />
+        <span class="cg-edge top" style="--i:0" aria-hidden="true"></span>
+        <span class="cg-edge right" style="--i:1" aria-hidden="true"></span>
+        <span class="cg-edge bottom" style="--i:2" aria-hidden="true"></span>
+        <span class="cg-edge left" style="--i:3" aria-hidden="true"></span>
+        <div id="cg-opening">
+            <label id="cg-label" for="cg-input"></label>
+            <div id="cg-field">
+                <div id="cg-slots" aria-hidden="true"></div>
+                <input id="cg-input" type="text" inputmode="text" maxlength="80" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="go" aria-describedby="cg-status" />
+            </div>
+            <p id="cg-status" role="status" aria-live="polite"></p>
+            <button id="cg-go" type="button" hidden></button>
         </div>
-    </div>
-    <div id="cg-under">
-        <p id="cg-status" role="status" aria-live="polite"></p>
-        <button id="cg-go" type="button" disabled></button>
     </div>
     <div id="cg-keys" role="group" aria-label="klawiatura znaczków"></div>
 </div>
@@ -1408,6 +1386,7 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
 <script src="/gate-config.js"></script>
+<script src="/gate-wall.js"></script>
 <script src="/gate.js"></script>
 </body>
 </html>
