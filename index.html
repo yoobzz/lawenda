@@ -2615,6 +2615,10 @@ nie lubię formalności, wielkich liter, pełnych imion ani udawania, że wszyst
                 return;
             }
             
+            // bramka z kodem na ekranie: klawisze idą do pola kodu, nie do skrótów wierszy
+            // (+ = - r g 1–9 zjadały znaki kodu, a g otwierał prompt)
+            if (document.body.classList.contains('code-mode')) return;
+
             // Nawigacja strzałkami
             if (e.key === 'ArrowUp' && currentPoem > 0) {
                 e.preventDefault();
