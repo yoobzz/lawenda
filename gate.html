@@ -966,30 +966,20 @@
             }
         }
         /* ──────────────────────────────────────
-           BRAMKA Z KODEM: biała kartka z rysą
+           BRAMKA Z KODEM: tytuł w 3D (gate-title.js) + pola kodu
            język strony startowej: Inter 300, rozstrzelone znaczki, lawenda, bez ramek.
-           kod wpisuje się na kartce; od pól biegnie rysa, z każdym znaczkiem dłuższa;
-           dobry kod rozłamuje kartkę na dwie połowy (za nią lawendowe znaczki), zły — rysa się zasklepia
+           za polami chmura lawendy ze startu kondensuje się w napis „~||-_^+*.”, kamera dryfuje
         ────────────────────────────────────── */
         body.code-mode .vignette,
+        body.code-mode .star-fog,
         body.code-mode #gate,
         body.code-mode #nocode-landing,
         body.code-mode #scan-prototype-stage,
         body.code-mode #camera-area { display: none !important; }
-        /* za kartką: rzadkie lawendowe znaczki jak na starcie */
-        body.code-mode .star-fog { z-index: 0; }
-        body.code-mode .star-particle { font-size: 1rem; }
-        body.code-mode .star-particle.typing-in { opacity: 0.6; }
 
-        #cg-crack { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 45; pointer-events: none; overflow: visible; }
-        #cg-crack-gap { fill: rgba(150, 130, 220, 0.22); }
-        #cg-crack-l, #cg-crack-r { fill: none; stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-        /* połowy kartki po rozłamaniu */
-        .cg-half { position: fixed; inset: 0; z-index: 46; background: var(--bg); overflow: hidden; }
-        .cg-half > * { pointer-events: none; }
+        #cg-title { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 30; pointer-events: none; transition: opacity 0.3s; }
 
         #code-gate {
-            background: var(--bg);
             --cg-n: 6;
             --cg-fs: clamp(2.4rem, 7.2vw, 5rem);
             --cg-gap: 0.26em;
@@ -1000,8 +990,8 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 72px 20px 40px;
+            justify-content: flex-end;
+            padding: 72px 20px clamp(28px, 7vh, 72px);
             color: var(--ink);
             font-family: var(--ff);
         }
@@ -1205,8 +1195,8 @@
             transform: translate(-50%, -50%);
         }
 
-        /* rozłamanie: kartka znika, połowy (klony) odjeżdżają; kod zostaje na połowach */
-        #code-gate.split { visibility: hidden; }
+        /* przelot do wierszy: pola i klawiatura gasną, zostaje napis */
+        #code-gate.leaving #cg-frame, #code-gate.leaving #cg-keys { opacity: 0; transition: opacity 0.5s; }
 
         #code-gate.shake #cg-slots { animation: cg-shake 0.5s; }
         #code-gate.shake .cg-slot { color: var(--lav); border-bottom-color: var(--lav); }
@@ -1221,7 +1211,7 @@
         #code-gate.drop .cg-slot:nth-child(even) { transform: translateY(1.1em) rotate(-10deg); }
 
         @media (max-width: 600px) {
-            #code-gate { --cg-fs: clamp(2.2rem, 11vw, 3.2rem); --cg-gap: 0.2em; padding: 64px 14px 28px; }
+            #code-gate { --cg-fs: clamp(2.2rem, 11vw, 3.2rem); --cg-gap: 0.2em; padding: 64px 14px 22px; }
             #code-gate[data-kind="alnum"] { --cg-fs: clamp(2.6rem, 14vw, 4rem); }
             #cg-frame { padding: 34px 30px; }
             .cg-edge { font-size: 0.66rem; letter-spacing: 0.24em; }
@@ -1331,14 +1321,7 @@
     <button id="camera-cancel" type="button">anuluj</button>
 </div>
 
-<svg id="cg-crack" aria-hidden="true">
-    <defs><clipPath id="cg-crack-clip"><rect id="cg-crack-clip-rect" x="0" y="0" width="0" height="0"/></clipPath></defs>
-    <g clip-path="url(#cg-crack-clip)">
-        <polygon id="cg-crack-gap"/>
-        <polyline id="cg-crack-l"/>
-        <polyline id="cg-crack-r"/>
-    </g>
-</svg>
+<canvas id="cg-title" aria-hidden="true"></canvas>
 <div id="code-gate" aria-hidden="true">
     <a id="cg-home" href="/">&rdquo;~||-_^+*.</a>
     <button id="cg-back" type="button"></button>
@@ -1399,7 +1382,9 @@
 <!-- jsQR zdjęty: jego integrity nie pasowało do pliku z CDN (przeglądarka go blokowała); bramka działa na wpisywanym kodzie (GATE_CONFIG.camera = false) -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="/gate-config.js"></script>
+<script src="/gate-title.js"></script>
 <script src="/gate.js"></script>
 </body>
 </html>

@@ -2306,116 +2306,9 @@ const cg = {
   touch: false,
 };
 
-/* ─── rysa w kartce ───
-   nierówna pozioma linia tuż pod polami kodu, wzdłuż linii pisma; rośnie od środka
-   w obie strony do krawędzi. state.len = ile rysy widać (0–1), state.gap = rozchylenie w px */
-const crack = { left: [], right: [], cx: 0, cy: 0, state: { len: 0, gap: 0 }, tween: null, svg: null };
-
-function cgCrackBuild() {
-  crack.svg = document.getElementById('cg-crack');
-  if (!crack.svg) return;
-  const W = window.innerWidth;
-  const r = cg.slots.getBoundingClientRect();
-  const cx = r.left + r.width / 2;
-  const cy = r.bottom + 16;
-  crack.cx = cx;
-  crack.cy = cy;
-  /* łamana z lekkim błądzeniem; co kilka kroków uskok, jak pęknięcie tynku */
-  const walk = (from, to) => {
-    const out = [[from, cy]];
-    const steps = 18;
-    let y = cy;
-    for (let i = 1; i <= steps; i += 1) {
-      const x = from + (to - from) * (i / steps);
-      y += (Math.random() - 0.5) * 9;
-      if (Math.random() < 0.16) y += (Math.random() < 0.5 ? -1 : 1) * (4 + Math.random() * 6);
-      y = Math.max(cy - 14, Math.min(cy + 14, y));
-      out.push([x, y]);
-    }
-    return out;
-  };
-  crack.left = walk(cx, -16);
-  crack.right = walk(cx, W + 16);
-  cgCrackDraw();
-}
-
-/* układ bywa przesuwany (dłuższy komunikat, inna liczba pól) — rysa jedzie za polami */
-function cgCrackFollow() {
-  if (!crack.svg || !crack.left.length) return;
-  const r = cg.slots.getBoundingClientRect();
-  const dy = (r.bottom + 16) - crack.cy;
-  const dx = (r.left + r.width / 2) - crack.cx;
-  if (Math.abs(dy) < 0.5 && Math.abs(dx) < 0.5) return;
-  const shift = pts => pts.forEach(pt => { pt[0] += dx; pt[1] += dy; });
-  shift(crack.left); shift(crack.right);
-  crack.cx += dx; crack.cy += dy;
-  cgCrackDraw();
-}
-
-function cgCrackLine() {
-  return [...crack.left.slice().reverse(), ...crack.right.slice(1)];
-}
-
-function cgCrackDraw() {
-  if (!crack.svg) return;
-  const { len, gap } = crack.state;
-  const W = window.innerWidth, H = window.innerHeight;
-  const reach = Math.max(crack.cx, W - crack.cx) + 20;
-  const half = len * reach;
-  const rect = document.getElementById('cg-crack-clip-rect');
-  rect.setAttribute('y', 0);
-  rect.setAttribute('height', H);
-  rect.setAttribute('x', crack.cx - half);
-  rect.setAttribute('width', half * 2);
-  const line = cgCrackLine();
-  const top = line.map(([x, y]) => x + ',' + (y - gap / 2));
-  const bottom = line.map(([x, y]) => x + ',' + (y + gap / 2));
-  document.getElementById('cg-crack-l').setAttribute('points', top.join(' '));
-  document.getElementById('cg-crack-r').setAttribute('points', bottom.join(' '));
-  document.getElementById('cg-crack-gap').setAttribute('points', top.concat(bottom.slice().reverse()).join(' '));
-}
-
-/* poziom = ile znaczków w polach; rysa rośnie od środka, szpara rozchyla się do 7 px */
-function cgCrackSet(level, instant) {
-  const target = { len: level, gap: level <= 0 ? 0 : 1.5 + level * 5.5 };
-  if (crack.tween) crack.tween.kill();
-  if (instant || prefersReducedMotion() || !window.gsap) {
-    Object.assign(crack.state, target);
-    cgCrackDraw();
-    return;
-  }
-  crack.tween = gsap.to(crack.state, { ...target, duration: level > crack.state.len ? 0.55 : 0.8, ease: level > crack.state.len ? 'power3.out' : 'power2.inOut', onUpdate: cgCrackDraw });
-}
-
-/* rozłamanie kartki wzdłuż rysy: górna i dolna połowa (klony) odjeżdżają, za nimi znaczki */
-function cgCrackSplit() {
-  return new Promise(resolve => {
-    const W = window.innerWidth, H = window.innerHeight;
-    /* połowy odsunięte o pół szpary: prześwit z rysy przechodzi płynnie w rozjazd */
-    const line = cgCrackLine();
-    const g = crack.state.gap / 2;
-    const top = line.map(([x, y]) => x + 'px ' + (y - g) + 'px');
-    const bottom = line.map(([x, y]) => x + 'px ' + (y + g) + 'px');
-    const leftPoly = ['0px 0px', W + 'px 0px', ...top.slice().reverse()].join(', ');
-    const rightPoly = [...bottom, W + 'px ' + H + 'px', '0px ' + H + 'px'].join(', ');
-    const make = poly => {
-      const half = document.createElement('div');
-      half.className = 'cg-half';
-      half.style.clipPath = 'polygon(' + poly + ')';
-      const clone = cg.root.cloneNode(true);
-      clone.classList.remove('split');
-      clone.style.visibility = 'visible';
-      half.appendChild(clone);
-      document.body.appendChild(half);
-      return half;
-    };
-    const L = make(leftPoly), R = make(rightPoly);
-    cg.root.classList.add('split');
-    if (crack.svg) crack.svg.style.display = 'none';
-    if (prefersReducedMotion() || !window.gsap) { setTimeout(resolve, 120); return; }
-    gsap.to(L, { y: -H * 0.95, rotation: -0.8, duration: 1.0, ease: 'power3.in' });
-    gsap.to(R, { y: H * 0.95, rotation: 0.8, duration: 1.0, ease: 'power3.in', onComplete: resolve });
-  });
+/* tło: tytuł w 3D (gate-title.js); bez three.js bramka działa bez tła */
+function cgTitle() {
+  return window.GateTitle || null;
 }
 
 /* wyjęty znaczek leci z klawisza (albo z klawiatury fizycznej: z jego klawisza) do pola */
@@ -2512,8 +2405,6 @@ function cgRender(typedIndex) {
   if (cg.keys) cg.keys.classList.toggle('locked', cg.busy || cg.input.readOnly);
   const level = cgSlotCount() ? cg.value.length / cgSlotCount() : 0;
   cg.root.style.setProperty('--lv', level.toFixed(3));
-  cgCrackSet(level);
-  requestAnimationFrame(cgCrackFollow);
 }
 
 function cgSetStatus(text, opts) {
@@ -2598,6 +2489,7 @@ function cgApply(raw, opts) {
   const typedIndex = cg.value.length > before ? cg.value.length - 1 : -1;
   cgRender(typedIndex);
   if (typedIndex >= 0 && cg.kind === 'glyph') cgFly(cg.value[typedIndex], fromKey, typedIndex);
+  if (typedIndex >= 0 && cgTitle()) cgTitle().pulse(cg.value[typedIndex], typedIndex, cgSlotCount());
   if (cgReady()) setTimeout(() => { if (!cg.busy && cgReady()) cgSubmit(); }, 420);
 }
 
@@ -2626,7 +2518,6 @@ function cgPressLetters() {
   cg.value = '';
   cg.input.value = '';
   cgRender();
-  cgCrackBuild();
   // na telefonie: dopiero teraz zwykła klawiatura systemu
   cg.input.setAttribute('inputmode', 'text');
   cgFocus();
@@ -2656,7 +2547,11 @@ function cgBuildKeyboard() {
 }
 
 async function cgLeave() {
-  await cgCrackSplit();
+  cg.root.classList.add('leaving');
+  await new Promise(resolve => {
+    if (cgTitle()) cgTitle().enter(resolve); else resolve();
+    setTimeout(resolve, 1600);
+  });
 }
 
 function cgShowMessage(lines, mark, vars, buttonLabel, onButton) {
@@ -2729,7 +2624,7 @@ async function cgVerifyCode(code) {
     cgSetStatus(CG_TEXT.notFound, { msg: true, mark: '×' });
     await sleep(900);
     cg.root.classList.add('drop');
-    cgCrackSet(0);
+    if (cgTitle()) cgTitle().fail();
     await sleep(prefersReducedMotion() ? 50 : 520);
     cgReset(CG_TEXT.notFound, '×');
     return;
@@ -2806,12 +2701,8 @@ function cgBuild() {
   cg.root.setAttribute('aria-hidden', 'false');
   cgSetButton(CG_TEXT.go, cgSubmit);
   cgRender();
-  cgCrackBuild();
-  let resizeTimer = null;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { if (!cg.root.classList.contains('split')) cgCrackBuild(); }, 150);
-  });
+  const titleCanvas = document.getElementById('cg-title');
+  if (titleCanvas && cgTitle()) cgTitle().init({ canvas: titleCanvas, reduced: prefersReducedMotion() });
   cgStartIdle();
   return true;
 }
@@ -2844,12 +2735,13 @@ async function init() {
     };
     return;
   }
-  initZnaczki();
-  fingerprint = await generateFingerprint();
   if (!GATE_CONFIG.camera) {
+    fingerprint = await generateFingerprint();
     await stateCodeGate(cgCodeFromUrl());
     return;
   }
+  initZnaczki();
+  fingerprint = await generateFingerprint();
   codeFromUrl = getCodeFromUrl();
   if (codeFromUrl) {
     await statePreGateWithCode(codeFromUrl);
