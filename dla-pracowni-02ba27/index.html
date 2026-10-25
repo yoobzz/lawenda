@@ -294,8 +294,17 @@ section {
 .card.s7 { grid-column: span 7; }
 .card.s8 { grid-column: span 8; }
 .card.s12 { grid-column: 1 / -1; }
-.duo { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 1.6vw, 20px); }
-.duo img { width: 100%; aspect-ratio: 1100 / 778; object-fit: contain; background: #fff; border: 1px solid var(--line); }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
+.trio img { width: 100%; aspect-ratio: 1100 / 778; object-fit: contain; background: #fff; border: 1px solid var(--line); }
+/* pionowe filmy (rolki): wysokość jak sąsiednia karta 16:10 */
+.card-media.pion { aspect-ratio: .775; }
+.card-media.pion > video, .card-media.pion > img { object-fit: contain; }
+.card-media.white { background: #fff; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(14px, 2vw, 26px); align-items: center; }
+.split .card-media.pion { aspect-ratio: 9 / 16; }
+.flow.vert { grid-auto-flow: row; grid-template-columns: 1fr; gap: 22px; }
+.flow.vert li::after { content: "\2193"; right: auto; left: 16px; top: auto; bottom: -22px; transform: none; font-size: 16px; }
+.flow.vert li:last-child::after { content: none; }
 .card.running { grid-column: 1 / -1; }
 .card-media { position: relative; aspect-ratio: 16 / 10; background: var(--soft); overflow: hidden; }
 .card-media > img, .card-media > video { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
@@ -365,6 +374,8 @@ section {
 .tri img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; transition: transform .5s var(--ease); }
 .tri:hover img { transform: translateY(-6px); }
 .stats { list-style: none; border-top: 1px solid var(--line); }
+.stats.row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(14px, 2vw, 24px); border-top: 0; }
+.stats.row li { border-top: 1px solid var(--line); }
 .stats li { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .stats b { font-weight: 700; font-size: clamp(36px, 4.4vw, 64px); line-height: .9; letter-spacing: -.03em; color: var(--accent); min-width: 1.9em; }
 .stats span { font-size: 15px; line-height: 1.4; }
@@ -455,7 +466,9 @@ section {
 }
 @media (max-width: 720px) {
   .card, .card.s5, .card.s6, .card.s7, .card.s8 { grid-column: 1 / -1; }
-  .duo { grid-template-columns: 1fr; }
+  .trio, .stats.row { grid-template-columns: 1fr; }
+  .split { gap: 12px; }
+  .split .flow.vert li { font-size: 12px; padding: 7px 8px 9px; }
   .side-label { display: none; }
   .flow, .way-head .flow { grid-auto-flow: row; grid-template-columns: 1fr; gap: 22px; }
   .flow li::after { content: "\2193"; right: auto; left: 16px; top: auto; bottom: -22px; transform: none; font-size: 16px; }
@@ -531,7 +544,7 @@ section {
     <p class="kicker">[6 sposobów]</p>
     <div class="legend"><span><i></i>robię ja</span><span><i class="ai"></i>robi AI</span></div>
     <ol class="toc-grid">
-      <li><a href="#rhino"><figure><img src="/portfolio/assets/bor-film/model.jpg" alt="" loading="lazy"><span class="n">01</span></figure><p>modeluje ze mną w Rhino<small>bór, czajnik, rysunki techniczne</small></p></a></li>
+      <li><a href="#rhino"><figure><img src="/portfolio/assets/bor-film/model.jpg" alt="" loading="lazy"><span class="n">01</span></figure><p>modeluje ze mną w Rhino<small>bór, para, czajnik, rysunki techniczne</small></p></a></li>
       <li><a href="#illustrator"><figure><img src="m/mkj-logo.jpg" alt="" loading="lazy"><span class="n">02</span></figure><p>pracuje w moim pliku w Illustratorze<small>logo, palety, strona</small></p></a></li>
       <li><a href="#kod"><figure><img src="m/icu-a.jpg" alt="" loading="lazy"><span class="n">03</span></figure><p>pisze kod do rzeczy, które widzą i słyszą<small>icu, yoobilizery, dziubi</small></p></a></li>
       <li><a href="#tekst"><figure><img src="m/lawenda.jpg" alt="" loading="lazy"><span class="n">04</span></figure><p>czyta moje wiersze<small>lawenda, bramka</small></p></a></li>
@@ -552,15 +565,15 @@ section {
       <h2 class="h2 rv">AI modeluje ze mną w&nbsp;Rhino</h2>
       <p class="tools"><span>Rhino</span><span>MCP</span><span>C#</span><span>RhinoPython</span></p>
       <ol class="flow">
-        <li><b>ja</b>opowiadanie i kierunek formy</li>
-        <li class="ai"><b>AI</b>modeluje wprost w Rhino</li>
-        <li class="ai"><b>AI</b>sprawdza kolizje z głową i drogę powietrza</li>
-        <li><b>ja</b>wybieram wariant, odrzucam, zmieniam kształt</li>
-        <li class="ai"><b>AI</b>skrypt rozkłada części na arkusze z wymiarami</li>
+        <li><b>ja</b>opowiadanie albo szkic, kierunek formy</li>
+        <li class="ai"><b>AI</b>modeluje wprost w Rhino, kilka wariantów</li>
+        <li class="ai"><b>AI</b>sprawdza kolizje, wymiary, drogę powietrza</li>
+        <li><b>ja</b>wybieram, drukuję prototyp, sprawdzam w ręce</li>
+        <li class="ai"><b>AI</b>rysunki techniczne, instrukcja, film z opisem</li>
       </ol>
     </header>
     <div class="grid">
-      <article class="card s7 rv">
+      <article class="card s8 rv">
         <div class="card-media gal">
           <div class="gal-stage contain">
             <video data-pane data-label="model" src="/portfolio/assets/bor-film/model.mp4" poster="/portfolio/assets/bor-film/model.jpg" muted loop playsinline preload="none" aria-label="model 3d bóru"></video>
@@ -573,7 +586,24 @@ section {
         <p>oczyszczacz powietrza na kark, z mojego opowiadania o roku 2400. 155 części, 29 plików do druku.</p>
         <a class="go" href="/portfolio/bor/">zobacz bór &rarr;</a>
       </article>
-      <article class="card s5 rv">
+      <article class="card s4 rv">
+        <div class="card-media pion white"><video src="m/bor-rolka.mp4" poster="m/bor-rolka.jpg" muted loop playsinline preload="none" aria-label="szkic rolki o bórze"></video></div>
+        <h3>rolka o bórze</h3>
+        <p>szkic rolki prosto z modelu: filtr, klapka zapachu, wyloty, światło.</p>
+      </article>
+      <article class="card s8 rv">
+        <div class="card-media gal">
+          <div class="gal-stage contain">
+            <img data-pane data-label="warianty w Rhino" src="m/para-rhino.jpg" alt="para: warianty stojaka na jajka w Rhino" loading="lazy">
+            <img data-pane data-label="prototyp" src="m/para-druk.jpg" alt="para: prawdziwe jajko i połówki stojaka gotowe do druku" loading="lazy">
+            <img data-pane data-label="opis i film" src="m/para-opis.jpg" alt="para: film z opisem zrobiony z jednego zdania" loading="lazy">
+          </div>
+          <div class="chips"></div>
+        </div>
+        <h3>para: stojak na jajka</h3>
+        <p>ceramika na mosiężnym łańcuszku, rama z jednego pręta. AI modeluje warianty w Rhino, ja drukuję połówki na próbę i przymierzam do prawdziwego jajka. film z opisem w moim stylu powstał z jednego zdania.</p>
+      </article>
+      <article class="card s4 rv">
         <div class="card-media gal">
           <div class="gal-stage">
             <img data-pane data-label="render" src="m/czajnik-render.jpg" alt="czajnik SMEG: render" loading="lazy">
@@ -582,16 +612,17 @@ section {
           <div class="chips"></div>
         </div>
         <h3>czajnik SMEG</h3>
-        <p>Rhino 2, projekt grupowy. odtworzony część po części: korpus, rączka, pokrywa, wylewka, podstawa.</p>
+        <p>Rhino 2, projekt grupowy. odtworzony część po części.</p>
         <a class="go" href="/portfolio/#czajnik">w portfolio &rarr;</a>
       </article>
       <article class="card s12 rv">
-        <div class="duo">
-          <img src="m/stas-rysunek.jpg" alt="rysunek techniczny bóru" loading="lazy">
-          <img src="m/czajnik-rysunek.jpg" alt="rysunek techniczny czajnika" loading="lazy">
+        <div class="trio">
+          <img src="m/bor-rozstrzal.jpg" alt="bór: rozstrzał i wykaz 50 pozycji" loading="lazy">
+          <img src="m/stas-rysunek.jpg" alt="bór: rzuty i gabaryty" loading="lazy">
+          <img src="m/czajnik-rysunek.jpg" alt="czajnik: rysunek techniczny" loading="lazy">
         </div>
         <h3>rysunki techniczne</h3>
-        <p>3 widoki i wymiary dla każdej części, arkusze rozkładają się same. przy bórze 7 arkuszy A3 i instrukcja montażu na 54 strony.</p>
+        <p>widoki, wymiary i wykaz części, arkusze rozkładają się same. w tabelce rysunku bóru stoi: „opracowanie: Claude (Anthropic), z modelu 3D”.</p>
       </article>
     </div>
   </div>
@@ -614,14 +645,20 @@ section {
         <li><b>ja</b>„wytłumacz, czemu to logo”, odrzucam</li>
         <li class="ai"><b>AI</b>przebudowuje dymki w moim pliku</li>
         <li><b>ja</b>ręcznie: usuwam uśmiechy, powiększam gwiazdę</li>
-        <li class="ai"><b>AI</b>palety, księga znaku, animacja oka</li>
+        <li class="ai"><b>AI</b>palety, księga znaku, animacje</li>
       </ol>
     </header>
     <div class="grid">
       <article class="card rv">
-        <div class="card-media contain"><img src="m/mkj-logo.jpg" alt="logo z czterech dymków" loading="lazy"></div>
+        <div class="card-media gal">
+          <div class="gal-stage contain">
+            <video data-pane data-label="animacja" src="m/logo-loop.mp4" poster="m/logo-loop.jpg" muted loop playsinline preload="none" aria-label="animacja logo: dymki rozchodzą się w pary"></video>
+            <img data-pane data-label="znak" src="m/mkj-logo.jpg" alt="logo z czterech dymków" loading="lazy">
+          </div>
+          <div class="chips"></div>
+        </div>
         <h3>logo</h3>
-        <p>cztery dymki to róża wiatrów, w środku uczeń. potem 8 palet i księga znaku na 12 stron.</p>
+        <p>cztery dymki to róża wiatrów, w środku uczeń. w animacji rozchodzą się w pary i wracają. do tego 8 palet i księga znaku na 12 stron.</p>
       </article>
       <article class="card rv">
         <div class="card-media gal">
@@ -689,9 +726,16 @@ section {
         <h3>yoobilizery</h3>
         <p>dźwięk &rarr; bit, bas, wysokie &rarr; neonowe bryły. AI wyciągnęło z mojego kodu (5000 linii) opis wyglądu i przepisało go do przeglądarki.</p>
       </article>
-      <article class="card s6 txt rv">
-        <div class="card-media">
-          <ol class="flow">
+      <article class="card s6 rv">
+        <div class="split">
+          <div class="card-media pion gal">
+            <div class="gal-stage">
+              <video data-pane data-label="rozmowa" src="m/dziubi-rozmowa.mp4" poster="m/dziubi-rozmowa.jpg" muted loop playsinline preload="none" aria-label="dziubi słucha i odpowiada na monitorze kineskopowym"></video>
+              <video data-pane data-label="oko" src="m/dziubi-oko.mp4" poster="m/dziubi-oko.jpg" muted loop playsinline preload="none" aria-label="dziubi i kamera, która jest jego okiem"></video>
+            </div>
+            <div class="chips"></div>
+          </div>
+          <ol class="flow vert">
             <li class="ai"><b>kamera</b>poznaje twarze, lokalnie</li>
             <li class="ai"><b>Whisper</b>słucha, lokalnie</li>
             <li class="ai"><b>Claude</b>myśli i odpowiada głosem</li>
@@ -774,17 +818,22 @@ section {
       </ol>
     </header>
     <div class="grid">
-      <article class="card s7 rv">
+      <article class="card s4 rv">
+        <div class="card-media pion"><video src="m/gdd-program.mp4" poster="m/gdd-program.jpg" muted loop playsinline preload="none" aria-label="rolka: program Gdańskich Dni Demokracji"></video></div>
+        <h3>rolka: program dnia</h3>
+        <p>Gdańskie Dni Demokracji, 14 września.</p>
+      </article>
+      <article class="card s8 rv">
         <div class="tri">
           <img src="m/gdd-1.jpg" alt="szablon rolki: Wspólnota ma moc" loading="lazy">
           <img src="m/gdd-2.jpg" alt="szablon rolki: Nie daj się manipulacji" loading="lazy">
           <img src="m/gdd-4.jpg" alt="szablon rolki: Gdańsk 14–16/09/2026" loading="lazy">
         </div>
         <h3>szablony rolek</h3>
-        <p>Gdańskie Dni Demokracji.</p>
+        <p>ten sam festiwal: szablony do kolejnych rolek.</p>
       </article>
-      <article class="card s5 rv">
-        <ul class="stats">
+      <article class="card s12 rv">
+        <ul class="stats row">
           <li><b>~90</b><span>rolek od lipca</span></li>
           <li><b>45</b><span>klipów z jednego wywiadu</span></li>
           <li><b>2</b><span>wersje językowe: polska i ukraińska</span></li>
