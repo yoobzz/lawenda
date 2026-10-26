@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>scroll strażnik — demo</title>
+<title>scroll strażnik</title>
 <meta name="robots" content="noindex, nofollow, noarchive">
-<meta name="description" content="strażnik scrollowania: demo strony z symulacją zamiast kamery">
+<meta name="description" content="strażnik scrollowania: kamera w przeglądarce widzi, kiedy scrollujesz">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <style>
   :root {
@@ -32,6 +32,13 @@
   #licznik span { display: block; font-size: 0.24em; letter-spacing: 0; color: var(--przygaszony); margin-top: 10px; }
   #okno { position: relative; justify-self: end; width: min(100%, 1100px); border: 6px solid var(--tusz); background: #000; aspect-ratio: 16 / 9; }
   #okno img, #okno canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+  #start { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #111; color: #f2efe8; text-align: center; padding: 20px; }
+  #start[hidden], #tryb[hidden] { display: none; }
+  #start button { font: 900 clamp(22px, 3vw, 44px)/1 var(--gruby); letter-spacing: -0.02em; text-transform: uppercase; padding: 16px 22px; border: 3px solid #f2efe8; background: #f2efe8; color: #111; cursor: pointer; border-radius: 0; }
+  #start #demo { font: 600 clamp(14px, 1.4vw, 18px)/1 var(--mono); text-transform: none; letter-spacing: 0; background: transparent; color: #f2efe8; border-width: 2px; padding: 10px 14px; }
+  #start button:hover { background: #d4231b; border-color: #d4231b; color: #fff3ea; }
+  #start p { margin: 6px 0 0; font: 13px var(--mono); color: #8a867d; }
+  #tryb { position: absolute; right: 10px; top: 10px; font: 600 13px/1 var(--mono); padding: 8px 10px; border: 2px solid #f2efe8; background: rgba(0,0,0,.55); color: #f2efe8; cursor: pointer; border-radius: 0; }
   #okno .opis { position: absolute; left: -6px; bottom: -34px; font: 13px var(--mono); color: var(--przygaszony); white-space: nowrap; }
 
   #zdania { padding: 70px 2vw 30px; max-width: 1400px; }
@@ -73,7 +80,13 @@
 
 <div id="scena">
   <div id="licznik">0:00<span>z 10:00</span></div>
-  <div id="okno"><canvas id="demo-podglad" width="1280" height="720" aria-label="podgląd z kamery (symulacja)"></canvas><div class="opis" id="opis-okna"></div></div>
+  <div id="okno"><canvas id="demo-podglad" width="1280" height="720" aria-label="podgląd z kamery"></canvas>
+    <div id="start">
+      <button id="wlacz" type="button">włącz kamerę</button>
+      <button id="demo" type="button">albo zobacz demo</button>
+      <p id="start-info">obraz zostaje w twojej przeglądarce, nic nie jest wysyłane</p>
+    </div>
+    <button id="tryb" type="button" hidden>włącz kamerę</button><div class="opis" id="opis-okna"></div></div>
 </div>
 
 <section id="zdania">
@@ -105,147 +118,7 @@
   <div id="diag"></div>
 </details>
 
-<script>
-/* DEMO na szpineta.com: zamiast serwera z kamerą i YOLO — symulacja.
-   Strona niżej to oryginalny kod; podmienione są tylko odpowiedzi /api/* i podgląd z kamery. */
-(function () {
-  const T = +(new URLSearchParams(location.search).get("t")) || 6; /* czas demo płynie 6× szybciej */
-  const ust = { zrodlo: "", esp: "", limit_s: 60, kara_s: 300, przerwa_s: 45, czulosc: "normalna", czuwanie: true };
-  const st = { seria: 0, przerwa: 0, kara: 0, phone: false, phase: 0, udzial: 0, odc: {} };
-  const SCRIPT = [ /* [sekundy demo, czy telefon w ręce] */
-    [24, false], [72, true], [30, false], [999, true]
-  ];
-  let t0 = performance.now(), last = t0, phaseLeft = SCRIPT[0][0];
-
-  function step() {
-    const now = performance.now();
-    const dt = Math.min(1, (now - last) / 1000) * T;
-    last = now;
-    if (st.kara > 0) {
-      st.kara = Math.max(0, st.kara - dt);
-      st.phone = false;
-      if (st.kara === 0) { st.seria = 0; st.phase = 0; phaseLeft = SCRIPT[0][0]; }
-      return;
-    }
-    phaseLeft -= dt;
-    if (phaseLeft <= 0) { st.phase = (st.phase + 1) % SCRIPT.length; phaseLeft = SCRIPT[st.phase][0]; }
-    st.phone = SCRIPT[st.phase][1];
-    if (st.phone) {
-      st.seria += dt; st.przerwa = 0;
-      st.udzial = Math.min(0.97, st.udzial + dt * 0.03);
-      if (st.seria >= ust.limit_s && ust.czuwanie) {
-        st.kara = ust.kara_s;
-        st.odc = { co: "odcięcie na " + ust.kara_s + " s", wynik: "tryb próbny — brak adresu ESP, nic nie odcięto", ok: true, kiedy: Date.now() / 1000 };
-      }
-    } else {
-      st.udzial = Math.max(0, st.udzial - dt * 0.02);
-      if (st.seria > 0) {
-        st.przerwa += dt;
-        if (st.przerwa >= ust.przerwa_s) { st.seria = 0; st.przerwa = 0; }
-      }
-    }
-  }
-  setInterval(step, 100);
-
-  function stan() {
-    const tel = st.phone && st.kara === 0 ? +(0.78 + Math.random() * 0.15).toFixed(2) : null;
-    return {
-      scrolluje: tel !== null, scrollujacych: tel !== null ? 1 : 0,
-      seria_s: +st.seria.toFixed(1), przerwa_s: +st.przerwa.toFixed(1), udzial: +st.udzial.toFixed(2),
-      kara_zostalo_s: Math.ceil(st.kara), obraz_ok: true, kamera: "ok (symulacja)", osoby: 1, telefon: tel,
-      powody: [tel !== null ? "reka 0.6 twarz 0.9" : "brak telefonu"],
-      analiza_ms: 38 + Math.round(Math.random() * 12), blad: "", odciecie: st.odc, ustawienia: Object.assign({}, ust)
-    };
-  }
-  const ok = (d, code) => new Response(JSON.stringify(d), { status: code || 200, headers: { "Content-Type": "application/json" } });
-  const realFetch = window.fetch.bind(window);
-  window.fetch = async function (url, opt) {
-    const u = String(url);
-    if (u.startsWith("/api/stan")) return ok(stan());
-    if (u.startsWith("/api/test-odciecia")) {
-      st.kara = 20;
-      st.odc = { co: "odcięcie na 20 s", wynik: "tryb próbny — brak adresu ESP, nic nie odcięto", ok: true, kiedy: Date.now() / 1000 };
-      return ok({ ok: true });
-    }
-    if (u.startsWith("/api/ustawienia")) {
-      let z = {};
-      try { z = JSON.parse((opt && opt.body) || "{}"); } catch (e) { return ok({ blad: "zły JSON" }, 400); }
-      const num = (k, lo, hi) => { if (k in z) { const v = +z[k]; if (!(v >= lo && v <= hi)) throw new Error(k + ": poza zakresem"); ust[k] = Math.round(v); } };
-      try {
-        num("limit_s", 10, 14400); num("kara_s", 10, 14400); num("przerwa_s", 5, 600);
-        if ("czulosc" in z) { if (!["ostrozna", "normalna", "czula"].includes(z.czulosc)) throw new Error("czułość"); ust.czulosc = z.czulosc; }
-        if ("czuwanie" in z) ust.czuwanie = !!z.czuwanie;
-        if ("zrodlo" in z) ust.zrodlo = String(z.zrodlo).slice(0, 200);
-        if ("esp" in z) ust.esp = String(z.esp).slice(0, 60);
-      } catch (e) { return ok({ blad: e.message }, 400); }
-      return ok(Object.assign({}, ust));
-    }
-    return realFetch(url, opt);
-  };
-  window.confirm = () => true; /* w demo bez okienka */
-
-  /* podgląd z kamery: rysunek zamiast strumienia MJPEG */
-  function rysuj() {
-    const c = document.getElementById("demo-podglad");
-    if (!c) return requestAnimationFrame(rysuj);
-    const g = c.getContext("2d"), W = c.width, H = c.height, t = performance.now() / 1000;
-    if (st.kara > 0) {
-      g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
-      g.fillStyle = "#f2efe8"; g.textAlign = "center";
-      g.font = "900 96px Helvetica Neue, Helvetica, Arial, sans-serif";
-      g.fillText("INTERNET ODCIETY", W / 2, H / 2 - 10);
-      const s = Math.ceil(st.kara), m = Math.floor(s / 60), r = s % 60;
-      g.font = "600 40px ui-monospace, Menlo, monospace";
-      g.fillText("wraca za " + m + ":" + String(r).padStart(2, "0"), W / 2, H / 2 + 60);
-      return requestAnimationFrame(rysuj);
-    }
-    const bg = g.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, "#3a3732"); bg.addColorStop(1, "#1d1b18");
-    g.fillStyle = bg; g.fillRect(0, 0, W, H);
-    g.fillStyle = "#2a2723"; g.fillRect(0, H * 0.72, W, H * 0.28);           /* podłoga */
-    g.fillStyle = "#4a443c"; g.fillRect(W * 0.32, H * 0.5, W * 0.36, H * 0.12); /* kanapa */
-    g.fillRect(W * 0.3, H * 0.4, W * 0.05, H * 0.24); g.fillRect(W * 0.65, H * 0.4, W * 0.05, H * 0.24);
-    const ph = st.phone, bob = Math.sin(t * 1.3) * 3;
-    const cx = W * 0.5, hy = H * 0.26 + bob + (ph ? 18 : 0);
-    const P = {
-      glowa: [cx + (ph ? 6 : 0), hy], szyja: [cx, hy + 46],
-      lb: [cx - 70, hy + 70], pb: [cx + 70, hy + 70],
-      ll: [cx - 95, hy + 165], pl: [cx + (ph ? 55 : 95), hy + (ph ? 140 : 165)],
-      ld: [cx - (ph ? 10 : 70), hy + (ph ? 175 : 240)], pd: [cx + (ph ? 20 : 80), hy + (ph ? 160 : 240)],
-      lbio: [cx - 50, hy + 230], pbio: [cx + 50, hy + 230],
-      lk: [cx - 70, hy + 300], pk: [cx + 70, hy + 300]
-    };
-    const kosci = [["glowa","szyja"],["szyja","lb"],["szyja","pb"],["lb","ll"],["ll","ld"],["pb","pl"],["pl","pd"],["lb","lbio"],["pb","pbio"],["lbio","pbio"],["lbio","lk"],["pbio","pk"]];
-    g.strokeStyle = "rgba(140,220,255,.85)"; g.lineWidth = 4;
-    kosci.forEach(([a, b]) => { g.beginPath(); g.moveTo(P[a][0], P[a][1]); g.lineTo(P[b][0], P[b][1]); g.stroke(); });
-    g.fillStyle = "#8cdcff";
-    Object.values(P).forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); });
-    g.beginPath(); g.strokeStyle = "rgba(140,220,255,.85)"; g.arc(P.glowa[0], P.glowa[1] - 4, 26, 0, 7); g.stroke();
-    /* ramka osoby */
-    const kol = ph ? "#ff3b30" : "#30d158";
-    g.strokeStyle = kol; g.lineWidth = 4;
-    g.strokeRect(cx - 150, hy - 50, 300, 380);
-    const etykieta = ph ? "osoba 1 · SCROLLUJE" : "osoba 1 · nie scrolluje";
-    g.font = "700 22px ui-monospace, Menlo, monospace"; g.textAlign = "left";
-    g.fillStyle = kol; g.fillRect(cx - 152, hy - 84, g.measureText(etykieta).width + 22, 34);
-    g.fillStyle = "#fff"; g.fillText(etykieta, cx - 142, hy - 59);
-    if (ph) { /* telefon w dłoniach */
-      const tx = (P.ld[0] + P.pd[0]) / 2 - 18, ty = (P.ld[1] + P.pd[1]) / 2 - 34;
-      g.fillStyle = "#111"; g.fillRect(tx, ty, 36, 62);
-      g.fillStyle = "#cfe8ff"; g.fillRect(tx + 4, ty + 6, 28, 48);
-      g.strokeStyle = "#ffd60a"; g.lineWidth = 3; g.strokeRect(tx - 10, ty - 10, 56, 82);
-      const tt = "telefon " + (0.8 + 0.1 * Math.abs(Math.sin(t))).toFixed(2);
-      g.font = "700 18px ui-monospace, Menlo, monospace";
-      g.fillStyle = "#ffd60a"; g.fillRect(tx - 11, ty - 36, g.measureText(tt).width + 16, 26);
-      g.fillStyle = "#111"; g.fillText(tt, tx - 4, ty - 17);
-    }
-    g.fillStyle = "rgba(255,255,255,.55)"; g.font = "600 18px ui-monospace, Menlo, monospace";
-    g.fillText("DEMO · symulacja zamiast kamery", 24, 36);
-    requestAnimationFrame(rysuj);
-  }
-  requestAnimationFrame(rysuj);
-})();
-</script>
+<script src="przegladarka.js"></script>
 <script>
 const $ = (s) => document.querySelector(s);
 let ust = null;

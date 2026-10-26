@@ -367,10 +367,10 @@ section {
       <article class="item s8 live rv" data-src="/portfolio/scroll-straznik/" data-title="scroll strażnik">
         <div class="card-media">
           <video src="m/straz-demo.mp4" poster="m/straz-demo.jpg" muted loop playsinline preload="none" aria-label="strona scroll strażnika: nie scrollujesz, scrollujesz, internet odcięty"></video>
-          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
+          <button class="play" type="button"><span>&#9654; odpal z kamerą</span></button>
         </div>
         <div class="cap"><span class="no">03</span><h3>scroll strażnik</h3><span class="what">kamera, która widzi, że scrollujesz</span></div>
-        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>OpenCV</span></p>
+        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>MediaPipe</span></p>
         <a class="go" href="/portfolio/scroll-straznik/" target="_blank" rel="noopener">otwórz osobno &nearr;</a>
       </article>
 
@@ -823,7 +823,7 @@ section {
       var f = document.createElement('iframe');
       f.src = card.dataset.src;
       f.title = card.dataset.title;
-      f.setAttribute('allow', 'fullscreen');
+      f.setAttribute('allow', 'fullscreen; camera');
       media.appendChild(f);
       card.classList.add('running');
       btn.remove();
