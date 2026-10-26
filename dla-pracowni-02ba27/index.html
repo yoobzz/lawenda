@@ -238,19 +238,6 @@ section {
 .chips button:hover { color: var(--accent); }
 .chips button[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-/* scroll strażnik: ruchoma grafika */
-.straz { background: #121212; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: background .5s ease; }
-.straz.on { background: #c8323a; }
-.straz-box { position: relative; width: 58%; height: 58%; border: 2px dashed rgba(255, 255, 255, .85); }
-.straz-win { position: absolute; inset: 0; overflow: hidden; }
-.straz-tag { position: absolute; left: -2px; top: -26px; padding: 4px 8px; font: 700 12px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; background: #fff; color: #121212; white-space: nowrap; }
-.straz-box { margin-top: 26px; }
-.straz-feed { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 14px; font: 700 clamp(16px, 1.6vw, 22px)/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: 2px; color: rgba(255, 255, 255, .7); }
-.straz.on .straz-feed { animation: feed 1.6s linear infinite; }
-@keyframes feed { to { transform: translateY(-50%); } }
-.straz-time { font: 400 13px/1.4 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .08em; color: rgba(255, 255, 255, .75); text-align: center; }
-.straz-time b { color: #fff; font-weight: 700; }
-
 /* granica: model miasta 3D */
 .city { background: var(--soft); cursor: grab; }
 .city:active { cursor: grabbing; }
@@ -357,7 +344,6 @@ section {
   <div class="wrap">
     <p class="kicker">[22 rzeczy &middot; pod każdą narzędzia]</p>
     <div class="grid">
-
       <article class="item s8 rv">
         <div class="card-media gal">
           <div class="gal-stage contain">
@@ -378,6 +364,22 @@ section {
         <p class="tools"><span>Claude</span><span>three.js</span></p>
       </article>
 
+      <article class="item s8 live rv" data-src="/portfolio/scroll-straznik/" data-title="scroll strażnik">
+        <div class="card-media">
+          <video src="m/straz-demo.mp4" poster="m/straz-demo.jpg" muted loop playsinline preload="none" aria-label="strona scroll strażnika: nie scrollujesz, scrollujesz, internet odcięty"></video>
+          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
+        </div>
+        <div class="cap"><span class="no">03</span><h3>scroll strażnik</h3><span class="what">kamera, która widzi, że scrollujesz</span></div>
+        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>OpenCV</span></p>
+        <a class="go" href="/portfolio/scroll-straznik/" target="_blank" rel="noopener">otwórz osobno &nearr;</a>
+      </article>
+
+      <article class="item rv">
+        <div class="card-media pion" style="background:#f6f6f6"><img src="m/plakat-wiersz.jpg" alt="plakat z wierszem: po pełni (z)nów" loading="lazy"></div>
+        <div class="cap"><span class="no">04</span><h3>plakaty z wierszami</h3></div>
+        <p class="tools"><span>Claude</span><span>Claude Design</span></p>
+      </article>
+
       <article class="item s8 rv">
         <div class="card-media gal">
           <div class="gal-stage">
@@ -391,30 +393,8 @@ section {
           </div>
           <div class="chips"></div>
         </div>
-        <div class="cap"><span class="no">03</span><h3>Lukullus</h3><span class="what">identyfikacja cukierni, koncepcja niezamawiana</span></div>
+        <div class="cap"><span class="no">05</span><h3>Lukullus</h3><span class="what">identyfikacja cukierni, koncepcja niezamawiana</span></div>
         <p class="tools"><span>Claude Design</span><span>Blender</span></p>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media pion straz" id="straz" role="img" aria-label="scroll strażnik: ekran robi się czerwony, kiedy kamera widzi scrollowanie">
-          <div class="straz-box"><span class="straz-tag" id="strazTag">NIE SCROLLUJE</span><div class="straz-win"><div class="straz-feed" aria-hidden="true"><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span></div></div></div>
-          <p class="straz-time">limit 05:00 &middot; <b id="strazTime">00:00</b></p>
-        </div>
-        <div class="cap"><span class="no">04</span><h3>scroll strażnik</h3><span class="what">kamera, która widzi, że scrollujesz</span></div>
-        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>OpenCV</span></p>
-      </article>
-
-      <article class="item s8 rv">
-        <div class="card-media gal">
-          <div class="gal-stage contain">
-            <img data-pane data-label="w Rhino" src="m/para-rhino.jpg" alt="para: warianty stojaka na jajka w Rhino" loading="lazy">
-            <img data-pane data-label="prototyp" src="m/para-druk.jpg" alt="para: jajko i połówki stojaka do druku" loading="lazy">
-            <img data-pane data-label="film" src="m/para-opis.jpg" alt="para: film z opisem" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">05</span><h3>para</h3><span class="what">stojak na jajka</span></div>
-        <p class="tools"><span>Claude</span><span>Rhino</span><span>druk 3D</span></p>
       </article>
 
       <article class="item rv">
@@ -429,7 +409,20 @@ section {
         <p class="tools"><span>Claude</span><span>Python</span><span>Whisper</span></p>
       </article>
 
-      <article class="item s8 rv">
+      <article class="item s6 rv">
+        <div class="card-media gal">
+          <div class="gal-stage contain">
+            <img data-pane data-label="w Rhino" src="m/para-rhino.jpg" alt="para: warianty stojaka na jajka w Rhino" loading="lazy">
+            <img data-pane data-label="prototyp" src="m/para-druk.jpg" alt="para: jajko i połówki stojaka do druku" loading="lazy">
+            <img data-pane data-label="film" src="m/para-opis.jpg" alt="para: film z opisem" loading="lazy">
+          </div>
+          <div class="chips"></div>
+        </div>
+        <div class="cap"><span class="no">07</span><h3>para</h3><span class="what">stojak na jajka</span></div>
+        <p class="tools"><span>Claude</span><span>Rhino</span><span>druk 3D</span></p>
+      </article>
+
+      <article class="item s6 rv">
         <div class="card-media gal">
           <div class="gal-stage">
             <div data-pane data-label="model 3D" class="city" id="city"><span class="wait">~||-_^+*.</span></div>
@@ -440,15 +433,9 @@ section {
           </div>
           <div class="chips"></div>
         </div>
-        <div class="cap"><span class="no">07</span><h3>granica</h3><span class="what">znak rzucony na Warszawę</span></div>
+        <div class="cap"><span class="no">08</span><h3>granica</h3><span class="what">znak rzucony na Warszawę</span></div>
         <p class="tools"><span>Claude</span><span>CesiumJS</span><span>Google 3D Tiles</span><span>Rhino</span></p>
         <a class="go" href="/portfolio/#granica">plakat &rarr;</a>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media pion" style="background:#f6f6f6"><img src="m/plakat-wiersz.jpg" alt="plakat z wierszem: po pełni (z)nów" loading="lazy"></div>
-        <div class="cap"><span class="no">08</span><h3>plakaty z wierszami</h3></div>
-        <p class="tools"><span>Claude</span><span>Claude Design</span></p>
       </article>
 
       <article class="item s12 rv">
@@ -825,25 +812,6 @@ section {
     } else {
       startCity();
     }
-  }
-
-  /* ---------- scroll strażnik: na zmianę scrolluje / nie scrolluje ---------- */
-  var straz = $('#straz');
-  if (straz && !reduce) {
-    var tag = $('#strazTag'), tm = $('#strazTime');
-    var on = false, secs = 0, tick = 0, live = false;
-    if (hasIO) new IntersectionObserver(function (es) { live = es[0].isIntersecting; }).observe(straz);
-    setInterval(function () {
-      if (!live) return;
-      tick++;
-      if (tick % 3 === 0) {
-        on = !on;
-        straz.classList.toggle('on', on);
-        tag.textContent = on ? 'SCROLLUJE 0.94' : 'NIE SCROLLUJE';
-      }
-      if (on) secs++;
-      tm.textContent = '00:' + String(secs % 60).padStart(2, '0');
-    }, 1000);
   }
 
   /* ---------- narzędzia na żywo: iframe dopiero po kliknięciu ---------- */

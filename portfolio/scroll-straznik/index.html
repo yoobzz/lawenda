@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>scroll strażnik — demo</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="description" content="strażnik scrollowania: demo strony z symulacją zamiast kamery">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<style>
+  :root {
+    --tlo: #e8e4da; --tusz: #111; --przygaszony: #6d685e; --akcent: #111;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --gruby: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  html.scrolluje { --tlo: #d4231b; --tusz: #fff3ea; --przygaszony: #ffc3b4; --akcent: #fff3ea; }
+  html.kara { --tlo: #0c0c0c; --tusz: #f2efe8; --przygaszony: #8a867d; --akcent: #f2efe8; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--tlo); color: var(--tusz); }
+  body { font: 16px/1.4 var(--gruby); transition: background .4s, color .4s; overflow-x: hidden; }
+
+  #pasek { position: fixed; top: 0; left: 0; height: 6px; background: var(--tusz); width: 0; transition: width .6s linear; z-index: 5; }
+
+  #slowo {
+    font: 900 clamp(36px, 13vw, 230px)/0.82 var(--gruby); letter-spacing: -0.045em;
+    text-transform: uppercase; margin: 0; padding: 28px 16px 0 2vw;
+  }
+  #slowo small { display: block; font: 600 clamp(14px, 1.6vw, 22px)/1.2 var(--mono); letter-spacing: 0; text-transform: none; margin-top: 18px; color: var(--przygaszony); }
+
+  #scena { display: grid; grid-template-columns: minmax(170px, 24vw) 1fr; gap: 0 3vw; padding: 0 2vw; margin-top: 22px; }
+  #licznik { font: 700 clamp(48px, 9vw, 150px)/0.9 var(--mono); letter-spacing: -0.06em; align-self: end; padding-bottom: 10px; }
+  #licznik span { display: block; font-size: 0.24em; letter-spacing: 0; color: var(--przygaszony); margin-top: 10px; }
+  #okno { position: relative; justify-self: end; width: min(100%, 1100px); border: 6px solid var(--tusz); background: #000; aspect-ratio: 16 / 9; }
+  #okno img, #okno canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+  #okno .opis { position: absolute; left: -6px; bottom: -34px; font: 13px var(--mono); color: var(--przygaszony); white-space: nowrap; }
+
+  #zdania { padding: 70px 2vw 30px; max-width: 1400px; }
+  .zdanie { font: 700 clamp(22px, 2.8vw, 40px)/1.5 var(--gruby); letter-spacing: -0.02em; margin: 0 0 18px; }
+  .wybor { display: inline-flex; flex-wrap: wrap; gap: 6px; vertical-align: middle; margin: 0 4px; }
+  .wybor button, #wiecej button {
+    font: 600 clamp(15px, 1.5vw, 20px)/1 var(--mono); padding: 9px 12px; border: 2px solid var(--tusz);
+    background: transparent; color: var(--tusz); cursor: pointer; border-radius: 0;
+  }
+  .wybor button.tak { background: var(--tusz); color: var(--tlo); }
+  .wybor input { width: 4.2em; font: 600 clamp(15px, 1.5vw, 20px)/1 var(--mono); padding: 8px; border: 2px dashed var(--tusz); background: transparent; color: var(--tusz); }
+  #zapis { font: 13px var(--mono); color: var(--przygaszony); min-height: 1.4em; }
+
+  #wiecej { margin: 30px 2vw 60px; border-top: 2px solid var(--tusz); padding-top: 14px; max-width: 1100px; }
+  #wiecej summary { font: 900 28px var(--gruby); letter-spacing: -0.02em; cursor: pointer; list-style: none; }
+  #wiecej summary::before { content: "+ "; }
+  #wiecej[open] summary::before { content: "– "; }
+  #wiecej label { display: block; margin: 18px 0 6px; font: 600 13px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--przygaszony); }
+  #wiecej input[type=text] { width: 100%; font: 16px var(--mono); padding: 10px; border: 2px solid var(--tusz); background: transparent; color: var(--tusz); }
+  #wiecej .rzad { display: flex; gap: 8px; }
+  #wiecej .rzad input { flex: 1; }
+  #diag { font: 13px/1.7 var(--mono); white-space: pre-wrap; margin-top: 20px; color: var(--przygaszony); }
+  #esp-info { font: 13px var(--mono); margin-top: 6px; }
+
+  @media (max-width: 760px) {
+    #slowo { font-size: 11.5vw; padding-left: 16px; }
+    #scena { grid-template-columns: 1fr; margin-top: 16px; padding: 0 16px; }
+    #zdania, #wiecej { padding-left: 16px; padding-right: 16px; margin-left: 0; margin-right: 0; }
+    #licznik { order: 2; padding-top: 44px; }
+    #okno { justify-self: stretch; }
+    #okno .opis { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div id="pasek"></div>
+
+<h1 id="slowo">Łączę…<small id="podslowo">&nbsp;</small></h1>
+
+<div id="scena">
+  <div id="licznik">0:00<span>z 10:00</span></div>
+  <div id="okno"><canvas id="demo-podglad" width="1280" height="720" aria-label="podgląd z kamery (symulacja)"></canvas><div class="opis" id="opis-okna"></div></div>
+</div>
+
+<section id="zdania">
+  <p class="zdanie">Wolno mi scrollować
+    <span class="wybor" data-pole="limit_s" data-mnoznik="60" data-wartosci="1,3,5,10,15,30,60"></span>
+    min bez przerwy.</p>
+  <p class="zdanie">Potem internet znika na
+    <span class="wybor" data-pole="kara_s" data-mnoznik="60" data-wartosci="5,10,15,30,60"></span>
+    min.</p>
+  <p class="zdanie">Licznik zeruje się po przerwie
+    <span class="wybor" data-pole="przerwa_s" data-mnoznik="1" data-wartosci="15,30,45,90,180"></span>
+    s.</p>
+  <p class="zdanie">Patrzę
+    <span class="wybor" data-pole="czulosc" data-etykiety="ostrozna:ostrożnie,normalna:normalnie,czula:czujnie"></span>
+    i
+    <span class="wybor" data-pole="czuwanie" data-etykiety="true:odcinam,false:tylko patrzę"></span>.</p>
+  <div id="zapis"></div>
+</section>
+
+<details id="wiecej">
+  <summary>Więcej</summary>
+  <label for="zrodlo">Kamera — adres RTSP (główny strumień, np. rtsp://user:hasło@192.168.0.20:554/stream1) albo „mac” = kamera MacBooka</label>
+  <div class="rzad"><input type="text" id="zrodlo" spellcheck="false" autocomplete="off"><button data-zapisz="zrodlo">Zapisz</button></div>
+  <label for="esp">ESP z przekaźnikiem — adres IP (puste = tryb próbny, nic nie odcina)</label>
+  <div class="rzad"><input type="text" id="esp" spellcheck="false" autocomplete="off" placeholder="np. 192.168.0.50"><button data-zapisz="esp">Zapisz</button></div>
+  <div id="esp-info"></div>
+  <label>Sprawdzenie przekaźnika</label>
+  <button id="test">Odetnij na 20 s (router wstaje potem 1–3 min)</button>
+  <div id="diag"></div>
+</details>
+
+<script>
+/* DEMO na szpineta.com: zamiast serwera z kamerą i YOLO — symulacja.
+   Strona niżej to oryginalny kod; podmienione są tylko odpowiedzi /api/* i podgląd z kamery. */
+(function () {
+  const T = +(new URLSearchParams(location.search).get("t")) || 6; /* czas demo płynie 6× szybciej */
+  const ust = { zrodlo: "", esp: "", limit_s: 60, kara_s: 300, przerwa_s: 45, czulosc: "normalna", czuwanie: true };
+  const st = { seria: 0, przerwa: 0, kara: 0, phone: false, phase: 0, udzial: 0, odc: {} };
+  const SCRIPT = [ /* [sekundy demo, czy telefon w ręce] */
+    [24, false], [72, true], [30, false], [999, true]
+  ];
+  let t0 = performance.now(), last = t0, phaseLeft = SCRIPT[0][0];
+
+  function step() {
+    const now = performance.now();
+    const dt = Math.min(1, (now - last) / 1000) * T;
+    last = now;
+    if (st.kara > 0) {
+      st.kara = Math.max(0, st.kara - dt);
+      st.phone = false;
+      if (st.kara === 0) { st.seria = 0; st.phase = 0; phaseLeft = SCRIPT[0][0]; }
+      return;
+    }
+    phaseLeft -= dt;
+    if (phaseLeft <= 0) { st.phase = (st.phase + 1) % SCRIPT.length; phaseLeft = SCRIPT[st.phase][0]; }
+    st.phone = SCRIPT[st.phase][1];
+    if (st.phone) {
+      st.seria += dt; st.przerwa = 0;
+      st.udzial = Math.min(0.97, st.udzial + dt * 0.03);
+      if (st.seria >= ust.limit_s && ust.czuwanie) {
+        st.kara = ust.kara_s;
+        st.odc = { co: "odcięcie na " + ust.kara_s + " s", wynik: "tryb próbny — brak adresu ESP, nic nie odcięto", ok: true, kiedy: Date.now() / 1000 };
+      }
+    } else {
+      st.udzial = Math.max(0, st.udzial - dt * 0.02);
+      if (st.seria > 0) {
+        st.przerwa += dt;
+        if (st.przerwa >= ust.przerwa_s) { st.seria = 0; st.przerwa = 0; }
+      }
+    }
+  }
+  setInterval(step, 100);
+
+  function stan() {
+    const tel = st.phone && st.kara === 0 ? +(0.78 + Math.random() * 0.15).toFixed(2) : null;
+    return {
+      scrolluje: tel !== null, scrollujacych: tel !== null ? 1 : 0,
+      seria_s: +st.seria.toFixed(1), przerwa_s: +st.przerwa.toFixed(1), udzial: +st.udzial.toFixed(2),
+      kara_zostalo_s: Math.ceil(st.kara), obraz_ok: true, kamera: "ok (symulacja)", osoby: 1, telefon: tel,
+      powody: [tel !== null ? "reka 0.6 twarz 0.9" : "brak telefonu"],
+      analiza_ms: 38 + Math.round(Math.random() * 12), blad: "", odciecie: st.odc, ustawienia: Object.assign({}, ust)
+    };
+  }
+  const ok = (d, code) => new Response(JSON.stringify(d), { status: code || 200, headers: { "Content-Type": "application/json" } });
+  const realFetch = window.fetch.bind(window);
+  window.fetch = async function (url, opt) {
+    const u = String(url);
+    if (u.startsWith("/api/stan")) return ok(stan());
+    if (u.startsWith("/api/test-odciecia")) {
+      st.kara = 20;
+      st.odc = { co: "odcięcie na 20 s", wynik: "tryb próbny — brak adresu ESP, nic nie odcięto", ok: true, kiedy: Date.now() / 1000 };
+      return ok({ ok: true });
+    }
+    if (u.startsWith("/api/ustawienia")) {
+      let z = {};
+      try { z = JSON.parse((opt && opt.body) || "{}"); } catch (e) { return ok({ blad: "zły JSON" }, 400); }
+      const num = (k, lo, hi) => { if (k in z) { const v = +z[k]; if (!(v >= lo && v <= hi)) throw new Error(k + ": poza zakresem"); ust[k] = Math.round(v); } };
+      try {
+        num("limit_s", 10, 14400); num("kara_s", 10, 14400); num("przerwa_s", 5, 600);
+        if ("czulosc" in z) { if (!["ostrozna", "normalna", "czula"].includes(z.czulosc)) throw new Error("czułość"); ust.czulosc = z.czulosc; }
+        if ("czuwanie" in z) ust.czuwanie = !!z.czuwanie;
+        if ("zrodlo" in z) ust.zrodlo = String(z.zrodlo).slice(0, 200);
+        if ("esp" in z) ust.esp = String(z.esp).slice(0, 60);
+      } catch (e) { return ok({ blad: e.message }, 400); }
+      return ok(Object.assign({}, ust));
+    }
+    return realFetch(url, opt);
+  };
+  window.confirm = () => true; /* w demo bez okienka */
+
+  /* podgląd z kamery: rysunek zamiast strumienia MJPEG */
+  function rysuj() {
+    const c = document.getElementById("demo-podglad");
+    if (!c) return requestAnimationFrame(rysuj);
+    const g = c.getContext("2d"), W = c.width, H = c.height, t = performance.now() / 1000;
+    if (st.kara > 0) {
+      g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
+      g.fillStyle = "#f2efe8"; g.textAlign = "center";
+      g.font = "900 96px Helvetica Neue, Helvetica, Arial, sans-serif";
+      g.fillText("INTERNET ODCIETY", W / 2, H / 2 - 10);
+      const s = Math.ceil(st.kara), m = Math.floor(s / 60), r = s % 60;
+      g.font = "600 40px ui-monospace, Menlo, monospace";
+      g.fillText("wraca za " + m + ":" + String(r).padStart(2, "0"), W / 2, H / 2 + 60);
+      return requestAnimationFrame(rysuj);
+    }
+    const bg = g.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, "#3a3732"); bg.addColorStop(1, "#1d1b18");
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    g.fillStyle = "#2a2723"; g.fillRect(0, H * 0.72, W, H * 0.28);           /* podłoga */
+    g.fillStyle = "#4a443c"; g.fillRect(W * 0.32, H * 0.5, W * 0.36, H * 0.12); /* kanapa */
+    g.fillRect(W * 0.3, H * 0.4, W * 0.05, H * 0.24); g.fillRect(W * 0.65, H * 0.4, W * 0.05, H * 0.24);
+    const ph = st.phone, bob = Math.sin(t * 1.3) * 3;
+    const cx = W * 0.5, hy = H * 0.26 + bob + (ph ? 18 : 0);
+    const P = {
+      glowa: [cx + (ph ? 6 : 0), hy], szyja: [cx, hy + 46],
+      lb: [cx - 70, hy + 70], pb: [cx + 70, hy + 70],
+      ll: [cx - 95, hy + 165], pl: [cx + (ph ? 55 : 95), hy + (ph ? 140 : 165)],
+      ld: [cx - (ph ? 10 : 70), hy + (ph ? 175 : 240)], pd: [cx + (ph ? 20 : 80), hy + (ph ? 160 : 240)],
+      lbio: [cx - 50, hy + 230], pbio: [cx + 50, hy + 230],
+      lk: [cx - 70, hy + 300], pk: [cx + 70, hy + 300]
+    };
+    const kosci = [["glowa","szyja"],["szyja","lb"],["szyja","pb"],["lb","ll"],["ll","ld"],["pb","pl"],["pl","pd"],["lb","lbio"],["pb","pbio"],["lbio","pbio"],["lbio","lk"],["pbio","pk"]];
+    g.strokeStyle = "rgba(140,220,255,.85)"; g.lineWidth = 4;
+    kosci.forEach(([a, b]) => { g.beginPath(); g.moveTo(P[a][0], P[a][1]); g.lineTo(P[b][0], P[b][1]); g.stroke(); });
+    g.fillStyle = "#8cdcff";
+    Object.values(P).forEach(([x, y]) => { g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); });
+    g.beginPath(); g.strokeStyle = "rgba(140,220,255,.85)"; g.arc(P.glowa[0], P.glowa[1] - 4, 26, 0, 7); g.stroke();
+    /* ramka osoby */
+    const kol = ph ? "#ff3b30" : "#30d158";
+    g.strokeStyle = kol; g.lineWidth = 4;
+    g.strokeRect(cx - 150, hy - 50, 300, 380);
+    const etykieta = ph ? "osoba 1 · SCROLLUJE" : "osoba 1 · nie scrolluje";
+    g.font = "700 22px ui-monospace, Menlo, monospace"; g.textAlign = "left";
+    g.fillStyle = kol; g.fillRect(cx - 152, hy - 84, g.measureText(etykieta).width + 22, 34);
+    g.fillStyle = "#fff"; g.fillText(etykieta, cx - 142, hy - 59);
+    if (ph) { /* telefon w dłoniach */
+      const tx = (P.ld[0] + P.pd[0]) / 2 - 18, ty = (P.ld[1] + P.pd[1]) / 2 - 34;
+      g.fillStyle = "#111"; g.fillRect(tx, ty, 36, 62);
+      g.fillStyle = "#cfe8ff"; g.fillRect(tx + 4, ty + 6, 28, 48);
+      g.strokeStyle = "#ffd60a"; g.lineWidth = 3; g.strokeRect(tx - 10, ty - 10, 56, 82);
+      const tt = "telefon " + (0.8 + 0.1 * Math.abs(Math.sin(t))).toFixed(2);
+      g.font = "700 18px ui-monospace, Menlo, monospace";
+      g.fillStyle = "#ffd60a"; g.fillRect(tx - 11, ty - 36, g.measureText(tt).width + 16, 26);
+      g.fillStyle = "#111"; g.fillText(tt, tx - 4, ty - 17);
+    }
+    g.fillStyle = "rgba(255,255,255,.55)"; g.font = "600 18px ui-monospace, Menlo, monospace";
+    g.fillText("DEMO · symulacja zamiast kamery", 24, 36);
+    requestAnimationFrame(rysuj);
+  }
+  requestAnimationFrame(rysuj);
+})();
+</script>
+<script>
+const $ = (s) => document.querySelector(s);
+let ust = null;
+
+const mmss = (s) => {
+  s = Math.max(0, Math.round(s));
+  const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, r = s % 60;
+  return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(r).padStart(2, "0");
+};
+
+async function zapisz(zmiany) {
+  $("#zapis").textContent = "zapisuję…";
+  try {
+    const r = await fetch("/api/ustawienia", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(zmiany) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.blad || r.status);
+    ust = d; rysujWybory();
+    $("#zapis").textContent = "zapisane";
+  } catch (e) { $("#zapis").textContent = "nie zapisano: " + e.message; }
+}
+
+function rysujWybory() {
+  document.querySelectorAll(".wybor").forEach((el) => {
+    const pole = el.dataset.pole, akt = ust[pole];
+    el.innerHTML = "";
+    if (el.dataset.etykiety) {
+      el.dataset.etykiety.split(",").forEach((p) => {
+        const [w, napis] = p.split(":");
+        const b = document.createElement("button");
+        b.textContent = napis;
+        if (String(akt) === w) b.className = "tak";
+        b.onclick = () => zapisz({ [pole]: w === "true" ? true : w === "false" ? false : w });
+        el.append(b);
+      });
+      return;
+    }
+    const mn = +el.dataset.mnoznik, wartosci = el.dataset.wartosci.split(",").map(Number);
+    let trafiony = false;
+    wartosci.forEach((w) => {
+      const b = document.createElement("button");
+      b.textContent = w;
+      if (akt === w * mn) { b.className = "tak"; trafiony = true; }
+      b.onclick = () => zapisz({ [pole]: w * mn });
+      el.append(b);
+    });
+    const inp = document.createElement("input");
+    inp.type = "number"; inp.min = "0"; inp.step = "any"; inp.placeholder = "inne";
+    inp.title = "własna wartość, Enter zapisuje";
+    if (!trafiony) inp.value = +(akt / mn).toFixed(2);
+    inp.onkeydown = (e) => { if (e.key === "Enter" && inp.value) zapisz({ [pole]: Math.round(+inp.value * mn) }); };
+    inp.onchange = () => { if (inp.value) zapisz({ [pole]: Math.round(+inp.value * mn) }); };
+    el.append(inp);
+  });
+  if (document.activeElement !== $("#zrodlo")) $("#zrodlo").value = ust.zrodlo;
+  if (document.activeElement !== $("#esp")) $("#esp").value = ust.esp;
+}
+
+document.querySelectorAll("[data-zapisz]").forEach((b) => {
+  b.onclick = () => zapisz({ [b.dataset.zapisz]: $("#" + b.dataset.zapisz).value });
+});
+$("#test").onclick = async () => {
+  if (!confirm("Odciąć prąd routera na 20 sekund?")) return;
+  await fetch("/api/test-odciecia", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+};
+
+function rysujStan(s) {
+  const pierwszy = !ust;
+  ust = s.ustawienia;
+  if (pierwszy) rysujWybory();
+  const kara = s.kara_zostalo_s > 0;
+  document.documentElement.className = kara ? "kara" : s.scrolluje ? "scrolluje" : "";
+  const slowo = kara ? "Internet odcięty" : s.scrolluje ? "Scrollujesz" : !s.obraz_ok ? "Nie widzę" : "Nie scrollujesz";
+  const pod = kara ? "wraca za " + mmss(s.kara_zostalo_s) + " (router potrzebuje jeszcze chwili, żeby wstać)"
+    : !s.obraz_ok ? s.kamera
+    : s.scrolluje ? "telefon w ręce — licznik idzie"
+    : s.seria_s > 0 ? "przerwa " + mmss(s.przerwa_s) + " z " + mmss(ust.przerwa_s) + " — potem licznik od zera"
+    : !ust.czuwanie ? "tylko patrzę, nic nie odcinam" : " ";
+  $("#slowo").firstChild.textContent = slowo;
+  $("#podslowo").textContent = pod;
+  $("#licznik").firstChild.textContent = mmss(s.seria_s);
+  $("#licznik span").textContent = "z " + mmss(ust.limit_s);
+  $("#pasek").style.width = kara ? "100%" : Math.min(100, (100 * s.seria_s) / ust.limit_s) + "%";
+  $("#opis-okna").textContent = s.obraz_ok && !kara
+    ?`osoby: ${s.osoby}   telefon: ${s.telefon === null ? "—" : s.telefon}   klatki z telefonem: ${Math.round(s.udzial * 100)}%`
+    : "";
+  const o = s.odciecie || {};
+  $("#esp-info").textContent = (ust.esp ? "ESP: " + ust.esp : "ESP nie ustawione — tryb próbny")
+    + (o.co ? `   ostatnio: ${o.co} — ${o.wynik}` : "");
+  $("#diag").textContent = [
+    "kamera: " + s.kamera,
+    "analiza klatki: " + (s.analiza_ms ?? "—") + " ms",
+    "osoby: " + (s.powody.join(" | ") || "—"),
+    s.blad ? "błąd: " + s.blad : "",
+  ].filter(Boolean).join("\n");
+}
+
+async function petla() {
+  try {
+    const r = await fetch("/api/stan", { cache: "no-store" });
+    rysujStan(await r.json());
+  } catch (e) {
+    $("#slowo").firstChild.textContent = "Brak serwera";
+    $("#podslowo").textContent = "uruchom start.command";
+  }
+  setTimeout(petla, 700);
+}
+petla();
+</script>
+<a href="/portfolio/#poza" class="sz-back" style="position:fixed;left:12px;bottom:12px;z-index:2147483000;font:700 13px/1 'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a1a1a;background:rgba(255,255,255,.92);border:1px solid #e5e5e5;padding:8px 12px;text-decoration:none;letter-spacing:.02em">&larr; portfolio <span style="color:#a88bd4">~||-_^+*.</span></a><script>(function () { if (window.top !== window.self) { var el = document.querySelector(".sz-back"); if (el) el.style.display = "none"; } })();</script>
+</body>
+</html>
