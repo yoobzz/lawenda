@@ -206,6 +206,7 @@ section {
 .cap .no { font-weight: 700; font-size: 13px; color: var(--accent); min-width: 1.6em; }
 .cap h3 { font-weight: 700; font-size: clamp(19px, 1.9vw, 26px); letter-spacing: -.01em; }
 .cap .what { font-size: 14px; color: var(--muted); }
+.desc { font-size: 14px; line-height: 1.5; color: #444; margin-top: 6px; max-width: 62ch; }
 .tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .tools span { font-size: 12px; font-weight: 700; padding: 4px 8px; border: 1px solid var(--line); color: #444; }
 .tools span:first-child { border-color: var(--accent); color: #6c4ca6; }
@@ -342,7 +343,7 @@ section {
   <span class="ascii tr">-||~&rdquo;</span>
   <span class="side-label left"><b>projekty</b>&nbsp;<i>01</i></span>
   <div class="wrap">
-    <p class="kicker">[22 rzeczy &middot; pod każdą narzędzia]</p>
+    <p class="kicker">[22 rzeczy]</p>
     <div class="grid">
       <article class="item s8 rv">
         <div class="card-media gal">
@@ -354,13 +355,15 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">01</span><h3>bór</h3><span class="what">oczyszczacz powietrza na kark</span></div>
-        <p class="tools"><span>Claude</span><span>Rhino</span></p>
+        <p class="desc">model 155 części budowany przez Claude wprost w Rhino (MCP, skrypty C#), ze sprawdzaniem kolizji z głową. w środku filtr HEPA, dmuchawa, serwo z klapką dozującą zapach i kryształ z LED; 29 plików STL na 13 płyt druku.</p>
+        <p class="tools"><span>Claude</span><span>Rhino</span><span>MCP</span><span>C#</span></p>
         <a class="go" href="/portfolio/bor/">strona bóru &rarr;</a>
       </article>
 
       <article class="item rv">
         <div class="card-media pion white"><video src="m/bor-rolka.mp4" poster="m/bor-rolka.jpg" muted loop playsinline preload="none" aria-label="rolka o bórze"></video></div>
         <div class="cap"><span class="no">02</span><h3>rolka o bórze</h3></div>
+        <p class="desc">szkic rolki 9:16 z widoków modelu 3D: filtr, klapka zapachu, wyloty, światło.</p>
         <p class="tools"><span>Claude</span><span>three.js</span></p>
       </article>
 
@@ -370,14 +373,16 @@ section {
           <button class="play" type="button"><span>&#9654; odpal z kamerą</span></button>
         </div>
         <div class="cap"><span class="no">03</span><h3>scroll strażnik</h3><span class="what">kamera, która widzi, że scrollujesz</span></div>
-        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>MediaPipe</span></p>
+        <p class="desc">kamera w rogu pokoju, YOLO26 (poza i telefon w powiększonym kadrze osoby) liczy, ile trzymasz telefon; po limicie przekaźnik na zasilaczu routera miał odciąć internet (ESP32, niezbudowany). tu wersja w przeglądarce: MediaPipe, ta sama logika.</p>
+        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>OpenCV</span><span>MediaPipe</span></p>
         <a class="go" href="/portfolio/scroll-straznik/" target="_blank" rel="noopener">otwórz osobno &nearr;</a>
       </article>
 
       <article class="item rv">
         <div class="card-media pion" style="background:#f6f6f6"><img src="m/plakat-wiersz.jpg" alt="plakat z wierszem: po pełni (z)nów" loading="lazy"></div>
-        <div class="cap"><span class="no">04</span><h3>plakaty z wierszami</h3></div>
-        <p class="tools"><span>Claude</span><span>Claude Design</span></p>
+        <div class="cap"><span class="no">04</span><h3>plakaty z wierszami</h3><span class="what">jeden plakat na wiersz</span></div>
+        <p class="desc">szata wyjęta z kodu szpineta.com: nastrój wiersza steruje kątem wersów, rozmiarem i wagą liter (Inter variable, 130–880). jeden akcent lawendowy, znaczki ascii jako słowa.</p>
+        <p class="tools"><span>Claude</span><span>Claude Design</span><span>HTML/CSS</span></p>
       </article>
 
       <article class="item s8 rv">
@@ -394,19 +399,15 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">05</span><h3>Lukullus</h3><span class="what">identyfikacja cukierni, koncepcja niezamawiana</span></div>
-        <p class="tools"><span>Claude Design</span><span>Blender</span></p>
+        <p class="desc">sygnet to przekrój kremówki złożony z moich znaczków; żółty #FFF200, czerń i lawenda, Bodoni Moda + Helvetica. 14 plansz: logo, opakowania z wykrojnikiem, pudełko 3D w CSS, render w Blenderze ze skryptów Pythona, strona.</p>
+        <p class="tools"><span>Claude Design</span><span>Blender</span><span>Python</span></p>
       </article>
 
       <article class="item rv">
-        <div class="card-media pion gal">
-          <div class="gal-stage">
-            <video data-pane data-label="rozmowa" src="m/dziubi-rozmowa.mp4" poster="m/dziubi-rozmowa.jpg" muted loop playsinline preload="none" aria-label="dziubi na monitorze kineskopowym"></video>
-            <video data-pane data-label="oko" src="m/dziubi-oko.mp4" poster="m/dziubi-oko.jpg" muted loop playsinline preload="none" aria-label="dziubi i jego kamera"></video>
-          </div>
-          <div class="chips"></div>
-        </div>
+        <div class="card-media pion"><video src="m/dziubi-oko.mp4" poster="m/dziubi-oko.jpg" muted loop playsinline preload="none" aria-label="dziubi na monitorze kineskopowym i jego kamera"></video></div>
         <div class="cap"><span class="no">06</span><h3>dziubi</h3><span class="what">stworek na starym monitorze</span></div>
-        <p class="tools"><span>Claude</span><span>Python</span><span>Whisper</span></p>
+        <p class="desc">postać w pygame na monitorze kineskopowym. kamera rozpoznaje twarze lokalnie (YuNet, SFace), Whisper słucha lokalnie, Claude odpowiada głosem; o zmierzchu zasypia, w nocy pisze dziennik.</p>
+        <p class="tools"><span>Claude</span><span>Python</span><span>pygame</span><span>Whisper</span></p>
       </article>
 
       <article class="item s6 rv">
@@ -419,6 +420,7 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">07</span><h3>para</h3><span class="what">stojak na jajka</span></div>
+        <p class="desc">ceramiczna forma na mosiężnym łańcuszku w ramie z jednego pręta. warianty modelowane w Rhino przez Claude, połówki prototypu drukowane na Bambu Lab A1 i przymierzane do jajka; rysunki i film z opisem z tego samego modelu.</p>
         <p class="tools"><span>Claude</span><span>Rhino</span><span>druk 3D</span></p>
       </article>
 
@@ -434,6 +436,7 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">08</span><h3>granica</h3><span class="what">znak rzucony na Warszawę</span></div>
+        <p class="desc">aplikacja na fotorealistycznym modelu miasta: adres, obserwator, kierunek, a obraz rzutuje się na bryły budynków; tryb spaceru z poziomu ulicy. obok model brył w Rhino.</p>
         <p class="tools"><span>Claude</span><span>CesiumJS</span><span>Google 3D Tiles</span><span>Rhino</span></p>
         <a class="go" href="/portfolio/#granica">plakat &rarr;</a>
       </article>
@@ -445,6 +448,7 @@ section {
           <img src="m/czajnik-rysunek.jpg" alt="czajnik: rysunek techniczny" loading="lazy">
         </div>
         <div class="cap"><span class="no">09</span><h3>rysunki techniczne</h3><span class="what">bór i czajnik</span></div>
+        <p class="desc">skrypt w RhinoPython rozkłada każdą część na arkusz: 3 widoki (Make2D) i wymiary. przy bórze 7 arkuszy A3, wykaz 50 pozycji i instrukcja montażu na 54 strony.</p>
         <p class="tools"><span>Claude</span><span>Rhino</span><span>RhinoPython</span></p>
       </article>
 
@@ -457,7 +461,8 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">10</span><h3>logo z dymków</h3><span class="what">dla Press Club Polska</span></div>
-        <p class="tools"><span>Claude</span><span>Claude Design</span><span>Illustrator</span><span>Figma</span></p>
+        <p class="desc">cztery dymki czatu tworzą różę wiatrów, w środku uczeń. kierunki w Claude Design, geometria poprawiana przez MCP w moim pliku Illustratora, 8 palet sprawdzanych pod WCAG, księga znaku skryptem ExtendScript.</p>
+        <p class="tools"><span>Claude Design</span><span>Illustrator</span><span>MCP</span><span>Figma</span></p>
       </article>
 
       <article class="item s6 rv">
@@ -471,7 +476,8 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">11</span><h3>medialna.edu.pl</h3><span class="what">kierunki nowej strony</span></div>
-        <p class="tools"><span>Claude</span><span>HTML</span></p>
+        <p class="desc">7 kierunków na prawdziwych treściach serwisu dla rodziców i nauczycieli. wejście przez to, jakiej wiedzy szukasz, 4 taksonomie, prototyp HTML pod motyw WordPressa.</p>
+        <p class="tools"><span>Claude</span><span>HTML</span><span>WordPress</span></p>
       </article>
 
       <article class="item s6 rv">
@@ -484,6 +490,7 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">12</span><h3>icu</h3><span class="what">lampa, która reaguje na obecność</span></div>
+        <p class="desc">drewno, plexi i papier, 94 diody na ESP z WLED. kamera i MediaPipe śledzą dłoń, jej pozycja w 3D zmienia kolor diod, machnięcie puszcza falę od krawędzi do szczytu.</p>
         <p class="tools"><span>Claude</span><span>Python</span><span>MediaPipe</span><span>WLED</span></p>
         <a class="go" href="/portfolio/#icu">dokumentacja &rarr;</a>
       </article>
@@ -498,19 +505,22 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">13</span><h3>yoobilizery</h3><span class="what">wizualizacje dźwięku na żywo</span></div>
-        <p class="tools"><span>Claude</span><span>Python</span><span>OpenGL</span></p>
+        <p class="desc">Python z OpenGL: bit, bas i wysokie zmieniają neonowe bryły z siatki, od torusów po butelkę Kleina; jedna wersja synchronizuje taśmę LED przez Arduino. AI wyciągnęło z 5000 linii kodu opis wyglądu i przepisało go do przeglądarki.</p>
+        <p class="tools"><span>Claude</span><span>Python</span><span>OpenGL</span><span>Arduino</span></p>
       </article>
 
       <article class="item s6 rv">
         <div class="card-media contain white"><video src="m/lawenda.mp4" poster="m/lawenda.jpg" muted loop playsinline preload="none" aria-label="lawenda z moich znaków"></video></div>
         <div class="cap"><span class="no">14</span><h3>lawenda</h3><span class="what">strona z moimi wierszami</span></div>
-        <p class="tools"><span>Claude</span><span>three.js</span></p>
+        <p class="desc">163 wiersze na szpineta.com. model nadał każdemu profil emocji, który steruje grubością liter (variable font); lawenda na starcie to chmura punktów z moich znaków.</p>
+        <p class="tools"><span>Claude</span><span>JS</span><span>three.js</span></p>
         <a class="go" href="/">szpineta.com &rarr;</a>
       </article>
 
       <article class="item s6 rv">
         <div class="card-media contain white"><video src="m/lawenda-gate.mp4" poster="m/lawenda-gate.jpg" muted loop playsinline preload="none" aria-label="bramka do wierszy"></video></div>
         <div class="cap"><span class="no">15</span><h3>bramka do wierszy</h3><span class="what">kod z moich znaczków</span></div>
+        <p class="desc">zamiast QR unikalne ciągi moich znaczków. najpierw skaner kamerą (progowanie Otsu, dopasowanie wzorców), teraz kod wpisywany z klawiatury znaczków.</p>
         <p class="tools"><span>Claude</span><span>JS</span></p>
       </article>
 
@@ -520,7 +530,8 @@ section {
           <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
         </div>
         <div class="cap"><span class="no">16</span><h3>harmonograf</h3><span class="what">instrument do rysowania plakatów</span></div>
-        <p class="tools"><span>Claude</span><span>JS</span></p>
+        <p class="desc">symulacja czterech wahadeł i dwóch piór, 20 suwaków. każdy rysunek ma swój kod, więc da się go odtworzyć i wyeksportować jako plakat PNG.</p>
+        <p class="tools"><span>Claude</span><span>JS</span><span>Canvas</span></p>
       </article>
 
       <article class="item s6 live rv" data-src="/portfolio/klawisz/" data-title="klawisz po klawiszu">
@@ -529,12 +540,14 @@ section {
           <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
         </div>
         <div class="cap"><span class="no">17</span><h3>klawisz po klawiszu</h3><span class="what">trener skrótów na Maca</span></div>
+        <p class="desc">49 skrótów, każdy z animowanym demo przed i po; tryby nauka, ćwiczenie, test. skróty sprawdzone z dokumentacją Apple, 7 wersji.</p>
         <p class="tools"><span>Claude</span><span>JS</span></p>
       </article>
 
       <article class="item rv">
         <div class="card-media pion"><video src="m/gdd-program.mp4" poster="m/gdd-program.jpg" muted loop playsinline preload="none" aria-label="rolka: program Gdańskich Dni Demokracji"></video></div>
         <div class="cap"><span class="no">18</span><h3>rolka: program dnia</h3><span class="what">Gdańskie Dni Demokracji</span></div>
+        <p class="desc">animowany program dnia 9:16 w identyfikacji festiwalu.</p>
         <p class="tools"><span>Claude Code</span></p>
       </article>
 
@@ -545,6 +558,7 @@ section {
           <img src="m/gdd-4.jpg" alt="szablon rolki: Gdańsk 14–16/09/2026" loading="lazy">
         </div>
         <div class="cap"><span class="no">19</span><h3>rolki dla Press Club Polska</h3><span class="what">ok. 90 sztuk, wywiady i wydarzenia</span></div>
+        <p class="desc">linia montażowa w Pythonie: transkrypcja mlx-whisper, wybór fragmentów (kilku agentów pilnuje, żeby cięcia nie urywały zdań), kadr 9:16 za twarzą, napisy, ffmpeg. z jednego wywiadu 45 klipów.</p>
         <p class="tools"><span>Claude Code</span><span>Whisper</span><span>ffmpeg</span><span>Python</span></p>
         <a class="go" href="https://youtu.be/uRurgMMceWI" target="_blank" rel="noopener">wywiad „Oni wiedzą” &nearr;</a>
       </article>
@@ -552,6 +566,7 @@ section {
       <article class="item rv">
         <div class="card-media"><video src="m/oczy-wojny.mp4" poster="m/oczy-wojny.jpg" muted loop playsinline preload="none" aria-label="oczy wojny: fotografowie"></video></div>
         <div class="cap"><span class="no">20</span><h3>oczy wojny</h3><span class="what">koncept strony</span></div>
+        <p class="desc">nieoficjalny koncept strony fotografów wystawy: indeks 16 nazwisk, portret idzie za kursorem, biogram jak teczka w ciemni.</p>
         <p class="tools"><span>Claude</span><span>HTML</span></p>
       </article>
 
@@ -564,13 +579,15 @@ section {
           <div class="chips"></div>
         </div>
         <div class="cap"><span class="no">21</span><h3>czajnik SMEG</h3><span class="what">Rhino 2, projekt grupowy</span></div>
+        <p class="desc">korpus, rączka, pokrywa, wylewka i podstawa odtworzone część po części, każda z arkuszem wymiarów; render w kuchni.</p>
         <p class="tools"><span>Claude</span><span>Rhino</span></p>
       </article>
 
       <article class="item rv">
         <div class="card-media"><video src="m/portfolio-sof.mp4" poster="m/portfolio-sof.jpg" muted loop playsinline preload="none" aria-label="archiwum pierwszego roku"></video></div>
         <div class="cap"><span class="no">22</span><h3>archiwum 1. roku</h3><span class="what">to portfolio</span></div>
-        <p class="tools"><span>Claude</span><span>HTML</span></p>
+        <p class="desc">lista projektów z podziałem na lata, przeglądarka plansz i filmów, czysty HTML, CSS i JS.</p>
+        <p class="tools"><span>Claude</span><span>HTML</span><span>JS</span></p>
         <a class="go" href="/portfolio/#rok-1">otwórz &rarr;</a>
       </article>
 
