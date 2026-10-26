@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <title>staś × ai — dla pracowni</title>
-<meta name="description" content="6 sposobów, w jakie używam AI w projektowaniu">
+<meta name="description" content="rzeczy, które zrobiłem z AI">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <style>
@@ -16,8 +16,6 @@
 :root {
   --ink: #1a1a1a;
   --accent: #a88bd4;
-  --accent-ink: #6c4ca6;
-  --accent-soft: #f3eefa;
   --bg: #ffffff;
   --soft: #f7f6f9;
   --line: #e5e5e5;
@@ -51,7 +49,6 @@ button { font: inherit; color: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
   padding: 0 var(--pad);
   background: rgba(255, 255, 255, .9);
   -webkit-backdrop-filter: blur(8px);
@@ -59,13 +56,9 @@ button { font: inherit; color: inherit; }
   font-size: 13px;
   font-weight: 700;
 }
-.bar a { text-decoration: none; }
-.bar .brand .x { color: var(--accent); }
-.bar nav { display: flex; gap: clamp(10px, 1.4vw, 20px); }
-.bar nav a { color: #b5b5b5; transition: color .25s; }
-.bar nav a.cur { color: var(--ink); }
-.bar nav a:hover { color: var(--accent); }
-.bar .now { display: none; color: var(--accent); }
+.bar a { text-decoration: none; transition: color .25s; }
+.bar a:hover { color: var(--accent); }
+.bar .x { color: var(--accent); }
 .prog {
   position: absolute;
   left: 0; bottom: 0;
@@ -126,14 +119,7 @@ section {
   font-size: clamp(12px, 1.2vw, 15px);
   color: var(--accent);
   letter-spacing: .06em;
-  margin-bottom: 12px;
-}
-.h2 {
-  font-weight: 700;
-  font-size: clamp(32px, 5vw, 72px);
-  line-height: 1.02;
-  letter-spacing: -.025em;
-  max-width: 18ch;
+  margin-bottom: clamp(20px, 4vh, 36px);
 }
 .accent { color: var(--accent); }
 .go {
@@ -148,62 +134,10 @@ section {
 }
 .go:hover { transform: translateX(6px); color: var(--accent); }
 
-/* wejścia przy przewijaniu */
 .js .rv { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
 .js .rv.in { opacity: 1; transform: none; }
 
-/* ---------- ja → AI: schemat pracy ---------- */
-
-.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 13px; color: var(--muted); }
-.legend span { display: inline-flex; align-items: center; gap: 7px; }
-.legend i { width: 14px; height: 14px; display: inline-block; border: 1.5px solid var(--ink); background: #fff; }
-.legend i.ai { border-color: var(--accent); background: var(--accent-soft); }
-
-.flow {
-  list-style: none;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  align-items: stretch;
-  gap: 12px 30px;
-}
-.flow li {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px 12px;
-  border: 1.5px solid var(--ink);
-  background: #fff;
-  font-size: clamp(13px, 1.15vw, 15px);
-  line-height: 1.35;
-  transition: transform .45s var(--ease), box-shadow .45s var(--ease), opacity .6s ease;
-}
-.flow li b {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
-.flow li.ai { border-color: var(--accent); background: var(--accent-soft); }
-.flow li.ai b { color: var(--accent-ink); }
-.flow li::after {
-  content: "\2192";
-  position: absolute;
-  right: -24px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--accent);
-}
-.flow li:last-child::after { content: none; }
-.flow li.cur { transform: translateY(-5px); box-shadow: 0 5px 0 0 var(--accent); }
-.js .flow li { opacity: 0; }
-.js .flow.in li { opacity: 1; transition-delay: calc(var(--k, 0) * 90ms); }
-.js .flow.in li.cur { transition-delay: 0s; }
-
-/* ---------- 0. okładka ---------- */
+/* ---------- okładka ---------- */
 
 .cover { justify-content: space-between; align-items: center; text-align: center; }
 .cover-top { margin-top: clamp(8px, 3vh, 40px); }
@@ -229,11 +163,8 @@ section {
 .big-title:hover { letter-spacing: .03em; }
 .big-title .x { color: var(--accent); }
 .cover-sub { font-size: clamp(16px, 2vw, 26px); margin-top: 18px; }
-.cover-loop { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: clamp(20px, 5vh, 56px); }
-.cover-loop .flow { grid-auto-columns: auto; justify-content: center; }
-.cover-loop .flow li { text-align: left; }
-.loop-note { font-size: 13px; color: var(--muted); }
-.loop-note b { color: var(--accent); }
+.cover-foot { margin-bottom: clamp(16px, 4vh, 40px); }
+.ascii-line { font-weight: 700; font-size: clamp(16px, 2vw, 26px); }
 .scroll-hint {
   position: absolute;
   bottom: 16px;
@@ -246,76 +177,39 @@ section {
 .scroll-hint:hover { color: var(--accent); }
 @keyframes nudge { 50% { transform: translateY(8px); } }
 
-/* ---------- spis sposobów ---------- */
-
-.toc { min-height: auto; }
-.toc-grid {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(14px, 2vw, 24px);
-  margin-top: clamp(20px, 4vh, 36px);
-}
-.toc-grid a { display: block; text-decoration: none; }
-.toc-grid figure { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--soft); }
-.toc-grid img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
-.toc-grid a:hover img { transform: scale(1.05); }
-.toc-grid .n {
-  position: absolute;
-  left: 10px;
-  top: 8px;
-  font-weight: 700;
-  font-size: clamp(30px, 3.4vw, 48px);
-  line-height: 1;
-  color: #fff;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, .35);
-}
-.toc-grid p { margin-top: 10px; font-weight: 700; font-size: clamp(16px, 1.6vw, 21px); line-height: 1.2; transition: color .3s; }
-.toc-grid a:hover p { color: var(--accent); }
-.toc-grid small { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; color: var(--muted); }
-
-/* ---------- sposoby ---------- */
-
-.way-head { display: grid; gap: 14px; margin-bottom: clamp(24px, 4vh, 40px); }
-.way-head .h2 { max-width: 20ch; }
-.tools { display: flex; flex-wrap: wrap; gap: 6px; }
-.tools span { font-size: 12px; font-weight: 700; padding: 4px 8px; border: 1px solid var(--line); color: #555; }
-.way-head .flow { margin-top: 8px; }
+/* ---------- projekty ---------- */
 
 .grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: clamp(28px, 4vh, 40px) clamp(14px, 2vw, 24px);
+  gap: clamp(36px, 6vh, 64px) clamp(14px, 2vw, 24px);
   align-items: start;
 }
-.card { grid-column: span 4; display: flex; flex-direction: column; }
-.card.s5 { grid-column: span 5; }
-.card.s6 { grid-column: span 6; }
-.card.s7 { grid-column: span 7; }
-.card.s8 { grid-column: span 8; }
-.card.s12 { grid-column: 1 / -1; }
-.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
-.trio img { width: 100%; aspect-ratio: 1100 / 778; object-fit: contain; background: #fff; border: 1px solid var(--line); }
-/* pionowe filmy (rolki): wysokość jak sąsiednia karta 16:10 */
-.card-media.pion { aspect-ratio: .775; }
-.card-media.pion > video, .card-media.pion > img { object-fit: contain; }
-.card-media.white { background: #fff; }
-.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(14px, 2vw, 26px); align-items: center; }
-.split .card-media.pion { aspect-ratio: 9 / 16; }
-.flow.vert { grid-auto-flow: row; grid-template-columns: 1fr; gap: 22px; }
-.flow.vert li::after { content: "\2193"; right: auto; left: 16px; top: auto; bottom: -22px; transform: none; font-size: 16px; }
-.flow.vert li:last-child::after { content: none; }
-.card.running { grid-column: 1 / -1; }
+.item { grid-column: span 4; display: flex; flex-direction: column; }
+.item.s6 { grid-column: span 6; }
+.item.s8 { grid-column: span 8; }
+.item.s12 { grid-column: 1 / -1; }
+.item.running { grid-column: 1 / -1; }
+
 .card-media { position: relative; aspect-ratio: 16 / 10; background: var(--soft); overflow: hidden; }
 .card-media > img, .card-media > video { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
-.card-media.contain > img, .card-media.contain > video { object-fit: contain; background: #fff; }
-.card:hover .card-media > img, .card:hover .card-media > video { transform: scale(1.03); }
-.card.running .card-media { aspect-ratio: auto; height: min(80vh, 700px); border: 1px solid var(--line); }
+.card-media.contain > img, .card-media.contain > video { object-fit: contain; }
+.card-media.white { background: #fff; }
+.item:hover .card-media > img, .item:hover .card-media > video { transform: scale(1.03); }
+/* pionowe rzeczy: wysokość jak sąsiednia karta 16:10 */
+.card-media.pion { aspect-ratio: .775; }
+.card-media.pion > video, .card-media.pion > img { object-fit: contain; }
+.item.running .card-media { aspect-ratio: auto; height: min(80vh, 700px); border: 1px solid var(--line); }
 .card-media iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
-.card h3 { font-weight: 700; font-size: clamp(18px, 1.8vw, 24px); margin-top: 12px; }
-.card h3 .tag { font-size: 11px; vertical-align: middle; color: #fff; background: var(--accent); padding: 3px 6px; margin-left: 6px; letter-spacing: .04em; }
-.card p { font-size: 14px; line-height: 1.5; color: #444; margin-top: 4px; max-width: 52ch; }
-.card .go { align-self: flex-start; }
+
+.cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin-top: 12px; }
+.cap .no { font-weight: 700; font-size: 13px; color: var(--accent); min-width: 1.6em; }
+.cap h3 { font-weight: 700; font-size: clamp(19px, 1.9vw, 26px); letter-spacing: -.01em; }
+.cap .what { font-size: 14px; color: var(--muted); }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tools span { font-size: 12px; font-weight: 700; padding: 4px 8px; border: 1px solid var(--line); color: #444; }
+.tools span:first-child { border-color: var(--accent); color: #6c4ca6; }
+.item .go { align-self: flex-start; }
 
 /* galeria w karcie */
 .gal-stage { position: absolute; inset: 0; background: var(--soft); }
@@ -329,8 +223,8 @@ section {
   transition: opacity .45s ease;
 }
 .gal-stage.contain > * { object-fit: contain; background: #fff; }
-.gal-stage > .on { opacity: 1; }
-.chips { position: absolute; left: 10px; bottom: 10px; z-index: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+.gal-stage > .on { opacity: 1; z-index: 1; }
+.chips { position: absolute; left: 10px; bottom: 10px; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px; }
 .chips button {
   padding: 6px 9px;
   font-size: 12px;
@@ -344,43 +238,32 @@ section {
 .chips button:hover { color: var(--accent); }
 .chips button[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-/* karta bez zdjęcia: schemat jest obrazem */
-.card.txt .card-media {
-  display: flex;
-  align-items: center;
-  padding: clamp(14px, 2vw, 26px);
-  background: var(--soft);
-}
-.card.txt .card-media::before {
-  content: "~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.~||-_^+*.";
-  position: absolute;
-  inset: 0;
-  padding: 8px;
-  font-weight: 700;
-  font-size: 22px;
-  line-height: 1.15;
-  letter-spacing: 2px;
-  color: #ebe4f5;
-  word-break: break-all;
-  overflow: hidden;
-  user-select: none;
-}
-.card.txt .flow { position: relative; width: 100%; gap: 10px 26px; }
-.card.txt .flow li { font-size: 13px; padding: 8px 10px 10px; }
-.card.txt .flow li::after { right: -21px; }
+/* scroll strażnik: ruchoma grafika */
+.straz { background: #121212; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: background .5s ease; }
+.straz.on { background: #c8323a; }
+.straz-box { position: relative; width: 58%; height: 58%; border: 2px dashed rgba(255, 255, 255, .85); }
+.straz-win { position: absolute; inset: 0; overflow: hidden; }
+.straz-tag { position: absolute; left: -2px; top: -26px; padding: 4px 8px; font: 700 12px/1 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .06em; background: #fff; color: #121212; white-space: nowrap; }
+.straz-box { margin-top: 26px; }
+.straz-feed { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 14px; font: 700 clamp(16px, 1.6vw, 22px)/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: 2px; color: rgba(255, 255, 255, .7); }
+.straz.on .straz-feed { animation: feed 1.6s linear infinite; }
+@keyframes feed { to { transform: translateY(-50%); } }
+.straz-time { font: 400 13px/1.4 "IBM Plex Mono", ui-monospace, monospace; letter-spacing: .08em; color: rgba(255, 255, 255, .75); text-align: center; }
+.straz-time b { color: #fff; font-weight: 700; }
 
-/* rolki */
+/* granica: model miasta 3D */
+.city { background: var(--soft); cursor: grab; }
+.city:active { cursor: grabbing; }
+.city canvas { display: block; width: 100% !important; height: 100% !important; }
+.city .wait { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #aaa; letter-spacing: 2px; }
+.city.ready .wait { display: none; }
+
 .tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .tri img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; transition: transform .5s var(--ease); }
 .tri:hover img { transform: translateY(-6px); }
-.stats { list-style: none; border-top: 1px solid var(--line); }
-.stats.row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 clamp(14px, 2vw, 24px); border-top: 0; }
-.stats.row li { border-top: 1px solid var(--line); }
-.stats li { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
-.stats b { font-weight: 700; font-size: clamp(36px, 4.4vw, 64px); line-height: .9; letter-spacing: -.03em; color: var(--accent); min-width: 1.9em; }
-.stats span { font-size: 15px; line-height: 1.4; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
+.trio img { width: 100%; aspect-ratio: 1100 / 778; object-fit: contain; background: #fff; border: 1px solid var(--line); }
 
-/* narzędzie na żywo */
 .play {
   position: absolute;
   inset: 0;
@@ -404,46 +287,9 @@ section {
 }
 .play:hover span { background: var(--accent); transform: scale(1.06); }
 
-/* ---------- pytania ---------- */
-
-.qs { list-style: none; margin-top: clamp(24px, 4vh, 40px); border-top: 1px solid var(--line); }
-.q { border-bottom: 1px solid var(--line); }
-.q-btn {
-  display: grid;
-  grid-template-columns: 2.6em 1fr auto;
-  align-items: baseline;
-  gap: 12px;
-  width: 100%;
-  padding: clamp(16px, 2.4vh, 24px) 4px;
-  background: none;
-  border: 0;
-  text-align: left;
-  cursor: pointer;
-}
-.q-n { font-weight: 700; color: var(--accent); font-size: clamp(14px, 1.4vw, 18px); }
-.q-t { font-weight: 700; font-size: clamp(20px, 2.6vw, 36px); line-height: 1.15; letter-spacing: -.01em; transition: color .3s; }
-.q-btn:hover .q-t { color: var(--accent); }
-.q-i { font-size: 34px; line-height: .8; transition: transform .4s var(--ease), color .3s; }
-.q.open .q-i { transform: rotate(45deg); color: var(--accent); }
-.q-a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease); }
-.q.open .q-a { grid-template-rows: 1fr; }
-.q-a > div { overflow: hidden; }
-.q-a p {
-  padding: 0 4px clamp(16px, 2.6vh, 24px) calc(2.6em + 16px);
-  font-size: clamp(15px, 1.4vw, 18px);
-  line-height: 1.55;
-  max-width: 60ch;
-  color: #444;
-}
-
 /* ---------- kontakt ---------- */
 
-.statement {
-  font-weight: 700;
-  font-size: clamp(36px, 6vw, 92px);
-  line-height: 1.02;
-  letter-spacing: -.025em;
-}
+.statement { font-weight: 700; font-size: clamp(36px, 6vw, 92px); line-height: 1.02; letter-spacing: -.025em; }
 .lead { font-size: clamp(16px, 1.6vw, 21px); line-height: 1.5; max-width: 44ch; margin-top: 18px; color: #333; }
 .contact-list { list-style: none; margin-top: clamp(24px, 5vh, 52px); font-size: clamp(20px, 3vw, 40px); }
 .contact-list li { display: flex; gap: clamp(20px, 4vw, 64px); padding: 6px 0; }
@@ -451,43 +297,24 @@ section {
 .contact-list a { text-decoration: none; }
 .contact-list a:hover { color: var(--accent); }
 .end-foot { margin-top: clamp(24px, 5vh, 52px); display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: baseline; }
-.ascii-line { font-weight: 700; font-size: clamp(16px, 2vw, 26px); }
 
 /* ---------- mniejsze ekrany ---------- */
 
 @media (max-width: 1000px) {
-  .card, .card.s5, .card.s7, .card.s8 { grid-column: span 6; }
-  .toc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 860px) {
-  .bar nav { display: none; }
-  .bar .now { display: block; }
-  .way-head .flow { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .item, .item.s8 { grid-column: span 6; }
+  .card-media.pion { aspect-ratio: 16 / 10; }
 }
 @media (max-width: 720px) {
-  .card, .card.s5, .card.s6, .card.s7, .card.s8 { grid-column: 1 / -1; }
-  .trio, .stats.row { grid-template-columns: 1fr; }
-  .split { gap: 12px; }
-  .split .flow.vert li { font-size: 12px; padding: 7px 8px 9px; }
+  .item, .item.s6, .item.s8 { grid-column: 1 / -1; }
+  .card-media.pion { aspect-ratio: 4 / 5; }
   .side-label { display: none; }
-  .flow, .way-head .flow { grid-auto-flow: row; grid-template-columns: 1fr; gap: 22px; }
-  .flow li::after { content: "\2193"; right: auto; left: 16px; top: auto; bottom: -22px; transform: none; font-size: 16px; }
-  .cover-loop .flow { grid-template-columns: repeat(2, auto); gap: 10px 24px; }
-  .cover-loop .flow li::after { content: "\2192"; left: auto; right: -20px; top: 50%; bottom: auto; transform: translateY(-50%); }
-  .card.txt .card-media { aspect-ratio: auto; }
-  .card.txt .flow { gap: 22px; }
-  .card.txt .flow li::after { right: auto; }
-  .cover-loop .flow li:nth-child(2n)::after { content: none; }
-  .toc-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-  .toc-grid small { display: none; }
-  .q-a p { padding-left: 4px; }
-  .q-btn { grid-template-columns: 2em 1fr auto; }
-  .card.running .card-media { height: 78vh; }
+  .trio { grid-template-columns: 1fr; }
+  .item.running .card-media { height: 78vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .rv, .js .flow li { opacity: 1; transform: none; transition: none; }
+  .js .rv { opacity: 1; transform: none; transition: none; }
   .scroll-hint { animation: none; }
   * { transition-duration: .01ms !important; }
 }
@@ -496,18 +323,8 @@ section {
 <body>
 
 <header class="bar" id="bar">
-  <a class="brand" href="#start">staś <span class="x">&times;</span> ai</a>
-  <nav aria-label="rozdziały">
-    <a href="#rhino">rhino</a>
-    <a href="#illustrator">illustrator</a>
-    <a href="#kod">kod</a>
-    <a href="#tekst">tekst</a>
-    <a href="#wideo">wideo</a>
-    <a href="#narzedzia">narzędzia</a>
-    <a href="#pytania">pytania</a>
-    <a href="#wpadne">kontakt</a>
-  </nav>
-  <span class="now" id="now" aria-hidden="true"></span>
+  <a href="#start">staś <span class="x">&times;</span> ai</a>
+  <a href="#wpadne">kontakt</a>
   <span class="prog" id="prog" aria-hidden="true"></span>
 </header>
 
@@ -524,56 +341,24 @@ section {
   <div class="cover-title">
     <p class="mirror" aria-hidden="true">staś &times; ai</p>
     <h1 class="big-title">staś <span class="x scr" data-word="&times; ai">&times; ai</span></h1>
-    <p class="cover-sub">6 sposobów, w jakie używam AI w projektowaniu</p>
+    <p class="cover-sub">rzeczy, które zrobiłem z AI</p>
   </div>
-  <div class="cover-loop">
-    <ol class="flow" aria-label="jak pracuję: pętla">
-      <li><b>ja</b>mówię, co chcę</li>
-      <li class="ai"><b>AI</b>buduje</li>
-      <li><b>ja</b>oceniam</li>
-      <li class="ai"><b>AI</b>poprawia</li>
-    </ol>
-    <p class="loop-note"><b>&#8635;</b> i od nowa: czasem 2 rundy, czasem 40</p>
-  </div>
-  <a class="scroll-hint" href="#sposoby" aria-label="dalej">&darr;</a>
+  <footer class="cover-foot">
+    <p class="ascii-line">~+_+~/&bdquo;-&bdquo;*+*^_^+~+</p>
+  </footer>
+  <a class="scroll-hint" href="#projekty" aria-label="dalej">&darr;</a>
 </section>
 
-<!-- ================= SPIS ================= -->
-<section class="toc" id="sposoby">
-  <div class="wrap">
-    <p class="kicker">[6 sposobów]</p>
-    <div class="legend"><span><i></i>robię ja</span><span><i class="ai"></i>robi AI</span></div>
-    <ol class="toc-grid">
-      <li><a href="#rhino"><figure><img src="/portfolio/assets/bor-film/model.jpg" alt="" loading="lazy"><span class="n">01</span></figure><p>modeluje ze mną w Rhino<small>bór, para, czajnik, rysunki techniczne</small></p></a></li>
-      <li><a href="#illustrator"><figure><img src="m/mkj-logo.jpg" alt="" loading="lazy"><span class="n">02</span></figure><p>pracuje w moim pliku w Illustratorze<small>logo, palety, strona</small></p></a></li>
-      <li><a href="#kod"><figure><img src="m/icu-a.jpg" alt="" loading="lazy"><span class="n">03</span></figure><p>pisze kod do rzeczy, które widzą i słyszą<small>icu, yoobilizery, dziubi</small></p></a></li>
-      <li><a href="#tekst"><figure><img src="m/lawenda.jpg" alt="" loading="lazy"><span class="n">04</span></figure><p>czyta moje wiersze<small>lawenda, bramka</small></p></a></li>
-      <li><a href="#wideo"><figure><img src="m/gdd-2.jpg" alt="" loading="lazy" style="object-position:50% 30%"><span class="n">05</span></figure><p>montuje rolki<small>ok. 90 rolek</small></p></a></li>
-      <li><a href="#narzedzia"><figure><img src="m/harmonograf.jpg" alt="" loading="lazy"><span class="n">06</span></figure><p>robi mi narzędzia<small>harmonograf, klawisz, granica</small></p></a></li>
-    </ol>
-  </div>
-</section>
-
-<!-- ================= 01 RHINO ================= -->
-<section id="rhino">
+<!-- ================= PROJEKTY ================= -->
+<section id="projekty">
   <span class="ascii tl">.*+^_</span>
   <span class="ascii tr">-||~&rdquo;</span>
-  <span class="side-label left"><b>rhino</b>&nbsp;<i>01</i></span>
+  <span class="side-label left"><b>projekty</b>&nbsp;<i>01</i></span>
   <div class="wrap">
-    <header class="way-head">
-      <p class="kicker">01</p>
-      <h2 class="h2 rv">AI modeluje ze mną w&nbsp;Rhino</h2>
-      <p class="tools"><span>Rhino</span><span>MCP</span><span>C#</span><span>RhinoPython</span></p>
-      <ol class="flow">
-        <li><b>ja</b>opowiadanie albo szkic, kierunek formy</li>
-        <li class="ai"><b>AI</b>modeluje wprost w Rhino, kilka wariantów</li>
-        <li class="ai"><b>AI</b>sprawdza kolizje, wymiary, drogę powietrza</li>
-        <li><b>ja</b>wybieram, drukuję prototyp, sprawdzam w ręce</li>
-        <li class="ai"><b>AI</b>rysunki techniczne, instrukcja, film z opisem</li>
-      </ol>
-    </header>
+    <p class="kicker">[22 rzeczy &middot; pod każdą narzędzia]</p>
     <div class="grid">
-      <article class="card s8 rv">
+
+      <article class="item s8 rv">
         <div class="card-media gal">
           <div class="gal-stage contain">
             <video data-pane data-label="model" src="/portfolio/assets/bor-film/model.mp4" poster="/portfolio/assets/bor-film/model.jpg" muted loop playsinline preload="none" aria-label="model 3d bóru"></video>
@@ -582,85 +367,113 @@ section {
           </div>
           <div class="chips"></div>
         </div>
-        <h3>bór</h3>
-        <p>oczyszczacz powietrza na kark, z mojego opowiadania o roku 2400. 155 części, 29 plików do druku.</p>
-        <a class="go" href="/portfolio/bor/">zobacz bór &rarr;</a>
+        <div class="cap"><span class="no">01</span><h3>bór</h3><span class="what">oczyszczacz powietrza na kark</span></div>
+        <p class="tools"><span>Claude</span><span>Rhino</span></p>
+        <a class="go" href="/portfolio/bor/">strona bóru &rarr;</a>
       </article>
-      <article class="card s4 rv">
-        <div class="card-media pion white"><video src="m/bor-rolka.mp4" poster="m/bor-rolka.jpg" muted loop playsinline preload="none" aria-label="szkic rolki o bórze"></video></div>
-        <h3>rolka o bórze</h3>
-        <p>szkic rolki prosto z modelu: filtr, klapka zapachu, wyloty, światło.</p>
+
+      <article class="item rv">
+        <div class="card-media pion white"><video src="m/bor-rolka.mp4" poster="m/bor-rolka.jpg" muted loop playsinline preload="none" aria-label="rolka o bórze"></video></div>
+        <div class="cap"><span class="no">02</span><h3>rolka o bórze</h3></div>
+        <p class="tools"><span>Claude</span><span>three.js</span></p>
       </article>
-      <article class="card s8 rv">
-        <div class="card-media gal">
-          <div class="gal-stage contain">
-            <img data-pane data-label="warianty w Rhino" src="m/para-rhino.jpg" alt="para: warianty stojaka na jajka w Rhino" loading="lazy">
-            <img data-pane data-label="prototyp" src="m/para-druk.jpg" alt="para: prawdziwe jajko i połówki stojaka gotowe do druku" loading="lazy">
-            <img data-pane data-label="opis i film" src="m/para-opis.jpg" alt="para: film z opisem zrobiony z jednego zdania" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <h3>para: stojak na jajka</h3>
-        <p>ceramika na mosiężnym łańcuszku, rama z jednego pręta. AI modeluje warianty w Rhino, ja drukuję połówki na próbę i przymierzam do prawdziwego jajka. film z opisem w moim stylu powstał z jednego zdania.</p>
-      </article>
-      <article class="card s4 rv">
+
+      <article class="item s8 rv">
         <div class="card-media gal">
           <div class="gal-stage">
-            <img data-pane data-label="render" src="m/czajnik-render.jpg" alt="czajnik SMEG: render" loading="lazy">
-            <img data-pane data-label="w kuchni" src="m/czajnik-kuchnia.jpg" alt="czajnik SMEG: render w kuchni" loading="lazy">
+            <img data-pane data-label="okładka" src="m/lukullus-1.jpg" alt="Lukullus: okładka identyfikacji" loading="lazy">
+            <img data-pane data-label="logo" src="m/lukullus-2.jpg" alt="Lukullus: logo" loading="lazy">
+            <img data-pane data-label="znaki" src="m/lukullus-3.jpg" alt="Lukullus: znaki rozpoznawcze" loading="lazy">
+            <img data-pane data-label="pudełko 3D" src="m/lukullus-4.jpg" alt="Lukullus: model 3D opakowania" loading="lazy">
+            <img data-pane data-label="opakowania" src="m/lukullus-5.jpg" alt="Lukullus: rodzina opakowań" loading="lazy">
+            <img data-pane data-label="strona" src="m/lukullus-6.jpg" alt="Lukullus: strona internetowa" loading="lazy">
+            <img data-pane data-label="zastosowania" src="m/lukullus-7.jpg" alt="Lukullus: zastosowania" loading="lazy">
           </div>
           <div class="chips"></div>
         </div>
-        <h3>czajnik SMEG</h3>
-        <p>Rhino 2, projekt grupowy. odtworzony część po części.</p>
-        <a class="go" href="/portfolio/#czajnik">w portfolio &rarr;</a>
+        <div class="cap"><span class="no">03</span><h3>Lukullus</h3><span class="what">identyfikacja cukierni, koncepcja niezamawiana</span></div>
+        <p class="tools"><span>Claude Design</span><span>Blender</span></p>
       </article>
-      <article class="card s12 rv">
+
+      <article class="item rv">
+        <div class="card-media pion straz" id="straz" role="img" aria-label="scroll strażnik: ekran robi się czerwony, kiedy kamera widzi scrollowanie">
+          <div class="straz-box"><span class="straz-tag" id="strazTag">NIE SCROLLUJE</span><div class="straz-win"><div class="straz-feed" aria-hidden="true"><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span><span>~||-</span><span>_^+*.</span></div></div></div>
+          <p class="straz-time">limit 05:00 &middot; <b id="strazTime">00:00</b></p>
+        </div>
+        <div class="cap"><span class="no">04</span><h3>scroll strażnik</h3><span class="what">kamera, która widzi, że scrollujesz</span></div>
+        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>OpenCV</span></p>
+      </article>
+
+      <article class="item s8 rv">
+        <div class="card-media gal">
+          <div class="gal-stage contain">
+            <img data-pane data-label="w Rhino" src="m/para-rhino.jpg" alt="para: warianty stojaka na jajka w Rhino" loading="lazy">
+            <img data-pane data-label="prototyp" src="m/para-druk.jpg" alt="para: jajko i połówki stojaka do druku" loading="lazy">
+            <img data-pane data-label="film" src="m/para-opis.jpg" alt="para: film z opisem" loading="lazy">
+          </div>
+          <div class="chips"></div>
+        </div>
+        <div class="cap"><span class="no">05</span><h3>para</h3><span class="what">stojak na jajka</span></div>
+        <p class="tools"><span>Claude</span><span>Rhino</span><span>druk 3D</span></p>
+      </article>
+
+      <article class="item rv">
+        <div class="card-media pion gal">
+          <div class="gal-stage">
+            <video data-pane data-label="rozmowa" src="m/dziubi-rozmowa.mp4" poster="m/dziubi-rozmowa.jpg" muted loop playsinline preload="none" aria-label="dziubi na monitorze kineskopowym"></video>
+            <video data-pane data-label="oko" src="m/dziubi-oko.mp4" poster="m/dziubi-oko.jpg" muted loop playsinline preload="none" aria-label="dziubi i jego kamera"></video>
+          </div>
+          <div class="chips"></div>
+        </div>
+        <div class="cap"><span class="no">06</span><h3>dziubi</h3><span class="what">stworek na starym monitorze</span></div>
+        <p class="tools"><span>Claude</span><span>Python</span><span>Whisper</span></p>
+      </article>
+
+      <article class="item s8 rv">
+        <div class="card-media gal">
+          <div class="gal-stage">
+            <div data-pane data-label="model 3D" class="city" id="city"><span class="wait">~||-_^+*.</span></div>
+            <img data-pane data-label="z góry" src="m/granica-1.jpg" alt="granica: znak na budynkach Warszawy z góry" loading="lazy">
+            <img data-pane data-label="pałac" src="m/granica-2.jpg" alt="granica: znak przy Pałacu Kultury" loading="lazy">
+            <img data-pane data-label="bliżej" src="m/granica-3.jpg" alt="granica: znak rozlany po dachach" loading="lazy">
+            <img data-pane data-label="spacer" src="m/granica-4.jpg" alt="granica: widok z ulicy" loading="lazy">
+          </div>
+          <div class="chips"></div>
+        </div>
+        <div class="cap"><span class="no">07</span><h3>granica</h3><span class="what">znak rzucony na Warszawę</span></div>
+        <p class="tools"><span>Claude</span><span>CesiumJS</span><span>Google 3D Tiles</span><span>Rhino</span></p>
+        <a class="go" href="/portfolio/#granica">plakat &rarr;</a>
+      </article>
+
+      <article class="item rv">
+        <div class="card-media pion" style="background:#f6f6f6"><img src="m/plakat-wiersz.jpg" alt="plakat z wierszem: po pełni (z)nów" loading="lazy"></div>
+        <div class="cap"><span class="no">08</span><h3>plakaty z wierszami</h3></div>
+        <p class="tools"><span>Claude</span><span>Claude Design</span></p>
+      </article>
+
+      <article class="item s12 rv">
         <div class="trio">
-          <img src="m/bor-rozstrzal.jpg" alt="bór: rozstrzał i wykaz 50 pozycji" loading="lazy">
+          <img src="m/bor-rozstrzal.jpg" alt="bór: rozstrzał i wykaz pozycji" loading="lazy">
           <img src="m/stas-rysunek.jpg" alt="bór: rzuty i gabaryty" loading="lazy">
           <img src="m/czajnik-rysunek.jpg" alt="czajnik: rysunek techniczny" loading="lazy">
         </div>
-        <h3>rysunki techniczne</h3>
-        <p>widoki, wymiary i wykaz części, arkusze rozkładają się same. w tabelce rysunku bóru stoi: „opracowanie: Claude (Anthropic), z modelu 3D”.</p>
+        <div class="cap"><span class="no">09</span><h3>rysunki techniczne</h3><span class="what">bór i czajnik</span></div>
+        <p class="tools"><span>Claude</span><span>Rhino</span><span>RhinoPython</span></p>
       </article>
-    </div>
-  </div>
-  <span class="pagenum r">1</span>
-</section>
 
-<!-- ================= 02 ILLUSTRATOR ================= -->
-<section id="illustrator">
-  <span class="ascii tl">&ldquo;~||-</span>
-  <span class="ascii tr">_^+*.</span>
-  <span class="side-label left"><b>illustrator</b>&nbsp;<i>02</i></span>
-  <div class="wrap">
-    <header class="way-head">
-      <p class="kicker">02 &middot; zlecenie dla Press Club Polska</p>
-      <h2 class="h2 rv">AI pracuje w moim pliku w&nbsp;Illustratorze</h2>
-      <p class="tools"><span>Claude Design</span><span>Illustrator</span><span>MCP</span><span>skrypty</span><span>Figma</span></p>
-      <ol class="flow">
-        <li><b>ja</b>koncept: dymki czatu składają się w kompas</li>
-        <li class="ai"><b>AI</b>3 kierunki z uzasadnieniem</li>
-        <li><b>ja</b>„wytłumacz, czemu to logo”, odrzucam</li>
-        <li class="ai"><b>AI</b>przebudowuje dymki w moim pliku</li>
-        <li><b>ja</b>ręcznie: usuwam uśmiechy, powiększam gwiazdę</li>
-        <li class="ai"><b>AI</b>palety, księga znaku, animacje</li>
-      </ol>
-    </header>
-    <div class="grid">
-      <article class="card rv">
+      <article class="item s6 rv">
         <div class="card-media gal">
           <div class="gal-stage contain">
-            <video data-pane data-label="animacja" src="m/logo-loop.mp4" poster="m/logo-loop.jpg" muted loop playsinline preload="none" aria-label="animacja logo: dymki rozchodzą się w pary"></video>
+            <video data-pane data-label="animacja" src="m/logo-loop.mp4" poster="m/logo-loop.jpg" muted loop playsinline preload="none" aria-label="animacja logo"></video>
             <img data-pane data-label="znak" src="m/mkj-logo.jpg" alt="logo z czterech dymków" loading="lazy">
           </div>
           <div class="chips"></div>
         </div>
-        <h3>logo</h3>
-        <p>cztery dymki to róża wiatrów, w środku uczeń. w animacji rozchodzą się w pary i wracają. do tego 8 palet i księga znaku na 12 stron.</p>
+        <div class="cap"><span class="no">10</span><h3>logo z dymków</h3><span class="what">dla Press Club Polska</span></div>
+        <p class="tools"><span>Claude</span><span>Claude Design</span><span>Illustrator</span><span>Figma</span></p>
       </article>
-      <article class="card rv">
+
+      <article class="item s6 rv">
         <div class="card-media gal">
           <div class="gal-stage">
             <video data-pane data-label="gazeta" src="m/medialna-gazeta.mp4" poster="m/medialna-gazeta.jpg" muted loop playsinline preload="none" aria-label="kierunek gazeta"></video>
@@ -670,38 +483,11 @@ section {
           </div>
           <div class="chips"></div>
         </div>
-        <h3>medialna.edu.pl</h3>
-        <p>7 kierunków strony na prawdziwych treściach. odrzucałem wszystko, co wyglądało jak typowe AI.</p>
+        <div class="cap"><span class="no">11</span><h3>medialna.edu.pl</h3><span class="what">kierunki nowej strony</span></div>
+        <p class="tools"><span>Claude</span><span>HTML</span></p>
       </article>
-      <article class="card rv">
-        <div class="card-media"><video src="m/oczy-wojny.mp4" poster="m/oczy-wojny.jpg" muted loop playsinline preload="none" aria-label="oczy wojny: fotografowie"></video></div>
-        <h3>oczy wojny</h3>
-        <p>koncept strony z jednego zdania: indeks 16 nazwisk, portret idzie za kursorem.</p>
-      </article>
-    </div>
-  </div>
-  <span class="pagenum r">2</span>
-</section>
 
-<!-- ================= 03 KOD ================= -->
-<section id="kod">
-  <span class="ascii tl">.*+^_</span>
-  <span class="ascii tr">-||~&rdquo;</span>
-  <span class="side-label left"><b>kod</b>&nbsp;<i>03</i></span>
-  <div class="wrap">
-    <header class="way-head">
-      <p class="kicker">03</p>
-      <h2 class="h2 rv">AI pisze kod do rzeczy, które widzą i&nbsp;słyszą</h2>
-      <p class="tools"><span>Python</span><span>Arduino</span><span>OpenGL</span><span>Whisper</span><span>przeglądarka</span></p>
-      <ol class="flow">
-        <li><b>ja</b>jak ma się zachowywać, forma, kable</li>
-        <li class="ai"><b>AI</b>pisze i testuje kod</li>
-        <li><b>ja</b>sprawdzam na żywo, upraszczam</li>
-        <li class="ai"><b>AI</b>kolejna wersja</li>
-      </ol>
-    </header>
-    <div class="grid">
-      <article class="card s6 rv">
+      <article class="item s6 rv">
         <div class="card-media gal">
           <div class="gal-stage">
             <img data-pane data-label="lampa" src="m/icu-a.jpg" alt="icu: świecący trójkąt" loading="lazy">
@@ -710,11 +496,12 @@ section {
           </div>
           <div class="chips"></div>
         </div>
-        <h3>icu</h3>
-        <p>lampa świeci, kiedy ktoś jest obok. dużo wersji programu: od dłoni śledzonej kamerą do obecności, która włącza dźwięk, na który reaguje światło.</p>
-        <a class="go" href="/portfolio/#icu">cała dokumentacja &rarr;</a>
+        <div class="cap"><span class="no">12</span><h3>icu</h3><span class="what">lampa, która reaguje na obecność</span></div>
+        <p class="tools"><span>Claude</span><span>Python</span><span>MediaPipe</span><span>WLED</span></p>
+        <a class="go" href="/portfolio/#icu">dokumentacja &rarr;</a>
       </article>
-      <article class="card s6 rv">
+
+      <article class="item s6 rv">
         <div class="card-media gal">
           <div class="gal-stage">
             <video data-pane data-label="yblzr pro" src="/portfolio/assets/yoobilizery/yblzrpro.mp4" poster="/portfolio/assets/yoobilizery/yblzrpro.jpg" muted loop playsinline preload="none" aria-label="yblzr pro"></video>
@@ -723,213 +510,93 @@ section {
           </div>
           <div class="chips"></div>
         </div>
-        <h3>yoobilizery</h3>
-        <p>dźwięk &rarr; bit, bas, wysokie &rarr; neonowe bryły. AI wyciągnęło z mojego kodu (5000 linii) opis wyglądu i przepisało go do przeglądarki.</p>
+        <div class="cap"><span class="no">13</span><h3>yoobilizery</h3><span class="what">wizualizacje dźwięku na żywo</span></div>
+        <p class="tools"><span>Claude</span><span>Python</span><span>OpenGL</span></p>
       </article>
-      <article class="card s6 rv">
-        <div class="split">
-          <div class="card-media pion gal">
-            <div class="gal-stage">
-              <video data-pane data-label="rozmowa" src="m/dziubi-rozmowa.mp4" poster="m/dziubi-rozmowa.jpg" muted loop playsinline preload="none" aria-label="dziubi słucha i odpowiada na monitorze kineskopowym"></video>
-              <video data-pane data-label="oko" src="m/dziubi-oko.mp4" poster="m/dziubi-oko.jpg" muted loop playsinline preload="none" aria-label="dziubi i kamera, która jest jego okiem"></video>
-            </div>
-            <div class="chips"></div>
-          </div>
-          <ol class="flow vert">
-            <li class="ai"><b>kamera</b>poznaje twarze, lokalnie</li>
-            <li class="ai"><b>Whisper</b>słucha, lokalnie</li>
-            <li class="ai"><b>Claude</b>myśli i odpowiada głosem</li>
-            <li class="ai"><b>noc</b>pisze dziennik</li>
-          </ol>
-        </div>
-        <h3>dziubi</h3>
-        <p>lawendowy stworek na starym monitorze kineskopowym. o zmierzchu zasypia, pamięta rozmowy.</p>
+
+      <article class="item s6 rv">
+        <div class="card-media contain white"><video src="m/lawenda.mp4" poster="m/lawenda.jpg" muted loop playsinline preload="none" aria-label="lawenda z moich znaków"></video></div>
+        <div class="cap"><span class="no">14</span><h3>lawenda</h3><span class="what">strona z moimi wierszami</span></div>
+        <p class="tools"><span>Claude</span><span>three.js</span></p>
+        <a class="go" href="/">szpineta.com &rarr;</a>
       </article>
-      <article class="card s6 txt rv">
+
+      <article class="item s6 rv">
+        <div class="card-media contain white"><video src="m/lawenda-gate.mp4" poster="m/lawenda-gate.jpg" muted loop playsinline preload="none" aria-label="bramka do wierszy"></video></div>
+        <div class="cap"><span class="no">15</span><h3>bramka do wierszy</h3><span class="what">kod z moich znaczków</span></div>
+        <p class="tools"><span>Claude</span><span>JS</span></p>
+      </article>
+
+      <article class="item s6 live rv" data-src="/portfolio/harmonograf/" data-title="harmonograf">
         <div class="card-media">
-          <ol class="flow">
-            <li><b>ja</b>moje znaki ascii</li>
-            <li class="ai"><b>AI</b>jedna liczba zmienia całą bryłę</li>
-            <li class="ai"><b>AI</b>bryła reaguje na dźwięk</li>
-            <li class="ai"><b>AI</b>163 pionowe filmy z wierszami</li>
-          </ol>
+          <video src="m/harmonograf.mp4" poster="m/harmonograf.jpg" muted loop playsinline preload="none" aria-label="harmonograf"></video>
+          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
         </div>
-        <h3>bryły do wierszy</h3>
-        <p>czarno-biały generator brył. tło do moich wierszy, z muzyką, która idzie razem z animacją.</p>
+        <div class="cap"><span class="no">16</span><h3>harmonograf</h3><span class="what">instrument do rysowania plakatów</span></div>
+        <p class="tools"><span>Claude</span><span>JS</span></p>
       </article>
-    </div>
-  </div>
-  <span class="pagenum r">3</span>
-</section>
 
-<!-- ================= 04 TEKST ================= -->
-<section id="tekst">
-  <span class="ascii tl">&ldquo;~||-</span>
-  <span class="ascii tr">_^+*.</span>
-  <span class="side-label left"><b>tekst</b>&nbsp;<i>04</i></span>
-  <div class="wrap">
-    <header class="way-head">
-      <p class="kicker">04 &middot; szpineta.com</p>
-      <h2 class="h2 rv">AI czyta moje wiersze</h2>
-      <p class="tools"><span>163 wiersze</span><span>JS</span><span>three.js</span></p>
-      <ol class="flow">
-        <li class="ai"><b>AI</b>proponuje redesign</li>
-        <li><b>ja</b>odrzucam: „okropne”</li>
-        <li><b>ja</b>wymyślam klucz z moich znaczków zamiast QR</li>
-        <li class="ai"><b>AI</b>generator kart i bramka</li>
-        <li class="ai"><b>AI</b>daje każdemu wierszowi profil emocji</li>
-        <li><b>ja</b>tekst stoi, zmienia się tylko grubość liter</li>
-      </ol>
-    </header>
-    <div class="grid">
-      <article class="card s7 rv">
-        <div class="card-media contain"><video src="m/lawenda.mp4" poster="m/lawenda.jpg" muted loop playsinline preload="none" aria-label="lawenda z moich znaków"></video></div>
-        <h3>lawenda z moich znaków</h3>
-        <p>chmura punktów na stronie startowej.</p>
-        <a class="go" href="/">wejdź na szpineta.com &rarr;</a>
+      <article class="item s6 live rv" data-src="/portfolio/klawisz/" data-title="klawisz po klawiszu">
+        <div class="card-media">
+          <video src="m/klawisz.mp4" poster="m/klawisz.jpg" muted loop playsinline preload="none" aria-label="klawisz po klawiszu"></video>
+          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
+        </div>
+        <div class="cap"><span class="no">17</span><h3>klawisz po klawiszu</h3><span class="what">trener skrótów na Maca</span></div>
+        <p class="tools"><span>Claude</span><span>JS</span></p>
       </article>
-      <article class="card s5 rv">
-        <div class="card-media contain"><video src="m/lawenda-gate.mp4" poster="m/lawenda-gate.jpg" muted loop playsinline preload="none" aria-label="bramka do wierszy"></video></div>
-        <h3>bramka</h3>
-        <p>do wierszy wchodzi się kodem z moich znaczków.</p>
-      </article>
-    </div>
-  </div>
-  <span class="pagenum r">4</span>
-</section>
 
-<!-- ================= 05 WIDEO ================= -->
-<section id="wideo">
-  <span class="ascii tl">.*+^_</span>
-  <span class="ascii tr">-||~&rdquo;</span>
-  <span class="side-label left"><b>wideo</b>&nbsp;<i>05</i></span>
-  <div class="wrap">
-    <header class="way-head">
-      <p class="kicker">05 &middot; zlecenia dla Press Club Polska</p>
-      <h2 class="h2 rv">AI jako linia montażowa do rolek</h2>
-      <p class="tools"><span>transkrypt</span><span>agenci</span><span>kadr za twarzą</span><span>napisy</span></p>
-      <ol class="flow">
-        <li><b>ja</b>godziny nagrań i brief</li>
-        <li class="ai"><b>AI</b>transkrypt</li>
-        <li class="ai"><b>AI</b>kilku agentów szuka fragmentów i pilnuje, żeby cięcia nie urywały zdań</li>
-        <li><b>ja</b>wybieram, projektuję styl</li>
-        <li class="ai"><b>AI</b>kadr pionowy za twarzą, napisy, cięcie do bitu</li>
-        <li><b>ja</b>poprawiam napisy, aż rytm się zgadza</li>
-      </ol>
-    </header>
-    <div class="grid">
-      <article class="card s4 rv">
+      <article class="item rv">
         <div class="card-media pion"><video src="m/gdd-program.mp4" poster="m/gdd-program.jpg" muted loop playsinline preload="none" aria-label="rolka: program Gdańskich Dni Demokracji"></video></div>
-        <h3>rolka: program dnia</h3>
-        <p>Gdańskie Dni Demokracji, 14 września.</p>
+        <div class="cap"><span class="no">18</span><h3>rolka: program dnia</h3><span class="what">Gdańskie Dni Demokracji</span></div>
+        <p class="tools"><span>Claude Code</span></p>
       </article>
-      <article class="card s8 rv">
+
+      <article class="item s8 rv">
         <div class="tri">
           <img src="m/gdd-1.jpg" alt="szablon rolki: Wspólnota ma moc" loading="lazy">
           <img src="m/gdd-2.jpg" alt="szablon rolki: Nie daj się manipulacji" loading="lazy">
           <img src="m/gdd-4.jpg" alt="szablon rolki: Gdańsk 14–16/09/2026" loading="lazy">
         </div>
-        <h3>szablony rolek</h3>
-        <p>ten sam festiwal: szablony do kolejnych rolek.</p>
+        <div class="cap"><span class="no">19</span><h3>rolki dla Press Club Polska</h3><span class="what">ok. 90 sztuk, wywiady i wydarzenia</span></div>
+        <p class="tools"><span>Claude Code</span><span>Whisper</span><span>ffmpeg</span><span>Python</span></p>
+        <a class="go" href="https://youtu.be/uRurgMMceWI" target="_blank" rel="noopener">wywiad „Oni wiedzą” &nearr;</a>
       </article>
-      <article class="card s12 rv">
-        <ul class="stats row">
-          <li><b>~90</b><span>rolek od lipca</span></li>
-          <li><b>45</b><span>klipów z jednego wywiadu</span></li>
-          <li><b>2</b><span>wersje językowe: polska i ukraińska</span></li>
-        </ul>
-      </article>
-    </div>
-  </div>
-  <span class="pagenum r">5</span>
-</section>
 
-<!-- ================= 06 NARZĘDZIA ================= -->
-<section id="narzedzia">
-  <span class="ascii tl">&ldquo;~||-</span>
-  <span class="ascii tr">_^+*.</span>
-  <span class="side-label left"><b>narzędzia</b>&nbsp;<i>06</i></span>
-  <div class="wrap">
-    <header class="way-head">
-      <p class="kicker">06</p>
-      <h2 class="h2 rv">AI robi mi narzędzia, których nie ma</h2>
-      <p class="tools"><span>przeglądarka</span><span>JS</span><span>mapa 3D</span></p>
-      <ol class="flow">
-        <li><b>ja</b>czego mi brakuje</li>
-        <li class="ai"><b>AI</b>pisze narzędzie</li>
-        <li><b>ja</b>testuję: „pokaż efekt, nie opisuj”</li>
-        <li class="ai"><b>AI</b>kolejna wersja</li>
-      </ol>
-    </header>
-    <div class="grid">
-      <article class="card s6 live rv" data-src="/portfolio/harmonograf/" data-title="harmonograf">
-        <div class="card-media">
-          <video src="m/harmonograf.mp4" poster="m/harmonograf.jpg" muted loop playsinline preload="none" aria-label="harmonograf: rysowanie wahadłem"></video>
-          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
-        </div>
-        <h3>harmonograf <span class="tag">na żywo</span></h3>
-        <p>wahadła rysują plakat. wybrałem kierunek (generatywnie, plakat, dużo interakcji), resztę zbudował model.</p>
-        <a class="go" href="/portfolio/harmonograf/" target="_blank" rel="noopener">otwórz osobno &nearr;</a>
+      <article class="item rv">
+        <div class="card-media"><video src="m/oczy-wojny.mp4" poster="m/oczy-wojny.jpg" muted loop playsinline preload="none" aria-label="oczy wojny: fotografowie"></video></div>
+        <div class="cap"><span class="no">20</span><h3>oczy wojny</h3><span class="what">koncept strony</span></div>
+        <p class="tools"><span>Claude</span><span>HTML</span></p>
       </article>
-      <article class="card s6 live rv" data-src="/portfolio/klawisz/" data-title="klawisz po klawiszu">
-        <div class="card-media">
-          <video src="m/klawisz.mp4" poster="m/klawisz.jpg" muted loop playsinline preload="none" aria-label="klawisz po klawiszu: trener skrótów"></video>
-          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
-        </div>
-        <h3>klawisz po klawiszu <span class="tag">na żywo</span></h3>
-        <p>trener skrótów na Maca: 49 skrótów, każdy z animowanym demo. 7 wersji.</p>
-        <a class="go" href="/portfolio/klawisz/" target="_blank" rel="noopener">otwórz osobno &nearr;</a>
-      </article>
-      <article class="card s6 rv">
+
+      <article class="item rv">
         <div class="card-media gal">
           <div class="gal-stage">
-            <img data-pane data-label="pałac" src="m/granica-pkin.jpg" alt="granica: znak rzucony na Pałac Kultury" loading="lazy">
-            <img data-pane data-label="z góry" src="m/granica-gora.jpg" alt="granica: miasto z góry" loading="lazy">
+            <img data-pane data-label="render" src="m/czajnik-render.jpg" alt="czajnik SMEG: render" loading="lazy">
+            <img data-pane data-label="w kuchni" src="m/czajnik-kuchnia.jpg" alt="czajnik SMEG: render w kuchni" loading="lazy">
           </div>
           <div class="chips"></div>
         </div>
-        <h3>granica</h3>
-        <p>wpisuję adres, stawiam obserwatora, a mój znak kładzie się na budynkach 3D Warszawy.</p>
-        <a class="go" href="/portfolio/#granica">plakat i proces &rarr;</a>
+        <div class="cap"><span class="no">21</span><h3>czajnik SMEG</h3><span class="what">Rhino 2, projekt grupowy</span></div>
+        <p class="tools"><span>Claude</span><span>Rhino</span></p>
       </article>
-      <article class="card s6 rv">
+
+      <article class="item rv">
         <div class="card-media"><video src="m/portfolio-sof.mp4" poster="m/portfolio-sof.jpg" muted loop playsinline preload="none" aria-label="archiwum pierwszego roku"></video></div>
-        <h3>archiwum 1. roku</h3>
-        <p>cała strona z projektami: układ, przeglądarka plansz, dodawanie projektów.</p>
+        <div class="cap"><span class="no">22</span><h3>archiwum 1. roku</h3><span class="what">to portfolio</span></div>
+        <p class="tools"><span>Claude</span><span>HTML</span></p>
         <a class="go" href="/portfolio/#rok-1">otwórz &rarr;</a>
       </article>
+
     </div>
   </div>
-  <span class="pagenum r">6</span>
-</section>
-
-<!-- ================= PYTANIA ================= -->
-<section id="pytania">
-  <span class="ascii tl">.*+^_</span>
-  <span class="ascii tr">-||~&rdquo;</span>
-  <span class="side-label left"><b>pytania</b>&nbsp;<i>07</i></span>
-  <div class="wrap">
-    <p class="kicker">[czego chcę się od was nauczyć]</p>
-    <h2 class="h2 rv">z tym do was przychodzę.</h2>
-    <ol class="qs">
-      <li class="q"><button class="q-btn" type="button" aria-expanded="false" aria-controls="qa-1"><span class="q-n">01</span><span class="q-t">gdzie kończy się mój projekt, a&nbsp;zaczyna model?</span><span class="q-i" aria-hidden="true">+</span></button>
-        <div class="q-a" id="qa-1"><div><p>forma bóru jest moja, geometrię liczył model. nie wiem, jak to podpisywać.</p></div></div></li>
-      <li class="q"><button class="q-btn" type="button" aria-expanded="false" aria-controls="qa-2"><span class="q-n">02</span><span class="q-t">jak projektować zachowanie, a&nbsp;nie tylko formę?</span><span class="q-i" aria-hidden="true">+</span></button>
-        <div class="q-a" id="qa-2"><div><p>w icu najciekawsze okazało się to, jak lampa reaguje na człowieka.</p></div></div></li>
-      <li class="q"><button class="q-btn" type="button" aria-expanded="false" aria-controls="qa-3"><span class="q-n">03</span><span class="q-t">jak zrobić własny, mały model?</span><span class="q-i" aria-hidden="true">+</span></button>
-        <div class="q-a" id="qa-3"><div><p>na razie korzystam z gotowych. chcę zrozumieć, jak się trenuje coś swojego.</p></div></div></li>
-      <li class="q"><button class="q-btn" type="button" aria-expanded="false" aria-controls="qa-4"><span class="q-n">04</span><span class="q-t">jak sprawdzić, co ludzie czują przy takich obiektach?</span><span class="q-i" aria-hidden="true">+</span></button>
-        <div class="q-a" id="qa-4"><div><p>robię rzeczy, które patrzą i słuchają, ale nie umiem jeszcze badać, jak ludzie je odbierają.</p></div></div></li>
-    </ol>
-  </div>
-  <span class="pagenum r">7</span>
+  <span class="pagenum r">1</span>
 </section>
 
 <!-- ================= KONTAKT ================= -->
 <section id="wpadne">
   <span class="ascii tl">&ldquo;~||-</span>
   <span class="ascii tr">_^+*.</span>
-  <span class="side-label right"><b>kontakt</b>&nbsp;<i>08</i></span>
+  <span class="side-label right"><b>kontakt</b>&nbsp;<i>02</i></span>
   <div class="wrap">
     <p class="statement rv">chętnie do was <span class="accent">wpadnę.</span></p>
     <p class="lead rv">pokażę to na żywo. a jeśli szukacie asystentów, <b>jestem bardziej niż chętny.</b></p>
@@ -959,79 +626,34 @@ section {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hasIO = 'IntersectionObserver' in window;
 
-  /* ---------- pasek: postęp i bieżący rozdział ---------- */
+  /* ---------- pasek postępu ---------- */
   var prog = $('#prog');
   var ticking = false;
+  var scrollHooks = [];
   function onScroll() {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(function () {
       var h = document.documentElement.scrollHeight - window.innerHeight;
       prog.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, window.scrollY / h) : 0) + ')';
+      scrollHooks.forEach(function (f) { f(); });
       ticking = false;
     });
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  var navLinks = $$('.bar nav a');
-  var nowEl = $('#now');
-  if (hasIO) {
-    var secIO = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        var hit = null;
-        navLinks.forEach(function (a) {
-          var on = a.getAttribute('href') === '#' + e.target.id;
-          a.classList.toggle('cur', on);
-          if (on) hit = a;
-        });
-        nowEl.textContent = hit ? hit.textContent : '';
-      });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    $$('main > section').forEach(function (s) { secIO.observe(s); });
-  }
-
-  /* ---------- schematy ja → AI: wchodzą po kolei, potem podświetla się krok po kroku ---------- */
-  var flows = $$('.flow');
-  flows.forEach(function (fl) {
-    $$('li', fl).forEach(function (li, k) { li.style.setProperty('--k', k); });
-  });
-
   /* ---------- wejścia przy przewijaniu ---------- */
-  var revealEls = $$('.rv').concat(flows);
+  var revealEls = $$('.rv');
   if (hasIO && !reduce) {
     var rvIO = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('in'); rvIO.unobserve(e.target); }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12 });
     revealEls.forEach(function (el) { rvIO.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add('in'); });
-  }
-
-  if (hasIO && !reduce) {
-    flows.forEach(function (fl) {
-      var items = $$('li', fl);
-      var i = -1;
-      var timer = null;
-      function step() {
-        if (i >= 0) items[i].classList.remove('cur');
-        i = (i + 1) % items.length;
-        items[i].classList.add('cur');
-      }
-      new IntersectionObserver(function (es) {
-        es.forEach(function (e) {
-          if (e.isIntersecting && !timer) {
-            timer = setInterval(step, 1400);
-          } else if (!e.isIntersecting && timer) {
-            clearInterval(timer);
-            timer = null;
-          }
-        });
-      }, { threshold: 0.6 }).observe(fl);
-    });
   }
 
   /* ---------- filmy: grają tylko widoczne ---------- */
@@ -1063,7 +685,7 @@ section {
     videos.forEach(function (v) { vIO.observe(v); });
   }
 
-  /* ---------- galerie w kartach: przełącznik na dole ---------- */
+  /* ---------- galerie w kartach ---------- */
   $$('.gal').forEach(function (g) {
     var items = $$('.gal-stage > [data-pane]', g);
     var holder = $('.chips', g);
@@ -1081,9 +703,148 @@ section {
         if (it.tagName === 'VIDEO') sync(it);
       });
       buttons.forEach(function (b, k) { b.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+      g.dispatchEvent(new CustomEvent('pane'));
     }
+    g._show = show;
     show(0);
   });
+
+  /* ---------- granica: model miasta, obraca się przy przewijaniu i daje się kręcić ---------- */
+  var cityBox = $('#city');
+  if (cityBox) {
+    var BASE = 'https://cdn.jsdelivr.net/npm/three@0.147.0/';
+    var loadScript = function (src) {
+      return new Promise(function (res, rej) {
+        var s = document.createElement('script');
+        s.src = src; s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    };
+    var gal = cityBox.closest('.gal');
+    var fallback = function () {
+      /* bez WebGL: zostają zrzuty z aplikacji */
+      gal._show(1);
+      var chip = $('.chips button', gal);
+      if (chip) chip.remove();
+      cityBox.remove();
+    };
+    var startCity = function () {
+      loadScript(BASE + 'build/three.min.js')
+        .then(function () { return Promise.all([loadScript(BASE + 'examples/js/loaders/STLLoader.js'), loadScript(BASE + 'examples/js/controls/OrbitControls.js')]); })
+        .then(function () {
+          var T = window.THREE;
+          var renderer;
+          try { renderer = new T.WebGLRenderer({ antialias: true, alpha: true }); } catch (err) { fallback(); return; }
+          renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+          cityBox.appendChild(renderer.domElement);
+          var scene = new T.Scene();
+          scene.add(new T.HemisphereLight(0xffffff, 0xb9b0c9, 0.9));
+          var sun = new T.DirectionalLight(0xffffff, 0.7);
+          sun.position.set(-1, 2, 1.2);
+          scene.add(sun);
+          var cam = new T.PerspectiveCamera(32, 1, 1, 5000);
+          var controls = new T.OrbitControls(cam, renderer.domElement);
+          controls.enableZoom = false;
+          controls.enablePan = false;
+          controls.enableDamping = true;
+          controls.minPolarAngle = 0.2;
+          controls.maxPolarAngle = 1.4;
+          if (window.matchMedia('(pointer: coarse)').matches) {
+            controls.enabled = false;
+            renderer.domElement.style.touchAction = 'pan-y';
+          }
+          var touched = false;
+          controls.addEventListener('start', function () { touched = true; });
+          var R = 200, H = 20;
+
+          function size() {
+            var w = cityBox.clientWidth, h = cityBox.clientHeight;
+            if (!w || !h) return;
+            renderer.setSize(w, h, false);
+            cam.aspect = w / h;
+            cam.updateProjectionMatrix();
+          }
+          function place() {
+            if (touched) return;
+            var r = cityBox.getBoundingClientRect(), vh = window.innerHeight;
+            var t = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
+            var az = -1.1 + t * 2.4;
+            var el = 0.95 - t * 0.5;
+            cam.position.set(Math.sin(az) * Math.cos(el) * R, Math.sin(el) * R + H * 0.3, Math.cos(az) * Math.cos(el) * R);
+            controls.target.set(0, H * 0.25, 0);
+            cam.lookAt(controls.target);
+          }
+          var inView = false;
+          function frame() {
+            if (!inView) return;
+            if (cityBox.classList.contains('on')) {
+              controls.update();
+              renderer.render(scene, cam);
+            }
+            requestAnimationFrame(frame);
+          }
+
+          new T.STLLoader().load('m/granica-miasto.bin', function (geo) {
+            geo.rotateX(-Math.PI / 2);
+            geo.computeBoundingBox();
+            var c = new T.Vector3();
+            geo.boundingBox.getCenter(c);
+            geo.translate(-c.x, -geo.boundingBox.min.y, -c.z);
+            geo.computeVertexNormals();
+            geo.computeBoundingBox();
+            var s = new T.Vector3();
+            geo.boundingBox.getSize(s);
+            R = Math.max(s.x, s.z) * 1.15;
+            H = s.y;
+            scene.add(new T.Mesh(geo, new T.MeshStandardMaterial({ color: 0xece8f3, roughness: 0.9, flatShading: true })));
+            scene.add(new T.LineSegments(new T.EdgesGeometry(geo, 35), new T.LineBasicMaterial({ color: 0x8a76c4, transparent: true, opacity: 0.4 })));
+            cityBox.classList.add('ready');
+            size();
+            place();
+            renderer.render(scene, cam);
+          }, undefined, fallback);
+
+          window.addEventListener('resize', size);
+          scrollHooks.push(place);
+          new IntersectionObserver(function (es) {
+            es.forEach(function (e) {
+              var was = inView;
+              inView = e.isIntersecting;
+              if (inView && !was) requestAnimationFrame(frame);
+            });
+          }).observe(cityBox);
+          gal.addEventListener('pane', size);
+        })
+        .catch(fallback);
+    };
+    if (hasIO) {
+      var cIO = new IntersectionObserver(function (es) {
+        if (es.some(function (e) { return e.isIntersecting; })) { cIO.disconnect(); startCity(); }
+      }, { rootMargin: '400px 0px' });
+      cIO.observe(cityBox);
+    } else {
+      startCity();
+    }
+  }
+
+  /* ---------- scroll strażnik: na zmianę scrolluje / nie scrolluje ---------- */
+  var straz = $('#straz');
+  if (straz && !reduce) {
+    var tag = $('#strazTag'), tm = $('#strazTime');
+    var on = false, secs = 0, tick = 0, live = false;
+    if (hasIO) new IntersectionObserver(function (es) { live = es[0].isIntersecting; }).observe(straz);
+    setInterval(function () {
+      if (!live) return;
+      tick++;
+      if (tick % 3 === 0) {
+        on = !on;
+        straz.classList.toggle('on', on);
+        tag.textContent = on ? 'SCROLLUJE 0.94' : 'NIE SCROLLUJE';
+      }
+      if (on) secs++;
+      tm.textContent = '00:' + String(secs % 60).padStart(2, '0');
+    }, 1000);
+  }
 
   /* ---------- narzędzia na żywo: iframe dopiero po kliknięciu ---------- */
   $$('.live').forEach(function (card) {
@@ -1102,16 +863,6 @@ section {
         card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
         f.focus();
       }, 80);
-    });
-  });
-
-  /* ---------- pytania ---------- */
-  $$('.q').forEach(function (q) {
-    var b = $('.q-btn', q);
-    b.addEventListener('click', function () {
-      var open = !q.classList.contains('open');
-      q.classList.toggle('open', open);
-      b.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
   });
 
