@@ -5,24 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <title>staś × ai — dla pracowni</title>
-<meta name="description" content="rzeczy, które zrobiłem z AI">
+<meta name="description" content="projekty zrobione z AI">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <style>
-/* staś szpineta — strona dla Otwartej Pracowni Sztucznej Inteligencji
+/* staś szpineta — galeria dla Otwartej Pracowni Sztucznej Inteligencji
    ukryta: dostępna tylko z linku, bez indeksowania
-   ten sam język co /portfolio/: biel, Helvetica, fiolet #a88bd4, ascii-ornamenty */
+   indeks jak plakat: najedź = podgląd przy kursorze, kliknij = karta projektu */
 
 :root {
   --ink: #1a1a1a;
   --accent: #a88bd4;
+  --accent-ink: #6c4ca6;
   --bg: #ffffff;
   --soft: #f7f6f9;
   --line: #e5e5e5;
-  --muted: #777;
+  --muted: #8a8a8a;
   --pad: clamp(20px, 4vw, 56px);
-  --bar: 44px;
   --ease: cubic-bezier(.2, .8, .2, 1);
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,21 +35,23 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
+body.lock { overflow: hidden; }
 a { color: inherit; }
 img, video { display: block; max-width: 100%; }
-button { font: inherit; color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 
-/* ---------- pasek u góry ---------- */
+/* ---------- pasek ---------- */
 
-.bar {
+.top {
   position: fixed;
   inset: 0 0 auto 0;
-  z-index: 50;
-  height: var(--bar);
+  z-index: 20;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 0 var(--pad);
   background: rgba(255, 255, 255, .9);
   -webkit-backdrop-filter: blur(8px);
@@ -56,821 +59,664 @@ button { font: inherit; color: inherit; }
   font-size: 13px;
   font-weight: 700;
 }
-.bar a { text-decoration: none; transition: color .25s; }
-.bar a:hover { color: var(--accent); }
-.bar .x { color: var(--accent); }
-.prog {
-  position: absolute;
-  left: 0; bottom: 0;
-  width: 100%; height: 2px;
-  background: var(--accent);
-  transform-origin: 0 50%;
-  transform: scaleX(0);
-}
+.top a { text-decoration: none; transition: color .25s; }
+.top a:hover { color: var(--accent); }
+.top .x { color: var(--accent); }
+.top .mid { color: var(--muted); font-weight: 400; }
 
-/* ---------- sekcje i ozdobniki ---------- */
+/* ---------- indeks ---------- */
 
-section {
+.index {
   position: relative;
   min-height: 100vh;
-  padding: calc(var(--bar) + var(--pad) + 28px) var(--pad) calc(var(--pad) + 48px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  padding: calc(44px + clamp(48px, 9vh, 96px)) var(--pad) clamp(48px, 8vh, 96px);
 }
-.wrap { width: 100%; max-width: 1180px; margin: 0 auto; }
-
-.ascii {
-  position: absolute;
-  top: calc(var(--bar) + 14px);
-  font-weight: 700;
-  font-size: clamp(14px, 1.6vw, 22px);
-  letter-spacing: 1px;
-  user-select: none;
-}
+.ascii { position: absolute; top: 58px; font-weight: 700; font-size: clamp(14px, 1.6vw, 22px); letter-spacing: 1px; user-select: none; }
 .ascii.tl { left: var(--pad); }
 .ascii.tr { right: var(--pad); }
 
-.side-label {
-  position: absolute;
-  top: calc(var(--bar) + 14px);
-  writing-mode: vertical-rl;
-  font-size: clamp(18px, 2.2vw, 30px);
-  white-space: nowrap;
-  user-select: none;
-}
-.side-label.left  { left: 8px; transform: rotate(180deg); }
-.side-label.right { right: 8px; }
-.side-label b { font-weight: 700; }
-.side-label i { font-style: normal; font-weight: 700; color: var(--accent); }
+.kicker { font: 700 clamp(12px, 1.1vw, 14px)/1.4 var(--mono); color: var(--accent); letter-spacing: .04em; margin-bottom: clamp(28px, 6vh, 56px); }
+.kicker span { color: var(--muted); font-weight: 400; }
 
-.pagenum {
-  position: absolute;
-  bottom: 12px;
-  font-size: clamp(36px, 5vw, 64px);
-  line-height: 1;
-  user-select: none;
+.zone { margin-bottom: clamp(36px, 8vh, 88px); }
+.zone-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding-bottom: 10px;
+  margin-bottom: clamp(10px, 2vh, 18px);
+  border-bottom: 1px solid var(--line);
+  font: 700 clamp(13px, 1.2vw, 16px)/1 var(--mono);
 }
-.pagenum.r { right: var(--pad); }
-.pagenum.l { left: var(--pad); }
+.zone-head b { color: var(--accent); font-size: 1.4em; letter-spacing: 2px; min-width: 2.2em; }
+.zone-head i { font-style: normal; font-weight: 400; color: var(--muted); }
+.zone-head .n { margin-left: auto; color: var(--muted); font-weight: 400; }
 
-.kicker {
+.idx {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 .28em;
   font-weight: 700;
-  font-size: clamp(12px, 1.2vw, 15px);
+  font-size: clamp(38px, 7.2vw, 118px);
+  line-height: 1.02;
+  letter-spacing: -.035em;
+}
+.idx-it {
+  position: relative;
+  text-align: left;
+  color: var(--ink);
+  letter-spacing: inherit;
+  line-height: inherit;
+  transition: color .3s ease, letter-spacing .5s var(--ease);
+}
+.idx-it sup {
+  font: 700 clamp(10px, .9vw, 13px)/1 var(--mono);
+  letter-spacing: 0;
   color: var(--accent);
-  letter-spacing: .06em;
-  margin-bottom: clamp(20px, 4vh, 36px);
+  vertical-align: top;
+  margin-left: .25em;
+  position: relative;
+  top: .55em;
 }
-.accent { color: var(--accent); }
-.go {
-  display: inline-block;
-  margin-top: 8px;
-  font-weight: 700;
-  font-size: 13px;
-  text-decoration: none;
-  border-bottom: 2px solid var(--accent);
-  padding-bottom: 2px;
-  transition: transform .3s var(--ease), color .3s;
+.sep { color: #d9d2e6; font-weight: 700; font-size: .5em; letter-spacing: 0; user-select: none; transform: translateY(-.25em); }
+@media (hover: hover) {
+  .idx:hover .idx-it { color: #d4d4d4; }
+  .idx:hover .idx-it sup { color: #d4d4d4; }
+  .idx .idx-it:hover { color: var(--ink); letter-spacing: .01em; }
+  .idx .idx-it:hover sup { color: var(--accent); }
 }
-.go:hover { transform: translateX(6px); color: var(--accent); }
 
-.js .rv { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
-.js .rv.in { opacity: 1; transform: none; }
-
-/* ---------- okładka ---------- */
-
-.cover { justify-content: space-between; align-items: center; text-align: center; }
-.cover-top { margin-top: clamp(8px, 3vh, 40px); }
-.cover-top p { font-weight: 700; font-size: clamp(13px, 1.4vw, 18px); }
-.cover-top p + p { color: var(--accent); margin-top: 4px; }
-.cover-title { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.mirror {
-  color: var(--accent);
-  font-weight: 700;
-  font-size: clamp(20px, 3vw, 40px);
-  transform: rotate(180deg);
-  user-select: none;
-}
-.big-title {
-  font-weight: 700;
-  font-size: clamp(72px, 16vw, 230px);
-  letter-spacing: -.04em;
-  line-height: .9;
-  cursor: default;
-  white-space: nowrap;
-  transition: letter-spacing .6s ease;
-}
-.big-title:hover { letter-spacing: .03em; }
-.big-title .x { color: var(--accent); }
-.cover-sub { font-size: clamp(16px, 2vw, 26px); margin-top: 18px; }
-.cover-foot { margin-bottom: clamp(16px, 4vh, 40px); }
-.ascii-line { font-weight: 700; font-size: clamp(16px, 2vw, 26px); }
-.scroll-hint {
-  position: absolute;
-  bottom: 16px;
-  right: var(--pad);
-  font-size: 32px;
-  font-weight: 700;
-  text-decoration: none;
-  animation: nudge 2.4s ease-in-out infinite;
-}
-.scroll-hint:hover { color: var(--accent); }
-@keyframes nudge { 50% { transform: translateY(8px); } }
-
-/* ---------- projekty ---------- */
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: clamp(36px, 6vh, 64px) clamp(14px, 2vw, 24px);
-  align-items: start;
-}
-.item { grid-column: span 4; display: flex; flex-direction: column; }
-.item.s6 { grid-column: span 6; }
-.item.s8 { grid-column: span 8; }
-.item.s12 { grid-column: 1 / -1; }
-.item.running { grid-column: 1 / -1; }
-
-.card-media { position: relative; aspect-ratio: 16 / 10; background: var(--soft); overflow: hidden; }
-.card-media > img, .card-media > video { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
-.card-media.contain > img, .card-media.contain > video { object-fit: contain; }
-.card-media.white { background: #fff; }
-.item:hover .card-media > img, .item:hover .card-media > video { transform: scale(1.03); }
-/* pionowe rzeczy: wysokość jak sąsiednia karta 16:10 */
-.card-media.pion { aspect-ratio: .775; }
-.card-media.pion > video, .card-media.pion > img { object-fit: contain; }
-.item.running .card-media { aspect-ratio: auto; height: min(80vh, 700px); border: 1px solid var(--line); }
-.card-media iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
-
-.cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin-top: 12px; }
-.cap .no { font-weight: 700; font-size: 13px; color: var(--accent); min-width: 1.6em; }
-.cap h3 { font-weight: 700; font-size: clamp(19px, 1.9vw, 26px); letter-spacing: -.01em; }
-.cap .what { font-size: 14px; color: var(--muted); }
-.desc { font-size: 14px; line-height: 1.5; color: #444; margin-top: 6px; max-width: 62ch; }
-.tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.tools span { font-size: 12px; font-weight: 700; padding: 4px 8px; border: 1px solid var(--line); color: #444; }
-.tools span:first-child { border-color: var(--accent); color: #6c4ca6; }
-.item .go { align-self: flex-start; }
-
-/* galeria w karcie */
-.gal-stage { position: absolute; inset: 0; background: var(--soft); }
-.gal-stage > * {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* podgląd przy kursorze */
+.peek {
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 30;
+  width: clamp(240px, 26vw, 400px);
+  pointer-events: none;
   opacity: 0;
-  transition: opacity .45s ease;
+  transform: translate(-9999px, 0);
+  transition: opacity .2s ease;
 }
-.gal-stage.contain > * { object-fit: contain; background: #fff; }
-.gal-stage > .on { opacity: 1; z-index: 1; }
-.chips { position: absolute; left: 10px; bottom: 10px; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px; }
-.chips button {
-  padding: 6px 9px;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  background: rgba(255, 255, 255, .92);
-  border: 1px solid var(--line);
-  cursor: pointer;
-  transition: background .2s, color .2s;
+.peek.on { opacity: 1; }
+.peek-box { position: relative; aspect-ratio: 16 / 10; background: #111; overflow: hidden; box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .45); }
+.peek-box.pion { aspect-ratio: 4 / 5; }
+.peek-box video, .peek-box img { width: 100%; height: 100%; object-fit: cover; }
+.peek-cap { margin-top: 8px; font: 12px/1.45 var(--mono); color: var(--ink); background: rgba(255, 255, 255, .92); display: inline-block; padding: 4px 6px; }
+
+/* ---------- kontakt ---------- */
+
+.kontakt { padding: clamp(48px, 10vh, 120px) var(--pad) clamp(40px, 8vh, 80px); border-top: 1px solid var(--line); }
+.kontakt h2 { font-weight: 700; font-size: clamp(30px, 4.6vw, 64px); line-height: 1.04; letter-spacing: -.025em; }
+.kontakt h2 span { color: var(--accent); }
+.kontakt p { margin-top: 14px; font-size: clamp(15px, 1.4vw, 19px); color: #333; }
+.kontakt ul { list-style: none; margin-top: 26px; display: flex; flex-wrap: wrap; gap: 8px 32px; font: 700 clamp(15px, 1.5vw, 20px)/1.4 var(--mono); }
+.kontakt ul a { text-decoration: none; border-bottom: 2px solid var(--accent); }
+.kontakt ul a:hover { color: var(--accent); }
+.kontakt .glify { margin-top: 36px; font-weight: 700; font-size: clamp(16px, 2vw, 24px); }
+
+/* ---------- karta projektu ---------- */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  animation: wjazd .45s var(--ease);
 }
-.chips button:hover { color: var(--accent); }
-.chips button[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.sheet[hidden] { display: none; }
+@keyframes wjazd { from { opacity: 0; transform: translateY(24px); } }
 
-/* granica: model miasta 3D */
-.city { background: var(--soft); cursor: grab; }
-.city:active { cursor: grabbing; }
-.city canvas { display: block; width: 100% !important; height: 100% !important; }
-.city .wait { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #aaa; letter-spacing: 2px; }
-.city.ready .wait { display: none; }
+.sh-top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px var(--pad);
+  font: 700 13px/1 var(--mono);
+}
+.sh-top .cat b { color: var(--accent); letter-spacing: 2px; margin-right: 8px; }
+.sh-top .count { color: var(--muted); font-weight: 400; }
+.sh-top .x { margin-left: auto; font: 400 34px/1 "Helvetica Neue", Helvetica, Arial, sans-serif; padding: 0 4px; transition: color .2s, transform .3s var(--ease); }
+.sh-top .x:hover { color: var(--accent); transform: rotate(90deg); }
 
-.tri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.tri img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; transition: transform .5s var(--ease); }
-.tri:hover img { transform: translateY(-6px); }
-.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.6vw, 20px); }
-.trio img { width: 100%; aspect-ratio: 1100 / 778; object-fit: contain; background: #fff; border: 1px solid var(--line); }
-
-.play {
+.sh-strip {
+  display: flex;
+  gap: clamp(10px, 1.4vw, 18px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--pad);
+  padding: 4px var(--pad) 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+  overscroll-behavior-x: contain;
+}
+.m {
+  position: relative;
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--soft);
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+.m.pion { aspect-ratio: 9 / 16; }
+.m.a4 { aspect-ratio: 1000 / 1414; }
+.m.white { background: #fff; outline: 1px solid var(--line); outline-offset: -1px; }
+.m > img, .m > video { width: 100%; height: 100%; object-fit: cover; }
+.m.contain > img, .m.contain > video { object-fit: contain; }
+.m iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+.m .play {
   position: absolute;
   inset: 0;
-  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0);
-  border: 0;
-  cursor: pointer;
   transition: background .3s;
 }
-.play:hover { background: rgba(255, 255, 255, .25); }
-.play span {
-  background: var(--ink);
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 12px 18px;
-  transition: background .25s, transform .25s var(--ease);
+.m .play:hover { background: rgba(255, 255, 255, .2); }
+.m .play span { background: var(--ink); color: #fff; font-weight: 700; font-size: 15px; padding: 13px 20px; transition: background .25s, transform .25s var(--ease); }
+.m .play:hover span { background: var(--accent); transform: scale(1.06); }
+.m .tag { position: absolute; left: 10px; bottom: 10px; font: 700 11px/1 var(--mono); background: rgba(255, 255, 255, .92); padding: 5px 7px; }
+.city { cursor: grab; }
+.city:active { cursor: grabbing; }
+.city canvas { display: block; width: 100% !important; height: 100% !important; }
+.city .wait { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #bbb; letter-spacing: 2px; }
+.city.ready .wait { display: none; }
+
+.sh-info {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 14px 32px;
+  padding: clamp(12px, 2vh, 22px) var(--pad) clamp(16px, 3vh, 30px);
 }
-.play:hover span { background: var(--accent); transform: scale(1.06); }
+.sh-title { font-weight: 700; font-size: clamp(32px, 4.6vw, 68px); line-height: .98; letter-spacing: -.03em; }
+.sh-title sup { font: 700 13px/1 var(--mono); color: var(--accent); vertical-align: top; letter-spacing: 0; margin-left: 8px; position: relative; top: .5em; }
+.sh-label { margin-top: 6px; font-size: clamp(15px, 1.4vw, 18px); color: var(--muted); }
+.sh-desc { margin-top: 10px; font-size: clamp(14px, 1.25vw, 16px); line-height: 1.5; max-width: 70ch; color: #333; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tools span { font: 700 12px/1 var(--mono); padding: 5px 8px; border: 1px solid var(--line); color: #444; }
+.tools span:first-child { border-color: var(--accent); color: var(--accent-ink); }
+.sh-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; }
+.sh-links a { font-weight: 700; font-size: 13px; text-decoration: none; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+.sh-links a:hover { color: var(--accent); }
+.sh-nav { display: flex; gap: 10px; font: 700 13px/1 var(--mono); white-space: nowrap; }
+.sh-nav button { border: 1px solid var(--line); padding: 10px 12px; transition: border-color .2s, color .2s; }
+.sh-nav button:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ---------- kontakt ---------- */
+/* ---------- telefon ---------- */
 
-.statement { font-weight: 700; font-size: clamp(36px, 6vw, 92px); line-height: 1.02; letter-spacing: -.025em; }
-.lead { font-size: clamp(16px, 1.6vw, 21px); line-height: 1.5; max-width: 44ch; margin-top: 18px; color: #333; }
-.contact-list { list-style: none; margin-top: clamp(24px, 5vh, 52px); font-size: clamp(20px, 3vw, 40px); }
-.contact-list li { display: flex; gap: clamp(20px, 4vw, 64px); padding: 6px 0; }
-.contact-list b { font-weight: 700; min-width: 3.2em; }
-.contact-list a { text-decoration: none; }
-.contact-list a:hover { color: var(--accent); }
-.end-foot { margin-top: clamp(24px, 5vh, 52px); display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: baseline; }
-
-/* ---------- mniejsze ekrany ---------- */
-
-@media (max-width: 1000px) {
-  .item, .item.s8 { grid-column: span 6; }
-  .card-media.pion { aspect-ratio: 16 / 10; }
-}
-@media (max-width: 720px) {
-  .item, .item.s6, .item.s8 { grid-column: 1 / -1; }
-  .card-media.pion { aspect-ratio: 4 / 5; }
-  .side-label { display: none; }
-  .trio { grid-template-columns: 1fr; }
-  .item.running .card-media { height: 78vh; }
+@media (max-width: 760px) {
+  .top .mid { display: none; }
+  .idx { font-size: clamp(34px, 10.5vw, 56px); }
+  .peek { display: none; }
+  .sh-strip { padding-bottom: 6px; }
+  .sheet { grid-template-rows: auto 52vh auto; overflow-y: auto; }
+  .sh-info { grid-template-columns: 1fr; }
+  .sh-nav { justify-content: space-between; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .rv { opacity: 1; transform: none; transition: none; }
-  .scroll-hint { animation: none; }
+  .sheet { animation: none; }
   * { transition-duration: .01ms !important; }
 }
 </style>
 </head>
 <body>
 
-<header class="bar" id="bar">
-  <a href="#start">staś <span class="x">&times;</span> ai</a>
-  <a href="#wpadne">kontakt</a>
-  <span class="prog" id="prog" aria-hidden="true"></span>
+<header class="top">
+  <a href="#projekty">staś szpineta <span class="x">&times;</span> ai</a>
+  <span class="mid">dla otwartej pracowni sztucznej inteligencji</span>
+  <a href="#kontakt">kontakt</a>
 </header>
 
 <main>
+  <section class="index" id="projekty">
+    <span class="ascii tl">&ldquo;~||-</span>
+    <span class="ascii tr">_^+*.</span>
+    <p class="kicker" id="kicker">[projekty zrobione z AI] <span>najedź &middot; kliknij</span></p>
+    <div id="zones"><!-- js --></div>
+  </section>
 
-<!-- ================= OKŁADKA ================= -->
-<section class="cover" id="start">
-  <span class="ascii tl">&ldquo;~||-</span>
-  <span class="ascii tr">_^+*.</span>
-  <header class="cover-top">
-    <p>staś szpineta &middot; school of form (swps), projektowanie, 2. rok</p>
-    <p>[dla otwartej pracowni sztucznej inteligencji]</p>
-  </header>
-  <div class="cover-title">
-    <p class="mirror" aria-hidden="true">staś &times; ai</p>
-    <h1 class="big-title">staś <span class="x scr" data-word="&times; ai">&times; ai</span></h1>
-    <p class="cover-sub">rzeczy, które zrobiłem z AI</p>
-  </div>
-  <footer class="cover-foot">
-    <p class="ascii-line">~+_+~/&bdquo;-&bdquo;*+*^_^+~+</p>
-  </footer>
-  <a class="scroll-hint" href="#projekty" aria-label="dalej">&darr;</a>
-</section>
-
-<!-- ================= PROJEKTY ================= -->
-<section id="projekty">
-  <span class="ascii tl">.*+^_</span>
-  <span class="ascii tr">-||~&rdquo;</span>
-  <span class="side-label left"><b>projekty</b>&nbsp;<i>01</i></span>
-  <div class="wrap">
-    <p class="kicker">[22 rzeczy]</p>
-    <div class="grid">
-      <article class="item s8 rv">
-        <div class="card-media gal">
-          <div class="gal-stage contain">
-            <video data-pane data-label="model" src="/portfolio/assets/bor-film/model.mp4" poster="/portfolio/assets/bor-film/model.jpg" muted loop playsinline preload="none" aria-label="model 3d bóru"></video>
-            <img data-pane data-label="render" src="m/stas-render.jpg" alt="render bóru" loading="lazy">
-            <img data-pane data-label="części" src="m/stas-czesci.jpg" alt="części bóru" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">01</span><h3>bór</h3><span class="what">oczyszczacz powietrza na kark</span></div>
-        <p class="desc">model 155 części budowany przez Claude wprost w Rhino (MCP, skrypty C#), ze sprawdzaniem kolizji z głową. w środku filtr HEPA, dmuchawa, serwo z klapką dozującą zapach i kryształ z LED; 29 plików STL na 13 płyt druku.</p>
-        <p class="tools"><span>Claude</span><span>Rhino</span><span>MCP</span><span>C#</span></p>
-        <a class="go" href="/portfolio/bor/">strona bóru &rarr;</a>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media pion white"><video src="m/bor-rolka.mp4" poster="m/bor-rolka.jpg" muted loop playsinline preload="none" aria-label="rolka o bórze"></video></div>
-        <div class="cap"><span class="no">02</span><h3>rolka o bórze</h3></div>
-        <p class="desc">szkic rolki 9:16 z widoków modelu 3D: filtr, klapka zapachu, wyloty, światło.</p>
-        <p class="tools"><span>Claude</span><span>three.js</span></p>
-      </article>
-
-      <article class="item s8 live rv" data-src="/portfolio/scroll-straznik/" data-title="scroll strażnik">
-        <div class="card-media">
-          <video src="m/straz-demo.mp4" poster="m/straz-demo.jpg" muted loop playsinline preload="none" aria-label="strona scroll strażnika: nie scrollujesz, scrollujesz, internet odcięty"></video>
-          <button class="play" type="button"><span>&#9654; odpal z kamerą</span></button>
-        </div>
-        <div class="cap"><span class="no">03</span><h3>scroll strażnik</h3><span class="what">kamera, która widzi, że scrollujesz</span></div>
-        <p class="desc">kamera w rogu pokoju, YOLO26 (poza i telefon w powiększonym kadrze osoby) liczy, ile trzymasz telefon; po limicie przekaźnik na zasilaczu routera miał odciąć internet (ESP32, niezbudowany). tu wersja w przeglądarce: MediaPipe, ta sama logika.</p>
-        <p class="tools"><span>Claude</span><span>Python</span><span>YOLO</span><span>OpenCV</span><span>MediaPipe</span></p>
-        <a class="go" href="/portfolio/scroll-straznik/" target="_blank" rel="noopener">otwórz osobno &nearr;</a>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media pion" style="background:#f6f6f6"><img src="m/plakat-wiersz.jpg" alt="plakat z wierszem: po pełni (z)nów" loading="lazy"></div>
-        <div class="cap"><span class="no">04</span><h3>plakaty z wierszami</h3><span class="what">jeden plakat na wiersz</span></div>
-        <p class="desc">szata wyjęta z kodu szpineta.com: nastrój wiersza steruje kątem wersów, rozmiarem i wagą liter (Inter variable, 130–880). jeden akcent lawendowy, znaczki ascii jako słowa.</p>
-        <p class="tools"><span>Claude</span><span>Claude Design</span><span>HTML/CSS</span></p>
-      </article>
-
-      <article class="item s8 rv">
-        <div class="card-media gal">
-          <div class="gal-stage">
-            <img data-pane data-label="okładka" src="m/lukullus-1.jpg" alt="Lukullus: okładka identyfikacji" loading="lazy">
-            <img data-pane data-label="logo" src="m/lukullus-2.jpg" alt="Lukullus: logo" loading="lazy">
-            <img data-pane data-label="znaki" src="m/lukullus-3.jpg" alt="Lukullus: znaki rozpoznawcze" loading="lazy">
-            <img data-pane data-label="pudełko 3D" src="m/lukullus-4.jpg" alt="Lukullus: model 3D opakowania" loading="lazy">
-            <img data-pane data-label="opakowania" src="m/lukullus-5.jpg" alt="Lukullus: rodzina opakowań" loading="lazy">
-            <img data-pane data-label="strona" src="m/lukullus-6.jpg" alt="Lukullus: strona internetowa" loading="lazy">
-            <img data-pane data-label="zastosowania" src="m/lukullus-7.jpg" alt="Lukullus: zastosowania" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">05</span><h3>Lukullus</h3><span class="what">identyfikacja cukierni, koncepcja niezamawiana</span></div>
-        <p class="desc">sygnet to przekrój kremówki złożony z moich znaczków; żółty #FFF200, czerń i lawenda, Bodoni Moda + Helvetica. 14 plansz: logo, opakowania z wykrojnikiem, pudełko 3D w CSS, render w Blenderze ze skryptów Pythona, strona.</p>
-        <p class="tools"><span>Claude Design</span><span>Blender</span><span>Python</span></p>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media pion"><video src="m/dziubi-oko.mp4" poster="m/dziubi-oko.jpg" muted loop playsinline preload="none" aria-label="dziubi na monitorze kineskopowym i jego kamera"></video></div>
-        <div class="cap"><span class="no">06</span><h3>dziubi</h3><span class="what">stworek na starym monitorze</span></div>
-        <p class="desc">postać w pygame na monitorze kineskopowym. kamera rozpoznaje twarze lokalnie (YuNet, SFace), Whisper słucha lokalnie, Claude odpowiada głosem; o zmierzchu zasypia, w nocy pisze dziennik.</p>
-        <p class="tools"><span>Claude</span><span>Python</span><span>pygame</span><span>Whisper</span></p>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media gal">
-          <div class="gal-stage contain">
-            <img data-pane data-label="w Rhino" src="m/para-rhino.jpg" alt="para: warianty stojaka na jajka w Rhino" loading="lazy">
-            <img data-pane data-label="prototyp" src="m/para-druk.jpg" alt="para: jajko i połówki stojaka do druku" loading="lazy">
-            <img data-pane data-label="film" src="m/para-opis.jpg" alt="para: film z opisem" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">07</span><h3>para</h3><span class="what">stojak na jajka</span></div>
-        <p class="desc">ceramiczna forma na mosiężnym łańcuszku w ramie z jednego pręta. warianty modelowane w Rhino przez Claude, połówki prototypu drukowane na Bambu Lab A1 i przymierzane do jajka; rysunki i film z opisem z tego samego modelu.</p>
-        <p class="tools"><span>Claude</span><span>Rhino</span><span>druk 3D</span></p>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media gal">
-          <div class="gal-stage">
-            <div data-pane data-label="model 3D" class="city" id="city"><span class="wait">~||-_^+*.</span></div>
-            <img data-pane data-label="z góry" src="m/granica-1.jpg" alt="granica: znak na budynkach Warszawy z góry" loading="lazy">
-            <img data-pane data-label="pałac" src="m/granica-2.jpg" alt="granica: znak przy Pałacu Kultury" loading="lazy">
-            <img data-pane data-label="bliżej" src="m/granica-3.jpg" alt="granica: znak rozlany po dachach" loading="lazy">
-            <img data-pane data-label="spacer" src="m/granica-4.jpg" alt="granica: widok z ulicy" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">08</span><h3>granica</h3><span class="what">znak rzucony na Warszawę</span></div>
-        <p class="desc">aplikacja na fotorealistycznym modelu miasta: adres, obserwator, kierunek, a obraz rzutuje się na bryły budynków; tryb spaceru z poziomu ulicy. obok model brył w Rhino.</p>
-        <p class="tools"><span>Claude</span><span>CesiumJS</span><span>Google 3D Tiles</span><span>Rhino</span></p>
-        <a class="go" href="/portfolio/#granica">plakat &rarr;</a>
-      </article>
-
-      <article class="item s12 rv">
-        <div class="trio">
-          <img src="m/bor-rozstrzal.jpg" alt="bór: rozstrzał i wykaz pozycji" loading="lazy">
-          <img src="m/stas-rysunek.jpg" alt="bór: rzuty i gabaryty" loading="lazy">
-          <img src="m/czajnik-rysunek.jpg" alt="czajnik: rysunek techniczny" loading="lazy">
-        </div>
-        <div class="cap"><span class="no">09</span><h3>rysunki techniczne</h3><span class="what">bór i czajnik</span></div>
-        <p class="desc">skrypt w RhinoPython rozkłada każdą część na arkusz: 3 widoki (Make2D) i wymiary. przy bórze 7 arkuszy A3, wykaz 50 pozycji i instrukcja montażu na 54 strony.</p>
-        <p class="tools"><span>Claude</span><span>Rhino</span><span>RhinoPython</span></p>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media gal">
-          <div class="gal-stage contain">
-            <video data-pane data-label="animacja" src="m/logo-loop.mp4" poster="m/logo-loop.jpg" muted loop playsinline preload="none" aria-label="animacja logo"></video>
-            <img data-pane data-label="znak" src="m/mkj-logo.jpg" alt="logo z czterech dymków" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">10</span><h3>logo z dymków</h3><span class="what">dla Press Club Polska</span></div>
-        <p class="desc">cztery dymki czatu tworzą różę wiatrów, w środku uczeń. kierunki w Claude Design, geometria poprawiana przez MCP w moim pliku Illustratora, 8 palet sprawdzanych pod WCAG, księga znaku skryptem ExtendScript.</p>
-        <p class="tools"><span>Claude Design</span><span>Illustrator</span><span>MCP</span><span>Figma</span></p>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media gal">
-          <div class="gal-stage">
-            <video data-pane data-label="gazeta" src="m/medialna-gazeta.mp4" poster="m/medialna-gazeta.jpg" muted loop playsinline preload="none" aria-label="kierunek gazeta"></video>
-            <video data-pane data-label="dymki" src="m/medialna-dymki.mp4" poster="m/medialna-dymki.jpg" muted loop playsinline preload="none" aria-label="kierunek z dymkami"></video>
-            <img data-pane data-label="spis" src="m/web-spis.jpg" alt="kierunek spis" loading="lazy">
-            <img data-pane data-label="dwa okna" src="m/web-dwaokna.jpg" alt="kierunek dwa okna" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">11</span><h3>medialna.edu.pl</h3><span class="what">kierunki nowej strony</span></div>
-        <p class="desc">7 kierunków na prawdziwych treściach serwisu dla rodziców i nauczycieli. wejście przez to, jakiej wiedzy szukasz, 4 taksonomie, prototyp HTML pod motyw WordPressa.</p>
-        <p class="tools"><span>Claude</span><span>HTML</span><span>WordPress</span></p>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media gal">
-          <div class="gal-stage">
-            <img data-pane data-label="lampa" src="m/icu-a.jpg" alt="icu: świecący trójkąt" loading="lazy">
-            <img data-pane data-label="elektronika" src="m/icu-p13.jpg" alt="icu: elektronika i program" loading="lazy">
-            <img data-pane data-label="światło" src="m/icu-p12.jpg" alt="icu: testy światła" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">12</span><h3>icu</h3><span class="what">lampa, która reaguje na obecność</span></div>
-        <p class="desc">drewno, plexi i papier, 94 diody na ESP z WLED. kamera i MediaPipe śledzą dłoń, jej pozycja w 3D zmienia kolor diod, machnięcie puszcza falę od krawędzi do szczytu.</p>
-        <p class="tools"><span>Claude</span><span>Python</span><span>MediaPipe</span><span>WLED</span></p>
-        <a class="go" href="/portfolio/#icu">dokumentacja &rarr;</a>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media gal">
-          <div class="gal-stage">
-            <video data-pane data-label="yblzr pro" src="/portfolio/assets/yoobilizery/yblzrpro.mp4" poster="/portfolio/assets/yoobilizery/yblzrpro.jpg" muted loop playsinline preload="none" aria-label="yblzr pro"></video>
-            <video data-pane data-label="yoobilizer" src="/portfolio/assets/yoobilizery/yoobilizer.mp4" poster="/portfolio/assets/yoobilizery/yoobilizer.jpg" muted loop playsinline preload="none" aria-label="yoobilizer"></video>
-            <video data-pane data-label="yblzr" src="/portfolio/assets/yoobilizery/yblzr.mp4" poster="/portfolio/assets/yoobilizery/yblzr.jpg" muted loop playsinline preload="none" aria-label="yblzr"></video>
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">13</span><h3>yoobilizery</h3><span class="what">wizualizacje dźwięku na żywo</span></div>
-        <p class="desc">Python z OpenGL: bit, bas i wysokie zmieniają neonowe bryły z siatki, od torusów po butelkę Kleina; jedna wersja synchronizuje taśmę LED przez Arduino. AI wyciągnęło z 5000 linii kodu opis wyglądu i przepisało go do przeglądarki.</p>
-        <p class="tools"><span>Claude</span><span>Python</span><span>OpenGL</span><span>Arduino</span></p>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media contain white"><video src="m/lawenda.mp4" poster="m/lawenda.jpg" muted loop playsinline preload="none" aria-label="lawenda z moich znaków"></video></div>
-        <div class="cap"><span class="no">14</span><h3>lawenda</h3><span class="what">strona z moimi wierszami</span></div>
-        <p class="desc">163 wiersze na szpineta.com. model nadał każdemu profil emocji, który steruje grubością liter (variable font); lawenda na starcie to chmura punktów z moich znaków.</p>
-        <p class="tools"><span>Claude</span><span>JS</span><span>three.js</span></p>
-        <a class="go" href="/">szpineta.com &rarr;</a>
-      </article>
-
-      <article class="item s6 rv">
-        <div class="card-media contain white"><video src="m/lawenda-gate.mp4" poster="m/lawenda-gate.jpg" muted loop playsinline preload="none" aria-label="bramka do wierszy"></video></div>
-        <div class="cap"><span class="no">15</span><h3>bramka do wierszy</h3><span class="what">kod z moich znaczków</span></div>
-        <p class="desc">zamiast QR unikalne ciągi moich znaczków. najpierw skaner kamerą (progowanie Otsu, dopasowanie wzorców), teraz kod wpisywany z klawiatury znaczków.</p>
-        <p class="tools"><span>Claude</span><span>JS</span></p>
-      </article>
-
-      <article class="item s6 live rv" data-src="/portfolio/harmonograf/" data-title="harmonograf">
-        <div class="card-media">
-          <video src="m/harmonograf.mp4" poster="m/harmonograf.jpg" muted loop playsinline preload="none" aria-label="harmonograf"></video>
-          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
-        </div>
-        <div class="cap"><span class="no">16</span><h3>harmonograf</h3><span class="what">instrument do rysowania plakatów</span></div>
-        <p class="desc">symulacja czterech wahadeł i dwóch piór, 20 suwaków. każdy rysunek ma swój kod, więc da się go odtworzyć i wyeksportować jako plakat PNG.</p>
-        <p class="tools"><span>Claude</span><span>JS</span><span>Canvas</span></p>
-      </article>
-
-      <article class="item s6 live rv" data-src="/portfolio/klawisz/" data-title="klawisz po klawiszu">
-        <div class="card-media">
-          <video src="m/klawisz.mp4" poster="m/klawisz.jpg" muted loop playsinline preload="none" aria-label="klawisz po klawiszu"></video>
-          <button class="play" type="button"><span>&#9654; odpal tutaj</span></button>
-        </div>
-        <div class="cap"><span class="no">17</span><h3>klawisz po klawiszu</h3><span class="what">trener skrótów na Maca</span></div>
-        <p class="desc">49 skrótów, każdy z animowanym demo przed i po; tryby nauka, ćwiczenie, test. skróty sprawdzone z dokumentacją Apple, 7 wersji.</p>
-        <p class="tools"><span>Claude</span><span>JS</span></p>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media pion"><video src="m/gdd-program.mp4" poster="m/gdd-program.jpg" muted loop playsinline preload="none" aria-label="rolka: program Gdańskich Dni Demokracji"></video></div>
-        <div class="cap"><span class="no">18</span><h3>rolka: program dnia</h3><span class="what">Gdańskie Dni Demokracji</span></div>
-        <p class="desc">animowany program dnia 9:16 w identyfikacji festiwalu.</p>
-        <p class="tools"><span>Claude Code</span></p>
-      </article>
-
-      <article class="item s8 rv">
-        <div class="tri">
-          <img src="m/gdd-1.jpg" alt="szablon rolki: Wspólnota ma moc" loading="lazy">
-          <img src="m/gdd-2.jpg" alt="szablon rolki: Nie daj się manipulacji" loading="lazy">
-          <img src="m/gdd-4.jpg" alt="szablon rolki: Gdańsk 14–16/09/2026" loading="lazy">
-        </div>
-        <div class="cap"><span class="no">19</span><h3>rolki dla Press Club Polska</h3><span class="what">ok. 90 sztuk, wywiady i wydarzenia</span></div>
-        <p class="desc">linia montażowa w Pythonie: transkrypcja mlx-whisper, wybór fragmentów (kilku agentów pilnuje, żeby cięcia nie urywały zdań), kadr 9:16 za twarzą, napisy, ffmpeg. z jednego wywiadu 45 klipów.</p>
-        <p class="tools"><span>Claude Code</span><span>Whisper</span><span>ffmpeg</span><span>Python</span></p>
-        <a class="go" href="https://youtu.be/uRurgMMceWI" target="_blank" rel="noopener">wywiad „Oni wiedzą” &nearr;</a>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media"><video src="m/oczy-wojny.mp4" poster="m/oczy-wojny.jpg" muted loop playsinline preload="none" aria-label="oczy wojny: fotografowie"></video></div>
-        <div class="cap"><span class="no">20</span><h3>oczy wojny</h3><span class="what">koncept strony</span></div>
-        <p class="desc">nieoficjalny koncept strony fotografów wystawy: indeks 16 nazwisk, portret idzie za kursorem, biogram jak teczka w ciemni.</p>
-        <p class="tools"><span>Claude</span><span>HTML</span></p>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media gal">
-          <div class="gal-stage">
-            <img data-pane data-label="render" src="m/czajnik-render.jpg" alt="czajnik SMEG: render" loading="lazy">
-            <img data-pane data-label="w kuchni" src="m/czajnik-kuchnia.jpg" alt="czajnik SMEG: render w kuchni" loading="lazy">
-          </div>
-          <div class="chips"></div>
-        </div>
-        <div class="cap"><span class="no">21</span><h3>czajnik SMEG</h3><span class="what">Rhino 2, projekt grupowy</span></div>
-        <p class="desc">korpus, rączka, pokrywa, wylewka i podstawa odtworzone część po części, każda z arkuszem wymiarów; render w kuchni.</p>
-        <p class="tools"><span>Claude</span><span>Rhino</span></p>
-      </article>
-
-      <article class="item rv">
-        <div class="card-media"><video src="m/portfolio-sof.mp4" poster="m/portfolio-sof.jpg" muted loop playsinline preload="none" aria-label="archiwum pierwszego roku"></video></div>
-        <div class="cap"><span class="no">22</span><h3>archiwum 1. roku</h3><span class="what">to portfolio</span></div>
-        <p class="desc">lista projektów z podziałem na lata, przeglądarka plansz i filmów, czysty HTML, CSS i JS.</p>
-        <p class="tools"><span>Claude</span><span>HTML</span><span>JS</span></p>
-        <a class="go" href="/portfolio/#rok-1">otwórz &rarr;</a>
-      </article>
-
-    </div>
-  </div>
-  <span class="pagenum r">1</span>
-</section>
-
-<!-- ================= KONTAKT ================= -->
-<section id="wpadne">
-  <span class="ascii tl">&ldquo;~||-</span>
-  <span class="ascii tr">_^+*.</span>
-  <span class="side-label right"><b>kontakt</b>&nbsp;<i>02</i></span>
-  <div class="wrap">
-    <p class="statement rv">chętnie do was <span class="accent">wpadnę.</span></p>
-    <p class="lead rv">pokażę to na żywo. a jeśli szukacie asystentów, <b>jestem bardziej niż chętny.</b></p>
-    <ul class="contact-list rv">
-      <li><b>@</b><span><a href="mailto:stanislaw@szpineta.com">stanislaw@szpineta.com</a></span></li>
-      <li><b>+</b><span><a href="tel:+48721707330">48&thinsp;721&thinsp;707&thinsp;330</a></span></li>
-      <li><b>web</b><span><a href="/">szpineta.com</a></span></li>
-      <li><b>ig</b><span><a href="https://instagram.com/s.sz_archive" target="_blank" rel="noopener">s.sz_archive</a></span></li>
+  <section class="kontakt" id="kontakt">
+    <h2>chętnie do was <span>wpadnę.</span></h2>
+    <p>a jeśli szukacie asystentów, jestem bardziej niż chętny.</p>
+    <ul>
+      <li><a href="mailto:stanislaw@szpineta.com">stanislaw@szpineta.com</a></li>
+      <li><a href="tel:+48721707330">+48&thinsp;721&thinsp;707&thinsp;330</a></li>
+      <li><a href="/">szpineta.com</a></li>
+      <li><a href="/portfolio/">portfolio</a></li>
+      <li><a href="https://instagram.com/s.sz_archive" target="_blank" rel="noopener">ig: s.sz_archive</a></li>
     </ul>
-    <div class="end-foot">
-      <p class="ascii-line">~+_+~/&bdquo;-&bdquo;*+*^_^+~+</p>
-      <a class="go" href="/portfolio/">całe portfolio &rarr;</a>
-    </div>
-  </div>
-  <span class="pagenum l">&infin;</span>
-</section>
-
+    <p class="glify">~+_+~/&bdquo;-&bdquo;*+*^_^+~+</p>
+  </section>
 </main>
+
+<div class="peek" id="peek" aria-hidden="true">
+  <div class="peek-box" id="peekBox"></div>
+  <p class="peek-cap" id="peekCap"></p>
+</div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle" hidden>
+  <div class="sh-top">
+    <span class="cat" id="shCat"></span>
+    <span class="count" id="shCount"></span>
+    <button class="x" id="shX" type="button" aria-label="zamknij">&times;</button>
+  </div>
+  <div class="sh-strip" id="shStrip" tabindex="0" aria-label="materiały projektu"></div>
+  <div class="sh-info">
+    <div>
+      <h2 class="sh-title" id="shTitle"></h2>
+      <p class="sh-label" id="shLabel"></p>
+      <p class="sh-desc" id="shDesc"></p>
+      <p class="tools" id="shTools"></p>
+      <p class="sh-links" id="shLinks"></p>
+    </div>
+    <nav class="sh-nav" aria-label="inne projekty">
+      <button type="button" id="shPrev">&larr; <span></span></button>
+      <button type="button" id="shNext"><span></span> &rarr;</button>
+    </nav>
+  </div>
+</div>
 
 <script>
 (function () {
   'use strict';
-  document.documentElement.classList.add('js');
+
+  /* ---------------- projekty ---------------- */
+
+  var B = '/portfolio/assets/';
+  var CAT = {
+    uczelnia: { glif: '||', nazwa: 'uczelnia', opis: 'School of Form' },
+    prywatne: { glif: '~', nazwa: 'prywatne', opis: 'dla siebie' },
+    zlecenia: { glif: '_^', nazwa: 'dla Press Club Polska', opis: 'zlecenia' }
+  };
+  /* media: v = film, i = obraz, live = narzędzie do odpalenia, city = model 3D; k: pion | a4, fit: contain, bg: white */
+  var P = [
+    { id: 'bor', cat: 'uczelnia', t: 'bór', l: 'oczyszczacz powietrza noszony na karku · warsztaty mistrzowskie u Alicji Wysockiej',
+      d: '155 części modelowanych przez Claude wprost w Rhino (MCP, C#), ze sprawdzaniem kolizji z głową; filtr HEPA, dmuchawa, serwo dozujące zapach, kryształ z LED. do tego 7 arkuszy A3, instrukcja i rolka z modelu.',
+      tools: ['Claude', 'Rhino', 'MCP', 'three.js'],
+      m: [{ v: B + 'bor-film/model.mp4', p: B + 'bor-film/model.jpg', fit: 1, bg: 1 }, { v: 'm/bor-rolka.mp4', p: 'm/bor-rolka.jpg', k: 'pion', fit: 1, bg: 1 }, { i: 'm/stas-render.jpg', fit: 1, bg: 1 }, { i: 'm/stas-czesci.jpg', fit: 1, bg: 1 }, { i: 'm/bor-rozstrzal.jpg', fit: 1, bg: 1 }, { i: 'm/stas-rysunek.jpg', fit: 1, bg: 1 }],
+      links: [['/portfolio/bor/', 'strona bóru']] },
+    { id: 'lukullus', cat: 'uczelnia', t: 'lukullus', l: 'identyfikacja cukierni, koncepcja',
+      d: 'sygnet to przekrój kremówki złożony z moich znaczków; żółć, czerń i lawenda, Bodoni Moda z Helvetiką. 14 plansz: logo, opakowania z wykrojnikiem, pudełko 3D w CSS, render w Blenderze ze skryptu, strona.',
+      tools: ['Claude Design', 'Blender', 'Python'],
+      m: [1, 2, 3, 4, 5, 6, 7].map(function (n) { return { i: 'm/lukullus-' + n + '.jpg' }; }) },
+    { id: 'para', cat: 'uczelnia', t: 'para', l: 'ceramiczny stojak na jajka',
+      d: 'forma na mosiężnym łańcuszku w ramie z jednego pręta. warianty modelowane w Rhino przez Claude, połówki prototypu drukowane i przymierzane do jajka, rysunki i film z opisem z tego samego modelu.',
+      tools: ['Claude', 'Rhino', 'druk 3D'],
+      m: [{ i: 'm/para-rhino.jpg' }, { i: 'm/para-druk.jpg' }, { i: 'm/para-opis.jpg', fit: 1 }] },
+    { id: 'granica', cat: 'uczelnia', t: 'granica', l: 'znak rzucony na Warszawę · projektowanie 2D',
+      d: 'aplikacja na fotorealistycznym modelu miasta: adres, obserwator, kierunek, obraz rzutowany na bryły budynków, spacer z poziomu ulicy. obok model brył w Rhino do kręcenia.',
+      tools: ['Claude', 'CesiumJS', 'Google 3D Tiles', 'Rhino'],
+      m: [{ i: 'm/granica-1.jpg' }, { city: 'm/granica-miasto.bin' }, { i: 'm/granica-2.jpg' }, { i: 'm/granica-3.jpg' }, { i: 'm/granica-4.jpg' }],
+      links: [['/portfolio/#granica', 'plakat i proces']] },
+    { id: 'icu', cat: 'uczelnia', t: 'icu', l: 'lampa, która reaguje na obecność · projektowanie 3D',
+      d: 'drewno, plexi i papier, 94 diody na ESP z WLED. kamera i MediaPipe śledzą dłoń, jej pozycja w 3D zmienia kolor diod, machnięcie puszcza falę od krawędzi do szczytu.',
+      tools: ['Claude', 'Python', 'MediaPipe', 'WLED'],
+      m: [{ i: 'm/icu-a.jpg' }, { i: 'm/icu-p13.jpg', fit: 1, bg: 1 }, { i: 'm/icu-p12.jpg', fit: 1, bg: 1 }],
+      links: [['/portfolio/#icu', 'cała dokumentacja']] },
+    { id: 'czajnik', cat: 'uczelnia', t: 'czajnik smeg', l: 'Rhino 2, projekt grupowy',
+      d: 'korpus, rączka, pokrywa, wylewka i podstawa odtworzone część po części, każda z arkuszem wymiarów; render w kuchni.',
+      tools: ['Claude', 'Rhino', 'RhinoPython'],
+      m: [{ i: 'm/czajnik-render.jpg' }, { i: 'm/czajnik-kuchnia.jpg' }, { i: 'm/czajnik-rysunek.jpg', fit: 1, bg: 1 }],
+      links: [['/portfolio/#czajnik', 'w portfolio']] },
+    { id: 'archiwum', cat: 'uczelnia', t: 'archiwum', l: 'portfolio pierwszego roku',
+      d: 'statyczna strona na szpineta.com: projekty z podziałem na lata, przeglądarka plansz i filmów.',
+      tools: ['Claude', 'HTML', 'JS'],
+      m: [{ v: 'm/portfolio-sof.mp4', p: 'm/portfolio-sof.jpg' }],
+      links: [['/portfolio/', 'otwórz']] },
+
+    { id: 'scroll-straznik', cat: 'prywatne', t: 'scroll strażnik', l: 'kamera, która widzi, że scrollujesz',
+      d: 'wykrywanie osoby i telefonu w ręce liczy czas scrollowania; po limicie ekran „internet odcięty”, przekaźnik routera w planach. na Macu YOLO, tutaj MediaPipe na twojej kamerze.',
+      tools: ['Claude', 'Python', 'YOLO', 'MediaPipe'],
+      m: [{ live: '/portfolio/scroll-straznik/', v: 'm/straz-demo.mp4', p: 'm/straz-demo.jpg', btn: 'odpal z kamerą' }],
+      links: [['/portfolio/scroll-straznik/', 'otwórz osobno']] },
+    { id: 'dziubi', cat: 'prywatne', t: 'dziubi', l: 'stworek na starym monitorze',
+      d: 'postać w pygame na monitorze kineskopowym. kamera rozpoznaje twarze lokalnie, Whisper słucha lokalnie, Claude odpowiada głosem; o zmierzchu zasypia, w nocy pisze dziennik.',
+      tools: ['Claude', 'Python', 'pygame', 'Whisper'],
+      m: [{ v: 'm/dziubi-oko.mp4', p: 'm/dziubi-oko.jpg', k: 'pion' }] },
+    { id: 'yoobilizery', cat: 'prywatne', t: 'yoobilizery', l: 'wizualizacje dźwięku na żywo',
+      d: 'bit, bas i wysokie sterują neonowymi bryłami z siatki, od torusów po butelkę Kleina; jedna wersja synchronizuje taśmę LED przez Arduino, nowa działa w przeglądarce.',
+      tools: ['Claude', 'Python', 'OpenGL', 'Arduino'],
+      m: [{ v: B + 'yoobilizery/yblzrpro.mp4', p: B + 'yoobilizery/yblzrpro.jpg' }, { v: B + 'yoobilizery/yoobilizer.mp4', p: B + 'yoobilizery/yoobilizer.jpg' }, { v: B + 'yoobilizery/yblzr.mp4', p: B + 'yoobilizery/yblzr.jpg' }] },
+    { id: 'lawenda', cat: 'prywatne', t: 'lawenda', l: 'moje wiersze: strona, bramka, plakaty',
+      d: '163 wiersze. model nadał każdemu profil emocji, który steruje grubością liter; wchodzi się kodem z moich znaczków; plakaty z tej samej szaty, jeden na wiersz.',
+      tools: ['Claude', 'three.js', 'Claude Design'],
+      m: [{ v: 'm/lawenda.mp4', p: 'm/lawenda.jpg', fit: 1, bg: 1 }, { i: 'm/plakat-wiersz.jpg', k: 'a4' }, { v: 'm/lawenda-gate.mp4', p: 'm/lawenda-gate.jpg', fit: 1, bg: 1 }],
+      links: [['/', 'szpineta.com']] },
+    { id: 'harmonograf', cat: 'prywatne', t: 'harmonograf', l: 'instrument do rysowania plakatów',
+      d: 'cztery wahadła, dwa pióra, 20 suwaków; każdy rysunek ma swój kod, więc da się go odtworzyć i wyeksportować jako plakat.',
+      tools: ['Claude', 'JS', 'Canvas'],
+      m: [{ live: '/portfolio/harmonograf/', v: 'm/harmonograf.mp4', p: 'm/harmonograf.jpg', btn: 'odpal tutaj' }],
+      links: [['/portfolio/harmonograf/', 'otwórz osobno']] },
+    { id: 'klawisz', cat: 'prywatne', t: 'klawisz po klawiszu', l: 'trener skrótów na Maca',
+      d: '49 skrótów, każdy z animowanym demo przed i po; nauka, ćwiczenie, test. 7 wersji.',
+      tools: ['Claude', 'JS'],
+      m: [{ live: '/portfolio/klawisz/', v: 'm/klawisz.mp4', p: 'm/klawisz.jpg', btn: 'odpal tutaj' }],
+      links: [['/portfolio/klawisz/', 'otwórz osobno']] },
+
+    { id: 'kompas', cat: 'zlecenia', t: 'medialny kompas jutra', l: 'znak, palety i kierunki strony medialna.edu.pl',
+      d: 'cztery dymki czatu tworzą różę wiatrów, w środku uczeń. kierunki w Claude Design, geometria przez MCP w moim pliku Illustratora, 8 palet pod WCAG, księga znaku skryptem; 7 kierunków strony na prawdziwych treściach.',
+      tools: ['Claude Design', 'Illustrator', 'MCP', 'Figma'],
+      m: [{ v: 'm/logo-loop.mp4', p: 'm/logo-loop.jpg', fit: 1 }, { i: 'm/mkj-logo.jpg', fit: 1, bg: 1 }, { v: 'm/medialna-gazeta.mp4', p: 'm/medialna-gazeta.jpg' }, { v: 'm/medialna-dymki.mp4', p: 'm/medialna-dymki.jpg' }, { i: 'm/web-spis.jpg' }, { i: 'm/web-dwaokna.jpg' }] },
+    { id: 'rolki', cat: 'zlecenia', t: 'rolki', l: 'ok. 90 rolek: wywiady i wydarzenia',
+      d: 'linia montażowa w Pythonie: transkrypcja Whisper, wybór fragmentów przez agentów pilnujących, żeby cięcia nie urywały zdań, kadr 9:16 za twarzą, napisy, ffmpeg.',
+      tools: ['Claude Code', 'Whisper', 'ffmpeg', 'Python'],
+      m: [{ v: 'm/gdd-program.mp4', p: 'm/gdd-program.jpg', k: 'pion' }, { i: 'm/gdd-1.jpg', k: 'pion' }, { i: 'm/gdd-2.jpg', k: 'pion' }, { i: 'm/gdd-4.jpg', k: 'pion' }],
+      links: [['https://youtu.be/uRurgMMceWI', 'wywiad „Oni wiedzą”']] },
+    { id: 'oczy-wojny', cat: 'zlecenia', t: 'oczy wojny', l: 'koncept strony fotografów wystawy, niezamawiany',
+      d: 'indeks 16 nazwisk, portret idzie za kursorem, biogram jak teczka w ciemni.',
+      tools: ['Claude', 'HTML'],
+      m: [{ v: 'm/oczy-wojny.mp4', p: 'm/oczy-wojny.jpg' }] }
+  ];
 
   var $ = function (s, r) { return (r || document).querySelector(s); };
-  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var hasIO = 'IntersectionObserver' in window;
+  var hover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var SEPS = ['~', '_', '^', '+', '*', '.', '|', '-'];
 
-  /* ---------- pasek postępu ---------- */
-  var prog = $('#prog');
-  var ticking = false;
-  var scrollHooks = [];
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(function () {
-      var h = document.documentElement.scrollHeight - window.innerHeight;
-      prog.style.transform = 'scaleX(' + (h > 0 ? Math.min(1, window.scrollY / h) : 0) + ')';
-      scrollHooks.forEach(function (f) { f(); });
-      ticking = false;
+  /* ---------------- indeks ---------------- */
+
+  var zones = $('#zones');
+  var nr = 0;
+  Object.keys(CAT).forEach(function (key) {
+    var lista = P.filter(function (p) { return p.cat === key; });
+    var z = document.createElement('div');
+    z.className = 'zone';
+    var html = '<p class="zone-head"><b>' + CAT[key].glif + '</b>' + CAT[key].nazwa + ' <i>' + CAT[key].opis + '</i><span class="n">' + lista.length + '</span></p><div class="idx">';
+    lista.forEach(function (p, k) {
+      nr++;
+      p.nr = nr;
+      if (k) html += '<span class="sep" aria-hidden="true">' + SEPS[(nr + k) % SEPS.length] + '</span>';
+      html += '<button class="idx-it" type="button" data-id="' + p.id + '">' + esc(p.t) + '<sup>' + String(nr).padStart(2, '0') + '</sup></button>';
+    });
+    z.innerHTML = html + '</div>';
+    zones.appendChild(z);
+  });
+  $('#kicker').innerHTML = '[' + P.length + ' projektów zrobionych z AI] <span>' + (hover ? 'najedź &middot; kliknij' : 'dotknij nazwy') + '</span>';
+  var byId = {};
+  P.forEach(function (p) { byId[p.id] = p; });
+
+  /* ---------------- podgląd przy kursorze ---------------- */
+
+  var peek = $('#peek'), peekBox = $('#peekBox'), peekCap = $('#peekCap');
+  var mx = 0, my = 0, px = 0, py = 0, peekOn = false, peekId = null;
+  function pierwszeMedium(p) {
+    for (var i = 0; i < p.m.length; i++) if (p.m[i].v || p.m[i].i) return p.m[i];
+    return p.m[0];
+  }
+  function pokazPeek(p) {
+    if (peekId !== p.id) {
+      peekId = p.id;
+      var m = pierwszeMedium(p);
+      peekBox.className = 'peek-box' + (m.k === 'pion' || m.k === 'a4' ? ' pion' : '');
+      peekBox.innerHTML = m.v
+        ? '<video src="' + m.v + '" poster="' + (m.p || '') + '" muted loop playsinline autoplay></video>'
+        : '<img src="' + m.i + '" alt="">';
+      var v = peekBox.querySelector('video');
+      if (v) { v.muted = true; var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
+      peekCap.textContent = p.l + '  ·  ' + p.tools.join(', ');
+    }
+    peekOn = true;
+    peek.classList.add('on');
+  }
+  function schowajPeek() {
+    peekOn = false;
+    peek.classList.remove('on');
+    var v = peekBox.querySelector('video');
+    if (v) v.pause();
+    peekId = null;
+  }
+  if (hover) {
+    document.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; });
+    (function petla() {
+      var w = peek.offsetWidth, h = peek.offsetHeight;
+      var tx = mx + 28, ty = my + 22;
+      if (tx + w > window.innerWidth - 12) tx = mx - w - 28;
+      if (ty + h > window.innerHeight - 12) ty = window.innerHeight - h - 12;
+      px += (tx - px) * (reduce ? 1 : 0.18);
+      py += (ty - py) * (reduce ? 1 : 0.18);
+      peek.style.transform = 'translate(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px)';
+      requestAnimationFrame(petla);
+    })();
+    zones.addEventListener('mouseover', function (e) {
+      var b = e.target.closest('.idx-it');
+      if (b) pokazPeek(byId[b.dataset.id]);
+    });
+    zones.addEventListener('mouseout', function (e) {
+      var b = e.target.closest('.idx-it');
+      if (b && !b.contains(e.relatedTarget)) schowajPeek();
     });
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  /* ---------- wejścia przy przewijaniu ---------- */
-  var revealEls = $$('.rv');
-  if (hasIO && !reduce) {
-    var rvIO = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); rvIO.unobserve(e.target); }
-      });
-    }, { threshold: 0.12 });
-    revealEls.forEach(function (el) { rvIO.observe(el); });
-  } else {
-    revealEls.forEach(function (el) { el.classList.add('in'); });
-  }
-
-  /* ---------- filmy: grają tylko widoczne ---------- */
-  var visible = [];
-  function shouldPlay(v) {
-    if (visible.indexOf(v) < 0) return false;
-    var pane = v.closest('[data-pane]');
-    return !pane || pane.classList.contains('on');
-  }
-  function sync(v) {
-    if (shouldPlay(v)) {
-      var p = v.play();
-      if (p && p.catch) p.catch(function () {});
-    } else {
-      v.pause();
-    }
-  }
-  var videos = $$('video');
-  videos.forEach(function (v) { v.muted = true; });
-  if (hasIO) {
-    var vIO = new IntersectionObserver(function (es) {
-      es.forEach(function (e) {
-        var i = visible.indexOf(e.target);
-        if (e.isIntersecting && i < 0) visible.push(e.target);
-        if (!e.isIntersecting && i >= 0) visible.splice(i, 1);
-        sync(e.target);
-      });
-    }, { threshold: 0.2 });
-    videos.forEach(function (v) { vIO.observe(v); });
-  }
-
-  /* ---------- galerie w kartach ---------- */
-  $$('.gal').forEach(function (g) {
-    var items = $$('.gal-stage > [data-pane]', g);
-    var holder = $('.chips', g);
-    var buttons = items.map(function (it, i) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.textContent = it.dataset.label || String(i + 1);
-      b.addEventListener('click', function () { show(i); });
-      holder.appendChild(b);
-      return b;
-    });
-    function show(i) {
-      items.forEach(function (it, k) {
-        it.classList.toggle('on', k === i);
-        if (it.tagName === 'VIDEO') sync(it);
-      });
-      buttons.forEach(function (b, k) { b.setAttribute('aria-current', k === i ? 'true' : 'false'); });
-      g.dispatchEvent(new CustomEvent('pane'));
-    }
-    g._show = show;
-    show(0);
+  zones.addEventListener('click', function (e) {
+    var b = e.target.closest('.idx-it');
+    if (b) { schowajPeek(); otworz(b.dataset.id, b); }
   });
 
-  /* ---------- granica: model miasta, obraca się przy przewijaniu i daje się kręcić ---------- */
-  var cityBox = $('#city');
-  if (cityBox) {
-    var BASE = 'https://cdn.jsdelivr.net/npm/three@0.147.0/';
-    var loadScript = function (src) {
-      return new Promise(function (res, rej) {
-        var s = document.createElement('script');
-        s.src = src; s.onload = res; s.onerror = rej;
-        document.head.appendChild(s);
-      });
-    };
-    var gal = cityBox.closest('.gal');
-    var fallback = function () {
-      /* bez WebGL: zostają zrzuty z aplikacji */
-      gal._show(1);
-      var chip = $('.chips button', gal);
-      if (chip) chip.remove();
-      cityBox.remove();
-    };
-    var startCity = function () {
-      loadScript(BASE + 'build/three.min.js')
-        .then(function () { return Promise.all([loadScript(BASE + 'examples/js/loaders/STLLoader.js'), loadScript(BASE + 'examples/js/controls/OrbitControls.js')]); })
-        .then(function () {
-          var T = window.THREE;
-          var renderer;
-          try { renderer = new T.WebGLRenderer({ antialias: true, alpha: true }); } catch (err) { fallback(); return; }
-          renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-          cityBox.appendChild(renderer.domElement);
-          var scene = new T.Scene();
-          scene.add(new T.HemisphereLight(0xffffff, 0xb9b0c9, 0.9));
-          var sun = new T.DirectionalLight(0xffffff, 0.7);
-          sun.position.set(-1, 2, 1.2);
-          scene.add(sun);
-          var cam = new T.PerspectiveCamera(32, 1, 1, 5000);
-          var controls = new T.OrbitControls(cam, renderer.domElement);
-          controls.enableZoom = false;
-          controls.enablePan = false;
-          controls.enableDamping = true;
-          controls.minPolarAngle = 0.2;
-          controls.maxPolarAngle = 1.4;
-          if (window.matchMedia('(pointer: coarse)').matches) {
-            controls.enabled = false;
-            renderer.domElement.style.touchAction = 'pan-y';
-          }
-          var touched = false;
-          controls.addEventListener('start', function () { touched = true; });
-          var R = 200, H = 20;
+  /* ---------------- karta projektu ---------------- */
 
-          function size() {
-            var w = cityBox.clientWidth, h = cityBox.clientHeight;
-            if (!w || !h) return;
-            renderer.setSize(w, h, false);
-            cam.aspect = w / h;
-            cam.updateProjectionMatrix();
-          }
-          function place() {
-            if (touched) return;
-            var r = cityBox.getBoundingClientRect(), vh = window.innerHeight;
-            var t = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
-            var az = -1.1 + t * 2.4;
-            var el = 0.95 - t * 0.5;
-            cam.position.set(Math.sin(az) * Math.cos(el) * R, Math.sin(el) * R + H * 0.3, Math.cos(az) * Math.cos(el) * R);
-            controls.target.set(0, H * 0.25, 0);
-            cam.lookAt(controls.target);
-          }
-          var inView = false;
-          function frame() {
-            if (!inView) return;
-            if (cityBox.classList.contains('on')) {
-              controls.update();
-              renderer.render(scene, cam);
-            }
-            requestAnimationFrame(frame);
-          }
+  var sheet = $('#sheet'), strip = $('#shStrip');
+  var biezacy = -1, skad = null, vIO = null;
 
-          new T.STLLoader().load('m/granica-miasto.bin', function (geo) {
-            geo.rotateX(-Math.PI / 2);
-            geo.computeBoundingBox();
-            var c = new T.Vector3();
-            geo.boundingBox.getCenter(c);
-            geo.translate(-c.x, -geo.boundingBox.min.y, -c.z);
-            geo.computeVertexNormals();
-            geo.computeBoundingBox();
-            var s = new T.Vector3();
-            geo.boundingBox.getSize(s);
-            R = Math.max(s.x, s.z) * 1.15;
-            H = s.y;
-            scene.add(new T.Mesh(geo, new T.MeshStandardMaterial({ color: 0xece8f3, roughness: 0.9, flatShading: true })));
-            scene.add(new T.LineSegments(new T.EdgesGeometry(geo, 35), new T.LineBasicMaterial({ color: 0x8a76c4, transparent: true, opacity: 0.4 })));
-            cityBox.classList.add('ready');
-            size();
-            place();
-            renderer.render(scene, cam);
-          }, undefined, fallback);
-
-          window.addEventListener('resize', size);
-          scrollHooks.push(place);
-          new IntersectionObserver(function (es) {
-            es.forEach(function (e) {
-              var was = inView;
-              inView = e.isIntersecting;
-              if (inView && !was) requestAnimationFrame(frame);
-            });
-          }).observe(cityBox);
-          gal.addEventListener('pane', size);
-        })
-        .catch(fallback);
-    };
-    if (hasIO) {
-      var cIO = new IntersectionObserver(function (es) {
-        if (es.some(function (e) { return e.isIntersecting; })) { cIO.disconnect(); startCity(); }
-      }, { rootMargin: '400px 0px' });
-      cIO.observe(cityBox);
-    } else {
-      startCity();
+  function mediumHTML(m, p, k) {
+    var cls = 'm' + (m.k ? ' ' + m.k : '') + (m.fit ? ' contain' : '') + (m.bg ? ' white' : '');
+    var alt = esc(p.t + ' — ' + (k + 1));
+    if (m.live) {
+      return '<div class="' + cls + '" data-live="' + m.live + '"><video src="' + m.v + '" poster="' + m.p + '" muted loop playsinline preload="metadata" aria-label="' + alt + '"></video>' +
+        '<button class="play" type="button"><span>&#9654; ' + esc(m.btn) + '</span></button></div>';
     }
+    if (m.city) return '<div class="' + cls + ' city" data-city="' + m.city + '"><span class="wait">~||-_^+*.</span><span class="tag">model 3D · przeciągnij</span></div>';
+    if (m.v) return '<div class="' + cls + '"><video src="' + m.v + '" poster="' + (m.p || '') + '" muted loop playsinline preload="metadata" aria-label="' + alt + '"></video></div>';
+    return '<div class="' + cls + '"><img src="' + m.i + '" alt="' + alt + '" loading="lazy"></div>';
   }
 
-  /* ---------- narzędzia na żywo: iframe dopiero po kliknięciu ---------- */
-  $$('.live').forEach(function (card) {
-    var btn = $('.play', card);
-    btn.addEventListener('click', function () {
-      var media = $('.card-media', card);
-      $$('video', media).forEach(function (v) { v.pause(); v.remove(); });
-      var f = document.createElement('iframe');
-      f.src = card.dataset.src;
-      f.title = card.dataset.title;
-      f.setAttribute('allow', 'fullscreen; camera');
-      media.appendChild(f);
-      card.classList.add('running');
-      btn.remove();
-      setTimeout(function () {
-        card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  function otworz(id, zrodlo) {
+    var i = P.findIndex(function (p) { return p.id === id; });
+    if (i < 0) return;
+    if (zrodlo) skad = zrodlo;
+    pokaz(i);
+    if (sheet.hidden) {
+      sheet.hidden = false;
+      document.body.classList.add('lock');
+      $('#shX').focus();
+    }
+    history.replaceState(null, '', '#' + id);
+  }
+
+  function pokaz(i) {
+    zatrzymajMedia();
+    biezacy = i;
+    var p = P[i], c = CAT[p.cat];
+    $('#shCat').innerHTML = '<b>' + c.glif + '</b>' + esc(c.nazwa);
+    $('#shCount').textContent = String(i + 1).padStart(2, '0') + ' / ' + P.length;
+    $('#shTitle').innerHTML = esc(p.t) + '<sup>' + String(p.nr).padStart(2, '0') + '</sup>';
+    $('#shLabel').textContent = p.l;
+    $('#shDesc').textContent = p.d;
+    $('#shTools').innerHTML = p.tools.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
+    $('#shLinks').innerHTML = (p.links || []).map(function (l) {
+      var ext = /^https?:/.test(l[0]);
+      return '<a href="' + l[0] + '"' + (ext ? ' target="_blank" rel="noopener"' : '') + '>' + esc(l[1]) + (ext ? ' &nearr;' : ' &rarr;') + '</a>';
+    }).join('');
+    var prev = P[(i - 1 + P.length) % P.length], next = P[(i + 1) % P.length];
+    $('#shPrev span').textContent = prev.t;
+    $('#shNext span').textContent = next.t;
+    strip.innerHTML = p.m.map(function (m, k) { return mediumHTML(m, p, k); }).join('');
+    strip.scrollLeft = 0;
+    podepnijMedia();
+  }
+
+  function podepnijMedia() {
+    var filmy = Array.prototype.slice.call(strip.querySelectorAll('video'));
+    if ('IntersectionObserver' in window) {
+      vIO = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting) { e.target.muted = true; var pr = e.target.play(); if (pr && pr.catch) pr.catch(function () {}); }
+          else e.target.pause();
+        });
+      }, { root: strip, threshold: 0.4 });
+      filmy.forEach(function (v) { vIO.observe(v); });
+    } else {
+      filmy.forEach(function (v) { v.muted = true; v.play(); });
+    }
+    Array.prototype.slice.call(strip.querySelectorAll('[data-live]')).forEach(function (box) {
+      $('.play', box).addEventListener('click', function () {
+        var v = $('video', box);
+        if (v) { v.pause(); v.remove(); }
+        var f = document.createElement('iframe');
+        f.src = box.dataset.live;
+        f.title = P[biezacy].t;
+        f.setAttribute('allow', 'fullscreen; camera');
+        box.appendChild(f);
+        this.remove();
         f.focus();
-      }, 80);
+      });
     });
-  });
-
-  /* ---------- okładka: znaki ~||-_^+*. ---------- */
-  var SCR = '~||-_^+*.';
-  function scramble(el) {
-    var word = el.dataset.word;
-    if (reduce) { el.textContent = word; return; }
-    var f = 0;
-    var total = 14;
-    clearInterval(el._t);
-    el._t = setInterval(function () {
-      f++;
-      el.textContent = word.split('').map(function (c, k) {
-        return c === ' ' || k < (f / total) * word.length ? c : SCR[Math.floor(Math.random() * SCR.length)];
-      }).join('');
-      if (f >= total) { clearInterval(el._t); el.textContent = word; }
-    }, 50);
+    var city = strip.querySelector('[data-city]');
+    if (city) miasto(city);
   }
-  $$('.scr').forEach(function (el) {
-    scramble(el);
-    el.closest('h1').addEventListener('mouseenter', function () { scramble(el); });
+
+  function zatrzymajMedia() {
+    if (vIO) { vIO.disconnect(); vIO = null; }
+    Array.prototype.slice.call(strip.querySelectorAll('video')).forEach(function (v) { v.pause(); });
+    if (zatrzymajMiasto) { zatrzymajMiasto(); zatrzymajMiasto = null; }
+    strip.innerHTML = '';
+  }
+
+  function zamknij() {
+    zatrzymajMedia();
+    sheet.hidden = true;
+    document.body.classList.remove('lock');
+    history.replaceState(null, '', '#projekty');
+    if (skad) skad.focus();
+  }
+
+  $('#shX').addEventListener('click', zamknij);
+  $('#shPrev').addEventListener('click', function () { otworz(P[(biezacy - 1 + P.length) % P.length].id); });
+  $('#shNext').addEventListener('click', function () { otworz(P[(biezacy + 1) % P.length].id); });
+  document.addEventListener('keydown', function (e) {
+    if (sheet.hidden) return;
+    if (e.key === 'Escape') zamknij();
+    else if (e.key === 'ArrowRight' && document.activeElement !== strip) $('#shNext').click();
+    else if (e.key === 'ArrowLeft' && document.activeElement !== strip) $('#shPrev').click();
   });
+  /* kółko myszy przewija pas w poziomie */
+  strip.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    if (e.target.closest('.city, iframe')) return;
+    strip.scrollLeft += e.deltaY;
+    e.preventDefault();
+  }, { passive: false });
+
+  /* ---------------- granica: model miasta 3D ---------------- */
+
+  var zatrzymajMiasto = null;
+  var THREE_BASE = 'https://cdn.jsdelivr.net/npm/three@0.147.0/';
+  var skrypty = null;
+  function wczytajThree() {
+    if (skrypty) return skrypty;
+    var jeden = function (src) {
+      return new Promise(function (res, rej) { var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    };
+    skrypty = jeden(THREE_BASE + 'build/three.min.js').then(function () {
+      return Promise.all([jeden(THREE_BASE + 'examples/js/loaders/STLLoader.js'), jeden(THREE_BASE + 'examples/js/controls/OrbitControls.js')]);
+    });
+    skrypty.catch(function () { skrypty = null; });
+    return skrypty;
+  }
+  var geometria = null, krawedzie = null;
+  function miasto(box) {
+    var zyje = true, ramka = 0;
+    var sprzatnij = [];
+    zatrzymajMiasto = function () {
+      zyje = false;
+      cancelAnimationFrame(ramka);
+      sprzatnij.forEach(function (f) { f(); });
+    };
+    var blad = function () { if (zyje) box.innerHTML = '<span class="wait">model 3D nie wczytał się</span>'; };
+    wczytajThree().then(function () {
+      if (!zyje) return;
+      var T = window.THREE, renderer;
+      try { renderer = new T.WebGLRenderer({ antialias: true, alpha: true }); } catch (e) { blad(); return; }
+      renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+      box.appendChild(renderer.domElement);
+      sprzatnij.push(function () { renderer.dispose(); if (renderer.forceContextLoss) renderer.forceContextLoss(); });
+      var scene = new T.Scene();
+      scene.add(new T.HemisphereLight(0xffffff, 0xb9b0c9, 0.9));
+      var sun = new T.DirectionalLight(0xffffff, 0.7);
+      sun.position.set(-1, 2, 1.2);
+      scene.add(sun);
+      var cam = new T.PerspectiveCamera(32, 1, 1, 5000);
+      var controls = new T.OrbitControls(cam, renderer.domElement);
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.enableDamping = true;
+      controls.autoRotate = !reduce;
+      controls.autoRotateSpeed = 0.8;
+      controls.minPolarAngle = 0.2;
+      controls.maxPolarAngle = 1.4;
+      controls.addEventListener('start', function () { controls.autoRotate = false; });
+      function rozmiar() {
+        var w = box.clientWidth, h = box.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        cam.aspect = w / h;
+        cam.updateProjectionMatrix();
+      }
+      function zbuduj(geo) {
+        if (!zyje) return;
+        var s = new T.Vector3();
+        geo.boundingBox.getSize(s);
+        var R = Math.max(s.x, s.z) * 1.15;
+        scene.add(new T.Mesh(geo, new T.MeshStandardMaterial({ color: 0xece8f3, roughness: 0.9, flatShading: true })));
+        scene.add(new T.LineSegments(krawedzie || (krawedzie = new T.EdgesGeometry(geo, 35)), new T.LineBasicMaterial({ color: 0x8a76c4, transparent: true, opacity: 0.4 })));
+        cam.position.set(-0.6 * R, 0.75 * R, 0.85 * R);
+        controls.target.set(0, s.y * 0.25, 0);
+        controls.update();
+        box.classList.add('ready');
+        rozmiar();
+        (function petla() {
+          if (!zyje) return;
+          controls.update();
+          renderer.render(scene, cam);
+          ramka = requestAnimationFrame(petla);
+        })();
+      }
+      if (geometria) { zbuduj(geometria); }
+      else {
+        new T.STLLoader().load(box.dataset.city, function (geo) {
+          geo.rotateX(-Math.PI / 2);
+          geo.computeBoundingBox();
+          var c = new T.Vector3();
+          geo.boundingBox.getCenter(c);
+          geo.translate(-c.x, -geo.boundingBox.min.y, -c.z);
+          geo.computeVertexNormals();
+          geo.computeBoundingBox();
+          geometria = geo;
+          zbuduj(geo);
+        }, undefined, blad);
+      }
+      window.addEventListener('resize', rozmiar);
+      sprzatnij.push(function () { window.removeEventListener('resize', rozmiar); controls.dispose(); });
+    }).catch(blad);
+  }
+
+  /* ---------------- adres #projekt otwiera kartę ---------------- */
+
+  function zHasha() {
+    var h = location.hash.slice(1);
+    if (byId[h]) otworz(h);
+    else if (!sheet.hidden) zamknij();
+  }
+  window.addEventListener('hashchange', zHasha);
+  if (byId[location.hash.slice(1)]) zHasha();
 })();
 </script>
 </body>
