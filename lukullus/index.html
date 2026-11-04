@@ -1,0 +1,1456 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap">
+<title>Lukullus — propozycja identyfikacji</title>
+<style>
+html,body{margin:0;height:100%;background:#E4E0E8;overflow:hidden}
+a{color:#121212}a:hover{color:#5E4590}
+.slide{position:fixed;inset:0;display:none}
+.slide.is-on{display:block}
+.stage{position:absolute;left:50%;top:50%;width:1600px;height:1000px;transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:50% 50%;overflow:hidden;background:#FFFFFF}
+.bar{position:fixed;right:14px;bottom:10px;z-index:10;display:flex;gap:6px;align-items:center;font:13px 'Helvetica Neue',Inter,Arial,sans-serif;color:#121212}
+.bar span{padding:0 6px;background:rgba(255,255,255,.7)}
+.bar button{min-width:44px;min-height:44px;background:rgba(255,255,255,.75);border:1px solid #121212;color:#121212;font:inherit;font-size:18px;cursor:pointer}
+@keyframes lkspin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+.lk-spin{animation:lkspin 24s linear infinite}
+.lk-still{animation:none}
+</style>
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+<section class="slide" data-dc="Main"><div class="stage"></div></section>
+<section class="slide" data-dc="Analiza"><div class="stage"></div></section>
+<section class="slide" data-dc="Logo"><div class="stage"></div></section>
+<section class="slide" data-dc="Znaki"><div class="stage"></div></section>
+<section class="slide" data-dc="Oznakowanie"><div class="stage"></div></section>
+<section class="slide" data-dc="Kolory"><div class="stage"></div></section>
+<section class="slide" data-dc="Typografia"><div class="stage"></div></section>
+<section class="slide" data-dc="Pudelko3D"><div class="stage"></div></section>
+<section class="slide">
+<div class="stage" style="display: flex; background: #ECE6F2; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+  <model-viewer src="/lukullus/assets/lukullus-pudelka.glb" alt="model 3D pudełek Lukullus" camera-controls auto-rotate auto-rotate-delay="0" rotation-per-second="10deg" shadow-intensity="0.9" shadow-softness="0.8" exposure="1.05" tone-mapping="neutral" environment-image="neutral" camera-orbit="25deg 64deg auto" interaction-prompt="none" loading="eager" style="width: 1140px; height: 1000px; background: #ECE6F2"></model-viewer>
+  <aside style="width: 460px; box-sizing: border-box; padding: 72px 56px 56px 48px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 22px; background: #FFFFFF">
+    <h1 style="margin: 0; font-size: 52px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">model 3D<br>z blendera</h1>
+    <p style="margin: 0; font-size: 17px; line-height: 1.45">przeciągnij, żeby obrócić; kółkiem albo dwoma palcami przybliżasz. ten sam model co w renderze: wymiary z wykrojnika, karton 1,5 mm, na bokach wiek oznakowanie składu.</p>
+    <dl style="margin: 0; display: grid; grid-template-columns: 110px 1fr; row-gap: 10px; column-gap: 12px; font-size: 15px; line-height: 1.35; border-top: 1.5px solid #121212; padding-top: 14px">
+      <dt style="font-weight: 500">tort</dt><dd style="margin: 0">Tort węgierski<br><span style="font-size: 20px; font-weight: 300; letter-spacing: 0.14em">~ ^ + .</span></dd>
+      <dt style="font-weight: 500">ciastka</dt><dd style="margin: 0">kremówka jesienna i bajadera<br><span style="font-size: 20px; font-weight: 300; letter-spacing: 0.14em">~ - _ + * .</span></dd>
+      <dt style="font-weight: 500">ciasteczka</dt><dd style="margin: 0">bajadery<br><span style="font-size: 20px; font-weight: 300; letter-spacing: 0.14em">~ + * .</span></dd>
+    </dl>
+    <a href="/lukullus/assets/lukullus-pudelka.glb" download style="margin-top: auto; align-self: flex-start; min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border: 1px solid #121212; color: #121212; text-decoration: none; font-size: 15px">pobierz model .glb</a>
+  </aside>
+</div></section>
+<section class="slide" data-dc="Opakowania"><div class="stage"></div></section>
+<section class="slide" data-dc="Wykrojnik"><div class="stage"></div></section>
+<section class="slide" data-dc="Render"><div class="stage"></div></section>
+<section class="slide">
+<div class="stage" style="background: #ECE6F2; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+  <div style="position: absolute; left: 48px; top: 30px; right: 48px; display: flex; justify-content: space-between; align-items: baseline; font-size: 15px">
+    <span><span style="font-size: 30px; font-weight: 300; letter-spacing: -0.02em">strona www</span>&nbsp;&nbsp; przewiń w ramce</span>
+    <a href="/lukullus/strona/" target="_blank" rel="noopener" style="color: #121212">otwórz osobno</a>
+  </div>
+  <div style="position: absolute; left: 48px; top: 84px; width: 1040px; height: 880px; overflow: hidden; background: #FFFFFF; box-shadow: 0 18px 40px rgba(18,18,18,0.14)">
+    <iframe src="/lukullus/strona/" loading="lazy" title="strona Lukullus na komputerze" style="width: 1440px; height: 1219px; border: 0; transform: scale(0.7222); transform-origin: 0 0"></iframe>
+  </div>
+  <div style="position: absolute; right: 48px; top: 84px; width: 406px; height: 860px; box-sizing: border-box; border: 8px solid #121212; border-radius: 34px; overflow: hidden; background: #FFFFFF; box-shadow: 0 18px 40px rgba(18,18,18,0.18)">
+    <iframe src="/lukullus/strona/" loading="lazy" title="strona Lukullus na telefonie" style="width: 390px; height: 844px; border: 0"></iframe>
+  </div>
+</div></section>
+<section class="slide" data-dc="Aplikacje"><div class="stage"></div></section>
+<section class="slide">
+<div class="stage" style="display: flex; gap: 56px; box-sizing: border-box; padding: 64px 80px; background: #ECE6F2; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+  <div style="width: 480px; flex: none; display: flex; flex-direction: column; gap: 22px">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">księga znaku</h1>
+    <p style="margin: 0; font-size: 19px; line-height: 1.45">wszystkie zasady w jednym dokumencie A4: znak, pole ochronne, rozmiary, kolory, kroje, alfabet składu, oznakowanie, opakowania i czego nie robić.</p>
+    <a href="/lukullus/ksiega/" target="_blank" rel="noopener" style="align-self: flex-start; min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border: 1px solid #121212; color: #121212; text-decoration: none; font-size: 15px">otwórz dokument</a>
+  </div>
+  <div style="flex: 1 1 auto; background: #FFFFFF; overflow: hidden; box-shadow: 0 18px 40px rgba(18,18,18,0.14)">
+    <iframe src="/lukullus/ksiega/" loading="lazy" title="księga znaku Lukullus" style="width: 100%; height: 100%; border: 0"></iframe>
+  </div>
+</div></section>
+<nav class="bar" aria-label="nawigacja prezentacji"><button id="prev" type="button" aria-label="poprzednia plansza">‹</button><span id="counter">01</span><button id="next" type="button" aria-label="następna plansza">›</button></nav>
+<script type="text/x-dc-tpl" id="tpl-Main"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; display: flex; background: #FFF200; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+
+  <section style="flex: 1 1 auto; position: relative; box-sizing: border-box; padding: 72px 80px 64px 80px; display: flex; flex-direction: column; justify-content: space-between">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; letter-spacing: 0.01em">
+      <span>propozycja identyfikacji wizualnej</span>
+      <span>październik 2026</span>
+    </div>
+
+    <div style="display: flex; align-items: flex-end; gap: 56px">
+      <svg viewBox="0 0 120 120" width="300" height="300" role="img" aria-label="sygnet Lukullus: przekrój kremówki z czereśnią" style="display: block; flex: none">
+        <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+        <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+        <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+        <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+      </svg>
+      <div style="display: flex; flex-direction: column; gap: 14px; padding-bottom: 36px; max-width: 420px">
+        <span style="font-size: 15px; letter-spacing: 0.01em">sygnet</span>
+        <p style="margin: 0; font-size: 22px; line-height: 1.35; font-weight: 300">przekrój kremówki, od której wszystko się zaczęło w 1946 roku. na wierzchu czereśnia, owoc, który Lukullus przywiózł do Europy.</p>
+      </div><aside style="flex: none; width: 440px; box-sizing: border-box; padding: 72px 64px 64px 56px; background: #B8A0D6; display: flex; flex-direction: column; justify-content: space-between">
+    <div style="font-size: 40px; font-weight: 300; letter-spacing: 0.08em">~||-_^+*.</div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 54px; font-weight: 300; line-height: 1.05; letter-spacing: -0.02em">
+      <span>smak.</span>
+      <span>piękno.</span>
+      <span>warszawa.</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 72px; line-height: 1">L</span>
+        <svg width="150" height="56" viewBox="0 0 150 56" role="img" aria-label="XXX" style="display: block">
+          <path d="M4 4 L44 52" stroke="#121212" stroke-width="8"></path><path d="M44 4 L4 52" stroke="#121212" stroke-width="1.6"></path>
+          <path d="M54 4 L94 52" stroke="#121212" stroke-width="8"></path><path d="M94 4 L54 52" stroke="#121212" stroke-width="1.6"></path>
+          <path d="M104 4 L144 52" stroke="#121212" stroke-width="8"></path><path d="M144 4 L104 52" stroke="#121212" stroke-width="1.6"></path>
+        </svg>
+      </div>
+      <div style="display: flex; justify-content: space-between; border-top: 1.5px solid #121212; padding-top: 14px; font-size: 18px">
+        <span>80 lat</span>
+        <span>1946 — 2026</span>
+      </div>
+    </div>
+
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="position: absolute; right: 32px; top: 32px"><path d="M9 0v18M0 9h18" stroke="#121212" stroke-width="1.5"></path></svg>
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="position: absolute; right: 32px; bottom: 32px"><path d="M9 0v18M0 9h18" stroke="#121212" stroke-width="1.5"></path></svg>
+  </aside>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 22px">
+      <div style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 230px; line-height: 0.9; letter-spacing: 0.08em; margin-left: -6px">LUKULLUS</div>
+      <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1.5px solid #121212; padding-top: 18px; font-size: 26px; font-weight: 300">
+        <span>cukiernia warszawska</span>
+        <span>od 1946</span>
+      </div>
+    </div>
+
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="position: absolute; left: 32px; top: 32px"><path d="M9 0v18M0 9h18" stroke="#121212" stroke-width="1.5"></path></svg>
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="position: absolute; left: 32px; bottom: 32px"><path d="M9 0v18M0 9h18" stroke="#121212" stroke-width="1.5"></path></svg>
+  </section>
+
+  
+</div></script>
+<script type="text/x-dc-code" id="code-Main">class Component extends DCLogic {
+  renderVals() {
+    return { lawenda: this.props.lawenda ?? '#B8A0D6' };
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Analiza"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 64px 80px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 40px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">analiza</h1>
+    <span style="font-size: 15px">źródło: cukiernialukullus.pl, stan z października 2026</span>
+  </header>
+
+  <div style="display: grid; grid-template-columns: 1.15fr 1fr 1fr; flex: 1 1 auto; border-top: 1.5px solid #121212">
+
+    <section style="padding: 24px 40px 0 0; display: flex; flex-direction: column; gap: 18px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 500">~ historia</h2>
+      <div style="display: grid; grid-template-columns: 96px 1fr; row-gap: 16px; column-gap: 16px; font-size: 17px; line-height: 1.4">
+        <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 22px">1946</span>
+        <span>Jan Dynowski, mistrz czekolady z fabryki Wedla, otwiera zakład „Kremówka” na Pradze, na rogu Stalowej i Środkowej.</span>
+        <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 22px">PRL</span>
+        <span>firmę prowadzą żona i córka założyciela: Stanisława Dynowska i Halina Judycka.</span>
+        <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 22px">po 1989</span>
+        <span>nowa nazwa: Lukullus, od rzymskiego wodza, któremu Europa zawdzięcza czereśnie i morele.</span>
+        <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 22px">dziś</span>
+        <span>trzecie pokolenie rodziny. siedem lokali, tylko w Warszawie, bez franczyzy.</span>
+        <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 22px">2026</span>
+        <span>80 lat. na stronie różowy dopisek sprayem „LXXX” na logo.</span>
+      </div>
+      <div style="margin-top: auto; padding-bottom: 8px; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 15px; font-weight: 500">filozofia, w tej kolejności</span>
+        <span style="font-size: 40px; font-weight: 300; letter-spacing: -0.02em">smak. piękno. warszawa.</span>
+      </div>
+    </section>
+
+    <section style="padding: 24px 40px 0 40px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 18px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 500">|| identyfikacja dziś</h2>
+      <div style="display: flex; gap: 16px; align-items: stretch">
+        <div style="width: 120px; height: 120px; background: #FFF200; flex: none"></div>
+        <div style="display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; font-size: 15px">
+          <span style="font-size: 22px">#FFF200</span>
+          <span>żółć: nagłówek strony, wieka pudełek, pasek cookies</span>
+        </div>
+      </div>
+      <dl style="margin: 0; display: grid; grid-template-columns: 112px 1fr; row-gap: 12px; column-gap: 16px; font-size: 16px; line-height: 1.4">
+        <dt style="font-weight: 500">znak</dt><dd style="margin: 0">szeryfowe wersaliki LUKULLUS w szarości, szeroko rozstawione</dd>
+        <dt style="font-weight: 500">krój</dt><dd style="margin: 0">Frank (100, 400, 500) na całej stronie</dd>
+        <dt style="font-weight: 500">ikony</dt><dd style="margin: 0">żółte koła z rysunkiem liniowym: miejsca, torty, ciasta, ciastka, ciasteczka, lody, specjalne</dd>
+        <dt style="font-weight: 500">strona</dt><dd style="margin: 0">siatka produktów z przyciskiem „dodaj do koszyka”; historia i filozofia schowane w podstronach</dd>
+        <dt style="font-weight: 500">dopisek</dt><dd style="margin: 0">różowe LXXX jak graffiti na logo</dd>
+      </dl>
+    </section>
+
+    <section style="padding: 24px 0 0 40px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 18px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 500">+ opakowanie</h2>
+      <div style="display: flex; gap: 20px; align-items: flex-end">
+        <div style="width: 210px; flex: none; display: flex; flex-direction: column" aria-hidden="true">
+          <div style="height: 44px; background: #FFF200; border: 1px solid #121212; display: flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 13px; letter-spacing: 0.2em; color: #6B6B6B">LUKULLUS</div>
+          <div style="height: 76px; border: 1px solid #121212; border-top: 0; background: repeating-linear-gradient(135deg, #FFFFFF 0 7px, #DADADA 7px 8px)"></div>
+        </div>
+        <div style="font-size: 15px; line-height: 1.4; display: flex; flex-direction: column; gap: 8px">
+          <span>żółte wieko ze znakiem</span>
+          <span>opaska z ilustracją artysty, zmieniana co sezon</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 15px; font-weight: 500">ilustracje na pudełkach</span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; row-gap: 4px; font-size: 16px; line-height: 1.4">
+          <span>Igor Kubik</span><span>Olka Osadzińska</span>
+          <span>Marta Ignerska</span><span>Ola Niepsuj</span>
+          <span>Gosia Herba</span><span>Bożka Rydlewska</span>
+          <span>Tytus Brzozowski</span><span>Anna Warszawska</span>
+          <span>Aneta Klejnowska</span><span>Jan Dziaczkowski</span>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 16px; line-height: 1.4">pudełka są w stałej ekspozycji Muzeum Warszawy. to najmocniejszy kapitał marki.</p>
+    </section>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1.5px solid #121212">
+    <div style="padding: 20px 40px 0 0; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 15px; font-weight: 500">zostaje</span>
+      <p style="margin: 0; font-size: 19px; line-height: 1.4; font-weight: 300">żółć, czerń i szeryf jako głos historii. program artystów na opaskach. Warszawa jako temat.</p>
+    </div>
+    <div style="padding: 20px 40px 0 40px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 15px; font-weight: 500">do poprawy</span>
+      <p style="margin: 0; font-size: 19px; line-height: 1.4; font-weight: 300">szary znak na żółtym jest słabo czytelny. ikony, krój i dopisek mówią trzema różnymi językami. strona nie opowiada historii.</p>
+    </div>
+    <div style="padding: 20px 0 0 40px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 15px; font-weight: 500">dochodzi</span>
+      <p style="margin: 0; font-size: 19px; line-height: 1.4; font-weight: 300">sygnet z przekroju kremówki. glify ~||-_^+*. jako alfabet składu: oznakowanie, ikony i wzór. krzyżyki w rogach. Helvetica Neue / Inter. lawenda obok żółci.</p>
+    </div>
+  </div>
+</div></script>
+<script type="text/x-dc-code" id="code-Analiza">class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Logo"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 80px 64px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 28px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">logo</h1>
+    <span style="font-size: 15px">sygnet + znak słowny + podpis. wszystkie elementy wektorowe.</span>
+  </header>
+
+  <div style="display: grid; grid-template-columns: 1.55fr 1fr; height: 440px; border-top: 1.5px solid #121212; border-bottom: 1px solid #121212">
+    <div style="position: relative; background: #FFF200; display: flex; align-items: center; justify-content: center">
+      <div style="display: flex; align-items: center; gap: 30px">
+        <svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="sygnet Lukullus" style="display: block; flex: none">
+          <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+          <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+          <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+          <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+        </svg>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 96px; line-height: 0.9; letter-spacing: 0.08em">LUKULLUS</span>
+          <span style="border-top: 1.5px solid #121212; padding-top: 10px; font-size: 22px; font-weight: 300; display: flex; justify-content: space-between"><span>cukiernia warszawska</span><span>od 1946</span></span>
+        </div>
+      </div>
+      <span style="position: absolute; left: 24px; bottom: 18px; font-size: 14px">znak główny, poziomy</span>
+    </div>
+    <div style="position: relative; border-left: 1px solid #121212; display: flex; align-items: center; justify-content: center">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 18px">
+        <svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="sygnet Lukullus" style="display: block">
+          <circle cx="60" cy="32" r="8" fill="{{lawenda}}"></circle>
+          <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+          <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+          <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+        </svg>
+        <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 62px; line-height: 0.9; letter-spacing: 0.08em">LUKULLUS</span>
+        <span style="font-size: 17px; font-weight: 300">cukiernia warszawska · od 1946</span>
+      </div>
+      <span style="position: absolute; left: 24px; bottom: 18px; font-size: 14px">znak pionowy, kropka w lawendzie na bieli</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; flex: 1 1 auto; border-bottom: 1px solid #121212">
+    <div style="position: relative; background: #121212; display: flex; align-items: center; justify-content: center">
+      <svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="sygnet na czerni" style="display: block">
+        <circle cx="60" cy="32" r="8" fill="{{lawenda}}"></circle>
+        <rect x="16" y="48" width="88" height="8" fill="#FFFFFF"></rect>
+        <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#FFFFFF" stroke-width="4"></path>
+        <rect x="16" y="88" width="88" height="8" fill="#FFFFFF"></rect>
+      </svg>
+      <span style="position: absolute; left: 20px; bottom: 16px; font-size: 14px; color: #F0EDE8">sygnet na czerni</span>
+    </div>
+    <div style="position: relative; background: {{lawenda}}; display: flex; align-items: center; justify-content: center">
+      <svg viewBox="0 0 120 120" width="150" height="150" role="img" aria-label="sygnet na lawendzie" style="display: block">
+        <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+        <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+        <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+        <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+      </svg>
+      <span style="position: absolute; left: 20px; bottom: 16px; font-size: 14px">sygnet na lawendzie</span>
+    </div>
+    <div style="position: relative; background: #FFF200; border-left: 1px solid #121212; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
+      <div style="display: flex; align-items: flex-end; gap: 8px">
+        <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 84px; line-height: 0.82">L</span>
+        <svg width="186" height="68" viewBox="0 0 186 68" role="img" aria-label="XXX" style="display: block">
+          <path d="M4 2 L54 66" stroke="#121212" stroke-width="10"></path><path d="M54 2 L4 66" stroke="#121212" stroke-width="2"></path>
+          <path d="M68 2 L118 66" stroke="#121212" stroke-width="10"></path><path d="M118 2 L68 66" stroke="#121212" stroke-width="2"></path>
+          <path d="M132 2 L182 66" stroke="#121212" stroke-width="10"></path><path d="M182 2 L132 66" stroke="#121212" stroke-width="2"></path>
+        </svg>
+      </div>
+      <span style="font-size: 17px; font-weight: 300">80 lat · 1946 — 2026</span>
+      <span style="position: absolute; left: 20px; bottom: 16px; font-size: 14px">jubileusz: LXXX, czyli 80 lat po rzymsku</span>
+    </div>
+    <div style="position: relative; border-left: 1px solid #121212; display: flex; align-items: center; justify-content: center">
+      <div style="position: relative; width: 180px; height: 180px; margin-bottom: 18px; background-image: linear-gradient(#E4E0EA 1px, transparent 1px), linear-gradient(90deg, #E4E0EA 1px, transparent 1px); background-size: 12px 12px; outline: 1px solid #E4E0EA">
+        <svg viewBox="0 0 120 120" width="180" height="180" role="img" aria-label="konstrukcja sygnetu na siatce modułowej" style="display: block; position: absolute; inset: 0">
+          <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+          <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+          <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+          <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+          <path d="M16 106 H104 M16 103 V109 M104 103 V109" stroke="#5E4590" stroke-width="0.8"></path>
+          <path d="M110 48 V56 M107 48 H113 M107 56 H113" stroke="#5E4590" stroke-width="0.8"></path>
+        </svg>
+        <span style="position: absolute; left: 50%; bottom: -16px; transform: translateX(-50%); font-size: 11px; color: #5E4590">11 m</span>
+        <span style="position: absolute; right: -26px; top: 70px; font-size: 11px; color: #5E4590">1 m</span>
+      </div>
+      <span style="position: absolute; left: 20px; bottom: 16px; font-size: 14px">siatka 15 × 15 m, m = grubość warstwy</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); font-size: 15px; line-height: 1.4">
+    <span style="padding-right: 24px">kropka: czereśnia</span>
+    <span style="padding: 0 24px">kreska: wierzch z ciasta francuskiego</span>
+    <span style="padding: 0 24px">fala: krem, cieńsza jak włoskowa kreska Bodoni</span>
+    <span style="padding-left: 24px">podkreślnik: spód</span>
+  </div>
+</div></script>
+<script type="text/x-dc-code" id="code-Logo">class Component extends DCLogic {
+  renderVals() {
+    return { lawenda: this.props.lawenda ?? '#B8A0D6' };
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Znaki"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 80px 64px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 28px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">znaki rozpoznawcze</h1>
+    <span style="font-size: 15px">alfabet składu: osiem znaków, osiem rodzajów warstw. z nich czytasz, co jest w środku.</span>
+  </header>
+
+  <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border-top: 1.5px solid #121212; border-bottom: 1px solid #121212; height: 470px">
+    <sc-for list="{{glyphs}}" as="g" hint-placeholder-count="8">
+      <div style="box-sizing: border-box; {{g.cellStyle}}">
+        <div style="height: 210px; display: flex; align-items: center; justify-content: center; font-size: 150px; font-weight: 300; line-height: 1; letter-spacing: -0.04em">{{g.glyph}}</div>
+        <div style="display: flex; flex-direction: column; gap: 8px; padding: 0 20px">
+          <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 30px; font-weight: 500; line-height: 1.1">{{g.name}}</span>
+          <span style="font-size: 16px; line-height: 1.4">{{g.meaning}}</span>
+        </div>
+        <div style="margin-top: auto; min-height: 104px; box-sizing: border-box; padding: 14px 20px 18px; border-top: 1px solid #121212; display: flex; flex-direction: column; gap: 4px">
+          <span style="font-size: 13px">na przykład</span>
+          <span style="font-size: 15px; font-weight: 500; line-height: 1.35">{{g.role}}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.9fr); gap: 32px; flex: 1 1 auto; min-height: 0">
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="flex: 1 1 auto; overflow: hidden; background: #FFFFFF; outline: 1px solid #121212; padding: 10px 0; display: flex; flex-direction: column; gap: 2px; color: #7B5EA7; font-size: 20px; font-weight: 300; letter-spacing: 0.3em; white-space: nowrap; line-height: 1.5" aria-hidden="true">
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="6"><span>{{r}}</span></sc-for>
+      </div>
+      <figcaption style="font-size: 14px">bibułka: lawenda na bieli</figcaption>
+    </figure>
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="flex: 1 1 auto; overflow: hidden; background: #FFFFFF; outline: 1px solid #121212; padding: 0 0 6px; display: flex; flex-direction: column; justify-content: flex-end; color: #121212; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 40px; font-weight: 300; letter-spacing: 0.08em; white-space: nowrap" aria-hidden="true">
+        <sc-for list="{{strata}}" as="r" hint-placeholder-count="4"><span style="display: block; height: 46px; line-height: 46px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+      </div>
+      <figcaption style="font-size: 14px">bok pudełka: przekrój tego, co w środku (Tort węgierski ~ ^ + .)</figcaption>
+    </figure>
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="flex: 1 1 auto; background: #121212; color: #F0EDE8; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 0 22px; overflow: hidden">
+        <span style="font-size: 30px; font-weight: 300; letter-spacing: 0.2em; white-space: nowrap" aria-hidden="true">~||-_^+*. ~||-_^+*. ~||-_^+*.</span>
+        <span style="border-top: 1px solid #F0EDE8; padding-top: 12px; font-size: 15px; display: flex; justify-content: space-between"><span>LUKULLUS</span><span>od 1946</span></span>
+      </div>
+      <figcaption style="font-size: 14px">taśma do zaklejania pudełek</figcaption>
+    </figure>
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="flex: 1 1 auto; position: relative; outline: 1px solid #121212; display: flex; align-items: center; justify-content: center; font-size: 15px; line-height: 1.4; text-align: center; padding: 0 36px">
+        <span>każdy format dostaje krzyżyki w rogach. odsunięcie: 1/40 krótszego boku.</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 10px; top: 10px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 10px; top: 10px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 10px; bottom: 10px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 10px; bottom: 10px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+      </div>
+      <figcaption style="font-size: 14px">krzyżyki w rogach: znaki cięcia, jak podział tabliczki czekolady</figcaption>
+    </figure>
+  </div>
+</div></script>
+<script type="text/x-dc-code" id="code-Znaki">class Component extends DCLogic {
+  renderVals() {
+    const base = 'display: flex; flex-direction: column; gap: 14px;';
+    const list = [
+      { glyph: '~', name: 'krem', meaning: 'krem, mus, karmel. wszystko, co miękkie', role: 'mus gruszkowy w Gruszkach na wierzbie' },
+      { glyph: '||', name: 'biszkopt', meaning: 'biszkopt i jego warstwy', role: 'biszkopt migdałowy w Torcie piemonckim' },
+      { glyph: '-', name: 'chrupiące', meaning: 'ciasto francuskie, kruszonka, pralina', role: 'ciasto francuskie w Kremówce jesiennej' },
+      { glyph: '_', name: 'ciasto', meaning: 'spód albo korpus: kruche, drożdżowe, parzone', role: 'ciasto drożdżowe w Pączku warszawskim' },
+      { glyph: '^', name: 'beza', meaning: 'beza i dacquoise', role: 'dacquoise w Torcie cassis' },
+      { glyph: '+', name: 'czekolada', meaning: 'ganache, mus, skorupka. tabliczka z góry to siatka krzyżyków', role: 'ganache w Torcie węgierskim' },
+      { glyph: '*', name: 'puder', meaning: 'cukier puder, kakao, posypka', role: 'kakao na Bajaderze' },
+      { glyph: '.', name: 'owoc', meaning: 'owoc, konfitura. czereśnia Lukullusa', role: 'maliny w Dżungli polskiej' }
+    ];
+    const glyphs = list.map((g, i) => ({ ...g, cellStyle: base + (i === 0 ? '' : ' border-left: 1px solid #121212;') }));
+    const seq = '~||-_^+*.';
+    const rows = [0, 3, 6, 1, 4, 7, 2, 5, 8, 0].map((o) => {
+      const shifted = seq.slice(o) + seq.slice(0, o);
+      return shifted.repeat(10);
+    });
+    const SH = { '.': -0.305, '_': -0.445, '-': -0.035, '~': -0.035, '^': 0.255, '*': 0.235, '|': 0 };
+    const strata = ['~', '^', '+', '.'].map((g, i) => ({ t: '~_-^'.indexOf(g) >= 0 ? g.repeat(60) : (g + ' ').repeat(40), style: 'transform: translateY(' + (SH[g[0]] ?? 0) + 'em);', bg: i % 2 ? 'background: rgba(184,160,214,0.34);' : '' }));
+    return { glyphs, rows, strata };
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Oznakowanie"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 48px 80px 48px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 24px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">oznakowanie</h1>
+    <span style="font-size: 15px">na pudełku, w cenniku i na stronie widać, co jest w środku</span>
+  </header>
+
+  <div style="display: grid; grid-template-columns: 1.15fr 1fr; height: 260px; border-top: 1.5px solid #121212">
+    <section style="padding: 16px 40px 0 0; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 14px; font-weight: 500">jak czytać</span>
+      <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); flex: 1 1 auto">
+        <sc-for list="{{alpha}}" as="a" hint-placeholder-count="8">
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-right: 8px">
+            <span style="height: 104px; display: flex; align-items: center; font-size: 92px; font-weight: 300; line-height: 1; letter-spacing: -0.04em">{{a.g}}</span>
+            <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 17px; font-weight: 500; line-height: 1.1">{{a.name}}</span>
+            <span style="font-size: 13px; line-height: 1.35">{{a.desc}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    <section style="padding: 16px 0 0 40px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 14px; font-weight: 500">przykład: pudełko z tortem</span>
+      <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 44px; font-weight: 500; line-height: 1">Tort węgierski</span>
+      <span style="display: flex; gap: 0.42em; font-size: 60px; font-weight: 300; line-height: 1.05" aria-label="skład: krem, beza, czekolada, owoc">
+        <sc-for list="{{example}}" as="m" hint-placeholder-count="8"><span style="color: {{m.c}}">{{m.g}}</span></sc-for>
+      </span>
+      <span style="font-size: 15px; line-height: 1.4">krem czekoladowy ~ · dacquoise migdałowy ^ · ganache + · konfitura z wiśni .</span>
+      <span style="font-size: 13px">na etykiecie zawsze cały alfabet w tej samej kolejności. czarne jest w środku, blade nie.</span>
+    </section>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.15fr 1fr; height: 312px; border-top: 1px solid #121212">
+    <section style="padding: 14px 40px 0 0; display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 14px; font-weight: 500">wyroby Lukullusa w alfabecie (składy ze strony cukierni)</span>
+      <div style="display: flex; flex-direction: column">
+        <sc-for list="{{products}}" as="p" hint-placeholder-count="9">
+          <div style="display: grid; grid-template-columns: 228px 132px 1fr; align-items: baseline; gap: 16px; border-bottom: 1px solid #D4D4D4; min-height: 29px">
+            <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 18px; font-weight: 500">{{p.name}}</span>
+            <span style="font-size: 20px; font-weight: 300; letter-spacing: 0.12em; white-space: nowrap">{{p.f}}</span>
+            <span style="font-size: 13px; line-height: 1.3">{{p.sklad}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    <section style="padding: 14px 0 0 40px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 14px">
+      <span style="font-size: 14px; font-weight: 500">na pudełku</span>
+      <div style="display: flex; flex-direction: column; width: 100%" aria-label="bok wieka z oznakowaniem składu" role="img">
+        <div style="height: 70px; box-sizing: border-box; background: #FFF200; border: 1px solid #121212; display: flex; align-items: center; justify-content: space-between; padding: 0 20px">
+          <span style="font-size: 12px">w środku</span>
+          <span style="display: flex; gap: 0.42em; font-size: 30px; font-weight: 300">
+            <sc-for list="{{example}}" as="m" hint-placeholder-count="8"><span style="color: {{m.c}}">{{m.g}}</span></sc-for>
+          </span>
+          <span style="font-size: 12px">od 1946</span>
+        </div>
+        <div style="height: 64px; box-sizing: border-box; margin: 0 4px; border: 1px solid #121212; border-top: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2px; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; font-weight: 300; letter-spacing: 0.08em; white-space: nowrap" aria-hidden="true">
+          <sc-for list="{{strata}}" as="r" hint-placeholder-count="4"><span style="display: block; height: 15px; line-height: 15px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+        </div>
+      </div>
+      <div style="display: flex; gap: 22px; align-items: flex-start">
+        <div style="display: grid; grid-template-columns: repeat(4, 48px); gap: 8px; flex: none" aria-hidden="true">
+          <sc-for list="{{alpha}}" as="a" hint-placeholder-count="8">
+            <span style="width: 48px; height: 48px; box-sizing: border-box; border: 1.5px solid #121212; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 300">{{a.g}}</span>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 15px; line-height: 1.4">bok wieka: cały alfabet blado, przy ladzie pieczątki zaczerniają to, co jest w środku. bok dna: ten sam skład jako przekrój, każdy znak to warstwa.</p>
+      </div>
+    </section>
+  </div>
+
+  <section style="border-top: 1px solid #121212; padding-top: 14px; display: flex; flex-direction: column; gap: 8px; flex: 1 1 auto">
+    <span style="font-size: 14px; font-weight: 500">ikony działów na stronie, ułożone z tych samych znaków</span>
+    <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); align-items: end">
+      <sc-for list="{{picto}}" as="p" hint-placeholder-count="8">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+          <span aria-hidden="true" style="height: 4.6em; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 22px; font-weight: 300; line-height: 0.92; white-space: pre; letter-spacing: 0.04em">
+            <sc-for list="{{p.lines}}" as="l" hint-placeholder-count="4"><span style="display: block; {{l.style}}">{{l.t}}</span></sc-for>
+          </span>
+          <span style="font-size: 15px">{{p.label}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div></script>
+<script type="text/x-dc-code" id="code-Oznakowanie">class Component extends DCLogic {
+  renderVals() {
+    const ALPHA = ['~', '||', '-', '_', '^', '+', '*', '.'];
+    const alpha = [
+      ['~', 'krem', 'krem, mus, karmel'],
+      ['||', 'biszkopt', 'biszkopt i jego warstwy'],
+      ['-', 'chrupiące', 'francuskie, kruszonka, pralina'],
+      ['_', 'ciasto', 'kruche, drożdżowe, parzone'],
+      ['^', 'beza', 'beza i dacquoise'],
+      ['+', 'czekolada', 'ganache, mus, skorupka'],
+      ['*', 'puder', 'cukier puder, kakao'],
+      ['.', 'owoc', 'owoc, konfitura']
+    ].map(([g, name, desc]) => ({ g, name, desc }));
+    const label = (present) => ALPHA.map((g) => ({ g, c: present.indexOf(g) >= 0 ? '#121212' : 'rgba(18,18,18,0.18)' }));
+    const example = label(['~', '^', '+', '.']);
+    const products = [
+      ['Gruszki na wierzbie', ['~', '||', '.'], 'krem karmelowy, mus gruszkowy, biszkopt migdałowy, gruszki'],
+      ['Tort piemoncki', ['~', '||', '-', '+'], 'mus z mlecznej czekolady, krem cytrynowy, feuilletine, biszkopt'],
+      ['Tort węgierski', ['~', '^', '+', '.'], 'krem czekoladowy, dacquoise, ganache, wiśnie'],
+      ['Tort cassis', ['~', '^', '.'], 'mus waniliowy, dacquoise, czarna porzeczka'],
+      ['Dżungla polska', ['~', '||', '+', '.'], 'mus czekoladowy i z marakui, biszkopt, maliny'],
+      ['Kremówka jesienna', ['~', '-', '_'], 'ciasto francuskie, krem waniliowy, karmel, pralina'],
+      ['Ptyś karmelowy', ['~', '-', '_'], 'ciasto parzone, kruszonka, krem karmelowy'],
+      ['Bajadera', ['~', '+', '*', '.'], 'czekolada, trufla, kakao, rodzynki'],
+      ['Pączek warszawski', ['_', '.'], 'ciasto drożdżowe, konfitura z róży']
+    ].map(([name, f, sklad]) => ({ name, f: f.join(' '), sklad }));
+    const SHIFT = { '.': -0.305, '_': -0.445, '-': -0.035, '~': -0.035, '^': 0.255, '*': 0.235, '|': 0 };
+    const line = (t) => {
+      if (t === 'V') return { t: '^', style: 'transform: translateY(-0.255em) rotate(180deg);' };
+      const s = SHIFT[t.trim()[0]] ?? 0;
+      return { t, style: 'transform: translateY(' + s + 'em);' };
+    };
+    const picto = [
+      ['torty', ['.', '^^^', '~~~', '||||', '___']],
+      ['ciasta', ['. . .', '~~~~~', '_____']],
+      ['ciastka', ['*', '---', '~~~', '___']],
+      ['ciasteczka', ['* *', '___', '___']],
+      ['lody', ['.', '~~', '~~', 'V']],
+      ['sezon', ['* * *', '.  .', '~~~~', '____']],
+      ['miejsca', ['-----', '|| . ||', '_____']],
+      ['o nas', ['.', '---', '~~~', '___']]
+    ].map(([lab, lines]) => ({ label: lab, lines: lines.map(line) }));
+    const strata = ['~', '^', '+', '.'].map((g, i) => ({ t: '~_-^'.indexOf(g) >= 0 ? g.repeat(80) : (g + ' ').repeat(50), style: 'transform: translateY(' + (SHIFT[g[0]] ?? 0) + 'em);', bg: i % 2 ? 'background: rgba(184,160,214,0.34);' : '' }));
+    return { alpha, example, products, picto, strata };
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Kolory"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 80px 64px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 28px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">kolory</h1>
+    <span style="font-size: 15px">żółć prowadzi, lawenda dopowiada. tekst na żółci zawsze czarny.</span>
+  </header>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; height: 40px; outline: 1px solid #121212" aria-hidden="true">
+      <div style="flex: 50; background: #FFF200"></div>
+      <div style="flex: 22; background: #121212"></div>
+      <div style="flex: 16; background: #FFFFFF; border-left: 1px solid #121212"></div>
+      <div style="flex: 8; background: #B8A0D6"></div>
+      <div style="flex: 2; background: #7B5EA7"></div>
+      <div style="flex: 2; background: #F0EDE8"></div>
+    </div>
+    <div style="display: flex; font-size: 13px">
+      <span style="flex: 50">50%</span><span style="flex: 22">22%</span><span style="flex: 16">16%</span><span style="flex: 8">8%</span><span style="flex: 4">4%</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; flex: 1 1 auto">
+    <sc-for list="{{swatches}}" as="s" hint-placeholder-count="6">
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <div style="display: block; {{s.blockStyle}}"></div>
+        <span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.1">{{s.name}}</span>
+        <div style="display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 1.45; border-top: 1px solid #121212; padding-top: 10px">
+          <span style="font-size: 20px; font-weight: 500">{{s.hex}}</span>
+          <span>RGB {{s.rgb}}</span>
+          <span>CMYK, Pantone: do proofu</span>
+        </div>
+        <span style="font-size: 15px; line-height: 1.4">{{s.role}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border-top: 1.5px solid #121212; padding-top: 14px; gap: 12px">
+    <sc-for list="{{pairs}}" as="p" hint-placeholder-count="8">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="box-sizing: border-box; {{p.chipStyle}}">Aa</div>
+        <span style="font-size: 13px; line-height: 1.3">{{p.label}}</span>
+      </div>
+    </sc-for>
+  </div>
+</div></script>
+<script type="text/x-dc-code" id="code-Kolory">class Component extends DCLogic {
+  renderVals() {
+    const block = 'height: 300px;';
+    const swatches = [
+      { name: 'żółć 1946', hex: '#FFF200', rgb: '255 242 0', role: 'wieka pudełek, szyld, nagłówek strony. kolor, który Warszawa już zna.', blockStyle: block + ' background: #FFF200;' },
+      { name: 'czerń', hex: '#121212', rgb: '18 18 18', role: 'znak, tekst, krzyżyki, taśma.', blockStyle: block + ' background: #121212;' },
+      { name: 'biel', hex: '#FFFFFF', rgb: '255 255 255', role: 'papier, bibułka, strona.', blockStyle: block + ' background: #FFFFFF; outline: 1px solid #121212; outline-offset: -1px;' },
+      { name: 'lawenda', hex: '#B8A0D6', rgb: '184 160 214', role: 'drugi kolor: wnętrze pudełka, plansze, jubileusz.', blockStyle: block + ' background: #B8A0D6;' },
+      { name: 'lawenda głęboka', hex: '#7B5EA7', rgb: '123 94 167', role: 'tekst i linki, tylko na bieli.', blockStyle: block + ' background: #7B5EA7;' },
+      { name: 'mleko', hex: '#F0EDE8', rgb: '240 237 232', role: 'tekst na czerni.', blockStyle: block + ' background: #F0EDE8;' }
+    ];
+    const chip = 'height: 56px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 500;';
+    const pairs = [
+      { label: 'czerń na żółci 16:1', chipStyle: chip + ' background: #FFF200; color: #121212;' },
+      { label: 'czerń na bieli 18,7:1', chipStyle: chip + ' background: #FFFFFF; color: #121212; outline: 1px solid #121212; outline-offset: -1px;' },
+      { label: 'czerń na lawendzie 8:1', chipStyle: chip + ' background: #B8A0D6; color: #121212;' },
+      { label: 'mleko na czerni 16:1', chipStyle: chip + ' background: #121212; color: #F0EDE8;' },
+      { label: 'lawenda na czerni 8:1', chipStyle: chip + ' background: #121212; color: #B8A0D6;' },
+      { label: 'lawenda głęboka na bieli 5,2:1', chipStyle: chip + ' background: #FFFFFF; color: #7B5EA7; outline: 1px solid #121212; outline-offset: -1px;' },
+      { label: 'nie: lawenda głęboka na żółci 4,5:1', chipStyle: chip + ' background: #FFF200; color: #7B5EA7; text-decoration: line-through;' },
+      { label: 'nie: biel na żółci 1,2:1', chipStyle: chip + ' background: #FFF200; color: #FFFFFF; text-decoration: line-through; text-decoration-color: #121212;' }
+    ];
+    return { swatches, pairs };
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Typografia"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 80px 56px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 24px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">typografia</h1>
+    <span style="font-size: 15px">dwa głosy: historia mówi szeryfem, codzienność groteską.</span>
+  </header>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; border-top: 1.5px solid #121212; height: 520px">
+    <section style="padding: 22px 48px 0 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-size: 15px; font-weight: 500">Bodoni Moda</span>
+        <span style="font-size: 15px">400 · 500 · 600 · kursywa · Google Fonts, OFL</span>
+      </div>
+      <div style="display: flex; align-items: flex-end; gap: 36px">
+        <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 230px; font-weight: 500; line-height: 0.8; letter-spacing: -0.02em">Aą</span>
+        <div style="display: flex; flex-direction: column; gap: 6px; padding-bottom: 6px">
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 44px; font-weight: 500; line-height: 1.05">Gruszki na wierzbie</span>
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 44px; font-style: italic; font-weight: 400; line-height: 1.05">Kremówka jesienna</span>
+        </div>
+      </div>
+      <p style="margin: 0; font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 26px; line-height: 1.35; letter-spacing: 0.02em">AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ<br>aąbcćdeęfghijklłmnńoóprsśtuwyzźż<br>1946 · 2026 · LXXX</p>
+      <p style="margin: 0; margin-top: auto; padding-bottom: 18px; font-size: 16px; line-height: 1.45; max-width: 560px">znak słowny, nazwy wyrobów, lata, cytaty z historii. zastępczo Bodoni 72 lub Didot. przy dużych stopniach oś optyczna daje kontrast jak w druku z lat czterdziestych.</p>
+    </section>
+
+    <section style="padding: 22px 0 0 48px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <span style="font-size: 15px; font-weight: 500">Helvetica Neue / Inter</span>
+        <span style="font-size: 15px">300 · 400 · 500</span>
+      </div>
+      <div style="display: flex; align-items: flex-end; gap: 36px">
+        <span style="font-size: 230px; font-weight: 300; line-height: 0.8; letter-spacing: -0.05em">Aą</span>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; font-size: 22px">
+          <span style="display: flex; gap: 28px; justify-content: space-between; border-bottom: 1px solid #121212; padding-bottom: 6px; min-width: 330px"><span>dziad drożdżowy</span><span style="font-weight: 500; font-variant-numeric: tabular-nums">32,90 zł</span></span>
+          <span style="display: flex; gap: 28px; justify-content: space-between; border-bottom: 1px solid #121212; padding-bottom: 6px"><span>pączek warszawski</span><span style="font-weight: 500; font-variant-numeric: tabular-nums">12,90 zł</span></span>
+          <span style="display: flex; gap: 28px; justify-content: space-between"><span>bajadera</span><span style="font-weight: 500; font-variant-numeric: tabular-nums">18,90 zł</span></span>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 26px; line-height: 1.35; font-weight: 300">AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ<br>aąbcćdeęfghijklłmnńoóprsśtuwyzźż<br>~||-_^+*. 0123456789</p>
+      <p style="margin: 0; margin-top: auto; padding-bottom: 18px; font-size: 16px; line-height: 1.45; max-width: 560px">nawigacja, opisy, ceny, etykiety, glify. Helvetica Neue w druku i na Macu, Inter w sieci. tytuły małymi literami, ceny cyframi tabelarycznymi.</p>
+    </section>
+  </div>
+
+  <table style="border-collapse: collapse; width: 100%; font-size: 15px; flex: 1 1 auto">
+    <thead>
+      <tr style="text-align: left; border-top: 1.5px solid #121212; border-bottom: 1px solid #121212">
+        <th style="padding: 8px 0; font-weight: 500; width: 18%">rola</th>
+        <th style="padding: 8px 0; font-weight: 500; width: 34%">przykład</th>
+        <th style="padding: 8px 0; font-weight: 500; width: 20%">krój i grubość</th>
+        <th style="padding: 8px 0; font-weight: 500; width: 14%">stopień / interlinia</th>
+        <th style="padding: 8px 0; font-weight: 500">zapis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #D4D4D4">
+        <td style="padding: 6px 0">znak słowny</td>
+        <td style="padding: 6px 0; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 22px; font-weight: 500; letter-spacing: 0.08em">LUKULLUS</td>
+        <td style="padding: 6px 0">Bodoni Moda 500</td><td style="padding: 6px 0">wg znaku</td><td style="padding: 6px 0">wersaliki, światło +8%</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #D4D4D4">
+        <td style="padding: 6px 0">nazwa wyrobu</td>
+        <td style="padding: 6px 0; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 22px; font-weight: 500">Tort piemoncki</td>
+        <td style="padding: 6px 0">Bodoni Moda 500</td><td style="padding: 6px 0">48 / 52</td><td style="padding: 6px 0">wielka pierwsza litera</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #D4D4D4">
+        <td style="padding: 6px 0">tytuł sekcji</td>
+        <td style="padding: 6px 0; font-size: 22px; font-weight: 300; letter-spacing: -0.03em">sztuka opakowania</td>
+        <td style="padding: 6px 0">Inter 300</td><td style="padding: 6px 0">72 / 72</td><td style="padding: 6px 0">małe litery, światło −3%</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #D4D4D4">
+        <td style="padding: 6px 0">tekst</td>
+        <td style="padding: 6px 0; font-size: 16px">bez franczyzy, tylko w Warszawie</td>
+        <td style="padding: 6px 0">Inter 400</td><td style="padding: 6px 0">16 / 24</td><td style="padding: 6px 0">zdania</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #121212">
+        <td style="padding: 6px 0">oznakowanie</td>
+        <td style="padding: 6px 0; font-size: 20px; font-weight: 300; letter-spacing: 0.14em">~ ^ + .</td>
+        <td style="padding: 6px 0">Inter 300</td><td style="padding: 6px 0">wg formatu</td><td style="padding: 6px 0">zawsze w kolejności alfabetu</td>
+      </tr>
+    </tbody>
+  </table>
+</div></script>
+<script type="text/x-dc-code" id="code-Typografia">class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Pudelko3D"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; display: flex; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+
+  <div role="img" aria-label="model 3D opakowania, przeciągnij, aby obrócić" onPointerDown="{{onDown}}" onPointerMove="{{onMove}}" onPointerUp="{{onUp}}" onPointerLeave="{{onUp}}" style="flex: 1 1 auto; position: relative; overflow: hidden; cursor: grab; touch-action: none; user-select: none; perspective: 2200px; perspective-origin: 50% 38%; background: #F6F5F2">
+
+    <div style="position: absolute; left: 50%; top: calc(50% + {{shadow.top}}px); width: {{shadow.w}}px; height: {{shadow.h}}px; margin-left: -{{shadow.half}}px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(18,18,18,0.22), rgba(18,18,18,0) 70%)"></div>
+
+    <div style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; transform: {{tilt}}">
+      <div class="{{spinClass}}" style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d">
+        <div style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; transform: rotateY({{ry}}deg)">
+
+          <sc-if value="{{isBox}}" hint-placeholder-val="{{true}}">
+            <div style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d">
+
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.bFront}} background: {{band.bg}}; color: {{band.fg}}">
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: {{band.gap}}px; padding-bottom: {{band.pb}}px; font-family: {{band.ff}}; font-size: {{band.fs}}px; font-weight: {{band.fw}}; letter-spacing: {{band.ls}}; white-space: nowrap; line-height: 1">
+                  <sc-for list="{{band.rows}}" as="r" hint-placeholder-count="6"><span style="display: block; height: {{band.rh}}px; line-height: {{band.rh}}px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+                </div>
+                <sc-if value="{{band.isArt}}" hint-placeholder-val="{{false}}">
+                  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: {{band.vis}}px; display: flex; align-items: center; justify-content: center"><span style="background: #FFFFFF; padding: 4px 8px; font-size: 12px">[ilustracja sezonowa: artysta]</span></div>
+                </sc-if>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.bBack}} background: {{band.bg}}; color: {{band.fg}}">
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: {{band.gap}}px; padding-bottom: {{band.pb}}px; font-family: {{band.ff}}; font-size: {{band.fs}}px; font-weight: {{band.fw}}; letter-spacing: {{band.ls}}; white-space: nowrap; line-height: 1">
+                  <sc-for list="{{band.rows}}" as="r" hint-placeholder-count="6"><span style="display: block; height: {{band.rh}}px; line-height: {{band.rh}}px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+                </div>
+                <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.14)"></div>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.bRight}} background: {{band.bg}}; color: {{band.fg}}">
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: {{band.gap}}px; padding-bottom: {{band.pb}}px; font-family: {{band.ff}}; font-size: {{band.fs}}px; font-weight: {{band.fw}}; letter-spacing: {{band.ls}}; white-space: nowrap; line-height: 1">
+                  <sc-for list="{{band.rows}}" as="r" hint-placeholder-count="6"><span style="display: block; height: {{band.rh}}px; line-height: {{band.rh}}px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+                </div>
+                <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.09)"></div>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.bLeft}} background: {{band.bg}}; color: {{band.fg}}">
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: {{band.gap}}px; padding-bottom: {{band.pb}}px; font-family: {{band.ff}}; font-size: {{band.fs}}px; font-weight: {{band.fw}}; letter-spacing: {{band.ls}}; white-space: nowrap; line-height: 1">
+                  <sc-for list="{{band.rows}}" as="r" hint-placeholder-count="6"><span style="display: block; height: {{band.rh}}px; line-height: {{band.rh}}px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+                </div>
+                <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.05)"></div>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.bBottom}} background: #DCDAD4"></div>
+
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iFront}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.18)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iBack}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.06)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iRight}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.12)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iLeft}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.10)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iBottom}} background: {{lawenda}}"></div>
+
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.tissue}} background: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(18,18,18,0.08)">
+                <div style="position: absolute; inset: 0; display: flex; flex-direction: column; gap: 6px; padding-top: 6px; color: {{lawendaGleboka}}; font-size: 11px; letter-spacing: 0.35em; white-space: nowrap; line-height: 1" aria-hidden="true">
+                  <sc-for list="{{tissueRows}}" as="r" hint-placeholder-count="10"><span>{{r}}</span></sc-for>
+                </div>
+                <div style="position: absolute; left: 50%; top: 50%; width: {{seal.d}}px; height: {{seal.d}}px; margin-left: -{{seal.r}}px; margin-top: -{{seal.r}}px; border-radius: 50%; background: #121212; display: flex; align-items: center; justify-content: center">
+                  <svg viewBox="0 0 120 120" width="{{seal.s}}" height="{{seal.s}}" aria-hidden="true" style="display: block">
+                    <circle cx="60" cy="32" r="8" fill="{{lawenda}}"></circle>
+                    <rect x="16" y="48" width="88" height="8" fill="#FFFFFF"></rect>
+                    <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#FFFFFF" stroke-width="4"></path>
+                    <rect x="16" y="88" width="88" height="8" fill="#FFFFFF"></rect>
+                  </svg>
+                </div>
+              </div>
+
+              <div style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; transform: {{lid}}; transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1)">
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.lTop}} background: #FFF200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: {{top.gap}}px; color: #121212">
+                  <svg viewBox="0 0 120 120" width="{{top.sig}}" height="{{top.sig}}" aria-hidden="true" style="display: block">
+                    <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+                    <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+                    <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+                    <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+                  </svg>
+                  <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: {{top.wm}}px; line-height: 0.9; letter-spacing: 0.08em">LUKULLUS</span>
+                  <span style="font-size: {{top.ds}}px; font-weight: 300; white-space: nowrap">cukiernia warszawska · od 1946</span>
+                  <svg viewBox="0 0 16 16" width="{{top.crs}}" height="{{top.crs}}" aria-hidden="true" style="position: absolute; left: {{top.cr}}px; top: {{top.cr}}px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+                  <svg viewBox="0 0 16 16" width="{{top.crs}}" height="{{top.crs}}" aria-hidden="true" style="position: absolute; right: {{top.cr}}px; top: {{top.cr}}px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+                  <svg viewBox="0 0 16 16" width="{{top.crs}}" height="{{top.crs}}" aria-hidden="true" style="position: absolute; left: {{top.cr}}px; bottom: {{top.cr}}px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+                  <svg viewBox="0 0 16 16" width="{{top.crs}}" height="{{top.crs}}" aria-hidden="true" style="position: absolute; right: {{top.cr}}px; bottom: {{top.cr}}px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+                </div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.lUnder}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.12)"></div></div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; box-sizing: border-box; {{f.lFront}} background: #FFF200; border-bottom: 1px solid rgba(18,18,18,0.35); display: flex; align-items: center; justify-content: space-between; padding: 0 {{skirt.pad}}px; font-size: {{skirt.fs}}px; white-space: nowrap">
+                  <span style="display: flex; gap: 0.4em; letter-spacing: 0"><sc-for list="{{boxLabel}}" as="g" hint-placeholder-count="8"><span style="color: {{g.c}}">{{g.g}}</span></sc-for></span><span>od 1946</span>
+                </div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; box-sizing: border-box; {{f.lBack}} background: #FFF200; border-bottom: 1px solid rgba(18,18,18,0.35); display: flex; align-items: center; justify-content: center; font-size: {{skirt.fs}}px; white-space: nowrap">
+                  <span>smak. piękno. warszawa.</span>
+                  <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.12)"></div>
+                </div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; box-sizing: border-box; {{f.lRight}} background: #FFF200; border-bottom: 1px solid rgba(18,18,18,0.35); display: flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-weight: 500; font-size: {{skirt.fs}}px; letter-spacing: 0.12em; white-space: nowrap">
+                  <span>LUKULLUS</span>
+                  <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.07)"></div>
+                </div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; box-sizing: border-box; {{f.lLeft}} background: #FFF200; border-bottom: 1px solid rgba(18,18,18,0.35); display: flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-weight: 500; font-size: {{skirt.fs}}px; letter-spacing: 0.12em; white-space: nowrap">
+                  <span>LUKULLUS</span>
+                  <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.04)"></div>
+                </div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.lIFront}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.16)"></div></div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.lIBack}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.08)"></div></div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.lIRight}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.12)"></div></div>
+                <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.lILeft}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.10)"></div></div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isBag}}" hint-placeholder-val="{{false}}">
+            <div style="position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d">
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; box-sizing: border-box; {{f.bFront}} background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px">
+                <svg viewBox="0 0 120 120" width="140" height="140" aria-hidden="true" style="display: block">
+                  <circle cx="60" cy="32" r="8" fill="{{lawenda}}"></circle>
+                  <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+                  <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+                  <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+                </svg>
+                <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 40px; line-height: 0.9; letter-spacing: 0.08em">LUKULLUS</span>
+                <span style="font-size: 13px; font-weight: 300">cukiernia warszawska · od 1946</span>
+                <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: #FFF200; display: flex; align-items: center; justify-content: center; font-size: 16px; letter-spacing: 0.35em">~||-_^+*.</span>
+                <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" style="position: absolute; left: 12px; top: 12px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+                <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" style="position: absolute; right: 12px; top: 12px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.bBack}} background: #FFFFFF; display: flex; flex-direction: column; justify-content: center; gap: 4px; padding-left: 40px; font-size: 34px; font-weight: 300; letter-spacing: -0.02em; line-height: 1.05">
+                <span>smak.</span><span>piękno.</span><span>warszawa.</span>
+                <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: #FFF200"></span>
+                <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.12)"></div>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.bRight}} background: #FFF200; display: flex; align-items: center; justify-content: center">
+                <span style="transform: rotate(90deg); font-family: 'Bodoni Moda', Didot, Georgia, serif; font-weight: 500; font-size: 30px; letter-spacing: 0.14em; white-space: nowrap">LUKULLUS</span>
+                <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.08)"></div>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; overflow: hidden; {{f.bLeft}} background: #FFF200; display: flex; align-items: center; justify-content: center">
+                <span style="transform: rotate(-90deg); font-size: 18px; letter-spacing: 0.35em; white-space: nowrap">~||-_^+*.</span>
+                <div style="position: absolute; inset: 0; background: rgba(18,18,18,0.04)"></div>
+              </div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.bBottom}} background: #DCDAD4"></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iFront}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.18)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iBack}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.06)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iRight}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.12)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iLeft}} background: {{lawenda}}"><div style="position: absolute; inset: 0; background: rgba(18,18,18,0.10)"></div></div>
+              <div style="position: absolute; left: 0; top: 0; backface-visibility: hidden; {{f.iBottom}} background: {{lawenda}}"></div>
+              <div style="position: absolute; left: 0; top: 0; box-sizing: border-box; {{f.hFront}} border: 7px solid #121212; border-bottom: 0; border-radius: 80px 80px 0 0"></div>
+              <div style="position: absolute; left: 0; top: 0; box-sizing: border-box; {{f.hBack}} border: 7px solid #121212; border-bottom: 0; border-radius: 80px 80px 0 0"></div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+
+    <span style="position: absolute; left: 32px; bottom: 28px; font-size: 14px">przeciągnij, żeby obrócić</span>
+    <span style="position: absolute; right: 32px; bottom: 28px; font-size: 14px">{{m.note}}</span>
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 28px; top: 28px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 28px; top: 28px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+  </div>
+
+  <aside style="flex: none; width: 500px; box-sizing: border-box; padding: 56px 56px 48px 48px; border-left: 1px solid #121212; display: flex; flex-direction: column; gap: 26px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <h1 style="margin: 0; font-size: 52px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">model 3D<br>opakowań</h1>
+      <p style="margin: 0; font-size: 16px; line-height: 1.4">boki dna to przekrój tego, co jest w środku: każdy znak składu to jedna warstwa. w środku lawenda, widać ją po zdjęciu wieka.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 14px; font-weight: 500">format</span>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+        <sc-for list="{{models}}" as="b" hint-placeholder-count="4">
+          <button type="button" onClick="{{b.pick}}" style="min-height: 56px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding: 8px 14px; font-family: inherit; cursor: pointer; {{b.style}}">
+            <span style="font-size: 16px; font-weight: 500">{{b.label}}</span>
+            <span style="font-size: 13px">{{b.dim}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 14px; font-weight: 500">opaska na dnie</span>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{bands}}" as="b" hint-placeholder-count="3">
+          <button type="button" onClick="{{b.pick}}" style="min-height: 44px; padding: 0 10px; font-family: inherit; font-size: 15px; cursor: pointer; {{b.style}}">{{b.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 14px; font-weight: 500">widok</span>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{views}}" as="b" hint-placeholder-count="4">
+          <button type="button" onClick="{{b.pick}}" style="min-height: 44px; padding: 0 6px; font-family: inherit; font-size: 15px; cursor: pointer; background: transparent; color: #121212; border: 1px solid #121212">{{b.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px">
+        <button type="button" onClick="{{toggleOpen}}" style="min-height: 44px; font-family: inherit; font-size: 15px; cursor: pointer; {{openStyle}}">{{openLabel}}</button>
+        <button type="button" onClick="{{toggleSpin}}" style="min-height: 44px; font-family: inherit; font-size: 15px; cursor: pointer; {{spinStyle}}">{{spinLabel}}</button>
+      </div>
+    </div>
+
+    <dl style="margin: 0; margin-top: auto; display: grid; grid-template-columns: 112px 1fr; row-gap: 8px; column-gap: 12px; font-size: 15px; line-height: 1.35; border-top: 1.5px solid #121212; padding-top: 14px">
+      <dt style="font-weight: 500">w środku</dt><dd style="margin: 0">{{m.inside}}</dd>
+      <dt style="font-weight: 500">wymiar</dt><dd style="margin: 0">{{m.cm}}</dd>
+      <dt style="font-weight: 500">konstrukcja</dt><dd style="margin: 0">{{m.build}}</dd>
+      <dt style="font-weight: 500">materiał</dt><dd style="margin: 0">{{m.mat}}</dd>
+      <dt style="font-weight: 500">druk</dt><dd style="margin: 0">{{m.print}}</dd>
+    </dl>
+  </aside>
+</div></script>
+<script type="text/x-dc-code" id="code-Pudelko3D">class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { model: 'tort', band: 'domowa', open: false, spin: true, rx: -24, ry: -34 };
+    this.drag = null;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const lawenda = this.props.lawenda ?? '#B8A0D6';
+    const MODELS = {
+      tort: { W: 364, D: 364, H: 168, L: 64, zoom: 1, label: 'tort', inside: 'Tort węgierski: ~ ^ + . (krem, dacquoise, ganache, wiśnie)', g: ['~', '^', '+', '.'], dim: '26 × 26 × 12 cm', cm: '26 × 26 × 12 cm', build: 'wieko + dno, teleskopowe', mat: 'karton GC1 400 g/m² (propozycja)', print: 'żółć + czerń na zewnątrz, lawenda w środku', note: 'skala 14 px = 1 cm' },
+      ciasta: { W: 420, D: 280, H: 126, L: 56, zoom: 1, label: 'ciastka', inside: 'Kremówka jesienna i Bajadera: razem ~ - _ + * .', g: ['~', '-', '_', '+', '*', '.'], dim: '30 × 20 × 9 cm', cm: '30 × 20 × 9 cm', build: 'wieko + dno, teleskopowe', mat: 'karton GC1 400 g/m² (propozycja)', print: 'żółć + czerń na zewnątrz, lawenda w środku', note: 'skala 14 px = 1 cm' },
+      ciasteczka: { W: 196, D: 196, H: 84, L: 36, zoom: 1.7, label: 'ciasteczka', inside: 'Bajadery: ~ + * . (trufla, czekolada, kakao, rodzynki)', g: ['~', '+', '*', '.'], dim: '14 × 14 × 6 cm', cm: '14 × 14 × 6 cm', build: 'wieko + dno, teleskopowe', mat: 'karton GC1 350 g/m² (propozycja)', print: 'żółć + czerń na zewnątrz, lawenda w środku', note: 'powiększone 1,7 ×' },
+      torba: { W: 364, D: 196, H: 448, L: 0, zoom: 0.9, label: 'torba', inside: 'pudełka; oznakowanie jest na nich', g: [], dim: '26 × 14 × 32 cm', cm: '26 × 14 × 32 cm', build: 'płaskie dno, uchwyty ze sznurka', mat: 'papier biały 150 g/m² (propozycja)', print: 'czerń + żółć, lawenda w środku', note: 'pomniejszone 0,9 ×' }
+    };
+    const m = MODELS[s.model];
+    const W = m.W, D = m.D, H = m.H, L = m.L;
+    const Wl = W + 4, Dl = D + 4;
+    const face = (w, h, t) => 'width: ' + w + 'px; height: ' + h + 'px; margin-left: ' + (-w / 2) + 'px; margin-top: ' + (-h / 2) + 'px; transform: ' + t + ';';
+    const f = {
+      bFront: face(W, H, 'translateZ(' + (D / 2) + 'px)'),
+      bBack: face(W, H, 'rotateY(180deg) translateZ(' + (D / 2) + 'px)'),
+      bRight: face(D, H, 'rotateY(90deg) translateZ(' + (W / 2) + 'px)'),
+      bLeft: face(D, H, 'rotateY(-90deg) translateZ(' + (W / 2) + 'px)'),
+      bBottom: face(W, D, 'rotateX(-90deg) translateZ(' + (H / 2) + 'px)'),
+      iFront: face(W, H, 'translateZ(' + (D / 2 - 1) + 'px) rotateY(180deg)'),
+      iBack: face(W, H, 'translateZ(' + (-(D / 2 - 1)) + 'px)'),
+      iRight: face(D, H, 'rotateY(-90deg) translateZ(' + (-(W / 2 - 1)) + 'px)'),
+      iLeft: face(D, H, 'rotateY(90deg) translateZ(' + (-(W / 2 - 1)) + 'px)'),
+      iBottom: face(W, D, 'rotateX(90deg) translateZ(' + (-(H / 2 - 1)) + 'px)'),
+      tissue: face(W - 8, D - 8, 'rotateX(90deg) translateZ(' + (H / 2 - 22) + 'px)'),
+      lTop: face(Wl, Dl, 'rotateX(90deg) translateZ(' + (L / 2) + 'px)'),
+      lUnder: face(Wl, Dl, 'rotateX(-90deg) translateZ(' + (-(L / 2 - 1)) + 'px)'),
+      lFront: face(Wl, L, 'translateZ(' + (Dl / 2) + 'px)'),
+      lBack: face(Wl, L, 'rotateY(180deg) translateZ(' + (Dl / 2) + 'px)'),
+      lRight: face(Dl, L, 'rotateY(90deg) translateZ(' + (Wl / 2) + 'px)'),
+      lLeft: face(Dl, L, 'rotateY(-90deg) translateZ(' + (Wl / 2) + 'px)'),
+      lIFront: face(Wl, L, 'translateZ(' + (Dl / 2 - 1) + 'px) rotateY(180deg)'),
+      lIBack: face(Wl, L, 'translateZ(' + (-(Dl / 2 - 1)) + 'px)'),
+      lIRight: face(Dl, L, 'rotateY(-90deg) translateZ(' + (-(Wl / 2 - 1)) + 'px)'),
+      lILeft: face(Dl, L, 'rotateY(90deg) translateZ(' + (-(Wl / 2 - 1)) + 'px)'),
+      hFront: face(160, 130, 'translateY(' + (-H / 2 - 44) + 'px) translateZ(' + (D / 2 - 6) + 'px)'),
+      hBack: face(160, 130, 'translateY(' + (-H / 2 - 44) + 'px) translateZ(' + (-(D / 2 - 6)) + 'px)')
+    };
+    const lidY = -H / 2 - 2 + L / 2;
+    const lid = s.open
+      ? 'translateY(' + (lidY - H - 120) + 'px) translateZ(' + (-D * 0.15) + 'px) rotateX(18deg)'
+      : 'translateY(' + lidY + 'px)';
+
+    const seq = '~||-_^+*.';
+    const shift = (o) => seq.slice(o % 9) + seq.slice(0, o % 9);
+    const glyphRows = [0, 3, 6, 1, 4, 7, 2, 5, 8, 0, 3, 6].map((o) => shift(o).repeat(7));
+    const jubRows = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => (i % 2 ? '1946 — 2026   LXXX   ' : 'LXXX   1946 — 2026   ').repeat(5));
+    const vis = Math.max(0, H - L);
+    const SH = { '.': -0.305, '_': -0.445, '-': -0.035, '~': -0.035, '^': 0.255, '*': 0.235, '|': 0 };
+    const stG = m.g.length ? m.g : ['~', '||', '-', '_', '^', '+', '*', '.'];
+    const rhS = Math.max(6, Math.floor((vis - 6) / stG.length));
+    const strataRows = stG.map((g, i) => ({ t: '~_-^'.indexOf(g) >= 0 ? g.repeat(80) : (g + ' ').repeat(50), style: 'transform: translateY(' + (SH[g[0]] ?? 0) + 'em);', bg: i % 2 ? 'background: rgba(184,160,214,0.34);' : '' }));
+    const BANDS = {
+      domowa: { bg: '#FFFFFF', fg: '#121212', ff: "Inter, 'Helvetica Neue', Arial, sans-serif", fs: Math.round(rhS * 0.9), fw: 400, ls: '0.08em', gap: 0, pb: 3, rh: rhS, rows: strataRows, isArt: false, vis },
+      artysta: { bg: 'repeating-linear-gradient(135deg, #FFFFFF 0 9px, #CFCDC8 9px 10px)', fg: '#121212', ff: 'inherit', fs: 13, fw: 400, ls: '0', gap: 0, pb: 0, rh: 13, rows: [], isArt: true, vis },
+      jubileusz: { bg: lawenda, fg: '#121212', ff: "'Bodoni Moda', Didot, Georgia, serif", fs: 15, fw: 500, ls: '0.08em', gap: 10, pb: 10, rh: 15, rows: jubRows.map((t) => ({ t, style: '', bg: '' })), isArt: false, vis }
+    };
+    const band = BANDS[s.band];
+
+    const top = {
+      sig: Math.round(Wl * 0.2),
+      wm: Math.round(Wl * 0.1),
+      ds: Math.max(7, Math.round(Wl * 0.033)),
+      gap: Math.round(Wl * 0.03),
+      cr: Math.round(Wl / 40),
+      crs: Math.max(7, Math.round(Wl * 0.035))
+    };
+    const skirt = { fs: Math.max(8, Math.round(L * 0.2)), pad: Math.round(L * 0.3) };
+    const sealD = Math.round(Math.min(W, D) * 0.3);
+    const seal = { d: sealD, r: sealD / 2, s: Math.round(sealD * 0.72) };
+    const tissueRows = [0, 3, 6, 1, 4, 7, 2, 5, 8, 0, 3, 6, 1, 4, 7, 2, 5, 8, 0, 3, 6, 1, 4, 7].map((o) => shift(o).repeat(5));
+
+    const on = 'background: #121212; color: #FFFFFF; border: 1px solid #121212;';
+    const off = 'background: transparent; color: #121212; border: 1px solid #121212;';
+    const models = ['tort', 'ciasta', 'ciasteczka', 'torba'].map((id) => ({
+      label: MODELS[id].label, dim: MODELS[id].dim, style: s.model === id ? on : off,
+      pick: () => this.setState({ model: id, open: false })
+    }));
+    const bands = [['domowa', 'skład'], ['artysta', 'artysta'], ['jubileusz', 'LXXX']].map(([id, label]) => ({
+      label, style: s.band === id ? on : off, pick: () => this.setState({ band: id })
+    }));
+    const views = [['¾', -24, -34], ['góra', -80, -12], ['przód', -6, 0], ['bok', -10, -90]].map(([label, rx, ry]) => ({
+      label, pick: () => this.setState({ rx, ry, spin: false })
+    }));
+    const zoom = m.zoom;
+    const shadowW = Math.round(Math.max(W, D) * zoom * 1.5);
+    const shadow = { w: shadowW, half: Math.round(shadowW / 2), h: Math.round(shadowW * 0.28), top: Math.round(H * zoom * 0.42 + 30) };
+
+    return {
+      lawenda,
+      lawendaGleboka: '#7B5EA7',
+      m, f, lid, band, top, skirt, seal, tissueRows, shadow,
+      boxLabel: ['~', '||', '-', '_', '^', '+', '*', '.'].map((x) => ({ g: x, c: m.g.indexOf(x) >= 0 ? '#121212' : 'rgba(18,18,18,0.22)' })),
+      isBox: s.model !== 'torba',
+      isBag: s.model === 'torba',
+      tilt: 'scale(' + zoom + ') rotateX(' + s.rx + 'deg)',
+      ry: s.ry,
+      spinClass: s.spin ? 'lk-spin' : 'lk-still',
+      models, bands, views,
+      openLabel: s.open ? 'zamknij wieko' : 'otwórz wieko',
+      openStyle: s.model === 'torba' ? off + ' opacity: 0.35;' : (s.open ? on : off),
+      toggleOpen: () => { if (this.state.model !== 'torba') this.setState({ open: !this.state.open }); },
+      spinLabel: s.spin ? 'obrót: wł.' : 'obrót: wył.',
+      spinStyle: s.spin ? on : off,
+      toggleSpin: () => this.setState({ spin: !this.state.spin }),
+      onDown: (e) => {
+        this.drag = { x: e.clientX, y: e.clientY, rx: this.state.rx, ry: this.state.ry };
+        if (e.currentTarget && e.currentTarget.setPointerCapture) { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {} }
+      },
+      onMove: (e) => {
+        if (!this.drag) return;
+        const dx = e.clientX - this.drag.x;
+        const dy = e.clientY - this.drag.y;
+        this.setState({ ry: this.drag.ry + dx * 0.45, rx: Math.max(-85, Math.min(15, this.drag.rx - dy * 0.35)) });
+      },
+      onUp: () => { this.drag = null; }
+    };
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Opakowania"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 80px 56px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 24px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">rodzina opakowań</h1>
+    <span style="font-size: 15px">widoki z przodu w jednej skali, 1 cm = 11 px</span>
+  </header>
+
+  <div style="position: relative; height: 432px; border-top: 1.5px solid #121212; border-bottom: 1.5px solid #121212; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 24px">
+
+    <figure style="margin: 0; position: relative; display: flex; flex-direction: column; align-items: center; gap: 0">
+      <div style="width: 160px; height: 84px; box-sizing: border-box; border: 6px solid #121212; border-bottom: 0; border-radius: 80px 80px 0 0; margin-bottom: -18px" aria-hidden="true"></div>
+      <div style="width: 291px; height: 358px; position: relative; background: #FFFFFF; outline: 1px solid #121212; outline-offset: -1px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px">
+        <svg viewBox="0 0 120 120" width="110" height="110" role="img" aria-label="sygnet" style="display: block">
+          <circle cx="60" cy="32" r="8" fill="#B8A0D6"></circle>
+          <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+          <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+          <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+        </svg>
+        <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 32px; line-height: 0.9; letter-spacing: 0.08em">LUKULLUS</span>
+        <span style="font-size: 11px; font-weight: 300">cukiernia warszawska · od 1946</span>
+        <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 44px; background: #FFF200; border-top: 1px solid #121212; display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: 0.35em">~||-_^+*.</span>
+      </div>
+      <figcaption style="position: absolute; bottom: -54px; font-size: 14px; line-height: 1.35; text-align: center; width: 291px">torba<br>26 × 14 × 32 cm</figcaption>
+    </figure>
+
+    <figure style="margin: 0; position: relative; display: flex; flex-direction: column; align-items: center">
+      <div style="width: 295px; height: 50px; box-sizing: border-box; background: #FFF200; border: 1px solid #121212; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-size: 11px; position: relative; z-index: 1">
+        <span style="display: flex; gap: 0.45em; font-size: 15px; font-weight: 300" aria-label="w środku: krem, beza, czekolada, owoc"><span>~</span><span style="color: rgba(18,18,18,0.22)">||</span><span style="color: rgba(18,18,18,0.22)">-</span><span style="color: rgba(18,18,18,0.22)">_</span><span>^</span><span>+</span><span style="color: rgba(18,18,18,0.22)">*</span><span>.</span></span><span>od 1946</span>
+      </div>
+      <div style="width: 291px; height: 84px; box-sizing: border-box; border: 1px solid #121212; border-top: 0; overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2px; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 17px; font-weight: 300; letter-spacing: 0.08em; white-space: nowrap" aria-hidden="true">
+        <sc-for list="{{stTort}}" as="r" hint-placeholder-count="4"><span style="display: block; height: 19px; line-height: 19px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+      </div>
+      <figcaption style="position: absolute; bottom: -54px; font-size: 14px; line-height: 1.35; text-align: center; width: 291px">tort, w środku Tort węgierski<br>26 × 26 × 12 cm</figcaption>
+    </figure>
+
+    <figure style="margin: 0; position: relative; display: flex; flex-direction: column; align-items: center">
+      <div style="width: 340px; height: 45px; box-sizing: border-box; background: #FFF200; border: 1px solid #121212; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-size: 11px; position: relative; z-index: 1">
+        <span style="display: flex; gap: 0.45em; font-size: 15px; font-weight: 300" aria-label="w środku: krem, chrupiące, ciasto, czekolada, puder, owoc"><span>~</span><span style="color: rgba(18,18,18,0.22)">||</span><span>-</span><span>_</span><span style="color: rgba(18,18,18,0.22)">^</span><span>+</span><span>*</span><span>.</span></span><span>od 1946</span>
+      </div>
+      <div style="width: 336px; height: 56px; box-sizing: border-box; border: 1px solid #121212; border-top: 0; overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 1px; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 8px; font-weight: 300; letter-spacing: 0.08em; white-space: nowrap" aria-hidden="true">
+        <sc-for list="{{stCiasta}}" as="r" hint-placeholder-count="6"><span style="display: block; height: 9px; line-height: 9px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+      </div>
+      <figcaption style="position: absolute; bottom: -54px; font-size: 14px; line-height: 1.35; text-align: center; width: 336px">ciastka: kremówka jesienna i bajadera<br>30 × 20 × 9 cm</figcaption>
+    </figure>
+
+    <figure style="margin: 0; position: relative; display: flex; flex-direction: column; align-items: center">
+      <div style="width: 160px; height: 28px; box-sizing: border-box; background: #FFF200; border: 1px solid #121212; display: flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 10px; letter-spacing: 0.14em; position: relative; z-index: 1">LUKULLUS</div>
+      <div style="width: 157px; height: 39px; box-sizing: border-box; border: 1px solid #121212; border-top: 0; overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 1px; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 8px; font-weight: 300; letter-spacing: 0.08em; white-space: nowrap" aria-hidden="true">
+        <sc-for list="{{stMale}}" as="r" hint-placeholder-count="4"><span style="display: block; height: 9px; line-height: 9px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+      </div>
+      <figcaption style="position: absolute; bottom: -54px; font-size: 14px; line-height: 1.35; text-align: center; width: 180px">ciasteczka, praliny<br>14 × 14 × 6 cm</figcaption>
+    </figure>
+
+    <figure style="margin: 0; position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px">
+      <div style="width: 74px; height: 74px; border-radius: 50%; background: #121212; display: flex; align-items: center; justify-content: center">
+        <svg viewBox="0 0 120 120" width="52" height="52" role="img" aria-label="pieczęć" style="display: block">
+          <circle cx="60" cy="32" r="8" fill="#B8A0D6"></circle>
+          <rect x="16" y="48" width="88" height="8" fill="#FFFFFF"></rect>
+          <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#FFFFFF" stroke-width="4"></path>
+          <rect x="16" y="88" width="88" height="8" fill="#FFFFFF"></rect>
+        </svg>
+      </div>
+      <div style="width: 120px; height: 26px; background: #121212; color: #F0EDE8; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.3em; white-space: nowrap; overflow: hidden">~||-_^+*.</div>
+      <figcaption style="position: absolute; bottom: -54px; font-size: 14px; line-height: 1.35; text-align: center; width: 160px">pieczęć ø 6,5 cm<br>taśma 2,5 cm</figcaption>
+    </figure>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 560px 1fr; gap: 56px; flex: 1 1 auto; padding-top: 44px">
+    <div style="display: flex; gap: 28px; align-items: flex-start">
+      <div style="width: 260px; height: 260px; flex: none; position: relative; background: #FFF200; outline: 1px solid #121212; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+        <svg viewBox="0 0 120 120" width="52" height="52" role="img" aria-label="sygnet na wieku" style="display: block">
+          <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+          <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+          <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+          <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+        </svg>
+        <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 26px; line-height: 0.9; letter-spacing: 0.08em">LUKULLUS</span>
+        <span style="font-size: 9px; font-weight: 300">cukiernia warszawska · od 1946</span>
+        <svg width="9" height="9" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 7px; top: 7px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+        <svg width="9" height="9" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 7px; top: 7px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+        <svg width="9" height="9" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 7px; bottom: 7px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+        <svg width="9" height="9" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 7px; bottom: 7px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 15px; line-height: 1.4">
+        <span style="font-size: 14px; font-weight: 500">wieko z góry</span>
+        <span>sygnet: 20% boku wieka</span>
+        <span>znak słowny: 10% boku</span>
+        <span>podpis: 3,3% boku</span>
+        <span>krzyżyki: odsunięte o 1/40 boku</span>
+        <span>bok wieka: alfabet składu, czarne jest w środku</span>
+        <span>wnętrze wieka i dna: lawenda</span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; gap: 28px; align-items: center">
+        <div style="width: 364px; flex: none; display: flex; flex-direction: column; align-items: center">
+          <div style="width: 368px; height: 40px; box-sizing: border-box; background: #FFF200; border: 1px solid #121212; position: relative; z-index: 1"></div>
+          <div style="width: 364px; height: 48px; box-sizing: border-box; border: 1px solid #121212; border-top: 0; overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2px; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 10px; font-weight: 300; letter-spacing: 0.08em; white-space: nowrap" aria-hidden="true">
+            <sc-for list="{{stTort}}" as="r" hint-placeholder-count="4"><span style="display: block; height: 11px; line-height: 11px; {{r.bg}}"><span style="display: inline-block; {{r.style}}">{{r.t}}</span></span></sc-for>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; line-height: 1.35"><span style="font-weight: 500">skład</span><span>przekrój tego, co w środku: każdy znak składu to warstwa</span></div>
+      </div>
+      <div style="display: flex; gap: 28px; align-items: center">
+        <div style="width: 364px; flex: none; display: flex; flex-direction: column; align-items: center">
+          <div style="width: 368px; height: 40px; box-sizing: border-box; background: #FFF200; border: 1px solid #121212; position: relative; z-index: 1"></div>
+          <div style="width: 364px; height: 48px; box-sizing: border-box; border: 1px solid #121212; border-top: 0; background: repeating-linear-gradient(135deg, #FFFFFF 0 7px, #CFCDC8 7px 8px); display: flex; align-items: center; justify-content: center"><span style="background: #FFFFFF; padding: 3px 8px; font-size: 12px">[ilustracja sezonowa: artysta]</span></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; line-height: 1.35"><span style="font-weight: 500">artysta</span><span>opaska oddana ilustratorowi na sezon, jak dotąd</span></div>
+      </div>
+      <div style="display: flex; gap: 28px; align-items: center">
+        <div style="width: 364px; flex: none; display: flex; flex-direction: column; align-items: center">
+          <div style="width: 368px; height: 40px; box-sizing: border-box; background: #FFF200; border: 1px solid #121212; position: relative; z-index: 1"></div>
+          <div style="width: 364px; height: 48px; box-sizing: border-box; border: 1px solid #121212; border-top: 0; overflow: hidden; background: #B8A0D6; display: flex; align-items: center; justify-content: center; gap: 18px; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-weight: 500; font-size: 20px; letter-spacing: 0.08em; white-space: nowrap">
+            <span>LXXX</span><span style="font-family: 'Helvetica Neue', Inter, Arial, sans-serif; font-weight: 300; font-size: 14px; letter-spacing: 0">1946 — 2026</span><span>LXXX</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 15px; line-height: 1.35"><span style="font-weight: 500">jubileusz</span><span>lawenda na 80 lat, edycja 2026</span></div>
+      </div>
+    </div>
+  </div>
+</div></script>
+<script type="text/x-dc-code" id="code-Opakowania">class Component extends DCLogic {
+  renderVals() {
+    const seq = '~||-_^+*.';
+    const rows = [0, 3, 6, 1, 4, 7, 2, 5, 8].map((o) => (seq.slice(o) + seq.slice(0, o)).repeat(6));
+    const SH = { '.': -0.305, '_': -0.445, '-': -0.035, '~': -0.035, '^': 0.255, '*': 0.235, '|': 0 };
+    const st = (gs) => gs.map((g, i) => ({ t: '~_-^'.indexOf(g) >= 0 ? g.repeat(80) : (g + ' ').repeat(50), style: 'transform: translateY(' + (SH[g[0]] ?? 0) + 'em);', bg: i % 2 ? 'background: rgba(184,160,214,0.34);' : '' }));
+    return { rows, stTort: st(['~', '^', '+', '.']), stCiasta: st(['~', '-', '_', '+', '*', '.']), stMale: st(['~', '+', '*', '.']) };
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Wykrojnik"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 80px 48px; background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 20px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">wykrojnik</h1>
+    <span style="font-size: 15px">pudełko na tort 26 × 26 × 12 cm, wymiary w mm, strona zadrukowana na wierzchu</span>
+  </header>
+
+  <div style="display: flex; gap: 48px; flex: 1 1 auto; border-top: 1.5px solid #121212; padding-top: 18px">
+
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
+      <svg viewBox="-34 -24 566 584" width="640" height="660" role="img" aria-label="wykrojnik dna pudełka: spód 260 na 260 mm, ściany 120 mm, klapki do klejenia" style="display: block; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+        <defs>
+          <pattern id="kl1" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#FFFFFF"></rect><path d="M0 0V6" stroke="#9A9A9A" stroke-width="1.2"></path></pattern>
+        </defs>
+        <rect x="120" y="0" width="260" height="120" fill="#FFFFFF"></rect>
+        <rect x="120" y="380" width="260" height="120" fill="#FFFFFF"></rect>
+        <rect x="0" y="120" width="120" height="260" fill="#FFFFFF"></rect>
+        <rect x="380" y="120" width="120" height="260" fill="#FFFFFF"></rect>
+        <rect x="120" y="120" width="260" height="260" fill="#EEECE7"></rect>
+        <path d="M120 6 L101 16 L101 112 L120 118 Z M380 6 L399 16 L399 112 L380 118 Z M120 494 L101 484 L101 388 L120 382 Z M380 494 L399 484 L399 388 L380 382 Z" fill="url(#kl1)"></path>
+        <rect x="120" y="0" width="260" height="34" fill="#FFF200" opacity="0"></rect>
+        <path d="M120 0 H380 V6 L399 16 V112 L380 118 V120 H500 V380 H380 V382 L399 388 V484 L380 494 V500 H120 V494 L101 484 V388 L120 382 V380 H0 V120 H120 V118 L101 112 V16 L120 6 Z" fill="none" stroke="#121212" stroke-width="1.6" stroke-linejoin="miter"></path>
+        <path d="M120 120 H380 M120 380 H380 M120 120 V380 M380 120 V380 M120 6 V118 M380 6 V118 M120 382 V494 M380 382 V494" fill="none" stroke="#7B5EA7" stroke-width="1.3" stroke-dasharray="6 4"></path>
+        <g font-size="11" fill="#121212" text-anchor="middle">
+          <text x="250" y="62">przekrój zawartości / artysta / LXXX</text>
+          <text x="250" y="444" transform="rotate(180 250 440)">przekrój zawartości / artysta / LXXX</text>
+          <text x="60" y="254" transform="rotate(90 60 250)">opaska</text>
+          <text x="440" y="254" transform="rotate(-90 440 250)">opaska</text>
+          <text x="250" y="238">spód</text>
+          <text x="250" y="256">skład, adres, kod: [do uzupełnienia]</text>
+          <text x="250" y="274">wewnątrz całe dno: lawenda</text>
+        </g>
+        <g stroke="#121212" stroke-width="0.8" fill="none">
+          <path d="M0 528 H500 M0 522 V534 M500 522 V534"></path>
+          <path d="M120 516 H380 M120 511 V521 M380 511 V521"></path>
+          <path d="M-18 0 V500 M-24 0 H-12 M-24 500 H-12"></path>
+          <path d="M-6 120 V0 M-11 0 H-1 M-11 120 H-1"></path>
+        </g>
+        <g font-size="11" fill="#121212" text-anchor="middle">
+          <text x="250" y="548">500</text>
+          <text x="250" y="512">260</text>
+          <text x="-22" y="254" transform="rotate(-90 -22 250)">500</text>
+          <text x="-10" y="64" transform="rotate(-90 -10 60)">120</text>
+          <text x="110" y="9" font-size="9">19</text>
+        </g>
+      </svg>
+      <figcaption style="font-size: 14px">dno: 500 × 500 mm arkusza netto</figcaption>
+    </figure>
+
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 8px">
+      <svg viewBox="-30 -24 414 424" width="440" height="451" role="img" aria-label="wykrojnik wieka: wierzch 264 na 264 mm, boki 45 mm, klapki do klejenia" style="display: block; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+        <defs>
+          <pattern id="kl2" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#FFF200"></rect><path d="M0 0V6" stroke="#121212" stroke-width="0.9"></path></pattern>
+        </defs>
+        <rect x="45" y="0" width="264" height="354" fill="#FFF200"></rect>
+        <rect x="0" y="45" width="354" height="264" fill="#FFF200"></rect>
+        <path d="M45 4 L28 12 L28 38 L45 42 Z M309 4 L326 12 L326 38 L309 42 Z M45 350 L28 342 L28 316 L45 312 Z M309 350 L326 342 L326 316 L309 312 Z" fill="url(#kl2)"></path>
+        <g transform="translate(177 165)">
+          <g transform="translate(-26 -40) scale(0.433)">
+            <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+            <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+            <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+            <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+          </g>
+          <text x="0" y="30" text-anchor="middle" font-family="'Bodoni Moda', Didot, Georgia, serif" font-weight="500" font-size="26" letter-spacing="2">LUKULLUS</text>
+          <text x="0" y="44" text-anchor="middle" font-size="8.5" font-weight="300">cukiernia warszawska · od 1946</text>
+        </g>
+        <g stroke="#121212" stroke-width="1">
+          <path d="M57 51 V63 M51 57 H63 M297 51 V63 M291 57 H303 M57 291 V303 M51 297 H63 M297 291 V303 M291 297 H303"></path>
+        </g>
+        <path d="M45 0 H309 V4 L326 12 V38 L309 42 V45 H354 V309 H309 V312 L326 316 V342 L309 350 V354 H45 V350 L28 342 V316 L45 312 V309 H0 V45 H45 V42 L28 38 V12 L45 4 Z" fill="none" stroke="#121212" stroke-width="1.6"></path>
+        <path d="M45 45 H309 M45 309 H309 M45 45 V309 M309 45 V309 M45 4 V42 M309 4 V42 M45 312 V350 M309 312 V350" fill="none" stroke="#7B5EA7" stroke-width="1.3" stroke-dasharray="6 4"></path>
+        <g font-size="10" fill="#121212" text-anchor="middle">
+          <text x="150" y="27" fill-opacity="0.35">~  ||  -  _  ^  +  *  .</text>
+          <text x="282" y="27">od 1946</text>
+          <text x="150" y="38" font-size="6.5">pole na pieczątki: alfabet w 20% czerni</text>
+          <text x="177" y="333" transform="rotate(180 177 330)">smak. piękno. warszawa.</text>
+          <text x="22" y="180" transform="rotate(90 22 177)">LUKULLUS</text>
+          <text x="332" y="180" transform="rotate(-90 332 177)">LUKULLUS</text>
+        </g>
+        <g stroke="#121212" stroke-width="0.8" fill="none">
+          <path d="M0 376 H354 M0 370 V382 M354 370 V382"></path>
+          <path d="M45 366 H309 M45 361 V371 M309 361 V371"></path>
+          <path d="M-14 0 V45 M-19 0 H-9 M-19 45 H-9"></path>
+        </g>
+        <g font-size="11" fill="#121212" text-anchor="middle">
+          <text x="177" y="395">354</text>
+          <text x="177" y="362">264</text>
+          <text x="-18" y="26" transform="rotate(-90 -18 22)">45</text>
+        </g>
+      </svg>
+      <figcaption style="font-size: 14px">wieko: 354 × 354 mm, luz 2 mm na stronę</figcaption>
+    </figure>
+
+    <aside style="flex: 1 1 auto; display: flex; flex-direction: column; gap: 18px; font-size: 15px; line-height: 1.4; border-left: 1px solid #121212; padding-left: 32px">
+      <span style="font-size: 14px; font-weight: 500">legenda</span>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <span style="display: flex; align-items: center; gap: 12px"><svg width="44" height="8" aria-hidden="true"><path d="M0 4H44" stroke="#121212" stroke-width="1.6"></path></svg>cięcie</span>
+        <span style="display: flex; align-items: center; gap: 12px"><svg width="44" height="8" aria-hidden="true"><path d="M0 4H44" stroke="#7B5EA7" stroke-width="1.3" stroke-dasharray="6 4"></path></svg>big, zgięcie</span>
+        <span style="display: flex; align-items: center; gap: 12px"><span style="width: 44px; height: 14px; display: block; background: repeating-linear-gradient(45deg, #FFFFFF 0 3px, #9A9A9A 3px 4px); outline: 1px solid #9A9A9A"></span>klej</span>
+      </div>
+      <span style="font-size: 14px; font-weight: 500; margin-top: 8px">propozycja produkcji</span>
+      <dl style="margin: 0; display: grid; grid-template-columns: 96px 1fr; row-gap: 8px; column-gap: 12px">
+        <dt style="font-weight: 500">karton</dt><dd style="margin: 0">GC1 400 g/m², włókna wzdłuż ścian</dd>
+        <dt style="font-weight: 500">druk</dt><dd style="margin: 0">zewnątrz żółć + czerń, wewnątrz lawenda</dd>
+        <dt style="font-weight: 500">żółć</dt><dd style="margin: 0">kolor dodatkowy, wzorzec do potwierdzenia z drukarnią</dd>
+        <dt style="font-weight: 500">lakier</dt><dd style="margin: 0">dyspersyjny, mat, bez folii</dd>
+        <dt style="font-weight: 500">spad</dt><dd style="margin: 0">3 mm na każdym cięciu</dd>
+        <dt style="font-weight: 500">bok wieka</dt><dd style="margin: 0">alfabet składu blado; przy ladzie pieczątki zaczerniają to, co jest w środku</dd>
+      </dl>
+      <p style="margin: 0; margin-top: auto">te same proporcje skalują się na pudełko na ciastka (30 × 20 × 9 cm) i na ciasteczka (14 × 14 × 6 cm).</p>
+    </aside>
+  </div>
+</div></script>
+<script type="text/x-dc-code" id="code-Wykrojnik">class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Render"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; background: #ECE6F2; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif">
+  
+  <div style="position: absolute; left: 48px; bottom: 40px; display: flex; flex-direction: column; gap: 6px">
+    <span style="font-size: 40px; font-weight: 300; letter-spacing: -0.02em; line-height: 1">render 3D</span>
+    <span style="font-size: 15px">Blender 5, Cycles · wymiary z wykrojnika · karton 1,5 mm</span>
+  </div>
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 28px; top: 28px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 28px; top: 28px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 28px; bottom: 28px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+<img src="/lukullus/assets/render.png" alt="render pudełek Lukullus: na bokach przekrój składu ułożony ze znaków, na wiekach oznakowanie; pudełko na tort z pudełkiem na ciasteczka, otwarte pudełko na ciastka z bibułką i czarną pieczęcią, obok żółte wieko" style="display: block; width: 1600px; height: 1000px; object-fit: cover"></div></script>
+<script type="text/x-dc-code" id="code-Render">class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}</script>
+<script type="text/x-dc-tpl" id="tpl-Aplikacje"><div style="width: 1600px; height: 1000px; position: relative; overflow: hidden; box-sizing: border-box; padding: 56px 80px 48px; background: #F6F5F2; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; display: flex; flex-direction: column; gap: 24px">
+
+  <header style="display: flex; justify-content: space-between; align-items: flex-end">
+    <h1 style="margin: 0; font-size: 72px; font-weight: 300; letter-spacing: -0.03em; line-height: 1">zastosowania</h1>
+    <span style="font-size: 15px">szyld, wizytówka, kubek, media społecznościowe, karta menu</span>
+  </header>
+
+  <div style="display: flex; gap: 40px; height: 440px; border-top: 1.5px solid #121212; padding-top: 20px">
+
+    <figure style="margin: 0; flex: none; width: 760px; display: flex; flex-direction: column; gap: 10px">
+      <div style="flex: 1 1 auto; display: flex; flex-direction: column; background: #121212; padding: 0 10px" aria-label="szyld i witryna cukierni" role="img">
+        <div style="height: 104px; background: #FFF200; display: flex; align-items: center; justify-content: space-between; padding: 0 30px">
+          <div style="display: flex; align-items: center; gap: 20px">
+            <svg viewBox="0 0 120 120" width="72" height="72" aria-hidden="true" style="display: block">
+              <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+              <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+              <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+              <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+            </svg>
+            <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 58px; letter-spacing: 0.08em; line-height: 1">LUKULLUS</span>
+          </div>
+          <span style="font-size: 18px; font-weight: 300; text-align: right; line-height: 1.3">cukiernia warszawska<br>od 1946</span>
+        </div>
+        <div style="flex: 1 1 auto; display: grid; grid-template-columns: 1.3fr 0.8fr 1.3fr; gap: 10px; padding: 10px 0 0">
+          <div style="background: #2B2D2E; position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; padding: 22px 20px; color: #F0EDE8">
+            <span style="font-size: 14px; color: #B8A0D6">jak czytać nasze etykiety</span>
+            <div style="display: grid; grid-template-columns: 34px 1fr 34px 1fr; row-gap: 8px; column-gap: 6px; align-items: baseline; font-size: 15px; font-weight: 300">
+              <span style="font-size: 24px">~</span><span>krem</span><span style="font-size: 24px">^</span><span>beza</span>
+              <span style="font-size: 24px">||</span><span>biszkopt</span><span style="font-size: 24px">+</span><span>czekolada</span>
+              <span style="font-size: 24px">-</span><span>chrupiące</span><span style="font-size: 24px">*</span><span>puder</span>
+              <span style="font-size: 24px">_</span><span>ciasto</span><span style="font-size: 24px">.</span><span>owoc</span>
+            </div>
+          </div>
+          <div style="background: #34373A; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #F0EDE8">
+            <svg viewBox="0 0 120 120" width="54" height="54" aria-hidden="true" style="display: block">
+              <circle cx="60" cy="32" r="8" fill="#B8A0D6"></circle>
+              <rect x="16" y="48" width="88" height="8" fill="#F0EDE8"></rect>
+              <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#F0EDE8" stroke-width="4"></path>
+              <rect x="16" y="88" width="88" height="8" fill="#F0EDE8"></rect>
+            </svg>
+            <span style="font-size: 12px; text-align: center; line-height: 1.4">[godziny otwarcia]</span>
+            <span style="position: absolute; right: 14px; top: 50%; width: 6px; height: 64px; background: #F0EDE8; margin-top: -32px"></span>
+          </div>
+          <div style="background: #2B2D2E; display: flex; flex-direction: column; justify-content: space-between; padding: 26px 22px; color: #B8A0D6">
+            <div style="display: flex; align-items: flex-end; gap: 6px">
+              <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 64px; line-height: 0.8">L</span>
+              <svg viewBox="0 0 186 68" width="140" height="51" aria-hidden="true" style="display: block">
+                <path d="M4 2 L54 66" stroke="#B8A0D6" stroke-width="10"></path><path d="M54 2 L4 66" stroke="#B8A0D6" stroke-width="2"></path>
+                <path d="M68 2 L118 66" stroke="#B8A0D6" stroke-width="10"></path><path d="M118 2 L68 66" stroke="#B8A0D6" stroke-width="2"></path>
+                <path d="M132 2 L182 66" stroke="#B8A0D6" stroke-width="10"></path><path d="M182 2 L132 66" stroke="#B8A0D6" stroke-width="2"></path>
+              </svg>
+            </div>
+            <span style="font-size: 20px; font-weight: 300; color: #F0EDE8">80 lat w Warszawie</span>
+          </div>
+        </div>
+      </div>
+      <figcaption style="font-size: 14px">szyld: żółty pas, czarny znak. witryna: legenda alfabetu składu i jubileusz jako folia</figcaption>
+    </figure>
+
+    <figure style="margin: 0; flex: none; display: flex; flex-direction: column; gap: 14px">
+      <div style="width: 278px; height: 180px; position: relative; background: #FFF200; box-shadow: 0 10px 24px rgba(18,18,18,0.12); display: flex; align-items: center; justify-content: center; gap: 14px">
+        <svg viewBox="0 0 120 120" width="54" height="54" aria-hidden="true" style="display: block">
+          <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+          <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+          <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+          <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+        </svg>
+        <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 30px; letter-spacing: 0.08em">LUKULLUS</span>
+        <svg width="9" height="9" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; left: 8px; top: 8px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+        <svg width="9" height="9" viewBox="0 0 16 16" aria-hidden="true" style="position: absolute; right: 8px; bottom: 8px"><path d="M8 0v16M0 8h16" stroke="#121212" stroke-width="1.5"></path></svg>
+      </div>
+      <div style="width: 278px; height: 180px; box-sizing: border-box; position: relative; background: #FFFFFF; box-shadow: 0 10px 24px rgba(18,18,18,0.12); padding: 22px 22px 18px; display: flex; flex-direction: column; justify-content: space-between">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 20px; font-weight: 500">[Imię Nazwisko]</span>
+          <span style="font-size: 12px">[stanowisko]</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 3px; font-size: 11px; line-height: 1.35; border-top: 1px solid #121212; padding-top: 8px">
+          <span>[telefon] · [e-mail]</span>
+          <span>cukiernialukullus.pl</span>
+          <span style="letter-spacing: 0.3em; color: #7B5EA7">~||-_^+*.</span>
+        </div>
+      </div>
+      <figcaption style="font-size: 14px">wizytówka 85 × 55 mm</figcaption>
+    </figure>
+
+    <figure style="margin: 0; flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px">
+      <div style="width: 196px; display: flex; flex-direction: column; align-items: center" role="img" aria-label="kubek na kawę z rękawem">
+        <div style="width: 196px; height: 18px; background: #121212; border-radius: 4px 4px 0 0"></div>
+        <div style="width: 186px; height: 10px; background: #2B2B2B"></div>
+        <div style="width: 180px; height: 292px; background: #FFFFFF; clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%); position: relative; display: flex; flex-direction: column; align-items: center">
+          <div style="position: absolute; left: 0; right: 0; top: 70px; height: 130px; background: #FFF200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+            <svg viewBox="0 0 120 120" width="50" height="50" aria-hidden="true" style="display: block">
+              <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+              <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+              <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+              <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+            </svg>
+            <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 17px; letter-spacing: 0.08em">LUKULLUS</span>
+          </div>
+          <span style="position: absolute; bottom: 30px; font-size: 11px">cukiernia warszawska</span>
+        </div>
+      </div>
+      <figcaption style="font-size: 14px">kubek z żółtym rękawem</figcaption>
+    </figure>
+  </div>
+
+  <div style="display: flex; gap: 32px; flex: 1 1 auto; align-items: flex-start">
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="width: 300px; height: 300px; box-sizing: border-box; position: relative; background: #FFF200; padding: 26px; display: flex; flex-direction: column; justify-content: space-between">
+        <span style="font-size: 14px">1 / 3</span>
+        <span style="font-size: 96px; font-weight: 300; letter-spacing: -0.05em; line-height: 0.9">smak.</span>
+        <span style="font-size: 14px; display: flex; justify-content: space-between; border-top: 1px solid #121212; padding-top: 8px"><span>LUKULLUS</span><span>od 1946</span></span>
+      </div>
+      <figcaption style="font-size: 14px">post: filozofia w trzech planszach</figcaption>
+    </figure>
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="width: 300px; height: 300px; box-sizing: border-box; position: relative; background: #B8A0D6; padding: 26px; display: flex; flex-direction: column; justify-content: space-between">
+        <span style="font-size: 14px">1946 — 2026</span>
+        <div style="display: flex; align-items: flex-end; gap: 6px">
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 92px; line-height: 0.8">L</span>
+          <svg viewBox="0 0 186 68" width="168" height="61" aria-hidden="true" style="display: block">
+            <path d="M4 2 L54 66" stroke="#121212" stroke-width="10"></path><path d="M54 2 L4 66" stroke="#121212" stroke-width="2"></path>
+            <path d="M68 2 L118 66" stroke="#121212" stroke-width="10"></path><path d="M118 2 L68 66" stroke="#121212" stroke-width="2"></path>
+            <path d="M132 2 L182 66" stroke="#121212" stroke-width="10"></path><path d="M182 2 L132 66" stroke="#121212" stroke-width="2"></path>
+          </svg>
+        </div>
+        <span style="font-size: 16px; line-height: 1.35">osiemdziesiąt lat. zaczęło się od kremówki na Pradze.</span>
+      </div>
+      <figcaption style="font-size: 14px">post: jubileusz</figcaption>
+    </figure>
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+      <div style="width: 300px; height: 300px; box-sizing: border-box; position: relative; background: #121212; color: #F0EDE8; padding: 26px; display: flex; flex-direction: column; justify-content: space-between">
+        <span style="font-size: 14px; color: #B8A0D6">wyrób dnia</span>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 40px; font-weight: 500; line-height: 1">Pączek warszawski</span>
+          <span style="display: flex; gap: 0.42em; font-size: 26px; font-weight: 300" aria-label="skład: ciasto, owoc"><span style="color: rgba(240,237,232,0.22)">~</span><span style="color: rgba(240,237,232,0.22)">||</span><span style="color: rgba(240,237,232,0.22)">-</span><span>_</span><span style="color: rgba(240,237,232,0.22)">^</span><span style="color: rgba(240,237,232,0.22)">+</span><span style="color: rgba(240,237,232,0.22)">*</span><span>.</span></span>
+        </div>
+        <span style="font-size: 13px; display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid #F0EDE8; padding-top: 8px"><span>ciasto drożdżowe, konfitura z róży</span><span style="white-space: nowrap">12,90 zł</span></span>
+      </div>
+      <figcaption style="font-size: 14px">post: wyrób dnia</figcaption>
+    </figure>
+    <figure style="margin: 0; display: flex; flex-direction: column; gap: 10px; margin-left: auto">
+      <div style="width: 212px; height: 300px; box-sizing: border-box; position: relative; background: #FFFFFF; box-shadow: 0 10px 24px rgba(18,18,18,0.10); padding: 20px 18px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline">
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 15px; letter-spacing: 0.08em">LUKULLUS</span>
+          <span style="font-size: 9px">karta</span>
+        </div>
+        <span style="font-size: 22px; font-weight: 300; letter-spacing: -0.02em; border-top: 1px solid #121212; padding-top: 8px">torty</span>
+        <sc-for list="{{menu}}" as="it" hint-placeholder-count="5">
+          <span style="display: flex; flex-direction: column; gap: 1px">
+            <span style="display: flex; align-items: baseline; gap: 6px; font-size: 10.5px"><span style="font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 12px; font-weight: 500">{{it.name}}</span><span style="flex: 1 1 auto; border-bottom: 1px dotted #121212" aria-hidden="true"></span><span style="font-weight: 500">{{it.price}}</span></span>
+            <span style="font-size: 10px; letter-spacing: 0.14em; color: #7B5EA7">{{it.f}}</span>
+          </span>
+        </sc-for>
+        <span style="margin-top: auto; font-size: 9px; letter-spacing: 0.3em; color: #7B5EA7">~||-_^+*.</span>
+      </div>
+      <figcaption style="font-size: 14px">karta menu A5</figcaption>
+    </figure>
+  </div>
+</div></script>
+<script type="text/x-dc-code" id="code-Aplikacje">class Component extends DCLogic {
+  renderVals() {
+    const menu = [
+      ['Gruszki na wierzbie', '159,90', '~ || .'], ['Tort piemoncki', '159,90', '~ || - +'], ['Tort węgierski', '159,90', '~ ^ + .'],
+      ['Tort cassis', '159,90', '~ ^ .'], ['Dżungla polska', '159,90', '~ || + .']
+    ].map(([name, price, f]) => ({ name, price, f }));
+    return { menu };
+  }
+}</script>
+<script src="/lukullus/dc-mini.js"></script>
+<script src="/lukullus/deck.js"></script>
+</body>
+</html>

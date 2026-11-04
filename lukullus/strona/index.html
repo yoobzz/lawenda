@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap">
+<title>Lukullus — strona (projekt)</title>
+<style>html,body{margin:0;background:#FFFFFF}a{color:#121212}a:hover{color:#5E4590}</style>
+</head>
+<body>
+<div id="app" style=""></div>
+<script type="text/x-dc-tpl" id="tpl"><div style="background: #FFFFFF; color: #121212; font-family: 'Helvetica Neue', Inter, Arial, sans-serif; overflow-x: hidden">
+
+  <header style="background: #FFF200; padding: 20px clamp(16px, 5vw, 80px) 0">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: clamp(20px, 3vw, 40px)">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px">
+        <a href="#start" aria-label="Lukullus, strona główna" style="display: flex; align-items: center; gap: 14px; text-decoration: none; color: #121212">
+          <svg viewBox="0 0 120 120" width="46" height="46" aria-hidden="true" style="display: block">
+            <circle cx="60" cy="32" r="8" fill="#121212"></circle>
+            <rect x="16" y="48" width="88" height="8" fill="#121212"></rect>
+            <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#121212" stroke-width="4"></path>
+            <rect x="16" y="88" width="88" height="8" fill="#121212"></rect>
+          </svg>
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 28px; letter-spacing: 0.08em; line-height: 1">LUKULLUS</span>
+        </a>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 15px">
+          <a href="#pl" style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 8px">pl</a>
+          <a href="#en" style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 8px">en</a>
+          <a href="#koszyk" style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border: 1px solid #121212; text-decoration: none">koszyk 0</a>
+        </div>
+      </div>
+      <nav aria-label="kategorie" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr)); border-top: 1.5px solid #121212">
+        <sc-for list="{{nav}}" as="n" hint-placeholder-count="8">
+          <a href="{{n.href}}" style="display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 16px 0 20px; text-decoration: none; color: #121212; min-height: 44px">
+            <span aria-hidden="true" style="height: 4.6em; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: clamp(16px, 1.6vw, 22px); font-weight: 300; line-height: 0.92; white-space: pre; letter-spacing: 0.04em">
+              <sc-for list="{{n.lines}}" as="l" hint-placeholder-count="4"><span style="display: block; {{l.style}}">{{l.t}}</span></sc-for>
+            </span>
+            <span style="font-size: 15px">{{n.label}}</span>
+          </a>
+        </sc-for>
+      </nav>
+    </div>
+  </header>
+
+  <section id="start" style="padding: clamp(48px, 7vw, 112px) clamp(16px, 5vw, 80px) clamp(40px, 6vw, 96px)">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 15px; padding-bottom: 20px">
+        <span>cukiernia warszawska</span>
+        <span>od 1946</span>
+      </div>
+      <sc-for list="{{values}}" as="v" hint-placeholder-count="3">
+        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 40px; border-top: 1.5px solid #121212; padding: 10px 0 18px">
+          <span style="font-size: clamp(64px, 12.5vw, 196px); font-weight: 300; line-height: 0.95; letter-spacing: -0.05em">{{v.word}}</span>
+          <p style="margin: 0; flex: 0 1 380px; font-size: 18px; line-height: 1.45; padding-bottom: 14px">{{v.text}}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="witryna" style="padding: 0 clamp(16px, 5vw, 80px) clamp(56px, 8vw, 120px)">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px">
+        <h2 style="margin: 0; font-size: clamp(44px, 6vw, 80px); font-weight: 300; letter-spacing: -0.03em; line-height: 1">dziś w witrynie</h2>
+        <span style="font-size: 15px">znaki pod nazwą mówią, co jest w środku. ceny i składy z cukiernialukullus.pl</span>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 0; background: #121212; color: #F0EDE8">
+        <div style="flex: 1 1 520px; min-height: 380px; display: flex; align-items: center; justify-content: center; background: repeating-linear-gradient(135deg, #1E1E1E 0 12px, #262626 12px 13px)">
+          <span style="font-size: 15px; background: #121212; padding: 6px 12px">[zdjęcie: kremówka jesienna]</span>
+        </div>
+        <div style="flex: 1 1 420px; box-sizing: border-box; padding: clamp(24px, 4vw, 56px); display: flex; flex-direction: column; justify-content: space-between; gap: 32px">
+          <span style="font-size: 15px; color: #B8A0D6">sezon: jesień</span>
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: clamp(40px, 4.4vw, 64px); font-weight: 500; line-height: 1">Kremówka jesienna</span>
+            <span style="display: flex; gap: 0.42em; font-size: 30px; font-weight: 300" aria-label="skład: krem, chrupiące, ciasto">
+              <sc-for list="{{seasonLabel}}" as="m" hint-placeholder-count="8"><span style="color: {{m.c}}">{{m.g}}</span></sc-for>
+            </span>
+            <p style="margin: 0; font-size: 18px; line-height: 1.45; max-width: 440px">zakład otwarty w 1946 roku na Pradze nazywał się „Kremówka”.</p>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #F0EDE8; padding-top: 18px">
+            <span style="font-size: 26px; font-weight: 500; font-variant-numeric: tabular-nums">24,90 zł</span>
+            <button type="button" style="min-height: 48px; padding: 0 22px; background: #FFF200; color: #121212; border: 0; font-family: inherit; font-size: 16px; cursor: pointer">do koszyka</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(520px, 100%), 1fr)); gap: 24px 64px">
+        <sc-for list="{{boards}}" as="b" hint-placeholder-count="2">
+          <div id="{{b.id}}" style="display: flex; flex-direction: column">
+            <div style="display: flex; align-items: flex-end; gap: 16px; border-bottom: 1.5px solid #121212; padding-bottom: 12px">
+              <span aria-hidden="true" style="height: 4.6em; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; font-family: Inter, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; font-weight: 300; line-height: 0.92; white-space: pre; letter-spacing: 0.04em">
+                <sc-for list="{{b.lines}}" as="l" hint-placeholder-count="4"><span style="display: block; {{l.style}}">{{l.t}}</span></sc-for>
+              </span>
+              <h3 style="margin: 0; font-size: 22px; font-weight: 500">{{b.title}}</h3>
+            </div>
+            <sc-for list="{{b.items}}" as="it" hint-placeholder-count="5">
+              <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #121212; min-height: 72px">
+                <span style="display: flex; flex-direction: column; gap: 4px; padding: 8px 0">
+                  <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: clamp(20px, 2vw, 26px); font-weight: 500; line-height: 1.15">{{it.name}}</span>
+                  <span style="font-size: 17px; font-weight: 300; letter-spacing: 0.14em; white-space: nowrap" aria-label="{{it.sklad}}">{{it.f}}</span>
+                </span>
+                <span style="flex: 1 1 auto; border-bottom: 1px dotted #121212; align-self: center" aria-hidden="true"></span>
+                <span style="font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap">{{it.price}}</span>
+                <button type="button" aria-label="{{it.aria}}" style="min-height: 44px; padding: 0 14px; flex: none; background: transparent; border: 1px solid #121212; font-family: inherit; font-size: 15px; cursor: pointer; color: #121212">dodaj</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="opakowania" style="padding: clamp(56px, 8vw, 120px) clamp(16px, 5vw, 80px); background: #FFF200">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 48px 80px; align-items: flex-start">
+      <div style="flex: 1 1 520px; display: flex; flex-direction: column; gap: 28px">
+        <h2 style="margin: 0; font-size: clamp(44px, 6vw, 80px); font-weight: 300; letter-spacing: -0.03em; line-height: 1">sztuka opakowania</h2>
+        <p style="margin: 0; font-size: 19px; line-height: 1.45; max-width: 560px">wieko zostaje żółte. opaskę na dnie co sezon rysuje ktoś inny. pudełka są w stałej ekspozycji Muzeum Warszawy.</p>
+        <ol style="list-style: none; margin: 0; padding: 0; border-top: 1.5px solid #121212">
+          <sc-for list="{{artists}}" as="a" hint-placeholder-count="10">
+            <li style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-bottom: 1px solid #121212; padding: 10px 0">
+              <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: clamp(24px, 2.6vw, 36px); font-weight: 500; line-height: 1.1">{{a.name}}</span>
+              <span style="font-size: 15px; white-space: nowrap">{{a.no}}</span>
+            </li>
+          </sc-for>
+        </ol>
+      </div>
+      <div style="flex: 1 1 380px; display: flex; flex-direction: column; align-items: center; gap: 18px; padding-top: 24px">
+        <div style="width: min(100%, 440px); display: flex; flex-direction: column; align-items: center" aria-hidden="true">
+          <div style="width: 100%; height: 72px; box-sizing: border-box; background: #FFF200; border: 1.5px solid #121212; display: flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-weight: 500; font-size: 22px; letter-spacing: 0.12em">LUKULLUS</div>
+          <div style="width: calc(100% - 6px); height: 120px; box-sizing: border-box; border: 1.5px solid #121212; border-top: 0; background: repeating-linear-gradient(135deg, #FFFFFF 0 9px, #CFCDC8 9px 10px); display: flex; align-items: center; justify-content: center">
+            <span style="background: #FFFFFF; padding: 4px 10px; font-size: 14px">[ilustracja sezonowa]</span>
+          </div>
+        </div>
+        <span style="font-size: 15px">opaska: miejsce dla artysty</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="o-nas" style="padding: clamp(56px, 8vw, 120px) clamp(16px, 5vw, 80px); background: #B8A0D6">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px">
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px">
+        <div style="display: flex; align-items: flex-end; gap: 10px">
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: clamp(80px, 10vw, 150px); line-height: 0.8">L</span>
+          <svg viewBox="0 0 186 68" role="img" aria-label="XXX" style="display: block; width: clamp(180px, 22vw, 330px); height: auto">
+            <path d="M4 2 L54 66" stroke="#121212" stroke-width="10"></path><path d="M54 2 L4 66" stroke="#121212" stroke-width="2"></path>
+            <path d="M68 2 L118 66" stroke="#121212" stroke-width="10"></path><path d="M118 2 L68 66" stroke="#121212" stroke-width="2"></path>
+            <path d="M132 2 L182 66" stroke="#121212" stroke-width="10"></path><path d="M182 2 L132 66" stroke="#121212" stroke-width="2"></path>
+          </svg>
+        </div>
+        <p style="margin: 0; flex: 0 1 420px; font-size: 19px; line-height: 1.45">80 lat Lukullusa. nazwa od rzymskiego wodza, któremu Europa zawdzięcza czereśnie i morele.</p>
+      </div>
+      <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); border-top: 1.5px solid #121212">
+        <sc-for list="{{timeline}}" as="t" hint-placeholder-count="5">
+          <li style="display: flex; flex-direction: column; gap: 12px; padding: 18px 24px 8px 0">
+            <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: 36px; font-weight: 500; line-height: 1">{{t.year}}</span>
+            <span style="font-size: 16px; line-height: 1.45">{{t.text}}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </div>
+  </section>
+
+  <section id="miejsca" style="padding: clamp(56px, 8vw, 120px) clamp(16px, 5vw, 80px)">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 32px 80px">
+      <div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 20px">
+        <h2 style="margin: 0; font-size: clamp(44px, 6vw, 80px); font-weight: 300; letter-spacing: -0.03em; line-height: 1">miejsca</h2>
+        <p style="margin: 0; font-size: 19px; line-height: 1.45; max-width: 360px">siedem cukierni. wszystkie w Warszawie, żadnej poza nią.</p>
+      </div>
+      <ul style="flex: 2 1 560px; list-style: none; margin: 0; padding: 0; border-top: 1.5px solid #121212">
+        <sc-for list="{{places}}" as="p" hint-placeholder-count="7">
+          <li style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; border-bottom: 1px solid #121212; padding: 14px 0">
+            <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-size: clamp(26px, 3vw, 40px); font-weight: 500; line-height: 1.1">{{p.name}}</span>
+            <span style="font-size: 15px">{{p.where}}</span>
+          </li>
+        </sc-for>
+      </ul>
+    </div>
+  </section>
+
+  <footer style="background: #121212; color: #F0EDE8; padding: clamp(48px, 6vw, 88px) clamp(16px, 5vw, 80px) 40px">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px">
+      <div style="font-size: clamp(48px, 11vw, 168px); font-weight: 300; letter-spacing: 0.04em; line-height: 1; white-space: nowrap; overflow: hidden" aria-hidden="true">~||-_^+*.</div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; border-top: 1px solid #F0EDE8; padding-top: 20px">
+        <div style="display: flex; align-items: center; gap: 14px">
+          <svg viewBox="0 0 120 120" width="40" height="40" aria-hidden="true" style="display: block">
+            <circle cx="60" cy="32" r="8" fill="#B8A0D6"></circle>
+            <rect x="16" y="48" width="88" height="8" fill="#F0EDE8"></rect>
+            <path d="M16 72 q5.5 -8 11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0 t11 0" fill="none" stroke="#F0EDE8" stroke-width="4"></path>
+            <rect x="16" y="88" width="88" height="8" fill="#F0EDE8"></rect>
+          </svg>
+          <span style="font-family: 'Bodoni Moda', 'Bodoni 72', Didot, Georgia, serif; font-weight: 500; font-size: 24px; letter-spacing: 0.08em">LUKULLUS</span>
+        </div>
+        <nav aria-label="stopka" style="display: flex; flex-wrap: wrap; gap: 4px 24px; font-size: 15px">
+          <a href="#kontakt" style="color: #F0EDE8; min-height: 44px; display: inline-flex; align-items: center">kontakt</a>
+          <a href="#pytania" style="color: #F0EDE8; min-height: 44px; display: inline-flex; align-items: center">pytania</a>
+          <a href="#regulamin" style="color: #F0EDE8; min-height: 44px; display: inline-flex; align-items: center">regulamin</a>
+          <a href="#instagram" style="color: #F0EDE8; min-height: 44px; display: inline-flex; align-items: center">instagram</a>
+        </nav>
+        <span style="font-size: 15px; color: #B8A0D6">smak. piękno. warszawa.</span>
+      </div>
+    </div>
+  </footer>
+</div></script>
+<script type="text/x-dc-code" id="code">class Component extends DCLogic {
+  renderVals() {
+    const SHIFT = { '.': -0.305, '_': -0.445, '-': -0.035, '~': -0.035, '^': 0.255, '*': 0.235, '|': 0 };
+    const line = (t) => {
+      if (t === 'V') return { t: '^', style: 'transform: translateY(-0.255em) rotate(180deg);' };
+      const s = SHIFT[t.trim()[0]] ?? 0;
+      return { t, style: 'transform: translateY(' + s + 'em);' };
+    };
+    const PICTO = {
+      torty: ['.', '^^^', '~~~', '||||', '___'],
+      ciasta: ['. . .', '~~~~~', '_____'],
+      ciastka: ['*', '---', '~~~', '___'],
+      ciasteczka: ['* *', '___', '___'],
+      lody: ['.', '~~', '~~', 'V'],
+      sezon: ['* * *', '.  .', '~~~~', '____'],
+      miejsca: ['-----', '|| . ||', '_____'],
+      onas: ['.', '---', '~~~', '___']
+    };
+    const nav = [
+      ['torty', 'torty', '#torty'], ['ciasta', 'ciasta', '#ciasta'], ['ciastka', 'ciastka', '#ciastka'], ['ciasteczka', 'ciasteczka', '#ciasteczka'],
+      ['lody', 'lody', '#lody'], ['sezon', 'sezon', '#witryna'], ['miejsca', 'miejsca', '#miejsca'], ['onas', 'o nas', '#o-nas']
+    ].map(([key, label, href]) => ({ lines: PICTO[key].map(line), label, href }));
+    const ALPHA = ['~', '||', '-', '_', '^', '+', '*', '.'];
+    const seasonLabel = ALPHA.map((g) => ({ g, c: ['~', '-', '_'].indexOf(g) >= 0 ? '#F0EDE8' : 'rgba(240,237,232,0.22)' }));
+    const values = [
+      { word: 'smak.', text: 'najpierw smak: proste połączenia, dobre składniki, hojne receptury, rzemiosło.' },
+      { word: 'piękno.', text: 'potem piękno: wyroby, pudełka, wnętrza i witryny. opakowania rysują ilustratorzy.' },
+      { word: 'warszawa.', text: 'na końcu Warszawa: bez franczyzy, tylko w stolicy, siedem cukierni.' }
+    ];
+    const add = (name, price, f, sklad) => ({ name, price: price + ' zł', f: f.join(' '), sklad: 'skład: ' + sklad, aria: 'dodaj do koszyka: ' + name });
+    const boards = [
+      { id: 'torty', lines: PICTO.torty.map(line), title: 'torty', items: [
+        add('Gruszki na wierzbie', '159,90', ['~', '||', '.'], 'krem karmelowy, mus gruszkowy, biszkopt migdałowy, gruszki'),
+        add('Tort piemoncki', '159,90', ['~', '||', '-', '+'], 'mus z mlecznej czekolady, krem cytrynowy, feuilletine, biszkopt'),
+        add('Tort węgierski', '159,90', ['~', '^', '+', '.'], 'krem czekoladowy, dacquoise, ganache, wiśnie'),
+        add('Tort cassis', '159,90', ['~', '^', '.'], 'mus waniliowy, dacquoise, czarna porzeczka'),
+        add('Tort dżungla polska', '159,90', ['~', '||', '+', '.'], 'mus czekoladowy i z marakui, biszkopt, maliny')
+      ] },
+      { id: 'ciastka', lines: PICTO.ciastka.map(line), title: 'ciastka', items: [
+        add('Kremówka jesienna', '24,90', ['~', '-', '_'], 'ciasto francuskie, krem waniliowy, karmel, pralina'),
+        add('Ptyś karmelowy', '24,90', ['~', '-', '_'], 'ciasto parzone, kruszonka, krem karmelowy'),
+        add('Bajadera', '18,90', ['~', '+', '*', '.'], 'czekolada, trufla, kakao, rodzynki'),
+        add('Pączek warszawski', '12,90', ['_', '.'], 'ciasto drożdżowe, konfitura z róży')
+      ] }
+    ];
+    const names = ['Igor Kubik', 'Marta Ignerska', 'Gosia Herba', 'Tytus Brzozowski', 'Aneta Klejnowska', 'Olka Osadzińska', 'Ola Niepsuj', 'Bożka Rydlewska', 'Anna Warszawska', 'Jan Dziaczkowski'];
+    const artists = names.map((name, i) => ({ name, no: (i + 1 < 10 ? '0' : '') + (i + 1) }));
+    const timeline = [
+      { year: '1946', text: 'Jan Dynowski, mistrz czekolady z fabryki Wedla, otwiera „Kremówkę” na rogu Stalowej i Środkowej.' },
+      { year: 'PRL', text: 'zakład prowadzą Stanisława Dynowska i Halina Judycka.' },
+      { year: 'po 1989', text: 'nowa nazwa: Lukullus.' },
+      { year: 'dziś', text: 'trzecie pokolenie rodziny, siedem cukierni.' },
+      { year: '2026', text: 'LXXX. osiemdziesiąt lat.' }
+    ];
+    const places = [
+      ['Chmielna', 'Śródmieście · [adres, godziny]'], ['Mokotowska', 'Śródmieście · [adres, godziny]'], ['Złote Tarasy', 'Śródmieście · [godziny]'],
+      ['Saska Kępa', 'Francuska · [adres, godziny]'], ['Lisowska', '[adres, godziny]'], ['Westfield Mokotów', 'Mokotów · [godziny]'], ['St. Tropez', '[adres, godziny]']
+    ].map(([name, where]) => ({ name, where }));
+    return { nav, seasonLabel, values, boards, artists, timeline, places };
+  }
+}</script>
+<script src="/lukullus/dc-mini.js"></script>
+<script>DCMini.mount(document.getElementById('app'), document.getElementById('tpl').textContent, document.getElementById('code').textContent, {});</script>
+</body>
+</html>
