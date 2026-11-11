@@ -1,596 +1,225 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>Klocki dla Mamy</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap">
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>Kupa Klocków — dla Mamy</title>
+<meta name="description" content="Kupa Klocków: gra dla Mamy na urodziny. Manio, Bimbo, Miłka, Tulek i Szach Mat.">
+<meta name="theme-color" content="#28223a">
+<link rel="icon" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <style>
-/* Layout: pitch od góry do dołu — obsada, trzy etapy (telefon + opis), galeria klocków, logika gry, pytania. */
-:root{
-  --bg:#f5f3fa; --surface:#ffffff; --ink:#241e35; --muted:#6a6380; --line:#e2ddef;
-  --accent:#d9466e; --accent-soft:#fbe3ea;
-  --manio:#3e7a37; --bimbo:#1e5a60; --koty:#2c3566; --chaos:#8a4fb0;
-  --display:"Lilita One","Arial Rounded MT Bold",system-ui,sans-serif;
-  --body:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#15121d; --surface:#201b2c; --ink:#f0ecf7; --muted:#a8a1bb; --line:#342c47;
-  --accent:#ff7598; --accent-soft:#3a1f2b; color-scheme:dark;
-}}
-:root[data-theme="dark"]{
-  --bg:#15121d; --surface:#201b2c; --ink:#f0ecf7; --muted:#a8a1bb; --line:#342c47;
-  --accent:#ff7598; --accent-soft:#3a1f2b; color-scheme:dark;
-}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
-.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:64px}
-h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
-h1{font-size:clamp(46px,11vw,96px)}
-h2{font-size:clamp(30px,6vw,44px)}
-h3{font-size:26px}
-p{margin:0;max-width:65ch}
-.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-.lead{font-size:clamp(17px,2.6vw,21px);color:var(--muted);max-width:44ch}
-section{display:flex;flex-direction:column;gap:22px}
-.hero{gap:18px}
-.hero h1 span{color:var(--accent)}
-.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:10px}
-.cast figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
-.cast canvas{width:100%;max-width:150px}
-.cast b{font-family:var(--display);font-weight:400;font-size:20px}
-.cast small{font-size:12.5px;color:var(--muted);text-align:center;line-height:1.3}
-@media (max-width:560px){.cast{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  :root {
+    --tlo: #f6f3fb;
+    --tusz: #241e35;
+    --szary: #8a84a0;
+    --lawenda: #b9a6ff;
+    --ramka: #1b1726;
+    --guzik: #ffffff;
+    --guzik-cien: #ddd5f3;
+    --akcent: #ffce40;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--tlo);
+    color: var(--tusz);
+    font: 300 15px/1.4 "Inter", "Helvetica Neue", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    padding: max(10px, env(safe-area-inset-top)) 16px max(14px, env(safe-area-inset-bottom));
+    min-height: 100svh;
+    overscroll-behavior: none;
+    user-select: none; -webkit-user-select: none;
+  }
+  header {
+    width: 100%; max-width: 420px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    letter-spacing: .02em; margin-bottom: 8px;
+  }
+  header b { font-weight: 600; letter-spacing: .14em; font-size: 13px; }
+  header span { color: var(--szary); font-size: 13px; }
 
-/* etapy */
-.stage{display:grid;grid-template-columns:270px minmax(0,1fr);gap:36px;align-items:start;padding-top:8px}
-@media (max-width:720px){.stage{grid-template-columns:minmax(0,1fr);gap:22px}.stage .phone{margin:0 auto}}
-.stage-text{display:flex;flex-direction:column;gap:14px;min-width:0}
-.tag{display:inline-flex;align-self:flex-start;gap:8px;align-items:center;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:5px 11px;border-radius:999px}
-.facts{display:grid;grid-template-columns:minmax(0,1fr);gap:0;border-top:1px solid var(--line);margin-top:4px}
-.facts div{display:grid;grid-template-columns:118px minmax(0,1fr);gap:14px;padding:10px 0;border-bottom:1px solid var(--line)}
-.facts dt{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px}
-.facts dd{margin:0}
-@media (max-width:420px){.facts div{grid-template-columns:minmax(0,1fr);gap:2px}}
-.quote{font-style:italic;color:var(--muted)}
+  /* jeden mocny element: ekran w ramce jak moduł 2,4" */
+  .modul {
+    background: var(--ramka);
+    border-radius: 22px;
+    padding: 12px 12px 16px;
+    box-shadow: 0 18px 40px -18px rgba(40, 20, 80, .55), inset 0 0 0 1px #2c2640;
+    width: min(100%, calc((100svh - 280px) * 0.75 + 24px), 420px);
+  }
+  .modul canvas {
+    display: block; width: 100%; aspect-ratio: 3 / 4;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+    border-radius: 6px; background: #000;
+    touch-action: none;
+  }
+  .kropka { width: 6px; height: 6px; border-radius: 50%; background: #3a3350; margin: 10px auto 0; }
 
-/* telefon (świat gry ma własne, stałe kolory) */
-.phone{width:270px;max-width:100%;background:#121019;border-radius:36px;padding:9px;box-shadow:0 18px 40px -18px rgba(20,10,40,.55),inset 0 0 0 1.5px #2b2738}
-.screen{border-radius:28px;overflow:hidden;display:flex;flex-direction:column}
-.hud{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px 8px;color:#fff;font-size:12px}
-.hud .lvl{font-family:var(--display);font-size:16px;line-height:1.1}
-.hud .score{font-variant-numeric:tabular-nums;font-weight:800;font-size:15px;text-align:right;line-height:1.15}
-.hud .score small{display:block;font-weight:600;font-size:10px;opacity:.7;letter-spacing:.06em;text-transform:uppercase}
-.nextbox{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;opacity:.95;text-align:center;line-height:1.1}
-.nextbox canvas{width:52px;background:rgba(0,0,0,.22);border-radius:8px}
-.board{width:100%;display:block}
-.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:9px 12px 14px}
-.pad span{display:grid;place-items:center;height:38px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-size:18px;font-weight:800}
-.pad span.big{background:rgba(255,255,255,.26)}
+  .sterowanie {
+    width: 100%; max-width: 420px; margin-top: 14px;
+    display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr; gap: 10px; align-items: center;
+  }
+  button {
+    font: inherit; color: var(--tusz);
+    background: var(--guzik); border: 0; border-radius: 16px;
+    height: 58px; display: grid; place-items: center;
+    box-shadow: 0 4px 0 var(--guzik-cien), 0 6px 16px -10px rgba(60, 30, 120, .5);
+    touch-action: manipulation; cursor: pointer;
+    transition: transform .05s, box-shadow .05s;
+  }
+  button.wcisniety { transform: translateY(3px); box-shadow: 0 1px 0 var(--guzik-cien); }
+  button svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 2.2; fill: none;
+               stroke-linecap: round; stroke-linejoin: round; }
+  button small { display: block; font-size: 10px; letter-spacing: .12em; color: var(--szary); margin-top: -2px; }
+  .pokretlo {
+    height: 76px; border-radius: 50%; aspect-ratio: 1; justify-self: center;
+    background: radial-gradient(circle at 35% 30%, #fff, #ebe5fb 70%);
+    box-shadow: 0 5px 0 #cfc4f0, 0 10px 22px -10px rgba(60, 30, 120, .6), inset 0 0 0 2px #fff;
+  }
+  .pokretlo.wcisniety { box-shadow: 0 1px 0 #cfc4f0, inset 0 0 0 2px #fff; }
+  .zrzut { background: var(--tusz); color: #fff; box-shadow: 0 4px 0 #0f0b18; }
+  .zrzut small { color: #b6aed0; }
+  .zrzut.wcisniety { box-shadow: 0 1px 0 #0f0b18; }
+  .rzad2 { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1.6fr 0.7fr; gap: 10px; }
 
-/* galeria */
-.gallery{display:flex;flex-direction:column;gap:18px}
-.grow{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.grow h3{font-size:21px;display:flex;gap:10px;align-items:center}
-.grow h3 i{width:12px;height:12px;border-radius:50%;display:inline-block}
-.pieces{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
-@media (max-width:700px){.pieces{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.pieces figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
-.pieces canvas{width:100%;border-radius:10px}
-.pieces figcaption{font-size:12px;color:var(--muted);text-align:center;line-height:1.25}
-
-/* logika */
-.timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-radius:16px;overflow:hidden}
-.timeline div{padding:14px 12px;color:#fff;display:flex;flex-direction:column;gap:2px;min-width:0}
-.timeline b{font-family:var(--display);font-weight:400;font-size:19px;line-height:1.1}
-.timeline small{font-size:12.5px;opacity:.88;font-variant-numeric:tabular-nums}
-@media (max-width:620px){.timeline{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-@media (max-width:720px){.cols{grid-template-columns:minmax(0,1fr)}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.card h3{font-size:22px}
-.card ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
-.tbl{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:14.5px;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
-th{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800}
-td.n{text-align:right}
-.screens{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-@media (max-width:620px){.screens{grid-template-columns:minmax(0,1fr)}}
-.ask{background:var(--accent-soft);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:14px}
-.ask ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;max-width:70ch}
-.muted{color:var(--muted)}
+  .podpowiedz { margin-top: 12px; color: var(--szary); font-size: 12px; text-align: center; letter-spacing: .02em; }
+  .podpowiedz kbd { font: inherit; font-weight: 500; color: var(--tusz); }
+  .laduje { position: fixed; inset: 0; display: grid; place-items: center; background: var(--tlo);
+            color: var(--szary); letter-spacing: .14em; font-size: 12px; transition: opacity .4s; }
+  .laduje.znika { opacity: 0; pointer-events: none; }
+  @media (hover: none) { .tylko-klawiatura { display: none; } }
+  @media (hover: hover) and (min-width: 700px) { .tylko-dotyk { display: none; } }
 </style>
+</head>
+<body>
+<header><b>KUPA KLOCKÓW</b><span>dla Mamy · sto lat</span></header>
 
-<div class="wrap">
-
-<header class="hero">
-  <div class="eyebrow">Propozycja gry na urodziny · do akceptacji</div>
-  <h1>Klocki <span>dla Mamy</span></h1>
-  <p class="lead">Gra w spadające klocki, która z czasem zmienia świat. Najpierw klocki robi Manio, potem spadają jamniki, a na końcu Miłka i Tulka.</p>
-  <div class="cast">
-    <figure><canvas id="c-manio"></canvas><b>Manio</b><small>wyżeł weimarski, główny dostawca klocków</small></figure>
-    <figure><canvas id="c-bimbo"></canvas><b>Bimbo</b><small>jamnik, klocek o długości 4 pól</small></figure>
-    <figure><canvas id="c-milka"></canvas><b>Miłka</b><small>szara kotka, jaśniejsza, wiecznie śpiąca</small></figure>
-    <figure><canvas id="c-tulka"></canvas><b>Tulka</b><small>szara kotka w paski, psotnica</small></figure>
-  </div>
-</header>
-
-<section>
-  <div class="eyebrow">Trzy etapy, zmieniają się same</div>
-  <h2>Tak to wygląda na telefonie</h2>
-
-  <div class="stage">
-    <div class="phone"><div class="screen" style="background:#2f6a2b">
-      <div class="hud"><div><div class="lvl">Etap 1 · Manio</div><span style="opacity:.75">linie 7 / 10</span></div>
-        <div class="nextbox"><canvas id="n1"></canvas>W brzuchu<br>Mania</div>
-        <div class="score">2 400<small>punkty</small></div></div>
-      <canvas class="board" id="b1"></canvas>
-      <div class="pad"><span>◀</span><span class="big">⟳</span><span>▶</span><span>▼</span></div>
-    </div></div>
-    <div class="stage-text">
-      <span class="tag" style="background:var(--manio)">Etap 1 · linie 0–9</span>
-      <h3>Manio kładzie klocki</h3>
-      <p>Na górze planszy, na trawniku, chodzi Manio. Przy każdym nowym klocku staje, przykuca, napina się i robi kupę w kształcie klocka. Klocek spada na trawę w parku.</p>
-      <dl class="facts">
-        <div><dt>Klocki</dt><dd>Brązowe „lody świderki” sklejone w kształty. Każdy rodzaj ma swój odcień, jeden ma kukurydzę, niektóre mają oczka.</dd></div>
-        <div><dt>Następny</dt><dd>Okienko „W brzuchu Mania” pokazuje, co się szykuje.</dd></div>
-        <div><dt>Zbita linia</dt><dd>Przelatuje zielony woreczek i sprząta rząd. Napisy: „Posprzątane!”, „Sąsiadka zadowolona”. Cztery linie naraz: „WIELKA KUPA SPRZĄTNIĘTA!”, a Manio macha ogonem.</dd></div>
-        <div><dt>Gdy wysoko</dt><dd>Nad stosem latają muchy, unoszą się zielone smugi i pojawia się napis „Coś tu śmierdzi…”.</dd></div>
-        <div><dt>Prędkość</dt><dd>Spokojna, na rozgrzewkę.</dd></div>
-      </dl>
-    </div>
-  </div>
-
-  <div class="stage">
-    <div class="phone"><div class="screen" style="background:#1d4f55">
-      <div class="hud"><div><div class="lvl">Etap 2 · Bimbo</div><span style="opacity:.75">linie 14 / 20</span></div>
-        <div class="nextbox"><canvas id="n2"></canvas>W kolejce<br>na kanapę</div>
-        <div class="score">7 900<small>punkty</small></div></div>
-      <canvas class="board" id="b2"></canvas>
-      <div class="pad"><span>◀</span><span class="big">⟳</span><span>▶</span><span>▼</span></div>
-    </div></div>
-    <div class="stage-text">
-      <span class="tag" style="background:var(--bimbo)">Etap 2 · linie 10–19</span>
-      <h3>Bimbo i jamniki</h3>
-      <p>Klocki to jamniki zgięte w kształty. Każdy ma głowę z oklapniętym uchem, czerwoną obrożę, krótkie łapki i ogonek. Długi klocek to po prostu Bimbo w całej okazałości. Zeskakują z kanapy w salonie i lądują na tym, co zostawił Manio.</p>
-      <dl class="facts">
-        <div><dt>Klocki</dt><dd>„Parówka” (długi), „Precel” (kwadrat: jamnik zwinięty w kółko, śpi), „Peryskop” (głowa wystaje z grzbietu), „Ogon do góry” i inne.</dd></div>
-        <div><dt>Zbita linia</dt><dd>Jamniki z rzędu szczekają „HAU!” i uciekają za ekran. Cztery naraz: „PARÓWKOWA CZWÓRKA!”.</dd></div>
-        <div><dt>Gdy wysoko</dt><dd>Jamniki skomlą, a na górze pojawia się miska z napisem „Bimbo chce jeść”.</dd></div>
-        <div><dt>Prędkość</dt><dd>Wyraźnie szybciej.</dd></div>
-      </dl>
-    </div>
-  </div>
-
-  <div class="stage">
-    <div class="phone"><div class="screen" style="background:#232b52">
-      <div class="hud"><div><div class="lvl">Etap 3 · Koty</div><span style="opacity:.75">linie 26 / 30</span></div>
-        <div class="nextbox"><canvas id="n3"></canvas>Na półce<br>czeka</div>
-        <div class="score">15 200<small>punkty</small></div></div>
-      <canvas class="board" id="b3"></canvas>
-      <div class="pad"><span>◀</span><span class="big">⟳</span><span>▶</span><span>▼</span></div>
-    </div></div>
-    <div class="stage-text">
-      <span class="tag" style="background:var(--koty)">Etap 3 · linie 20–29</span>
-      <h3>Miłka i Tulka</h3>
-      <p>Noc, parapet, księżyc. Koty to ciecz, więc wchodzą w każdy kształt. Siedzą na półce na górze i, jak to koty, łapą zrzucają klocki w dół. Miłka jest jaśniejsza i śpiąca, Tulka ciemniejsza, w paski i z szeroko otwartymi oczami.</p>
-      <dl class="facts">
-        <div><dt>Psota</dt><dd>Co jakiś czas z boku wysuwa się kocia łapa i przesuwa spadający klocek o jedno pole („Tulka zepchnęła!”). Łapa miga sekundę wcześniej, żeby dało się zareagować.</dd></div>
-        <div><dt>Klocki</dt><dd>„Kocia bułka” (kwadrat), „Kot rozciągnięty” (długi), „Kot w pudełku” i inne. Oczy, wąsy, białe łapki, ogon.</dd></div>
-        <div><dt>Zbita linia</dt><dd>Koty przeciągają się i znikają z „mrrr”. Cztery naraz: „KOCI ZAWRÓT GŁOWY!”.</dd></div>
-        <div><dt>Prędkość</dt><dd>Najszybciej.</dd></div>
-      </dl>
-    </div>
-  </div>
-</section>
-
-<section class="gallery">
-  <div class="eyebrow">Wszystkie 7 kształtów w każdym świecie</div>
-  <h2>Galeria klocków</h2>
-  <div class="grow"><h3><i style="background:var(--manio)"></i>Etap 1 · klocki Mania</h3><div class="pieces" id="g-manio"></div></div>
-  <div class="grow"><h3><i style="background:var(--bimbo)"></i>Etap 2 · jamniki</h3><div class="pieces" id="g-bimbo"></div></div>
-  <div class="grow"><h3><i style="background:var(--koty)"></i>Etap 3 · Miłka i Tulka</h3><div class="pieces" id="g-koty"></div></div>
-</section>
-
-<section>
-  <div class="eyebrow">Jak działa gra</div>
-  <h2>Logika</h2>
-  <p>Zasady jak w klasycznych spadających klockach: obracasz, przesuwasz, pełny rząd znika. Co 10 zbitych linii świat zmienia się sam i gra przyspiesza. Mama nic nie wybiera, po prostu gra.</p>
-
-  <div class="timeline">
-    <div style="background:var(--manio)"><b>Manio</b><small>linie 0–9</small></div>
-    <div style="background:var(--bimbo)"><b>Bimbo</b><small>linie 10–19</small></div>
-    <div style="background:var(--koty)"><b>Miłka i Tulka</b><small>linie 20–29</small></div>
-    <div style="background:var(--chaos)"><b>Rodzinny chaos</b><small>od 30 linii do końca</small></div>
-  </div>
-
-  <div class="cols">
-    <div class="card">
-      <h3>Zmiana etapu</h3>
-      <ul>
-        <li>Gra staje na 2 sekundy. Plansza z napisem, np. „Manio skończył. Na kanapę wchodzi Bimbo!”.</li>
-        <li>Stare klocki zostają w starym stylu, więc jamniki lądują na kupach Mania, a koty na jamnikach.</li>
-        <li>Zmienia się tło, postać na górze i odgłosy.</li>
-        <li><b>Rodzinny chaos:</b> klocki losowo ze wszystkich trzech światów, a prędkość rośnie co 10 linii aż do przegranej.</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>Sterowanie</h3>
-      <ul>
-        <li><b>Telefon:</b> cztery duże przyciski pod planszą: ◀ ▶ przesuń, ⟳ obróć, ▼ zrzuć na dół. Dodatkowo stuknięcie w planszę obraca, a przesunięcie palcem w bok przesuwa.</li>
-        <li><b>Komputer:</b> strzałki, spacja zrzuca, P pauzuje.</li>
-        <li>Cień pokazuje, gdzie klocek wyląduje.</li>
-        <li>Bez „schowka” na klocek, żeby było prosto.</li>
-      </ul>
-    </div>
-    <div class="card">
-      <h3>Punkty i prędkość</h3>
-      <div class="tbl"><table>
-        <thead><tr><th>Zbite naraz</th><th class="n">Punkty × nr etapu</th></tr></thead>
-        <tbody><tr><td>1 linia</td><td class="n">100</td></tr><tr><td>2 linie</td><td class="n">300</td></tr><tr><td>3 linie</td><td class="n">500</td></tr><tr><td>4 linie</td><td class="n">800</td></tr></tbody>
-      </table></div>
-      <div class="tbl"><table>
-        <thead><tr><th>Etap</th><th class="n">Klocek opada o pole co</th></tr></thead>
-        <tbody><tr><td>Manio</td><td class="n">0,80 s</td></tr><tr><td>Bimbo</td><td class="n">0,55 s</td></tr><tr><td>Koty</td><td class="n">0,38 s</td></tr><tr><td>Chaos</td><td class="n">0,30 s → 0,10 s</td></tr></tbody>
-      </table></div>
-      <p class="muted" style="font-size:14px">Zrzut na dół daje 2 punkty za każde pole. Rekord zapisuje się w telefonie jako „Rekord Mamy”.</p>
-    </div>
-    <div class="card">
-      <h3>Urodzinowe ekrany</h3>
-      <ul>
-        <li><b>Start:</b> „Wszystkiego najlepszego, Mamo!”, tort ułożony z klocków ze świeczkami, a wokół Manio, Bimbo, Miłka i Tulka. Przycisk „Graj”.</li>
-        <li><b>Koniec gry:</b> „Koniec gry, ale urodziny trwają dalej!”, wynik, rekord i „Jeszcze raz”.</li>
-        <li><b>Nowy rekord:</b> konfetti z małych kupek, kości i kłębków włóczki.</li>
-        <li>Dźwięki robione w kodzie (plask, hau, miau), domyślnie wyciszone, z przyciskiem głośnika.</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3>Technicznie</h3>
-    <p>Jeden plik HTML, wszystko rysowane w kodzie, bez zdjęć i bez internetu po załadowaniu. Działa w przeglądarce na telefonie i na komputerze. Wrzucę go do repo w osobnym folderze <code>klocki/</code> i opublikuję jako link, który wyślesz Mamie. Te same rysunki, które widzisz tutaj, trafią do gry.</p>
-  </div>
-</section>
-
-<section class="ask">
-  <div class="eyebrow">Zanim zbuduję</div>
-  <h2>Do decyzji</h2>
-  <ol>
-    <li><b>Jak wygląda Bimbo?</b> Teraz jest rudy krótkowłosy. Może być czarny podpalany, długowłosy albo szorstkowłosy.</li>
-    <li><b>Miłka i Tulka:</b> czy dobrze, że Miłka jest jaśniejsza i śpiąca, a Tulka ciemniejsza w paski i psotna? Jakie mają oczy?</li>
-    <li><b>Zmiana etapu:</b> co 10 linii (zależy od gry Mamy) czy po czasie, np. co 3 minuty?</li>
-    <li><b>Mama gra</b> na telefonie czy na komputerze? Od tego zależy wielkość przycisków.</li>
-    <li><b>Ekran startowy:</b> chcesz dopisać imię Mamy, wiek albo własne życzenia?</li>
-  </ol>
-</section>
-
+<div class="modul">
+  <canvas id="ekran" width="240" height="320" aria-label="Ekran gry Kupa Klocków"></canvas>
+  <div class="kropka"></div>
 </div>
 
+<div class="sterowanie" aria-label="Sterowanie">
+  <button id="lewo" aria-label="W lewo"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <span></span>
+  <button id="obrot" class="pokretlo" aria-label="Obróć"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg></button>
+  <span></span>
+  <button id="prawo" aria-label="W prawo"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <div class="rzad2">
+    <button id="szybko" aria-label="Szybciej w dół (trzymaj)"><div><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg><small>TRZYMAJ</small></div></button>
+    <button id="zrzut" class="zrzut" aria-label="Zrzuć klocek"><div><svg viewBox="0 0 24 24"><path d="M12 4v13"/><path d="M6 12l6 6 6-6"/><path d="M5 21h14"/></svg><small>ZRZUĆ</small></div></button>
+    <button id="pauza" aria-label="Pauza"><svg viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></svg></button>
+  </div>
+</div>
+
+<p class="podpowiedz tylko-klawiatura"><kbd>← →</kbd> ruch · <kbd>↑</kbd> obrót · <kbd>↓</kbd> szybciej · <kbd>spacja</kbd> zrzut · <kbd>P</kbd> pauza</p>
+<p class="podpowiedz tylko-dotyk">na ekranie: stuknij = obrót · przesuń w bok = ruch · machnij w dół = zrzut</p>
+
+<div class="laduje" id="laduje">ŁADUJĘ KUPĘ KLOCKÓW…</div>
+
+<script src="/mamatetris/kupa.js"></script>
 <script>
-/* ---------- kształty (komórki w kolejności „ścieżki”, ważne dla jamników i kotów) ---------- */
-const SHAPES={
-  I:[[0,0],[1,0],[2,0],[3,0]],
-  O:[[0,0],[1,0],[1,1],[0,1]],
-  T:[[0,1],[1,1],[2,1],[1,0]],
-  S:[[0,1],[1,1],[1,0],[2,0]],
-  Z:[[0,0],[1,0],[1,1],[2,1]],
-  J:[[0,0],[0,1],[1,1],[2,1]],
-  L:[[2,0],[2,1],[1,1],[0,1]],
-};
-function rot(cells,r){
-  let c=cells.map(p=>p.slice());
-  for(let i=0;i<((r%4)+4)%4;i++){const h=Math.max(...c.map(p=>p[1]));c=c.map(([x,y])=>[h-y,x]);}
-  const mx=Math.min(...c.map(p=>p[0])),my=Math.min(...c.map(p=>p[1]));
-  return c.map(([x,y])=>[x-mx,y-my]);
-}
-const adj=(a,b)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])===1;
-const has=(cells,x,y)=>cells.some(c=>c[0]===x&&c[1]===y);
+(async () => {
+  const M = await KupaModule({ locateFile: p => "/mamatetris/" + p });
+  const cv = document.getElementById("ekran");
+  const ctx = cv.getContext("2d");
+  const obraz = ctx.createImageData(240, 320);
+  const ptr = M._kupa_rgba();
+  const N = 240 * 320 * 4;
+  (function rysuj() {
+    obraz.data.set(M.HEAPU8.subarray(ptr, ptr + N));
+    ctx.putImageData(obraz, 0, 0);
+    requestAnimationFrame(rysuj);
+  })();
+  document.getElementById("laduje").classList.add("znika");
 
-function setup(cv,w,h){
-  const r=Math.min(window.devicePixelRatio||1,3);
-  cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.aspectRatio=w+"/"+h;
-  const ctx=cv.getContext("2d");ctx.setTransform(r,0,0,r,0,0);return ctx;
-}
-function ell(ctx,x,y,rx,ry,a=0){ctx.beginPath();ctx.ellipse(x,y,Math.max(rx,.1),Math.max(ry,.1),a,0,Math.PI*2);}
-function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);}
-
-/* ---------- ETAP 1: kupy Mania ---------- */
-const POOP=[{b:"#7b4a25",d:"#4a2a11",l:"#a9733f"},{b:"#8f5d2c",d:"#573413",l:"#c18a55",corn:true},{b:"#663b1c",d:"#3d210c",l:"#93603a"},{b:"#7f5530",d:"#4c2f15",l:"#ae7f52"}];
-function swirl(ctx,cx,cy,s,p){
-  const tiers=[[.27,.47,.2],[.03,.37,.17],[-.19,.27,.14]];
-  ctx.lineWidth=s*.045;
-  for(const [dy,rx,ry] of tiers){
-    ell(ctx,cx,cy+dy*s,rx*s,ry*s);ctx.fillStyle=p.b;ctx.fill();ctx.strokeStyle=p.d;ctx.stroke();
-    ctx.beginPath();ctx.ellipse(cx-rx*.2*s,cy+dy*s-ry*.3*s,rx*.55*s,ry*.42*s,0,Math.PI*1.08,Math.PI*1.62);ctx.strokeStyle=p.l;ctx.lineWidth=s*.05;ctx.stroke();ctx.lineWidth=s*.045;
+  // Przycisk musi być wciśnięty co najmniej 70 ms, żeby gra go zauważyła (filtr drgań jak na płytce).
+  function przycisk(ustaw) {
+    let od = 0, puscZa = null;
+    return {
+      wcisnij() { clearTimeout(puscZa); od = performance.now(); ustaw(1); },
+      pusc() {
+        const ile = performance.now() - od;
+        clearTimeout(puscZa);
+        puscZa = setTimeout(() => ustaw(0), Math.max(0, 70 - ile));
+      },
+    };
   }
-  ctx.beginPath();ctx.moveTo(cx-.13*s,cy-.25*s);ctx.quadraticCurveTo(cx-.02*s,cy-.36*s,cx+.09*s,cy-.47*s);ctx.quadraticCurveTo(cx+.12*s,cy-.32*s,cx+.13*s,cy-.24*s);ctx.closePath();
-  ctx.fillStyle=p.b;ctx.fill();ctx.strokeStyle=p.d;ctx.stroke();
-}
-function drawPoop(ctx,cells,s,ox,oy,v,opt={}){
-  const p=POOP[v%POOP.length];const C=cells.map(([x,y])=>[ox+(x+.5)*s,oy+(y+.5)*s]);
-  ctx.fillStyle=p.b;
-  for(let i=0;i<cells.length;i++)for(let j=i+1;j<cells.length;j++)if(adj(cells[i],cells[j])&&cells[i][1]===cells[j][1]){
-    const x1=Math.min(C[i][0],C[j][0]),y=C[i][1];rr(ctx,x1,y+.08*s,s,.38*s,.12*s);ctx.fill();ctx.strokeStyle=p.d;ctx.lineWidth=s*.04;ctx.stroke();}
-  const order=C.map((c,i)=>i).sort((a,b)=>C[a][1]-C[b][1]).reverse();
-  for(const i of order)swirl(ctx,C[i][0],C[i][1],s,p);
-  if(p.corn){ctx.fillStyle="#f4cd4f";for(const [cx,cy] of C){ell(ctx,cx+.16*s,cy+.27*s,.05*s,.035*s,.4);ctx.fill();ell(ctx,cx-.12*s,cy+.04*s,.045*s,.03*s,-.3);ctx.fill();}}
-  if(opt.face!==false&&(v%2===0)){const [cx,cy]=C[Math.min(1,C.length-1)];
-    for(const sx of[-1,1]){ell(ctx,cx+sx*.12*s,cy+.01*s,.075*s,.085*s);ctx.fillStyle="#fff";ctx.fill();ell(ctx,cx+sx*.12*s+.015*s,cy+.025*s,.035*s,.045*s);ctx.fillStyle="#1b0f07";ctx.fill();}
-    ctx.beginPath();ctx.arc(cx,cy+.2*s,.11*s,.15*Math.PI,.85*Math.PI);ctx.strokeStyle="#2a1508";ctx.lineWidth=s*.045;ctx.stroke();}
-}
-function stink(ctx,x,y,s,t=0){ctx.strokeStyle="rgba(170,220,90,.75)";ctx.lineWidth=s*.07;ctx.lineCap="round";
-  for(let k=0;k<3;k++){ctx.beginPath();const bx=x+(k-1)*.32*s;ctx.moveTo(bx,y);for(let i=1;i<=6;i++)ctx.lineTo(bx+Math.sin(i*1.3+k+t)*.08*s,y-i*.12*s);ctx.stroke();}}
-function fly(ctx,x,y,s){ctx.fillStyle="rgba(230,240,255,.75)";ell(ctx,x-.1*s,y-.1*s,.1*s,.06*s,-.6);ctx.fill();ell(ctx,x+.1*s,y-.1*s,.1*s,.06*s,.6);ctx.fill();ctx.fillStyle="#141414";ell(ctx,x,y,.08*s,.06*s);ctx.fill();}
+  const enc = przycisk(d => M._kupa_enc(d));
+  const k0 = przycisk(d => M._kupa_key(d));
+  const krok = d => M._kupa_obrot(d);
+  const pauza = () => { k0.wcisnij(); setTimeout(() => M._kupa_key(0), 720); };
 
-/* ---------- ETAP 2: jamniki ---------- */
-const DACHS=[{b:"#b8622b",d:"#6c3311",bl:"#dc8c52"},{b:"#a95420",d:"#62300f",bl:"#d07f45"},{b:"#c26f37",d:"#733a16",bl:"#e39a62"}];
-function orient(ctx,dx,dy){if(dx<0)ctx.scale(-1,1);else if(dy<0)ctx.rotate(-Math.PI/2);else if(dy>0)ctx.rotate(Math.PI/2);}
-function dogHead(ctx,x,y,s,dx,dy,p,sleep,tongue){
-  ctx.save();ctx.translate(x,y);orient(ctx,dx,dy);
-  ctx.lineWidth=s*.04;ctx.strokeStyle=p.d;
-  ctx.fillStyle="#d8283c";rr(ctx,-.36*s,-.24*s,.12*s,.48*s,.05*s);ctx.fill();
-  ell(ctx,0,-.03*s,.32*s,.3*s);ctx.fillStyle=p.b;ctx.fill();ctx.stroke();
-  ell(ctx,.32*s,.06*s,.27*s,.15*s);ctx.fill();ctx.stroke();
-  if(tongue){ell(ctx,.36*s,.22*s,.07*s,.09*s);ctx.fillStyle="#ec6f86";ctx.fill();}
-  ell(ctx,.57*s,.02*s,.075*s,.065*s);ctx.fillStyle="#1a120f";ctx.fill();
-  if(sleep){ctx.beginPath();ctx.arc(.13*s,-.1*s,.06*s,.1*Math.PI,.9*Math.PI);ctx.strokeStyle="#1a120f";ctx.lineWidth=s*.04;ctx.stroke();}
-  else{ell(ctx,.13*s,-.11*s,.06*s,.065*s);ctx.fillStyle="#1a120f";ctx.fill();ell(ctx,.145*s,-.13*s,.02*s,.02*s);ctx.fillStyle="#fff";ctx.fill();
-    ctx.beginPath();ctx.moveTo(.06*s,-.22*s);ctx.lineTo(.2*s,-.2*s);ctx.strokeStyle=p.d;ctx.lineWidth=s*.035;ctx.stroke();}
-  ell(ctx,-.09*s,.1*s,.13*s,.27*s,.28);ctx.fillStyle=p.d;ctx.fill();
-  ctx.restore();
-}
-function dogTail(ctx,x,y,s,dx,dy,p){
-  ctx.save();ctx.translate(x,y);orient(ctx,dx,dy);ctx.lineCap="round";
-  ctx.beginPath();ctx.moveTo(.18*s,0);ctx.quadraticCurveTo(.46*s,-.02*s,.5*s,-.3*s);
-  ctx.strokeStyle=p.d;ctx.lineWidth=s*.15;ctx.stroke();ctx.strokeStyle=p.b;ctx.lineWidth=s*.08;ctx.stroke();ctx.restore();
-}
-function dogLegs(ctx,cx,cy,s,p){ctx.fillStyle=p.d;for(const ox of[-.22,.1]){rr(ctx,cx+ox*s,cy+.12*s,.13*s,.32*s,.06*s);ctx.fill();}}
-function drawDachs(ctx,cells,s,ox,oy,v,type,opt={}){
-  const p=DACHS[v%DACHS.length];let P=cells.map(([x,y])=>[ox+(x+.5)*s,oy+(y+.5)*s]);let K=cells.slice();
-  ctx.lineCap="round";ctx.lineJoin="round";
-  const strokePath=(pts,closed)=>{ctx.beginPath();ctx.moveTo(...pts[0]);for(let i=1;i<pts.length;i++)ctx.lineTo(...pts[i]);if(closed)ctx.closePath();
-    ctx.strokeStyle=p.d;ctx.lineWidth=s*.66;ctx.stroke();ctx.strokeStyle=p.b;ctx.lineWidth=s*.56;ctx.stroke();
-    ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]+.13*s);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]+.13*s);if(closed)ctx.closePath();ctx.strokeStyle=p.bl;ctx.lineWidth=s*.14;ctx.stroke();};
-  const legsAt=(idx)=>{for(const i of idx){const [x,y]=K[i];if(!has(K,x,y+1))dogLegs(ctx,P[i][0],P[i][1],s,p);}};
-  const dir=(a,b)=>[Math.sign(P[a][0]-P[b][0]),Math.sign(P[a][1]-P[b][1])];
-  if(type==="O"){
-    const mx=(P[0][0]+P[2][0])/2,my=(P[0][1]+P[2][1])/2;
-    legsAt([0,1,2,3].filter(i=>P[i][1]>my));
-    strokePath(P,true);ell(ctx,mx,my,.22*s,.22*s);ctx.fillStyle=p.b;ctx.fill();
-    const top=[0,1,2,3].filter(i=>P[i][1]<my).sort((a,b)=>P[a][0]-P[b][0]);
-    const bot=[0,1,2,3].filter(i=>P[i][1]>my).sort((a,b)=>P[a][0]-P[b][0]);
-    dogTail(ctx,P[bot[0]][0],P[bot[0]][1],s,-1,0,p);
-    dogHead(ctx,P[top[0]][0],P[top[0]][1],s,-1,0,p,true);
-    if(opt.zzz!==false){ctx.fillStyle="rgba(255,255,255,.85)";ctx.font=`${.34*s}px ${getComputedStyle(document.body).getPropertyValue("--display")}`;ctx.fillText("z",P[top[1]][0]+.05*s,P[top[1]][1]-.15*s);ctx.font=`${.26*s}px sans-serif`;ctx.fillText("z",P[top[1]][0]+.3*s,P[top[1]][1]-.38*s);}
-    return;
+  function podepnij(id, wcisnij, pusc) {
+    const el = document.getElementById(id);
+    const w = e => { e.preventDefault(); el.setPointerCapture?.(e.pointerId); el.classList.add("wcisniety"); wcisnij(); };
+    const p = e => { if (!el.classList.contains("wcisniety")) return; el.classList.remove("wcisniety"); pusc && pusc(); };
+    el.addEventListener("pointerdown", w);
+    el.addEventListener("pointerup", p);
+    el.addEventListener("pointercancel", p);
+    el.addEventListener("contextmenu", e => e.preventDefault());
   }
-  if(type==="T"){
-    legsAt([0,2]);strokePath([P[0],P[1],P[2]]);strokePath([P[1],P[3]]);
-    dogTail(ctx,P[0][0],P[0][1],s,...dir(0,1),p);
-    const d=dir(3,1);dogHead(ctx,P[3][0],P[3][1],s,d[0],d[1],p,false,v%2===0);return;
+  // ruch z powtarzaniem przy przytrzymaniu
+  function ruch(d) {
+    let t1 = null, t2 = null;
+    return [() => { krok(d); t1 = setTimeout(() => { t2 = setInterval(() => krok(d), 85); }, 230); },
+            () => { clearTimeout(t1); clearInterval(t2); }];
   }
-  // ścieżka: głowa na końcu, z którego patrzy poziomo
-  let d0=dir(0,1),d3=dir(3,2);
-  if(d0[0]===0&&d3[0]!==0){P=P.reverse();K=K.reverse();}
-  legsAt([1,2,3].filter((i,_,a)=>true));
-  strokePath(P);
-  dogTail(ctx,P[3][0],P[3][1],s,...dir(3,2),p);
-  const dh=dir(0,1);dogHead(ctx,P[0][0],P[0][1],s,dh[0],dh[1],p,false,v%3===1);
-}
+  podepnij("lewo", ...ruch(-1));
+  podepnij("prawo", ...ruch(1));
+  podepnij("obrot", () => enc.wcisnij(), () => enc.pusc());
+  podepnij("szybko", () => M._kupa_szybko(1), () => M._kupa_szybko(0));
+  podepnij("zrzut", () => k0.wcisnij(), () => k0.pusc());
+  podepnij("pauza", pauza);
 
-/* ---------- ETAP 3: koty ---------- */
-const CATS=[
-  {name:"Miłka",f:"#b9bdc6",d:"#868b95",w:"#f1f2f5",eye:"#bcd44a",sleepy:true},
-  {name:"Tulka",f:"#878d98",d:"#5b606a",w:"#dadde3",eye:"#efb93a",stripes:true}
-];
-function drawCat(ctx,cells,s,ox,oy,v,type,opt={}){
-  const p=CATS[v%2];const P=cells.map(([x,y])=>[ox+(x+.5)*s,oy+(y+.5)*s]);
-  const fillBody=(dy,col)=>{ctx.fillStyle=col;
-    for(const [cx,cy] of P){rr(ctx,cx-.46*s,cy-.44*s+dy,.92*s,.9*s,.34*s);ctx.fill();}
-    for(let i=0;i<cells.length;i++)for(let j=i+1;j<cells.length;j++)if(adj(cells[i],cells[j])){
-      const [x1,y1]=P[i],[x2,y2]=P[j];
-      if(y1===y2)ctx.fillRect(Math.min(x1,x2),y1-.44*s+dy,s,.9*s);else ctx.fillRect(x1-.46*s,Math.min(y1,y2)+dy,.92*s,s);}};
-  // ogon
-  let head,tail;
-  if(type==="O"){head=cells.reduce((a,c,i)=>(c[1]<cells[a][1]||(c[1]===cells[a][1]&&c[0]<cells[a][0]))?i:a,0);}
-  else if(type==="T"){head=3;tail=0;}
-  else{const free=i=>!has(cells,cells[i][0],cells[i][1]-1);head=free(0)?0:(free(3)?3:0);tail=head===0?3:0;}
-  if(type==="O"){
-    const bottom=P.filter(q=>q[1]>Math.min(...P.map(z=>z[1]))).sort((a,b)=>b[0]-a[0]);
-    ctx.lineCap="round";ctx.beginPath();ctx.moveTo(bottom[0][0]+.38*s,bottom[0][1]+.1*s);ctx.quadraticCurveTo(bottom[0][0]+.3*s,bottom[0][1]+.52*s,bottom[1][0],bottom[1][1]+.42*s);
-    ctx.strokeStyle=p.d;ctx.lineWidth=s*.2;ctx.stroke();ctx.strokeStyle=p.f;ctx.lineWidth=s*.13;ctx.stroke();
-  }else{
-    const nb=tail===0?1:2;const dx=Math.sign(P[tail][0]-P[nb][0]),dy=Math.sign(P[tail][1]-P[nb][1]);
-    const [tx,ty]=P[tail];ctx.lineCap="round";ctx.beginPath();
-    const sx=tx+dx*.36*s,sy=ty+dy*.36*s;ctx.moveTo(sx,sy);
-    const ex=sx+(dx?dx*.32*s:.3*s),ey=sy+(dy?dy*.32*s:-.0*s)-(dx?.42*s:0);
-    ctx.quadraticCurveTo(sx+dx*.38*s+(dy?.25*s:0),sy+dy*.38*s,ex,ey);
-    ctx.strokeStyle=p.d;ctx.lineWidth=s*.21;ctx.stroke();ctx.strokeStyle=p.f;ctx.lineWidth=s*.14;ctx.stroke();
-    ell(ctx,ex,ey,.07*s,.07*s);ctx.fillStyle=p.d;ctx.fill();
-  }
-  fillBody(.05*s,p.d);fillBody(0,p.f);
-  if(p.stripes){ctx.strokeStyle=p.d;ctx.lineWidth=s*.065;ctx.lineCap="round";
-    P.forEach(([cx,cy],i)=>{if(i===head)return;for(const k of[-.18,0,.18]){ctx.beginPath();ctx.moveTo(cx+k*s-.05*s,cy-.36*s);ctx.quadraticCurveTo(cx+k*s+.04*s,cy-.22*s,cx+k*s-.02*s,cy-.1*s);ctx.stroke();}});}
-  // łapki
-  if(type!=="O")P.forEach(([cx,cy],i)=>{const [x,y]=cells[i];if(!has(cells,x,y+1)&&i!==head){ctx.fillStyle=p.w;for(const o of[-.15,.15]){ell(ctx,cx+o*s,cy+.4*s,.11*s,.07*s);ctx.fill();}}});
-  else{const lows=P.filter(q=>q[1]>Math.min(...P.map(z=>z[1])));ctx.fillStyle=p.w;for(const [cx,cy] of lows){ell(ctx,cx-.05*s,cy+.41*s,.13*s,.06*s);ctx.fill();}}
-  // głowa
-  const [hx,hy]=P[head];
-  ctx.fillStyle=p.f;ctx.strokeStyle=p.d;ctx.lineWidth=s*.04;
-  for(const sx of[-1,1]){ctx.beginPath();ctx.moveTo(hx+sx*.38*s,hy-.18*s);ctx.lineTo(hx+sx*.3*s,hy-.62*s);ctx.lineTo(hx+sx*.06*s,hy-.36*s);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.beginPath();ctx.moveTo(hx+sx*.31*s,hy-.27*s);ctx.lineTo(hx+sx*.28*s,hy-.5*s);ctx.lineTo(hx+sx*.15*s,hy-.35*s);ctx.closePath();ctx.fillStyle="#e7a3ae";ctx.fill();ctx.fillStyle=p.f;}
-  rr(ctx,hx-.42*s,hy-.4*s,.84*s,.8*s,.32*s);ctx.fill();
-  ell(ctx,hx,hy+.17*s,.22*s,.14*s);ctx.fillStyle=p.w;ctx.fill();
-  for(const sx of[-1,1]){const ex=hx+sx*.17*s,ey=hy-.05*s;
-    ell(ctx,ex,ey,.105*s,.09*s);ctx.fillStyle=p.eye;ctx.fill();
-    ell(ctx,ex,ey,.028*s,.075*s);ctx.fillStyle="#111";ctx.fill();
-    if(p.sleepy){ctx.beginPath();ctx.ellipse(ex,ey,.115*s,.1*s,0,Math.PI,Math.PI*2);ctx.fillStyle=p.f;ctx.fill();ctx.beginPath();ctx.moveTo(ex-.115*s,ey);ctx.lineTo(ex+.115*s,ey);ctx.strokeStyle=p.d;ctx.lineWidth=s*.035;ctx.stroke();}}
-  ctx.beginPath();ctx.moveTo(hx-.06*s,hy+.09*s);ctx.lineTo(hx+.06*s,hy+.09*s);ctx.lineTo(hx,hy+.16*s);ctx.closePath();ctx.fillStyle="#e48a9b";ctx.fill();
-  ctx.beginPath();ctx.moveTo(hx,hy+.16*s);ctx.quadraticCurveTo(hx-.04*s,hy+.24*s,hx-.09*s,hy+.2*s);ctx.moveTo(hx,hy+.16*s);ctx.quadraticCurveTo(hx+.04*s,hy+.24*s,hx+.09*s,hy+.2*s);ctx.strokeStyle="#5a4c50";ctx.lineWidth=s*.03;ctx.stroke();
-  ctx.strokeStyle="rgba(255,255,255,.8)";ctx.lineWidth=s*.022;
-  for(const sx of[-1,1])for(const k of[-.05,.03]){ctx.beginPath();ctx.moveTo(hx+sx*.17*s,hy+.15*s+k*s);ctx.lineTo(hx+sx*.5*s,hy+.12*s+k*2.2*s);ctx.stroke();}
-}
-function paw(ctx,x,y,s,dir,p){ctx.save();ctx.translate(x,y);ctx.scale(dir,1);
-  rr(ctx,-1.2*s,-.22*s,1.2*s,.44*s,.22*s);ctx.fillStyle=p.f;ctx.fill();
-  ell(ctx,.02*s,0,.26*s,.24*s);ctx.fillStyle=p.w;ctx.fill();
-  ctx.fillStyle="#e7a3ae";for(const [a,b] of[[.1,-.1],[.14,.03],[.1,.14]]){ell(ctx,a*s,b*s,.045*s,.04*s);ctx.fill();}
-  ctx.restore();}
-
-/* ---------- Manio (wyżeł weimarski) ---------- */
-function drawManio(ctx,x,y,u,flip=false){
-  // u = skala; rysunek w pudełku ~100x66
-  ctx.save();ctx.translate(x,y);if(flip){ctx.scale(-1,1);}ctx.scale(u/100,u/100);
-  const B="#aaa59c",D="#8a847a",L="#c6c1b8";
-  ctx.lineCap="round";ctx.lineJoin="round";
-  // ogon
-  ctx.beginPath();ctx.moveTo(22,30);ctx.quadraticCurveTo(10,22,9,8);ctx.strokeStyle=D;ctx.lineWidth=7;ctx.stroke();ctx.strokeStyle=B;ctx.lineWidth=4.5;ctx.stroke();
-  // tylna noga zgięta
-  ell(ctx,30,43,15,13);ctx.fillStyle=D;ctx.fill();
-  rr(ctx,22,52,22,7,3.5);ctx.fill();
-  // przednie nogi
-  ctx.fillStyle=D;rr(ctx,61,36,7,26,3.5);ctx.fill();ctx.fillStyle=B;rr(ctx,69,36,7,26,3.5);ctx.fill();
-  // tułów
-  ell(ctx,47,34,28,14,-.32);ctx.fillStyle=B;ctx.fill();
-  ell(ctx,46,40,18,6,-.32);ctx.fillStyle=L;ctx.fill();
-  ell(ctx,30,42,14,12);ctx.fillStyle=B;ctx.fill();
-  // szyja + głowa
-  ctx.beginPath();ctx.moveTo(62,32);ctx.lineTo(77,14);ctx.strokeStyle=B;ctx.lineWidth=15;ctx.stroke();
-  rr(ctx,64,24,13,4,2);ctx.fillStyle="#3b6fd1";ctx.fill();
-  ell(ctx,79,14,11,10);ctx.fillStyle=B;ctx.fill();
-  ell(ctx,90,19,10,6,.15);ctx.fill();
-  ell(ctx,99,18.5,2.8,2.4);ctx.fillStyle="#7a5a5c";ctx.fill();
-  ell(ctx,74,20,5,11,.35);ctx.fillStyle=D;ctx.fill();
-  // oko bursztynowe + skupienie
-  ell(ctx,83,11.5,2.9,2.7);ctx.fillStyle="#e7a83c";ctx.fill();ell(ctx,83.6,11.7,1.3,1.5);ctx.fillStyle="#2a1a0c";ctx.fill();
-  ctx.beginPath();ctx.moveTo(79,6.5);ctx.lineTo(87,8.5);ctx.strokeStyle="#6f6a61";ctx.lineWidth=1.6;ctx.stroke();
-  // pot
-  ctx.fillStyle="#8fd3ff";ell(ctx,72,4,1.8,2.6);ctx.fill();ell(ctx,92,3,1.5,2.2);ctx.fill();
-  ctx.restore();
-}
-
-/* ---------- plansze ---------- */
-function board(w,h){return{w,h,g:Array.from({length:h},()=>Array(w).fill(0)),pieces:[]};}
-function fits(b,cells,x,y){return cells.every(([cx,cy])=>{const X=x+cx,Y=y+cy;return X>=0&&X<b.w&&Y<b.h&&(Y<0||!b.g[Y][X]);});}
-function dropP(b,t,r,x,theme,v){const c=rot(SHAPES[t],r);let y=-3;while(fits(b,c,x,y+1))y++;const abs=c.map(([cx,cy])=>[x+cx,y+cy]);abs.forEach(([X,Y])=>{if(Y>=0)b.g[Y][X]=1;});b.pieces.push({t,theme,v,cells:abs});return y;}
-function ghostY(b,c,x){let y=0;while(fits(b,c,x,y+1))y++;return y;}
-function drawPiece(ctx,theme,t,cells,s,ox,oy,v,opt){
-  if(theme==="manio")drawPoop(ctx,cells,s,ox,oy,v,opt);
-  else if(theme==="bimbo")drawDachs(ctx,cells,s,ox,oy,v,t,opt);
-  else drawCat(ctx,cells,s,ox,oy,v,t,opt);
-}
-function pop(ctx,txt,x,y,size,fill,rotA=0){ctx.save();ctx.translate(x,y);ctx.rotate(rotA);
-  ctx.font=`${size}px "Lilita One", sans-serif`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.lineJoin="round";
-  ctx.lineWidth=size*.28;ctx.strokeStyle="#1b1424";ctx.strokeText(txt,0,0);ctx.fillStyle=fill;ctx.fillText(txt,0,0);ctx.restore();}
-function bubble(ctx,txt,x,y,size){ctx.save();ctx.font=`${size}px "Lilita One", sans-serif`;const w=ctx.measureText(txt).width+size*1.1,h=size*1.7;
-  rr(ctx,x-w/2,y-h/2,w,h,h/2);ctx.fillStyle="#fff";ctx.fill();ctx.beginPath();ctx.moveTo(x+w*.15,y+h/2-1);ctx.lineTo(x+w*.32,y+h/2+size*.7);ctx.lineTo(x+w*.32,y+h/2-1);ctx.fill();
-  ctx.fillStyle="#241e35";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(txt,x,y+1);ctx.restore();}
-
-const COLS=10,ROWS=16,S=26,TOP=2.6*S;
-function bg(ctx,theme,W,H){
-  if(theme==="manio"){
-    let g=ctx.createLinearGradient(0,0,0,TOP);g.addColorStop(0,"#9bd3f0");g.addColorStop(1,"#cfeaf4");ctx.fillStyle=g;ctx.fillRect(0,0,W,TOP);
-    ctx.fillStyle="#5aa64a";ctx.fillRect(0,TOP-.45*S,W,.45*S);
-    g=ctx.createLinearGradient(0,TOP,0,H);g.addColorStop(0,"#3f8a39");g.addColorStop(1,"#2c6a28");ctx.fillStyle=g;ctx.fillRect(0,TOP,W,H-TOP);
-    ctx.strokeStyle="rgba(150,210,110,.22)";ctx.lineWidth=1.2;
-    for(let i=0;i<70;i++){const x=(i*53.7)%W,y=TOP+((i*97.3)%(H-TOP));ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-2,y-6);ctx.moveTo(x+3,y);ctx.lineTo(x+4,y-5);ctx.stroke();}
-  }else if(theme==="bimbo"){
-    ctx.fillStyle="#e2c48e";ctx.fillRect(0,0,W,TOP);
-    ctx.fillStyle="#d3b37c";for(let x=0;x<W;x+=18)ctx.fillRect(x,0,9,TOP);
-    ctx.fillStyle="#1f5a60";ctx.fillRect(0,TOP,W,H-TOP);
-    ctx.fillStyle="rgba(255,255,255,.05)";
-    for(let y=TOP;y<H;y+=S*2)for(let x=0;x<W;x+=S*2){ctx.beginPath();ctx.moveTo(x+S,y);ctx.lineTo(x+2*S,y+S);ctx.lineTo(x+S,y+2*S);ctx.lineTo(x,y+S);ctx.closePath();ctx.fill();}
-  }else{
-    const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#1a2045");g.addColorStop(1,"#2c3668");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    ctx.fillStyle="rgba(255,255,255,.75)";for(let i=0;i<34;i++){const x=(i*61.3)%W,y=TOP+((i*113.7)%(H-TOP));ell(ctx,x,y,.9,.9);ctx.fill();}
-    ell(ctx,W-1.3*S,TOP+1.6*S,.75*S,.75*S);ctx.fillStyle="#f3e7b5";ctx.fill();ell(ctx,W-1.05*S,TOP+1.45*S,.65*S,.65*S);ctx.fillStyle="#222a57";ctx.fill();
-    ctx.fillStyle="#6b4a33";ctx.fillRect(0,TOP-.35*S,W,.35*S);ctx.fillStyle="#86603f";ctx.fillRect(0,TOP-.35*S,W,.08*S);
-  }
-  ctx.strokeStyle="rgba(255,255,255,.055)";ctx.lineWidth=1;
-  for(let x=1;x<COLS;x++){ctx.beginPath();ctx.moveTo(x*S,TOP);ctx.lineTo(x*S,H);ctx.stroke();}
-  for(let y=1;y<ROWS;y++){ctx.beginPath();ctx.moveTo(0,TOP+y*S);ctx.lineTo(COLS*S,TOP+y*S);ctx.stroke();}
-}
-function ghost(ctx,cells,ox,oy){ctx.strokeStyle="rgba(255,255,255,.45)";ctx.setLineDash([4,3]);ctx.lineWidth=1.5;
-  for(const [x,y] of cells){rr(ctx,ox+x*S+3,oy+y*S+3,S-6,S-6,6);ctx.stroke();}ctx.setLineDash([]);}
-
-function mock(id,theme,seq,cur,extras){
-  const W=COLS*S,H=TOP+ROWS*S;const ctx=setup(document.getElementById(id),W,H);
-  bg(ctx,theme,W,H);
-  const b=board(COLS,ROWS);
-  for(const [t,r,x,th,v] of seq)dropP(b,t,r,x,th||theme,v);
-  const cc=rot(SHAPES[cur.t],cur.r);
-  const gy=ghostY(b,cc,cur.x);
-  ghost(ctx,cc.map(([x,y])=>[x+cur.x,y+gy]),0,TOP);
-  for(const p of b.pieces)drawPiece(ctx,p.theme,p.t,p.cells,S,0,TOP,p.v);
-  drawPiece(ctx,cur.theme||theme,cur.t,cc.map(([x,y])=>[x+cur.x,y+cur.y]),S,0,TOP,cur.v);
-  extras(ctx,W,H,b);
-}
-function nextBox(id,theme,t,v){const w=60,h=40;const ctx=setup(document.getElementById(id),w,h);const c=rot(SHAPES[t],0);
-  const cw=Math.max(...c.map(p=>p[0]))+1,ch=Math.max(...c.map(p=>p[1]))+1;const s=Math.min(13,(w-12)/cw,(h-10)/ch);
-  drawPiece(ctx,theme,t,c,s,(w-cw*s)/2,(h-ch*s)/2,v,{zzz:false});}
-
-function render(){
-  /* --- Etap 1 --- */
-  mock("b1","manio",[
-    ["I",0,0,0,0],["O",0,4,0,1],["L",2,6,0,2],["J",0,7,0,3],["S",0,0,0,1],["T",2,4,0,2],["Z",1,8,0,0],["I",1,3,0,3],["O",0,1,0,0],["L",0,5,0,1]
-  ],{t:"T",r:0,x:4,y:0,v:0},(ctx,W,H,b)=>{
-    drawManio(ctx,3.2*S,.2*S,4.2*S);
-    bubble(ctx,"Uff… idzie!",7.6*S,.85*S,11);
-    stink(ctx,1.6*S,TOP+9.3*S,S);fly(ctx,1.2*S,TOP+8.2*S,S);fly(ctx,2.6*S,TOP+7.6*S,S);fly(ctx,8.4*S,TOP+9.1*S,S);
-    pop(ctx,"PLASK!",7.3*S,TOP+10.9*S,22,"#ffd84a",-.12);
+  // klawiatura
+  const wcisniete = new Set();
+  addEventListener("keydown", e => {
+    const k = e.key;
+    if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " ", "Enter"].includes(k)) e.preventDefault();
+    if (k === "ArrowLeft" || k === "a") krok(-1);
+    else if (k === "ArrowRight" || k === "d") krok(1);
+    if (e.repeat || wcisniete.has(k)) return;
+    wcisniete.add(k);
+    if (k === "ArrowUp" || k === "w" || k === "x") enc.wcisnij();
+    else if (k === "ArrowDown" || k === "s") M._kupa_szybko(1);
+    else if (k === " " || k === "Enter") k0.wcisnij();
+    else if (k === "p" || k === "Escape") pauza();
   });
-  nextBox("n1","manio","L",1);
-  /* --- Etap 2 --- */
-  mock("b2","bimbo",[
-    ["I",0,0,"manio",0],["O",0,4,"manio",1],["J",0,6,"manio",3],["Z",0,0,"manio",2],
-    ["I",0,6,0,0],["L",0,3,0,1],["O",0,8,0,2],["S",0,0,0,0],["T",2,4,0,1],["J",1,8,0,2],["Z",0,1,0,1]
-  ],{t:"I",r:0,x:3,y:1,v:1},(ctx,W,H)=>{
-    ctx.fillStyle="#7e3d2a";rr(ctx,.3*S,.55*S,W-.6*S,1.55*S,.5*S);ctx.fill();
-    ctx.fillStyle="#9a4c34";rr(ctx,.3*S,1.3*S,W-.6*S,.8*S,.35*S);ctx.fill();
-    rr(ctx,.1*S,.9*S,.9*S,1.3*S,.4*S);ctx.fill();rr(ctx,W-S,.9*S,.9*S,1.3*S,.4*S);ctx.fill();
-    drawDachs(ctx,[[0,0],[1,0],[2,0],[3,0]],S*.9,6.1*S,.55*S,0,"I");
-    pop(ctx,"HAU!",2.2*S,1.15*S,20,"#fff",-.15);
-    pop(ctx,"HAU!",8.2*S,TOP+10.2*S,18,"#ffd84a",.12);
+  addEventListener("keyup", e => {
+    const k = e.key;
+    wcisniete.delete(k);
+    if (k === "ArrowUp" || k === "w" || k === "x") enc.pusc();
+    else if (k === "ArrowDown" || k === "s") M._kupa_szybko(0);
+    else if (k === " " || k === "Enter") k0.pusc();
   });
-  nextBox("n2","bimbo","O",2);
-  /* --- Etap 3 --- */
-  mock("b3","koty",[
-    ["I",0,0,"manio",2],["J",0,4,"manio",1],["O",0,8,"bimbo",0],["L",0,0,"bimbo",1],["T",0,5,"bimbo",2],
-    ["O",0,0,0,0],["I",1,9,0,1],["S",0,3,0,0],["Z",0,6,0,1],["J",3,2,0,1],["L",1,6,0,0]
-  ],{t:"Z",r:0,x:3,y:2,v:1},(ctx,W,H)=>{
-    drawCat(ctx,[[0,0],[1,0],[1,1],[0,1]],S*.95,.4*S,.05*S,0,"O");
-    paw(ctx,2.85*S,TOP+2.9*S,S,1,CATS[1]);
-    pop(ctx,"Tulka zepchnęła!",5.4*S,TOP+.6*S,17,"#ffd84a",-.06);
-    ctx.strokeStyle="#ffd84a";ctx.lineWidth=3;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(6.6*S,TOP+3.7*S);ctx.lineTo(7.6*S,TOP+3.7*S);ctx.moveTo(7.3*S,TOP+3.4*S);ctx.lineTo(7.6*S,TOP+3.7*S);ctx.lineTo(7.3*S,TOP+4*S);ctx.stroke();
-    pop(ctx,"mrrr…",7.9*S,1.2*S,16,"#fff",.08);
+
+  // gesty na ekranie: stuknięcie = obrót, przesunięcie w bok = ruch, machnięcie w dół = zrzut
+  let g = null;
+  cv.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    cv.setPointerCapture(e.pointerId);
+    g = { x: e.clientX, y: e.clientY, t: performance.now(), krokX: e.clientX, ruszyl: false };
   });
-  nextBox("n3","koty","O",0);
-
-  /* --- obsada --- */
-  {const ctx=setup(document.getElementById("c-manio"),150,110);ctx.fillStyle="#5aa64a";rr(ctx,8,92,134,10,5);ctx.fill();drawManio(ctx,18,30,112);drawPoop(ctx,[[0,0]],22,15,80,1,{face:false});}
-  {const ctx=setup(document.getElementById("c-bimbo"),150,110);drawDachs(ctx,[[0,0],[1,0],[2,0],[3,0]],30,14,40,0,"I");}
-  {const ctx=setup(document.getElementById("c-milka"),150,110);drawCat(ctx,[[0,0],[1,0],[1,1],[0,1]],36,39,30,0,"O");}
-  {const ctx=setup(document.getElementById("c-tulka"),150,110);drawCat(ctx,[[0,0],[1,0],[1,1],[0,1]],36,39,30,1,"O");}
-
-  /* --- galeria --- */
-  const names={
-    manio:{I:"Rekordowa",O:"Kopczyk",T:"Tron",S:"Ślizgawka",Z:"Zygzak",J:"Haczyk",L:"Kolanko"},
-    bimbo:{I:"Parówka",O:"Precel (śpi)",T:"Peryskop",S:"Slalom",Z:"Zakręt",J:"Ogon do góry",L:"Siad"},
-    koty:{I:"Kot rozciągnięty",O:"Kocia bułka",T:"Kot na straży",S:"Kot płynny",Z:"Przeciąganie",J:"Kot w pudełku",L:"Kot na kanapie"}
+  cv.addEventListener("pointermove", e => {
+    if (!g) return;
+    const kratka = cv.clientWidth / 240 * 12 * 1.4;   // jedna kratka planszy z zapasem
+    while (e.clientX - g.krokX > kratka) { krok(1); g.krokX += kratka; g.ruszyl = true; }
+    while (g.krokX - e.clientX > kratka) { krok(-1); g.krokX -= kratka; g.ruszyl = true; }
+  });
+  const koniecGestu = e => {
+    if (!g) return;
+    const dx = e.clientX - g.x, dy = e.clientY - g.y, dt = performance.now() - g.t;
+    if (!g.ruszyl && dy > 50 && dy > Math.abs(dx) * 1.5 && dt < 450) { k0.wcisnij(); k0.pusc(); }
+    else if (!g.ruszyl && Math.hypot(dx, dy) < 12 && dt < 350) { enc.wcisnij(); enc.pusc(); }
+    g = null;
   };
-  const bgc={manio:"#3a8235",bimbo:"#1f5a60",koty:"#252d58"};
-  for(const theme of["manio","bimbo","koty"]){
-    const host=document.getElementById("g-"+theme);host.innerHTML="";
-    Object.keys(SHAPES).forEach((t,i)=>{
-      const f=document.createElement("figure");const cv=document.createElement("canvas");const cap=document.createElement("figcaption");
-      cap.textContent=names[theme][t];f.append(cv,cap);host.append(f);
-      const s=24,W=4.8*s,H=3.2*s;const ctx=setup(cv,W,H);ctx.fillStyle=bgc[theme];ctx.fillRect(0,0,W,H);
-      const c=rot(SHAPES[t],0);const cw=Math.max(...c.map(p=>p[0]))+1,ch=Math.max(...c.map(p=>p[1]))+1;
-      drawPiece(ctx,theme,t,c,s,(W-cw*s)/2,(H-ch*s)/2+(theme==="koty"?.15*s:0),i);
-    });
-  }
-}
-(document.fonts?document.fonts.ready:Promise.resolve()).then(render);
-</script>
+  cv.addEventListener("pointerup", koniecGestu);
+  cv.addEventListener("pointercancel", () => { g = null; });
 
-</body></html>
+  // pod telefonem nie przewijaj strony przy graniu
+  document.addEventListener("touchmove", e => e.preventDefault(), { passive: false });
+})();
+</script>
+</body>
+</html>
